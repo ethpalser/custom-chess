@@ -19,4 +19,23 @@ class CoordinateTest {
         Coordinate coordinate = new Coordinate(0, 0);
         assertNotNull(coordinate);
     }
+
+    @Test
+    void parseString_invalidFormat_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, Coordinate.parseString("aa"));
+        assertThrows(IllegalArgumentException.class, Coordinate.parseString("abc"));
+    }
+
+    @Test
+    void parseString_outOfBounds_throwsIndexOutOfBoundsException() {
+        assertThrows(IndexOutOfBoundsException.class, Coordinate.parseString("a9"));
+        assertThrows(IndexOutOfBoundsException.class, Coordinate.parseString("i1"));
+    }
+
+    @Test
+    void parseString_inBounds_isNotNull() {
+        Coordinate coordinate = Coordinate.parseString("a1");
+        assertNotNull(coordinate);
+    }
+
 }
