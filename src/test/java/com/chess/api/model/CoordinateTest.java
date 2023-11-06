@@ -1,7 +1,6 @@
 package com.chess.api.model;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class CoordinateTest {
@@ -22,20 +21,22 @@ class CoordinateTest {
 
     @Test
     void parseString_invalidFormat_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, Coordinate.parseString("aa"));
-        assertThrows(IllegalArgumentException.class, Coordinate.parseString("abc"));
+        assertThrows(IllegalArgumentException.class, () -> Coordinate.parseString("a"));
+        assertThrows(IllegalArgumentException.class, () -> Coordinate.parseString("abc"));
     }
 
     @Test
     void parseString_outOfBounds_throwsIndexOutOfBoundsException() {
-        assertThrows(IndexOutOfBoundsException.class, Coordinate.parseString("a9"));
-        assertThrows(IndexOutOfBoundsException.class, Coordinate.parseString("i1"));
+        assertThrows(IndexOutOfBoundsException.class, () -> Coordinate.parseString("a9"));
+        assertThrows(IndexOutOfBoundsException.class, () -> Coordinate.parseString("i1"));
     }
 
     @Test
     void parseString_inBounds_isNotNull() {
         Coordinate coordinate = Coordinate.parseString("a1");
         assertNotNull(coordinate);
+        assertEquals(0, coordinate.getPosX());
+        assertEquals(0, coordinate.getPosY());
     }
 
 }
