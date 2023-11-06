@@ -1,19 +1,22 @@
 package com.chess.api.model;
 
-import java.text.ParseException;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
-public class CoordinateTest {
+class CoordinateTest {
 
-    public void initialize_fromIntegersAndOutOfBounds_throwsIndexOutOfBoundsException() {
-        Assert.assertThrows(null, IndexOutOfBoundsException.class, new Coordinate(0, 8));
-        Assert.assertThrows(null, IndexOutOfBoundsException.class, new Coordinate(0, -1));
-        Assert.assertThrows(null, IndexOutOfBoundsException.class, new Coordinate(8, 0));
-        Assert.assertThrows(null, IndexOutOfBoundsException.class, new Coordinate(-1, 0));
+    @Test
+    void initialize_fromIntegersAndOutOfBounds_throwsIndexOutOfBoundsException() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(0, 8));
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(0, -1));
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(8, 0));
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(-1, 0));
     }
 
-    public void initialize_fromIntegersAndInBounds_isNotNull() {
+    @Test
+    void initialize_fromIntegersAndInBounds_isNotNull() {
         Coordinate coordinate = new Coordinate(0, 0);
-        Assert.assertNotNull(coordinate);
+        assertNotNull(coordinate);
     }
 }
