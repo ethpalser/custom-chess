@@ -1,5 +1,6 @@
 package com.chess.api.model.piece;
 
+import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -54,12 +55,12 @@ class BishopTest {
         Coordinate start = new Coordinate(x, y);
         Bishop bishop = new Bishop(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(3, 1);
+        int nextX = 3;
+        int nextY = 1;
+        Coordinate next = new Coordinate(nextX, nextY);
         bishop.setCoordinate(next);
-        assertEquals(x, bishop.getCoordinate().getX());
-        assertEquals(y, bishop.getCoordinate().getY());
-        assertFalse(bishop.isMoved());
+        assertEquals(nextX, bishop.getCoordinate().getX());
+        assertEquals(nextY, bishop.getCoordinate().getY());
+        assertTrue(bishop.isMoved());
     }
-    }
-
 }

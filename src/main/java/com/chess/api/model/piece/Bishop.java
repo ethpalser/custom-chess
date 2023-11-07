@@ -1,5 +1,6 @@
 package com.chess.api.model.piece;
 
+import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
 import lombok.Getter;
 import lombok.NonNull;
