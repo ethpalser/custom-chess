@@ -20,6 +20,20 @@ class CoordinateTest {
     }
 
     @Test
+    void initialize_fromCharsAndOutOfBounds_throwsIndexOutOfBoundsException() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate('a', 'a'));
+        assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate('1', '1'));
+    }
+
+    @Test
+    void initialize_fromCharsAndInBounds_isNotNull() {
+        Coordinate coordinate = new Coordinate('a', '1');
+        assertNotNull(coordinate);
+        assertEquals(0, coordinate.getX());
+        assertEquals(0, coordinate.getY());
+    }
+
+    @Test
     void parseString_invalidFormat_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> Coordinate.parseString("a"));
         assertThrows(IllegalArgumentException.class, () -> Coordinate.parseString("abc"));
