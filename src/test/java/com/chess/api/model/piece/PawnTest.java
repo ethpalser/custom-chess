@@ -22,7 +22,7 @@ class PawnTest {
         Coordinate start = new Coordinate(x, y);
         Pawn pawn = new Pawn(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(2, 0);
+        Coordinate next = new Coordinate(x, y);
         pawn.setCoordinate(next);
         assertEquals(x, pawn.getCoordinate().getX());
         assertEquals(y, pawn.getCoordinate().getY());

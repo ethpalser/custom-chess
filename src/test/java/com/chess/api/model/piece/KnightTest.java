@@ -22,7 +22,7 @@ class KnightTest {
         Coordinate start = new Coordinate(x, y);
         Knight knight = new Knight(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(2, 2);
+        Coordinate next = new Coordinate(x, y);
         knight.setCoordinate(next);
         assertEquals(x, knight.getCoordinate().getX());
         assertEquals(y, knight.getCoordinate().getY());

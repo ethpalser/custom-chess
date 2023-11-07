@@ -22,7 +22,7 @@ class KingTest {
         Coordinate start = new Coordinate(x, y);
         King king = new King(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(4, 0);
+        Coordinate next = new Coordinate(x, y);
         king.setCoordinate(next);
         assertEquals(x, king.getCoordinate().getX());
         assertEquals(y, king.getCoordinate().getY());

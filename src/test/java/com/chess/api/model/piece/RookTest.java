@@ -22,7 +22,7 @@ class RookTest {
         Coordinate start = new Coordinate(x, y);
         Rook rook = new Rook(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(2, 0);
+        Coordinate next = new Coordinate(x, y);
         rook.setCoordinate(next);
         assertEquals(x, rook.getCoordinate().getX());
         assertEquals(y, rook.getCoordinate().getY());

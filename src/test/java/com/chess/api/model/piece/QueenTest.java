@@ -22,7 +22,7 @@ class QueenTest {
         Coordinate start = new Coordinate(x, y);
         Queen queen = new Queen(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(2, 1);
+        Coordinate next = new Coordinate(x, y);
         queen.setCoordinate(next);
         assertEquals(x, queen.getCoordinate().getX());
         assertEquals(y, queen.getCoordinate().getY());

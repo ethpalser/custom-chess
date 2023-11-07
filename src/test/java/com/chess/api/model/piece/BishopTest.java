@@ -22,7 +22,7 @@ class BishopTest {
         Coordinate start = new Coordinate(x, y);
         Bishop bishop = new Bishop(Colour.WHITE, start);
 
-        Coordinate next = new Coordinate(2, 0);
+        Coordinate next = new Coordinate(x, y);
         bishop.setCoordinate(next);
         assertEquals(x, bishop.getCoordinate().getX());
         assertEquals(y, bishop.getCoordinate().getY());
