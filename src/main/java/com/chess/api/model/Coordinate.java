@@ -18,14 +18,16 @@ public class Coordinate {
         this.y = y;
     }
 
+    public Coordinate(char x, char y) {
+        this(x - 'a', y - '1');
+    }
+
     public static Coordinate parseString(String str) {
         if (str.length() != 2) {
             throw new IllegalArgumentException();
         }
         char[] chars = str.toLowerCase(Locale.ROOT).toCharArray();
-        int x = chars[0] - 'a';
-        int y = chars[1] - '1';
-        return new Coordinate(x, y);
+        return new Coordinate(chars[0], chars[1]);
     }
 
 }
