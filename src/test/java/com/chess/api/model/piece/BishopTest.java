@@ -9,7 +9,7 @@ class BishopTest {
     @Test
     void initialize_fromValidCoordinate_isNotNullAndHasCoordinateAndNotMoved() {
         Coordinate coordinate = new Coordinate(2, 0);
-        Bishop bishop = new Bishop(coordinate, Colour.WHITE);
+        Bishop bishop = new Bishop(Colour.WHITE, coordinate);
         assertNotEquals(null, bishop.getCoordinate());
         assertFalse(bishop.isMoved());
     }
@@ -19,7 +19,7 @@ class BishopTest {
         int x = 2;
         int y = 0;
         Coordinate start = new Coordinate(x, y);
-        Bishop bishop = new Bishop(start, Colour.WHITE);
+        Bishop bishop = new Bishop(Colour.WHITE, start);
 
         Coordinate next = new Coordinate(2, 0);
         bishop.setCoordinate(next);
@@ -33,7 +33,7 @@ class BishopTest {
         int x = 2;
         int y = 0;
         Coordinate start = new Coordinate(x, y);
-        Bishop bishop = new Bishop(start, Colour.WHITE);
+        Bishop bishop = new Bishop(Colour.WHITE, start);
 
         int nextX = 3;
         int nextY = 1;
@@ -52,7 +52,7 @@ class BishopTest {
         int x = 2;
         int y = 0;
         Coordinate start = new Coordinate(x, y);
-        Bishop bishop = new Bishop(start, Colour.WHITE);
+        Bishop bishop = new Bishop(Colour.WHITE, start);
 
         Coordinate next = new Coordinate(3, 1);
         bishop.setCoordinate(next);
