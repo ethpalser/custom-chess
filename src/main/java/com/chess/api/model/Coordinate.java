@@ -6,16 +6,16 @@ import lombok.Getter;
 @Getter
 public class Coordinate {
 
-    private final int posX;
-    private final int posY;
+    private final int x;
+    private final int y;
 
     public Coordinate(int x, int y) {
         if (x > 7 || x < 0 || y > 7 || y < 0) {
             throw new IndexOutOfBoundsException();
         }
 
-        posX = x;
-        posY = y;
+        this.x = x;
+        this.y = y;
     }
 
     public static Coordinate parseString(String str) {

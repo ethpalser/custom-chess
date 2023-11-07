@@ -35,8 +35,8 @@ class CoordinateTest {
     void parseString_inBounds_isNotNull() {
         Coordinate coordinate = Coordinate.parseString("a1");
         assertNotNull(coordinate);
-        assertEquals(0, coordinate.getPosX());
-        assertEquals(0, coordinate.getPosY());
+        assertEquals(0, coordinate.getX());
+        assertEquals(0, coordinate.getY());
     }
 
 }
