@@ -55,6 +55,7 @@ class BoardTest {
         }
     }
 
+    @Test
     void movePiece_noPieceAtCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 2;
         int pieceY = 2;
@@ -71,6 +72,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toSameCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 1;
@@ -87,6 +89,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 1;
@@ -101,6 +104,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toValidSameColourOccupiedCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 1;
@@ -118,6 +122,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toValidOppositeColourOccupiedCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
@@ -135,6 +140,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toValidOppositeColourOccupiedCoordinatePathOpen_pieceMovedAndOneFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
@@ -153,6 +159,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toValidEmptyCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
@@ -170,6 +177,7 @@ class BoardTest {
         assertEquals(32, board.getPieces().size());
     }
 
+    @Test
     void movePiece_toValidEmptyCoordinatePathOpen_pieceMovedAndNoFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
