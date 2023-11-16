@@ -15,11 +15,11 @@ import lombok.Getter;
 public class Board {
 
     private List<Piece> pieces;
-    private boolean[][] board;
+    private Colour[][] colours;
 
     public Board() {
         List<Piece> pieceList = new ArrayList<>();
-        boolean[][] occupiedList = new boolean[8][8];
+        Colour[][] occupiedList = new Colour[8][8];
 
         int y = 0;
         for (int x = 0; x < 8; x++) {
@@ -31,19 +31,19 @@ public class Board {
                 case 4 -> new King(Colour.WHITE, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
-            occupiedList[x][y] = true;
+            occupiedList[x][y] = Colour.WHITE;
         }
 
         y = 1;
         for (int x = 0; x < 8; x++) {
             pieceList.add(new Pawn(Colour.WHITE, new Coordinate(x, y)));
-            occupiedList[x][y] = true;
+            occupiedList[x][y] = Colour.WHITE;
         }
 
         y = 6;
         for (int x = 0; x < 8; x++) {
             pieceList.add(new Pawn(Colour.BLACK, new Coordinate(x, y)));
-            occupiedList[x][y] = true;
+            occupiedList[x][y] = Colour.BLACK;
         }
 
         y = 7;
@@ -56,10 +56,10 @@ public class Board {
                 case 4 -> new King(Colour.BLACK, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
-            occupiedList[x][y] = true;
+            occupiedList[x][y] = Colour.BLACK;
         }
         this.pieces = pieceList;
-        this.board = occupiedList;
+        this.colours = occupiedList;
     }
 
 }
