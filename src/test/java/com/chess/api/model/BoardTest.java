@@ -104,7 +104,7 @@ class BoardTest {
         Board board = new Board();
         board.movePiece(pieceC, nextC);
 
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY]);
+        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
         assertEquals(32, board.count());
     }
 
