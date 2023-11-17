@@ -4,13 +4,16 @@ import java.util.Locale;
 import lombok.Getter;
 
 @Getter
-public class Coordinate {
+public class Coordinate implements Comparable<Coordinate> {
+
+    private static final int MAX_X = 7;
+    private static final int MAX_Y = 7;
 
     private final int x;
     private final int y;
 
     public Coordinate(int x, int y) {
-        if (x > 7 || x < 0 || y > 7 || y < 0) {
+        if (x > MAX_X || x < 0 || y > MAX_Y || y < 0) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -30,4 +33,15 @@ public class Coordinate {
         return new Coordinate(chars[0], chars[1]);
     }
 
+    @Override
+    public int compareTo(Coordinate o) {
+        if (o == null) {
+            return -1;
+        }
+        return (this.getY() * MAX_X + this.getX()) - (o.getY() * MAX_X + o.getX());
+    }
+
+    public boolean equals(Coordinate coordinate) {
+        return this.compareTo(coordinate) == 0;
+    }
 }

@@ -53,4 +53,36 @@ class CoordinateTest {
         assertEquals(0, coordinate.getY());
     }
 
+    @Test
+    void equals_null_isFalse() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = null;
+        boolean isEqual = coA.equals(coB);
+        assertFalse(isEqual);
+    }
+
+    @Test
+    void equals_coordinateWithDifferentX_isFalse() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = new Coordinate(2, 7);
+        boolean isEqual = coA.equals(coB);
+        assertFalse(isEqual);
+    }
+
+    @Test
+    void equals_coordinateWithDifferentY_isFalse() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = new Coordinate(5, 5);
+        boolean isEqual = coA.equals(coB);
+        assertFalse(isEqual);
+    }
+
+    @Test
+    void equals_coordinateWithSameXAndY_isTrue() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = new Coordinate(5, 7);
+        boolean isEqual = coA.equals(coB);
+        assertTrue(isEqual);
+    }
+
 }
