@@ -8,14 +8,12 @@ public class Coordinate implements Comparable<Coordinate> {
 
     private static final int MAX_X = 7;
     private static final int MAX_Y = 7;
-    private static final int MIN_X = 0;
-    private static final int MIN_Y = 0;
 
     private final int x;
     private final int y;
 
     public Coordinate(int x, int y) {
-        if (x > MAX_X || x < MIN_X || y > MAX_Y || y < MIN_Y) {
+        if (x > MAX_X || x < 0 || y > MAX_Y || y < 0) {
             throw new IndexOutOfBoundsException();
         }
 
