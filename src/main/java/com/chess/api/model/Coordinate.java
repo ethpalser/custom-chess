@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 @Getter
 public class Coordinate implements Comparable<Coordinate> {
 
-    private static final int MAX_X = 7;
-    private static final int MAX_Y = 7;
+    public static final int MAX_X = 7;
+    public static final int MAX_Y = 7;
 
     private final int x;
     private final int y;

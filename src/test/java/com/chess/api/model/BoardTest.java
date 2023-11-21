@@ -78,8 +78,8 @@ class BoardTest {
     void movePiece_noPieceAtCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 2;
         int pieceY = 2;
-        int nextX = 3;
-        int nextY = 4;
+        int nextX = 4;
+        int nextY = 3;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // Nothing at location
         Coordinate nextC = new Coordinate(nextX, nextY);
@@ -93,10 +93,10 @@ class BoardTest {
 
     @Test
     void movePiece_toSameCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
-        int nextX = 0;
-        int nextY = 1;
+        int pieceX = 1;
+        int pieceY = 0;
+        int nextX = 1;
+        int nextY = 0;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
         Coordinate nextC = new Coordinate(nextX, nextY);
@@ -110,10 +110,10 @@ class BoardTest {
 
     @Test
     void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
+        int pieceX = 1;
+        int pieceY = 0;
         int nextX = -1;
-        int nextY = 0;
+        int nextY = -2;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
         assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(nextX, nextY));
@@ -163,8 +163,8 @@ class BoardTest {
     void movePiece_toValidOppositeColourOccupiedCoordinatePathOpen_pieceMovedAndOneFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
-        int nextX = 0;
-        int nextY = 6;
+        int nextX = 6;
+        int nextY = 0;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Rook
         Coordinate nextC = new Coordinate(nextX, nextY); // Black Pawn
@@ -180,10 +180,10 @@ class BoardTest {
 
     @Test
     void movePiece_toValidEmptyCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 2;
-        int nextX = 2;
-        int nextY = 4;
+        int pieceX = 2;
+        int pieceY = 0;
+        int nextX = 4;
+        int nextY = 2;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Bishop
         Coordinate nextC = new Coordinate(nextX, nextY); // Empty
@@ -198,10 +198,10 @@ class BoardTest {
 
     @Test
     void movePiece_toValidEmptyCoordinatePathOpen_pieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 2;
-        int nextX = 2;
-        int nextY = 4;
+        int pieceX = 2;
+        int pieceY = 0;
+        int nextX = 4;
+        int nextY = 2;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Bishop
         Coordinate nextC = new Coordinate(nextX, nextY); // Empty
