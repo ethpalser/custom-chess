@@ -2,6 +2,7 @@ package com.chess.api.model;
 
 import java.util.Locale;
 import lombok.Getter;
+import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 
 @Getter
 public class Coordinate implements Comparable<Coordinate> {
@@ -38,10 +39,34 @@ public class Coordinate implements Comparable<Coordinate> {
         if (o == null) {
             return -1;
         }
-        return (this.getY() * MAX_X + this.getX()) - (o.getY() * MAX_X + o.getX());
+        return (this.y * MAX_X + this.x) - (o.getY() * MAX_X + o.getX());
     }
 
-    public boolean equals(Coordinate coordinate) {
-        return this.compareTo(coordinate) == 0;
+    @Override
+    public int hashCode() {
+        return this.y * MAX_X + this.x;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (o.getClass() != this.getClass())
+            return false;
+
+        Coordinate coordinate = (Coordinate) o;
+        if (coordinate.getX() != this.x)
+            return false;
+        if (coordinate.getY() != this.y)
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        char xChar = (char) ('a' + this.x);
+        return "" + xChar + this.y;
     }
 }

@@ -62,6 +62,14 @@ class CoordinateTest {
     }
 
     @Test
+    void equals_differentClass_isFalse() {
+        Coordinate coA = new Coordinate(5, 7);
+        Integer b = 5;
+        boolean isEqual = coA.equals(b);
+        assertFalse(isEqual);
+    }
+
+    @Test
     void equals_coordinateWithDifferentX_isFalse() {
         Coordinate coA = new Coordinate(5, 7);
         Coordinate coB = new Coordinate(2, 7);
@@ -82,6 +90,26 @@ class CoordinateTest {
         Coordinate coA = new Coordinate(5, 7);
         Coordinate coB = new Coordinate(5, 7);
         boolean isEqual = coA.equals(coB);
+        assertTrue(isEqual);
+    }
+
+    @Test
+    void hashCode_notEqualCoordinate_isNotEqual() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = new Coordinate(5, 5);
+        int hashA = coA.hashCode();
+        int hashB = coB.hashCode();
+        boolean isEqual = hashA == hashB;
+        assertFalse(isEqual);
+    }
+
+    @Test
+    void hashCode_equalCoordinate_isEqual() {
+        Coordinate coA = new Coordinate(5, 7);
+        Coordinate coB = new Coordinate(5, 7);
+        int hashA = coA.hashCode();
+        int hashB = coB.hashCode();
+        boolean isEqual = hashA == hashB;
         assertTrue(isEqual);
     }
 
