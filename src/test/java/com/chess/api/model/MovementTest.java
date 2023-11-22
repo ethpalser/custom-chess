@@ -2,18 +2,39 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.PathType;
+import java.util.ArrayList;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
 class MovementTest {
 
+    private List<Coordinate> rookCoordinates() {
+        List<Coordinate> list = new ArrayList<>();
+        for (int x = 1; x <= Coordinate.MAX_X; x++) {
+            list.add(new Coordinate(x, 0));
+        }
+        for (int y = 1; y <= Coordinate.MAX_Y; y++) {
+            list.add(new Coordinate(0, y));
+        }
+        return list;
+    }
+
+    private List<Coordinate> bishopCoordinates() {
+        List<Coordinate> list = new ArrayList<>();
+        for (int i = 1; i <= Coordinate.MAX_X; i++) {
+            list.add(new Coordinate(i, i));
+        }
+        return list;
+    }
+
     @Test
     void getCoordinates_relativeToPieceNoMirror_isOffsetByCoordinateAndOnlyForward() {
-        Movement movement = new Movement(PathType.ADVANCE, false, false, false, new Coordinate(0, 1));
+        Movement movement = new Movement(PathType.ADVANCE, false, false, false, rookCoordinates());
         boolean[][] baseMove = movement.drawCoordinates();
 
-        Coordinate co = new Coordinate(1, 0);
+        Coordinate co = new Coordinate(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(co);
 
         final int coX = co.getX();
@@ -46,10 +67,10 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorX_isOffsetByCoordinateAndOnlyForwardAndBehind() {
-        Movement movement = new Movement(PathType.ADVANCE, true, false, false, new Coordinate(0, 1));
+        Movement movement = new Movement(PathType.ADVANCE, true, false, false, rookCoordinates());
         boolean[][] baseMove = movement.drawCoordinates();
 
-        Coordinate co = new Coordinate(1, 0);
+        Coordinate co = new Coordinate(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(co);
 
         final int coX = co.getX();
@@ -82,10 +103,10 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorY_isOffsetByCoordinateAndOnlyForwardRightAndForwardLeft() {
-        Movement movement = new Movement(PathType.ADVANCE, false, true, false, new Coordinate(0, 1));
+        Movement movement = new Movement(PathType.ADVANCE, false, true, false, bishopCoordinates());
         boolean[][] baseMove = movement.drawCoordinates();
 
-        Coordinate co = new Coordinate(1, 0);
+        Coordinate co = new Coordinate(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(co);
 
         final int coX = co.getX();
@@ -118,10 +139,10 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorXAndY_isOffsetByCoordinateAndMovesInAllDirections() {
-        Movement movement = new Movement(PathType.ADVANCE, true, true, false, new Coordinate(0, 1));
+        Movement movement = new Movement(PathType.ADVANCE, true, true, false, bishopCoordinates());
         boolean[][] baseMove = movement.drawCoordinates();
 
-        Coordinate co = new Coordinate(1, 0);
+        Coordinate co = new Coordinate(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(co);
 
         final int coX = co.getX();
@@ -154,10 +175,10 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceReverseForBlack_isOffsetByCoordinateAndMovesBackwards() {
-        Movement movement = new Movement(PathType.ADVANCE, false, false, true, new Coordinate(0, 1));
+        Movement movement = new Movement(PathType.ADVANCE, false, false, true, bishopCoordinates());
         boolean[][] baseMove = movement.drawCoordinates();
 
-        Coordinate co = new Coordinate(1, 0);
+        Coordinate co = new Coordinate(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(co, Colour.BLACK);
 
         final int coX = co.getX();
