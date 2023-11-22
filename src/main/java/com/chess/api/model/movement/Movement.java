@@ -128,25 +128,11 @@ public class Movement {
         return map;
     }
 
-    public boolean[][] drawCoordinates() {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates();
-        boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
-        for (Coordinate c : coordinates.values()) {
-            boardMove[c.getX()][c.getY()] = true;
-        }
-        return boardMove;
+    public boolean[][] drawCoordinates(Colour colour) {
+        return this.drawCoordinates(colour, new Coordinate(0, 0));
     }
 
-    public boolean[][] drawCoordinates(Coordinate offset) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(offset, Colour.WHITE);
-        boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
-        for (Coordinate c : coordinates.values()) {
-            boardMove[c.getX()][c.getY()] = true;
-        }
-        return boardMove;
-    }
-
-    public boolean[][] drawCoordinates(Coordinate offset, Colour colour) {
+    public boolean[][] drawCoordinates(Colour colour, Coordinate offset) {
         Map<Integer, Coordinate> coordinates = this.getCoordinates(offset, colour);
         boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
         for (Coordinate c : coordinates.values()) {
@@ -155,8 +141,8 @@ public class Movement {
         return boardMove;
     }
 
-    public String toString(Coordinate offset, Colour colour) {
-        boolean[][] boardMove = this.drawCoordinates(offset, colour);
+    public String toString(Colour colour, Coordinate offset) {
+        boolean[][] boardMove = this.drawCoordinates(colour, offset);
         StringBuilder sb = new StringBuilder();
         for (int y = boardMove[0].length - 1; y >= 0; y--) {
             for (int x = 0; x < boardMove.length; x++) {
