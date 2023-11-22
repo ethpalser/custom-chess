@@ -13,6 +13,7 @@ import lombok.Getter;
 public class Board {
 
     private final Piece[][] pieces;
+    private Piece lastMoved;
 
     public Board() {
         Piece[][] pieceList = new Piece[8][8];
@@ -62,6 +63,10 @@ public class Board {
             }
         }
         return count;
+    }
+
+    public Piece getAt(Coordinate co) {
+        return pieces[co.getX()][co.getY()];
     }
 
     /**
