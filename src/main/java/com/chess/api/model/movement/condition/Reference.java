@@ -1,20 +1,8 @@
 package com.chess.api.model.movement.condition;
 
 import com.chess.api.model.Coordinate;
-import lombok.Getter;
 
-@Getter
-public class Reference {
-
-    public enum Location {
-        LAST_MOVED,
-        AT_CURRENT,
-        AT_COORDINATE,
-        AT_DESTINATION;
-    }
-
-    private final Location location;
-    private final Coordinate coordinate;
+public record Reference(Location location, Coordinate coordinate) {
 
     public Reference() {
         this(Location.AT_CURRENT);

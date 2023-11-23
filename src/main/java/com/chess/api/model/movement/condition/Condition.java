@@ -58,11 +58,11 @@ public class Condition {
     }
 
     private Piece getReferencePiece(Board board, Coordinate current, Coordinate next) {
-        return switch (reference.getLocation()) {
+        return switch (reference.location()) {
             case LAST_MOVED -> board.getLastMoved();
             case AT_CURRENT -> board.getAt(current);
             case AT_DESTINATION -> board.getAt(next);
-            case AT_COORDINATE -> board.getAt(reference.getCoordinate());
+            case AT_COORDINATE -> board.getAt(reference.coordinate());
         };
     }
 }
