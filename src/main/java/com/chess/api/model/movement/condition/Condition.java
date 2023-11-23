@@ -8,18 +8,18 @@ public class Condition {
 
     private final Reference reference;
     private final Property<Piece> property;
-    private final Object value;
     private final State state;
+    private final Object value;
 
     public Condition() {
         this(new Reference(), new Property<>(null), null, null);
     }
 
-    public Condition(Reference reference, Property<Piece> property, Object value, State state) {
+    public Condition(Reference reference, Property<Piece> property, State state, Object value) {
         this.reference = reference;
         this.property = property;
-        this.value = value;
         this.state = state;
+        this.value = value;
     }
 
     public Boolean evaluate(Board board, Coordinate current, Coordinate next) {
