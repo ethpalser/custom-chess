@@ -1,7 +1,7 @@
-package com.chess.api.model;
+package com.chess.api.model.movement;
 
-import com.chess.api.model.movement.Movement;
-import com.chess.api.model.movement.PathType;
+import com.chess.api.model.Colour;
+import com.chess.api.model.Coordinate;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
