@@ -17,9 +17,11 @@ public record Property<T>(String key) {
         } catch (NoSuchFieldException ex) {
             return null;
         }
+        // Uppercase first character of the name to follow getter-method syntax
+        String fieldName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 
         Class<?> objCls = obj.getClass();
-        String methodName = "get" + field.getName();
+        String methodName = "get" + fieldName;
         try {
             Method method = objCls.getMethod(methodName);
             return method.invoke(obj);

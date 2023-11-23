@@ -3,67 +3,77 @@ package com.chess.api.model.movement.condition;
 import com.chess.api.model.Board;
 import com.chess.api.model.Coordinate;
 import com.chess.api.model.piece.Piece;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Condition {
 
     private final Reference reference;
     private final Property<Piece> property;
-    private final State state;
-    private final Object value;
+    private final PropertyState propertyState;
+    private final Object expected;
 
     public Condition() {
         this(new Reference(), new Property<>(null), null, null);
     }
 
-    public Condition(Reference reference, Property<Piece> property, State state, Object value) {
+    public Condition(Reference reference, Property<Piece> property, PropertyState propertyState, Object expected) {
         this.reference = reference;
         this.property = property;
-        this.state = state;
-        this.value = value;
+        this.propertyState = propertyState;
+        this.expected = expected;
     }
 
-    public Boolean evaluate(Board board, Coordinate current, Coordinate next) {
-        if (this.property == null) {
-            return true;
-        }
+    public Boolean evaluate(Board board, Coordinate start, Coordinate end) {
+        List<Piece> list = this.getReferencePiece(board, start, end);
+        Iterator<Piece> iterator = list.iterator();
+        boolean result = true;
 
-        Piece obj = this.getReferencePiece(board, current, next);
-        Object propertyValue = this.property.fetch(obj);
-        if (propertyValue == null || !propertyValue.getClass().equals(this.value.getClass())) {
-            return false;
-        }
+        while (result && iterator.hasNext()) {
+            Piece piece = iterator.next();
+            if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
+                return false;
+            } else if (piece == null) {
+                continue;
+            }
 
-        switch (state) {
-            case TRUE -> {
-                return this.value.equals(true);
-            }
-            case FALSE -> {
-                return this.value.equals(false);
-            }
-            case EQUAL -> {
-                return this.value.equals(obj);
-            }
-            case OPPOSITE -> {
-                Piece currentPiece = board.getAt(current);
-                Object currentValue = this.property.fetch(currentPiece);
-                if(currentValue == null || !propertyValue.getClass().equals(currentValue.getClass())) {
+            Object propVal = this.property.fetch(piece);
+            switch (this.propertyState) {
+                case TRUE -> result = Boolean.TRUE.equals(propVal);
+                case FALSE -> result = Boolean.FALSE.equals(propVal);
+                case EQUAL -> result = (this.expected == null && propVal == null) ||
+                        this.expected != null && propVal != null
+                                && propVal.getClass().equals(this.expected.getClass())
+                                && propVal.equals(this.expected);
+                case OPPOSITE -> {
+                    // The start piece is implied for OPPOSITE, as the condition's value is not known until runtime
+                    Piece currPiece = board.getAt(start);
+                    Object currVal = this.property.fetch(currPiece);
+                    result = (currVal == null && propVal == null) ||
+                            currVal != null && propVal != null
+                                    && propVal.getClass().equals(currVal.getClass())
+                                    && propVal.equals(currVal);
+                }
+                default -> {
                     return false;
                 }
-                return !this.value.equals(currentValue);
-            }
-            default -> {
-                return false;
             }
         }
+        return result;
     }
 
-    private Piece getReferencePiece(Board board, Coordinate current, Coordinate next) {
-        return switch (reference.location()) {
-            case LAST_MOVED -> board.getLastMoved();
-            case AT_CURRENT -> board.getAt(current);
-            case AT_DESTINATION -> board.getAt(next);
-            case AT_COORDINATE -> board.getAt(reference.coordinate());
-        };
+    private List<Piece> getReferencePiece(Board board, Coordinate start, Coordinate end) {
+        List<Piece> pieces = new ArrayList<>();
+        switch (reference.location()) {
+            case LAST_MOVED -> pieces.add(board.getLastMoved());
+            case AT_START -> pieces.add(board.getAt(start));
+            case AT_DESTINATION -> pieces.add(board.getAt(end));
+            case AT_COORDINATE -> pieces.add(board.getAt(reference.coordinate()));
+            case PATH_TO_DESTINATION -> pieces = board.getAtPath(start, end);
+            case PATH_TO_COORDINATE -> pieces = board.getAtPath(start, reference.coordinate());
+        }
+        return pieces;
     }
 }
 
