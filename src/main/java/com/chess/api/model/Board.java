@@ -52,6 +52,7 @@ public class Board {
             });
         }
         this.pieces = pieceList;
+        this.lastMoved = null;
     }
 
     public int count() {
