@@ -1,5 +1,6 @@
 package com.chess.api.model;
 
+import com.chess.api.model.movement.PathDirection;
 import com.chess.api.model.piece.Bishop;
 import com.chess.api.model.piece.King;
 import com.chess.api.model.piece.Knight;
@@ -7,6 +8,8 @@ import com.chess.api.model.piece.Pawn;
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.Queen;
 import com.chess.api.model.piece.Rook;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -67,7 +70,46 @@ public class Board {
     }
 
     public Piece getAt(Coordinate co) {
-        return pieces[co.getX()][co.getY()];
+        return this.getAt(co.getX(), co.getY());
+    }
+
+    public Piece getAt(int x, int y) {
+        return pieces[x][y];
+    }
+
+    public List<Piece> getAtPath(Coordinate start, Coordinate destination) {
+        List<Piece> list = new ArrayList<>();
+        // Only three paths are possible: vertical, horizontal, and diagonal
+        PathDirection direction = PathDirection.findDirection(start, destination);
+        switch (direction) {
+            case VERTICAL -> {
+                int x = 0;
+                for (int y = start.getY() + 1; y < destination.getY(); y++) {
+                    list.add(this.getAt(x, y));
+                }
+            }
+            case HORIZONTAL -> {
+                int y = 0;
+                for (int x = start.getX() + 1; x < destination.getX(); x++) {
+                    list.add(this.getAt(x, y));
+                }
+            }
+            case DIAGONAL -> {
+                int x = start.getX();
+                int y = start.getY();
+                final int dirX = (destination.getX() - x) / Math.abs(destination.getX() - x);
+                final int dirY = (destination.getY() - y) / Math.abs(destination.getY() - y);
+                // Move towards the next one space to exclude the current piece
+                x += dirX;
+                y += dirY;
+                while (x != destination.getX() && y != destination.getY()) {
+                    list.add(this.getAt(x, y));
+                    x += dirX;
+                    y += dirY;
+                }
+            }
+        }
+        return list;
     }
 
     /**

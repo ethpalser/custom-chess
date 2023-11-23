@@ -5,7 +5,7 @@ import com.chess.api.model.Coordinate;
 public record Reference(Location location, Coordinate coordinate) {
 
     public Reference() {
-        this(Location.AT_CURRENT);
+        this(Location.AT_START);
     }
 
     public Reference(Location location) {
