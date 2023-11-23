@@ -2,6 +2,7 @@ package com.chess.api.model.movement;
 
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
+import com.chess.api.model.movement.condition.Condition;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class Movement {
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean reverseForBlack;
+    private final Condition condition;
 
     public Movement() {
         this.coordinateBlueprint = new HashMap<>();
@@ -22,6 +24,7 @@ public class Movement {
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
         this.reverseForBlack = false;
+        this.condition = null;
     }
 
     public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, boolean reverseForBlack,
@@ -36,6 +39,7 @@ public class Movement {
             coordinateHashMap.put(c.hashCode(), c);
         }
         this.coordinateBlueprint = coordinateHashMap;
+        this.condition = null;
     }
 
     public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, boolean reverseForBlack,
@@ -50,6 +54,7 @@ public class Movement {
             coordinateHashMap.put(c.hashCode(), c);
         }
         this.coordinateBlueprint = coordinateHashMap;
+        this.condition = null;
     }
 
     public Map<Integer, Coordinate> getCoordinates() {
