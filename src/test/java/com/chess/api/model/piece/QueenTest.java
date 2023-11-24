@@ -12,7 +12,7 @@ class QueenTest {
         Coordinate coordinate = new Coordinate(3, 0);
         Queen queen = new Queen(Colour.WHITE, coordinate);
         assertNotEquals(null, queen.getCoordinate());
-        assertFalse(queen.isMoved());
+        assertFalse(queen.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class QueenTest {
         queen.setCoordinate(next);
         assertEquals(x, queen.getCoordinate().getX());
         assertEquals(y, queen.getCoordinate().getY());
-        assertFalse(queen.isMoved());
+        assertFalse(queen.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class QueenTest {
         queen.setCoordinate(next);
         assertEquals(nextX, queen.getCoordinate().getX());
         assertEquals(nextY, queen.getCoordinate().getY());
-        assertTrue(queen.isMoved());
+        assertTrue(queen.getHasMoved());
     }
 
     @Test
@@ -61,6 +61,6 @@ class QueenTest {
         queen.setCoordinate(next);
         assertEquals(nextX, queen.getCoordinate().getX());
         assertEquals(nextY, queen.getCoordinate().getY());
-        assertTrue(queen.isMoved());
+        assertTrue(queen.getHasMoved());
     }
 }

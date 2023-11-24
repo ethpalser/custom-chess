@@ -12,7 +12,7 @@ class PawnTest {
         Coordinate coordinate = new Coordinate(2, 0);
         Pawn pawn = new Pawn(Colour.WHITE, coordinate);
         assertNotEquals(null, pawn.getCoordinate());
-        assertFalse(pawn.isMoved());
+        assertFalse(pawn.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class PawnTest {
         pawn.setCoordinate(next);
         assertEquals(x, pawn.getCoordinate().getX());
         assertEquals(y, pawn.getCoordinate().getY());
-        assertFalse(pawn.isMoved());
+        assertFalse(pawn.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class PawnTest {
         pawn.setCoordinate(next);
         assertEquals(nextX, pawn.getCoordinate().getX());
         assertEquals(nextY, pawn.getCoordinate().getY());
-        assertTrue(pawn.isMoved());
+        assertTrue(pawn.getHasMoved());
     }
 
     @Test
@@ -59,7 +59,7 @@ class PawnTest {
         pawn.setCoordinate(next);
         assertEquals(x, pawn.getCoordinate().getX());
         assertEquals(y, pawn.getCoordinate().getY());
-        assertTrue(pawn.isMoved());
+        assertTrue(pawn.getHasMoved());
     }
 
 }

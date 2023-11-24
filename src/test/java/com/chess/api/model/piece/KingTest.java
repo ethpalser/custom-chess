@@ -12,7 +12,7 @@ class KingTest {
         Coordinate coordinate = new Coordinate(2, 0);
         King king = new King(Colour.WHITE, coordinate);
         assertNotEquals(null, king.getCoordinate());
-        assertFalse(king.isMoved());
+        assertFalse(king.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class KingTest {
         king.setCoordinate(next);
         assertEquals(x, king.getCoordinate().getX());
         assertEquals(y, king.getCoordinate().getY());
-        assertFalse(king.isMoved());
+        assertFalse(king.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class KingTest {
         king.setCoordinate(next);
         assertEquals(nextX, king.getCoordinate().getX());
         assertEquals(nextY, king.getCoordinate().getY());
-        assertTrue(king.isMoved());
+        assertTrue(king.getHasMoved());
     }
 
     @Test
@@ -61,6 +61,6 @@ class KingTest {
         king.setCoordinate(next);
         assertEquals(nextX, king.getCoordinate().getX());
         assertEquals(nextY, king.getCoordinate().getY());
-        assertTrue(king.isMoved());
+        assertTrue(king.getHasMoved());
     }
 }

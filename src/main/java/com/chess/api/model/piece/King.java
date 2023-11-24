@@ -2,6 +2,7 @@ package com.chess.api.model.piece;
 
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -10,12 +11,14 @@ public class King implements Piece {
 
     private final Colour colour;
     private Coordinate coordinate;
-    private boolean moved;
+
+    @Getter(AccessLevel.NONE)
+    private boolean hasMoved;
 
     public King(@NonNull Colour colour, @NonNull Coordinate coordinate) {
         this.coordinate = coordinate;
         this.colour = colour;
-        this.moved = false;
+        this.hasMoved = false;
     }
 
     public void setCoordinate(Coordinate next) {
@@ -23,6 +26,11 @@ public class King implements Piece {
             return;
         }
         this.coordinate = next;
-        this.moved = true;
+        this.hasMoved = true;
+    }
+
+    @Override
+    public boolean getHasMoved() {
+        return false;
     }
 }

@@ -9,6 +9,6 @@ public interface Piece {
 
     Coordinate getCoordinate();
 
-    boolean isMoved();
+    boolean getHasMoved();
 
 }

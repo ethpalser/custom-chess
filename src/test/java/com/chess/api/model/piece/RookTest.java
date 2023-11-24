@@ -12,7 +12,7 @@ class RookTest {
         Coordinate coordinate = new Coordinate(0, 0);
         Rook rook = new Rook(Colour.WHITE, coordinate);
         assertNotEquals(null, rook.getCoordinate());
-        assertFalse(rook.isMoved());
+        assertFalse(rook.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class RookTest {
         rook.setCoordinate(next);
         assertEquals(x, rook.getCoordinate().getX());
         assertEquals(y, rook.getCoordinate().getY());
-        assertFalse(rook.isMoved());
+        assertFalse(rook.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class RookTest {
         rook.setCoordinate(next);
         assertEquals(nextX, rook.getCoordinate().getX());
         assertEquals(nextY, rook.getCoordinate().getY());
-        assertTrue(rook.isMoved());
+        assertTrue(rook.getHasMoved());
     }
 
     @Test
@@ -61,6 +61,6 @@ class RookTest {
         rook.setCoordinate(next);
         assertEquals(nextX, rook.getCoordinate().getX());
         assertEquals(nextY, rook.getCoordinate().getY());
-        assertTrue(rook.isMoved());
+        assertTrue(rook.getHasMoved());
     }
 }

@@ -12,7 +12,7 @@ class BishopTest {
         Coordinate coordinate = new Coordinate(2, 0);
         Bishop bishop = new Bishop(Colour.WHITE, coordinate);
         assertNotEquals(null, bishop.getCoordinate());
-        assertFalse(bishop.isMoved());
+        assertFalse(bishop.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class BishopTest {
         bishop.setCoordinate(next);
         assertEquals(x, bishop.getCoordinate().getX());
         assertEquals(y, bishop.getCoordinate().getY());
-        assertFalse(bishop.isMoved());
+        assertFalse(bishop.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class BishopTest {
         bishop.setCoordinate(next);
         assertEquals(nextX, bishop.getCoordinate().getX());
         assertEquals(nextY, bishop.getCoordinate().getY());
-        assertTrue(bishop.isMoved());
+        assertTrue(bishop.getHasMoved());
     }
 
     @Test
@@ -61,6 +61,6 @@ class BishopTest {
         bishop.setCoordinate(next);
         assertEquals(nextX, bishop.getCoordinate().getX());
         assertEquals(nextY, bishop.getCoordinate().getY());
-        assertTrue(bishop.isMoved());
+        assertTrue(bishop.getHasMoved());
     }
 }

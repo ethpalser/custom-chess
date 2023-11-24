@@ -12,7 +12,7 @@ class KnightTest {
         Coordinate coordinate = new Coordinate(1, 0);
         Knight knight = new Knight(Colour.WHITE, coordinate);
         assertNotEquals(null, knight.getCoordinate());
-        assertFalse(knight.isMoved());
+        assertFalse(knight.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class KnightTest {
         knight.setCoordinate(next);
         assertEquals(x, knight.getCoordinate().getX());
         assertEquals(y, knight.getCoordinate().getY());
-        assertFalse(knight.isMoved());
+        assertFalse(knight.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class KnightTest {
         knight.setCoordinate(next);
         assertEquals(nextX, knight.getCoordinate().getX());
         assertEquals(nextY, knight.getCoordinate().getY());
-        assertTrue(knight.isMoved());
+        assertTrue(knight.getHasMoved());
     }
 
     @Test
@@ -61,7 +61,7 @@ class KnightTest {
         knight.setCoordinate(next);
         assertEquals(nextX, knight.getCoordinate().getX());
         assertEquals(nextY, knight.getCoordinate().getY());
-        assertTrue(knight.isMoved());
+        assertTrue(knight.getHasMoved());
     }
 
 }
