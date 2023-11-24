@@ -1,19 +1,13 @@
 package com.chess.api.model;
 
-import com.chess.api.model.piece.Bishop;
-import com.chess.api.model.piece.King;
-import com.chess.api.model.piece.Knight;
-import com.chess.api.model.piece.Pawn;
 import com.chess.api.model.piece.Piece;
-import com.chess.api.model.piece.Queen;
-import com.chess.api.model.piece.Rook;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class Board {
 
     private final Piece[][] pieces;
-    private Piece lastMoved;
 
     public Board() {
         Piece[][] pieceList = new Piece[8][8];
@@ -21,33 +15,33 @@ public class Board {
         int y = 0;
         for (int x = 0; x < 8; x++) {
             pieceList[x][y] = (switch (x) {
-                case 0, 7 -> new Rook(Colour.WHITE, new Coordinate(x, y));
-                case 1, 6 -> new Knight(Colour.WHITE, new Coordinate(x, y));
-                case 2, 5 -> new Bishop(Colour.WHITE, new Coordinate(x, y));
-                case 3 -> new Queen(Colour.WHITE, new Coordinate(x, y));
-                case 4 -> new King(Colour.WHITE, new Coordinate(x, y));
+                case 0, 7 -> Piece.ROOK(Colour.WHITE, new Coordinate(x, y));
+                case 1, 6 -> Piece.KNIGHT(Colour.WHITE, new Coordinate(x, y));
+                case 2, 5 -> Piece.BISHOP(Colour.WHITE, new Coordinate(x, y));
+                case 3 -> Piece.QUEEN(Colour.WHITE, new Coordinate(x, y));
+                case 4 -> Piece.KING(Colour.WHITE, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
         }
 
         y = 1;
         for (int x = 0; x < 8; x++) {
-            pieceList[x][y] = new Pawn(Colour.WHITE, new Coordinate(x, y));
+            pieceList[x][y] = Piece.PAWN(Colour.WHITE, new Coordinate(x, y));
         }
 
         y = 6;
         for (int x = 0; x < 8; x++) {
-            pieceList[x][y] = new Pawn(Colour.BLACK, new Coordinate(x, y));
+            pieceList[x][y] = Piece.PAWN(Colour.BLACK, new Coordinate(x, y));
         }
 
         y = 7;
         for (int x = 0; x < 8; x++) {
             pieceList[x][y] = (switch (x) {
-                case 0, 7 -> new Rook(Colour.BLACK, new Coordinate(x, y));
-                case 1, 6 -> new Knight(Colour.BLACK, new Coordinate(x, y));
-                case 2, 5 -> new Bishop(Colour.BLACK, new Coordinate(x, y));
-                case 3 -> new Queen(Colour.BLACK, new Coordinate(x, y));
-                case 4 -> new King(Colour.BLACK, new Coordinate(x, y));
+                case 0, 7 -> Piece.ROOK(Colour.BLACK, new Coordinate(x, y));
+                case 1, 6 -> Piece.KNIGHT(Colour.BLACK, new Coordinate(x, y));
+                case 2, 5 -> Piece.BISHOP(Colour.BLACK, new Coordinate(x, y));
+                case 3 -> Piece.QUEEN(Colour.BLACK, new Coordinate(x, y));
+                case 4 -> Piece.KING(Colour.BLACK, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
         }
@@ -65,8 +59,12 @@ public class Board {
         return count;
     }
 
-    public Piece getAt(Coordinate co) {
-        return pieces[co.getX()][co.getY()];
+    public Piece getPiece(int x, int y) {
+        return pieces[x][y];
+    }
+
+    public Piece getPiece(Coordinate coordinate) {
+        return pieces[coordinate.getX()][coordinate.getY()];
     }
 
     /**
@@ -79,13 +77,24 @@ public class Board {
      * <li>The piece can move to that location after restrictions apply by moving or capturing</li>
      * </ol>
      *
-     * @param pieceC
-     * @param nextC
+     * @param start
+     * @param destination
      */
-    public void movePiece(Coordinate pieceC, Coordinate nextC) {
-        if (pieces[pieceC.getX()][pieceC.getY()] == pieces[nextC.getX()][nextC.getY()]) {
+    public void movePiece(@NonNull Coordinate start, @NonNull Coordinate destination) {
+        Piece source = pieces[start.getX()][start.getY()];
+        Piece target = pieces[destination.getX()][destination.getY()];
+
+        if (source == null || source.equals(target) || (target != null && source.getColour().equals(target.getColour()))) {
             return;
         }
+        // Todo: verify destination is valid
+        // Todo: validate movement is allowed
+        // Todo: verify path is empty, but only if the piece traverses along a path
+        // Update the piece's internal position
+        source.performMove(destination);
+        // Update the piece on the board
+        pieces[destination.getX()][destination.getY()] = pieces[start.getX()][start.getY()];
+        pieces[start.getX()][start.getY()] = null;
     }
 
 }
