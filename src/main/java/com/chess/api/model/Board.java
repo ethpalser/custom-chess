@@ -87,8 +87,11 @@ public class Board {
         if (source == null || source.equals(target) || (target != null && source.getColour().equals(target.getColour()))) {
             return;
         }
-        // Todo: verify destination is valid
-        // Todo: validate movement is allowed
+        // Verify the destination is a valid coordinate for this piece to move to
+        if (!source.verifyMove(destination)) {
+            return;
+        }
+        // Todo: validate movement condition is passed
         // Todo: verify path is empty, but only if the piece traverses along a path
         // Update the piece's internal position
         source.performMove(destination);

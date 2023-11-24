@@ -108,7 +108,7 @@ class BoardTest {
     void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 1;
         int pieceY = 0;
-        int nextX = -1;
+        int nextX = 0;
         int nextY = -2;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
@@ -121,10 +121,10 @@ class BoardTest {
 
     @Test
     void movePiece_toValidSameColourOccupiedCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
-        int nextX = 1;
-        int nextY = 3;
+        int pieceX = 1;
+        int pieceY = 0;
+        int nextX = 2;
+        int nextY = 2;
 
         Coordinate source = new Coordinate(pieceX, pieceY); // White Knight
         Coordinate target = new Coordinate(nextX, nextY); // White Pawn
@@ -155,7 +155,7 @@ class BoardTest {
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
-        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
+        assertEquals(Colour.BLACK, board.getPiece(target).getColour());
         assertEquals(32, board.count());
     }
 
@@ -163,14 +163,14 @@ class BoardTest {
     void movePiece_toValidOppositeColourOccupiedCoordinatePathOpen_pieceMovedAndOneFewerPieces() {
         int pieceX = 0;
         int pieceY = 0;
-        int nextX = 6;
-        int nextY = 0;
+        int nextX = 0;
+        int nextY = 6;
 
         Coordinate source = new Coordinate(pieceX, pieceY); // White Rook
         Coordinate target = new Coordinate(nextX, nextY); // Black Pawn
 
         Board board = new Board();
-        board.getPieces()[1][0] = null; // Can be sufficient for path checks
+        board.getPieces()[0][1] = null; // Can be sufficient for path checks
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
