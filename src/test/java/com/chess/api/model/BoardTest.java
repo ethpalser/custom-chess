@@ -1,13 +1,9 @@
 package com.chess.api.model;
 
-import com.chess.api.model.piece.Bishop;
-import com.chess.api.model.piece.King;
-import com.chess.api.model.piece.Knight;
-import com.chess.api.model.piece.Pawn;
 import com.chess.api.model.piece.Piece;
-import com.chess.api.model.piece.Queen;
-import com.chess.api.model.piece.Rook;
+import com.chess.api.model.piece.PieceType;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 class BoardTest {
@@ -29,7 +25,7 @@ class BoardTest {
                     continue;
                 }
 
-                Coordinate coordinate = piece.getCoordinate();
+                Coordinate coordinate = piece.getPosition();
                 if (coordinate.getY() == 0 || coordinate.getY() == 1) {
                     assertEquals(Colour.WHITE, piece.getColour());
                 } else if (coordinate.getY() == 6 || coordinate.getY() == 7) {
@@ -37,15 +33,15 @@ class BoardTest {
                 }
 
                 if (coordinate.getY() == 1 || coordinate.getY() == 6) {
-                    assertInstanceOf(Pawn.class, piece);
+                    assertEquals(PieceType.PAWN, piece.getType());
                 } else {
                     switch (coordinate.getX()) {
-                        case 0, 7 -> assertInstanceOf(Rook.class, piece);
-                        case 1, 6 -> assertInstanceOf(Knight.class, piece);
-                        case 2, 5 -> assertInstanceOf(Bishop.class, piece);
-                        case 3 -> assertInstanceOf(Queen.class, piece);
-                        case 4 -> assertInstanceOf(King.class, piece);
-                        default -> assertInstanceOf(Piece.class, piece); // Should never occur
+                        case 0, 7 -> assertEquals(PieceType.ROOK, piece.getType());
+                        case 1, 6 -> assertEquals(PieceType.KNIGHT, piece.getType());
+                        case 2, 5 -> assertEquals(PieceType.BISHOP, piece.getType());
+                        case 3 -> assertEquals(PieceType.QUEEN, piece.getType());
+                        case 4 -> assertEquals(PieceType.KING, piece.getType());
+                        default -> fail("Board size is invalid, or test coordinate is outside board bounds");
                     }
                 }
             }
@@ -130,14 +126,16 @@ class BoardTest {
         int nextX = 1;
         int nextY = 3;
 
-        Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
-        Coordinate nextC = new Coordinate(nextX, nextY); // White Pawn
+        Coordinate source = new Coordinate(pieceX, pieceY); // White Knight
+        Coordinate target = new Coordinate(nextX, nextY); // White Pawn
 
         Board board = new Board();
-        board.movePiece(pieceC, nextC);
+        board.movePiece(source, target);
 
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
-        assertEquals(Colour.WHITE, board.getPieces()[nextX][nextY].getColour());
+        assertNotNull(board.getPiece(source));
+        assertNotNull(board.getPiece(target));
+        assertEquals(Colour.WHITE, board.getPiece(source).getColour());
+        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
         assertEquals(32, board.count());
     }
 
@@ -148,14 +146,16 @@ class BoardTest {
         int nextX = 0;
         int nextY = 6;
 
-        Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Rook
-        Coordinate nextC = new Coordinate(nextX, nextY); // Black Pawn
+        Coordinate source = new Coordinate(pieceX, pieceY); // White Rook
+        Coordinate target = new Coordinate(nextX, nextY); // Black Pawn
 
         Board board = new Board();
-        board.movePiece(pieceC, nextC);
+        board.movePiece(source, target);
 
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
-        assertEquals(Colour.BLACK, board.getPieces()[nextX][nextY].getColour());
+        assertNotNull(board.getPiece(source));
+        assertNotNull(board.getPiece(target));
+        assertEquals(Colour.WHITE, board.getPiece(source).getColour());
+        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
         assertEquals(32, board.count());
     }
 
@@ -166,53 +166,56 @@ class BoardTest {
         int nextX = 0;
         int nextY = 6;
 
-        Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Rook
-        Coordinate nextC = new Coordinate(nextX, nextY); // Black Pawn
+        Coordinate source = new Coordinate(pieceX, pieceY); // White Rook
+        Coordinate target = new Coordinate(nextX, nextY); // Black Pawn
 
         Board board = new Board();
         board.getPieces()[1][0] = null; // Can be sufficient for path checks
-        board.movePiece(pieceC, nextC);
+        board.movePiece(source, target);
 
-        assertNull(board.getPieces()[pieceX][pieceY]);
-        assertEquals(Colour.WHITE, board.getPieces()[nextX][nextY].getColour());
-        assertEquals(32, board.count());
+        assertNull(board.getPiece(source));
+        assertNotNull(board.getPiece(target));
+        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
+        assertEquals(30, board.count()); // Two fewer pieces due to forced removal and capture
     }
 
     @Test
     void movePiece_toValidEmptyCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 2;
-        int nextX = 2;
-        int nextY = 4;
+        int pieceX = 2;
+        int pieceY = 0;
+        int nextX = 4;
+        int nextY = 2;
 
-        Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Bishop
-        Coordinate nextC = new Coordinate(nextX, nextY); // Empty
+        Coordinate source = new Coordinate(pieceX, pieceY); // White Bishop
+        Coordinate target = new Coordinate(nextX, nextY); // Empty
 
         Board board = new Board();
-        board.movePiece(pieceC, nextC);
+        board.movePiece(source, target);
 
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
-        assertNull(board.getPieces()[nextX][nextY]);
+        assertNotNull(board.getPiece(source));
+        assertEquals(Colour.WHITE, board.getPiece(source).getColour());
+        assertNull(board.getPiece(target));
         assertEquals(32, board.count());
     }
 
     @Test
     void movePiece_toValidEmptyCoordinatePathOpen_pieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 2;
-        int nextX = 2;
-        int nextY = 4;
+        int pieceX = 2;
+        int pieceY = 0;
+        int nextX = 4;
+        int nextY = 2;
 
-        Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Bishop
-        Coordinate nextC = new Coordinate(nextX, nextY); // Empty
+        Coordinate source = new Coordinate(pieceX, pieceY); // White Bishop
+        Coordinate target = new Coordinate(nextX, nextY); // Empty
 
         Board board = new Board();
-        board.getPieces()[1][3] = null;
-        board.movePiece(pieceC, nextC);
+        board.getPieces()[3][1] = null; // Clearing the path for a Bishop's move
+        board.movePiece(source, target);
 
-        assertNull(board.getPieces()[pieceX][pieceY]);
-        assertEquals(Colour.WHITE, board.getPieces()[nextX][nextY].getColour());
-        assertEquals(32, board.count());
+        assertNull(board.getPiece(source));
+        assertNotNull(board.getPiece(target));
+        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
+        assertEquals(31, board.count()); // One fewer piece from forced removal
     }
 
 }
