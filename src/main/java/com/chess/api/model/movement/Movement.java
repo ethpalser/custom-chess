@@ -12,18 +12,18 @@ import lombok.NonNull;
 public class Movement {
 
     private final Map<Integer, Coordinate> coordinateBlueprint;
-    private final PathType pathType;
+    private final MovementType pathType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
 
     public Movement() {
         this.coordinateBlueprint = new HashMap<>();
-        this.pathType = PathType.NONE;
+        this.pathType = MovementType.JUMP;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
     }
 
-    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> blueprintCoordinates) {
+    public Movement(MovementType pathType, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> blueprintCoordinates) {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
@@ -35,7 +35,7 @@ public class Movement {
         this.coordinateBlueprint = coordinateHashMap;
     }
 
-    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate... blueprintCoordinates) {
+    public Movement(MovementType pathType, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate... blueprintCoordinates) {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;

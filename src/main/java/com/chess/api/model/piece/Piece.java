@@ -3,7 +3,7 @@ package com.chess.api.model.piece;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
 import com.chess.api.model.movement.Movement;
-import com.chess.api.model.movement.PathType;
+import com.chess.api.model.movement.MovementType;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -68,11 +68,11 @@ public class Piece {
     // region Static methods
 
     public static Piece PAWN(@NonNull Colour colour, @NonNull Coordinate coordinate) {
-        Movement pawnBaseMove = new Movement(PathType.ADVANCE, false, false, new Coordinate(0, 1));
+        Movement pawnBaseMove = new Movement(MovementType.ADVANCE, false, false, new Coordinate(0, 1));
         // Todo: Add conditions to these moves
-        Movement fastAdvance = new Movement(PathType.ADVANCE, false, false, new Coordinate(0, 2));
-        Movement capture = new Movement(PathType.ADVANCE, false, true, new Coordinate(1, 1));
-        Movement enPassant = new Movement(PathType.ADVANCE, false, true, new Coordinate(1, 1));
+        Movement fastAdvance = new Movement(MovementType.ADVANCE, false, false, new Coordinate(0, 2));
+        Movement capture = new Movement(MovementType.ADVANCE, false, true, new Coordinate(1, 1));
+        Movement enPassant = new Movement(MovementType.ADVANCE, false, true, new Coordinate(1, 1));
         return new Piece(PieceType.PAWN, colour, coordinate, pawnBaseMove, fastAdvance, capture, enPassant);
     }
 
@@ -82,12 +82,12 @@ public class Piece {
         baseCoordinates.addAll(Coordinate.vertical(origin));
         baseCoordinates.addAll(Coordinate.horizontal(origin));
 
-        Movement rookBaseMove = new Movement(PathType.ADVANCE, true, true, baseCoordinates);
+        Movement rookBaseMove = new Movement(MovementType.ADVANCE, true, true, baseCoordinates);
         return new Piece(PieceType.ROOK, colour, coordinate, rookBaseMove);
     }
 
     public static Piece KNIGHT(@NonNull Colour colour, @NonNull Coordinate coordinate) {
-        Movement knightBaseMove = new Movement(PathType.NONE, true, true, new Coordinate(1, 2), new Coordinate(2, 1));
+        Movement knightBaseMove = new Movement(MovementType.JUMP, true, true, new Coordinate(1, 2), new Coordinate(2, 1));
         return new Piece(PieceType.KNIGHT, colour, coordinate, knightBaseMove);
     }
 
@@ -95,7 +95,7 @@ public class Piece {
         Coordinate origin = Coordinate.origin();
         List<Coordinate> baseCoordinates = new ArrayList<>(Coordinate.diagonal(origin));
 
-        Movement bishopBaseMove = new Movement(PathType.ADVANCE, true, true, baseCoordinates);
+        Movement bishopBaseMove = new Movement(MovementType.ADVANCE, true, true, baseCoordinates);
         return new Piece(PieceType.BISHOP, colour, coordinate, bishopBaseMove);
     }
 
@@ -106,12 +106,12 @@ public class Piece {
         baseCoordinates.addAll(Coordinate.horizontal(origin));
         baseCoordinates.addAll(Coordinate.diagonal(origin));
         
-        Movement queenBaseMove = new Movement(PathType.ADVANCE, true, true, baseCoordinates);
+        Movement queenBaseMove = new Movement(MovementType.ADVANCE, true, true, baseCoordinates);
         return new Piece(PieceType.QUEEN, colour, coordinate, queenBaseMove);
     }
 
     public static Piece KING(@NonNull Colour colour, @NonNull Coordinate coordinate) {
-        Movement kingBaseMove = new Movement(PathType.ADVANCE, true, true, new Coordinate(0, 1), new Coordinate(1, 1),
+        Movement kingBaseMove = new Movement(MovementType.ADVANCE, true, true, new Coordinate(0, 1), new Coordinate(1, 1),
                 new Coordinate(1, 0));
         return new Piece(PieceType.KING, colour, coordinate, kingBaseMove);
     }
