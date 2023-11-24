@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class Movement {
@@ -22,8 +23,7 @@ public class Movement {
         this.mirrorYAxis = false;
     }
 
-    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, boolean reverseForBlack,
-            List<Coordinate> blueprintCoordinates) {
+    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> blueprintCoordinates) {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
@@ -35,8 +35,7 @@ public class Movement {
         this.coordinateBlueprint = coordinateHashMap;
     }
 
-    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, boolean reverseForBlack,
-            Coordinate... blueprintCoordinates) {
+    public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate... blueprintCoordinates) {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
@@ -52,7 +51,7 @@ public class Movement {
         return coordinateBlueprint;
     }
 
-    public Map<Integer, Coordinate> getCoordinates(Coordinate offset, Colour colour) {
+    public Map<Integer, Coordinate> getCoordinates(@NonNull Coordinate offset, @NonNull Colour colour) {
         if (Colour.WHITE.equals(colour)) {
             return this.getWhiteCoordinates(offset.getX(), offset.getY());
         } else {
@@ -124,11 +123,16 @@ public class Movement {
         return map;
     }
 
-    public boolean[][] drawCoordinates(Colour colour) {
+    public boolean validCoordinate(@NonNull Colour colour, @NonNull Coordinate source, @NonNull Coordinate destination) {
+        Map<Integer, Coordinate> coordinates = this.getCoordinates(source, colour);
+        return coordinates.get(destination.hashCode()) != null;
+    }
+
+    public boolean[][] drawCoordinates(@NonNull Colour colour) {
         return this.drawCoordinates(colour, new Coordinate(0, 0));
     }
 
-    public boolean[][] drawCoordinates(Colour colour, Coordinate offset) {
+    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
         Map<Integer, Coordinate> coordinates = this.getCoordinates(offset, colour);
         boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
         for (Coordinate c : coordinates.values()) {
@@ -137,7 +141,7 @@ public class Movement {
         return boardMove;
     }
 
-    public String toString(Colour colour, Coordinate offset) {
+    public String toString(@NonNull Colour colour, @NonNull Coordinate offset) {
         boolean[][] boardMove = this.drawCoordinates(colour, offset);
         StringBuilder sb = new StringBuilder();
         for (int y = boardMove[0].length - 1; y >= 0; y--) {
