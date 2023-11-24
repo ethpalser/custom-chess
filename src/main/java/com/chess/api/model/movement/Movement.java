@@ -14,14 +14,12 @@ public class Movement {
     private final PathType pathType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
-    private final boolean reverseForBlack;
 
     public Movement() {
         this.coordinateBlueprint = new HashMap<>();
         this.pathType = PathType.NONE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
-        this.reverseForBlack = false;
     }
 
     public Movement(PathType pathType, boolean mirrorXAxis, boolean mirrorYAxis, boolean reverseForBlack,
@@ -29,7 +27,6 @@ public class Movement {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-        this.reverseForBlack = reverseForBlack;
 
         Map<Integer, Coordinate> coordinateHashMap = new HashMap<>();
         for (Coordinate c : blueprintCoordinates) {
@@ -43,7 +40,6 @@ public class Movement {
         this.pathType = pathType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-        this.reverseForBlack = reverseForBlack;
 
         Map<Integer, Coordinate> coordinateHashMap = new HashMap<>();
         for (Coordinate c : blueprintCoordinates) {
@@ -57,7 +53,7 @@ public class Movement {
     }
 
     public Map<Integer, Coordinate> getCoordinates(Coordinate offset, Colour colour) {
-        if (Colour.WHITE.equals(colour) || !reverseForBlack) {
+        if (Colour.WHITE.equals(colour)) {
             return this.getWhiteCoordinates(offset.getX(), offset.getY());
         } else {
             return this.getBlackCoordinates(offset.getX(), offset.getY());
