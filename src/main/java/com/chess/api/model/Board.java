@@ -72,6 +72,17 @@ public class Board {
         return pieces[coordinate.getX()][coordinate.getY()];
     }
 
+    public List<Piece> getPieces(Coordinate source, Coordinate target) {
+        Path path = new Path(source, target);
+        List<Piece> list = new ArrayList<>();
+        for (Coordinate coordinate : path) {
+            if (this.getPiece(coordinate) != null) {
+                list.add(this.getPiece(coordinate));
+            }
+        }
+        return list;
+    }
+
     /**
      * Move a piece to a new coordinate within the board.
      * <p>For a piece to move the following must be valid:</p>
@@ -93,8 +104,19 @@ public class Board {
             // Cannot move a piece if there is no piece, both are the same piece, or both are the same colour
             return;
         }
-        // Verify the destination is a valid coordinate for this piece to move to
         if (!source.verifyMove(end)) {
+            // Not a valid location for the piece to move to
+            return;
+        }
+
+        boolean hasValidPath = false;
+        Iterator<Movement> movementIterator = source.getMovementList().listIterator();
+        while (movementIterator.hasNext() && !hasValidPath) {
+            Movement movement = movementIterator.next();
+            // Todo: validate movement condition is passed
+            hasValidPath = this.isValidPath(source.getColour(), movement.getPath(source.getColour(), start, end));
+        }
+        if (!hasValidPath) {
             return;
         }
         // Update the piece's internal position
@@ -102,6 +124,24 @@ public class Board {
         // Update the piece on the board
         pieces[end.getX()][end.getY()] = pieces[start.getX()][start.getY()];
         pieces[start.getX()][start.getY()] = null;
+    }
+
+    private boolean isValidPath(@NonNull Colour colour, Path path) {
+        if (path == null || path.isEmpty()) {
+            return false;
+        }
+
+        boolean hasPiece = false;
+        for (Coordinate coordinate : path) {
+            Piece piece = this.getPiece(coordinate);
+            if (piece != null) {
+                if (hasPiece || colour.equals(piece.getColour())) {
+                    return false;
+                }
+                hasPiece = true;
+            }
+        }
+        return true;
     }
 
 }
