@@ -1,14 +1,15 @@
 package com.chess.api.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 
 @Getter
 public class Coordinate implements Comparable<Coordinate> {
 
-    private static final int MAX_X = 7;
-    private static final int MAX_Y = 7;
+    public static final int MAX_X = 7;
+    public static final int MAX_Y = 7;
 
     private final int x;
     private final int y;
@@ -32,6 +33,14 @@ public class Coordinate implements Comparable<Coordinate> {
         }
         char[] chars = str.toLowerCase(Locale.ROOT).toCharArray();
         return new Coordinate(chars[0], chars[1]);
+    }
+
+    public static Coordinate at(int x, int y) {
+        return new Coordinate(x, y);
+    }
+
+    public static Coordinate origin() {
+        return new Coordinate(0, 0);
     }
 
     @Override

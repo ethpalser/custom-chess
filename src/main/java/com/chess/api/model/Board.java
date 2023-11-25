@@ -1,6 +1,11 @@
 package com.chess.api.model;
 
+import com.chess.api.model.movement.Movement;
+import com.chess.api.model.movement.Path;
 import com.chess.api.model.piece.Piece;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -15,33 +20,33 @@ public class Board {
         int y = 0;
         for (int x = 0; x < 8; x++) {
             pieceList[x][y] = (switch (x) {
-                case 0, 7 -> Piece.ROOK(Colour.WHITE, new Coordinate(x, y));
-                case 1, 6 -> Piece.KNIGHT(Colour.WHITE, new Coordinate(x, y));
-                case 2, 5 -> Piece.BISHOP(Colour.WHITE, new Coordinate(x, y));
-                case 3 -> Piece.QUEEN(Colour.WHITE, new Coordinate(x, y));
-                case 4 -> Piece.KING(Colour.WHITE, new Coordinate(x, y));
+                case 0, 7 -> Piece.rook(Colour.WHITE, new Coordinate(x, y));
+                case 1, 6 -> Piece.knight(Colour.WHITE, new Coordinate(x, y));
+                case 2, 5 -> Piece.bishop(Colour.WHITE, new Coordinate(x, y));
+                case 3 -> Piece.queen(Colour.WHITE, new Coordinate(x, y));
+                case 4 -> Piece.king(Colour.WHITE, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
         }
 
         y = 1;
         for (int x = 0; x < 8; x++) {
-            pieceList[x][y] = Piece.PAWN(Colour.WHITE, new Coordinate(x, y));
+            pieceList[x][y] = Piece.pawn(Colour.WHITE, new Coordinate(x, y));
         }
 
         y = 6;
         for (int x = 0; x < 8; x++) {
-            pieceList[x][y] = Piece.PAWN(Colour.BLACK, new Coordinate(x, y));
+            pieceList[x][y] = Piece.pawn(Colour.BLACK, new Coordinate(x, y));
         }
 
         y = 7;
         for (int x = 0; x < 8; x++) {
             pieceList[x][y] = (switch (x) {
-                case 0, 7 -> Piece.ROOK(Colour.BLACK, new Coordinate(x, y));
-                case 1, 6 -> Piece.KNIGHT(Colour.BLACK, new Coordinate(x, y));
-                case 2, 5 -> Piece.BISHOP(Colour.BLACK, new Coordinate(x, y));
-                case 3 -> Piece.QUEEN(Colour.BLACK, new Coordinate(x, y));
-                case 4 -> Piece.KING(Colour.BLACK, new Coordinate(x, y));
+                case 0, 7 -> Piece.rook(Colour.BLACK, new Coordinate(x, y));
+                case 1, 6 -> Piece.knight(Colour.BLACK, new Coordinate(x, y));
+                case 2, 5 -> Piece.bishop(Colour.BLACK, new Coordinate(x, y));
+                case 3 -> Piece.queen(Colour.BLACK, new Coordinate(x, y));
+                case 4 -> Piece.king(Colour.BLACK, new Coordinate(x, y));
                 default -> throw new IllegalStateException("Unexpected value: " + x);
             });
         }
@@ -67,6 +72,17 @@ public class Board {
         return pieces[coordinate.getX()][coordinate.getY()];
     }
 
+    public List<Piece> getPieces(Coordinate source, Coordinate target) {
+        Path path = new Path(source, target);
+        List<Piece> list = new ArrayList<>();
+        for (Coordinate coordinate : path) {
+            if (this.getPiece(coordinate) != null) {
+                list.add(this.getPiece(coordinate));
+            }
+        }
+        return list;
+    }
+
     /**
      * Move a piece to a new coordinate within the board.
      * <p>For a piece to move the following must be valid:</p>
@@ -78,23 +94,52 @@ public class Board {
      * </ol>
      *
      * @param start
-     * @param destination
+     * @param end
      */
-    public void movePiece(@NonNull Coordinate start, @NonNull Coordinate destination) {
+    public void movePiece(@NonNull Coordinate start, @NonNull Coordinate end) {
         Piece source = pieces[start.getX()][start.getY()];
-        Piece target = pieces[destination.getX()][destination.getY()];
+        Piece target = pieces[end.getX()][end.getY()];
 
         if (source == null || source.equals(target) || (target != null && source.getColour().equals(target.getColour()))) {
+            // Cannot move a piece if there is no piece, both are the same piece, or both are the same colour
             return;
         }
-        // Todo: verify destination is valid
-        // Todo: validate movement is allowed
-        // Todo: verify path is empty, but only if the piece traverses along a path
+        if (!source.verifyMove(end)) {
+            // Not a valid location for the piece to move to
+            return;
+        }
+
+        boolean hasValidPath = false;
+        Iterator<Movement> movementIterator = source.getMovementList().listIterator();
+        while (movementIterator.hasNext() && !hasValidPath) {
+            Movement movement = movementIterator.next();
+            // Todo: validate movement condition is passed
+            hasValidPath = this.isValidPath(movement.getPath(source.getColour(), start, end));
+        }
+        if (!hasValidPath) {
+            return;
+        }
         // Update the piece's internal position
-        source.performMove(destination);
+        source.performMove(end);
         // Update the piece on the board
-        pieces[destination.getX()][destination.getY()] = pieces[start.getX()][start.getY()];
+        pieces[end.getX()][end.getY()] = pieces[start.getX()][start.getY()];
         pieces[start.getX()][start.getY()] = null;
+    }
+
+    private boolean isValidPath(Path path) {
+        if (path == null || path.isEmpty()) {
+            return false;
+        }
+
+        Iterator<Coordinate> iterator = path.iterator();
+        while (iterator.hasNext()) {
+            Coordinate coordinate = iterator.next();
+            if (this.getPiece(coordinate) != null && iterator.hasNext()) {
+                // Piece is in the middle of the path
+                return false;
+            }
+        }
+        return true;
     }
 
 }

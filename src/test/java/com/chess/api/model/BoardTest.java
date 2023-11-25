@@ -74,8 +74,8 @@ class BoardTest {
     void movePiece_noPieceAtCoordinate_noPieceMovedAndNoFewerPieces() {
         int pieceX = 2;
         int pieceY = 2;
-        int nextX = 3;
-        int nextY = 4;
+        int nextX = 4;
+        int nextY = 3;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // Nothing at location
         Coordinate nextC = new Coordinate(nextX, nextY);
@@ -89,10 +89,10 @@ class BoardTest {
 
     @Test
     void movePiece_toSameCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
-        int nextX = 0;
-        int nextY = 1;
+        int pieceX = 1;
+        int pieceY = 0;
+        int nextX = 1;
+        int nextY = 0;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
         Coordinate nextC = new Coordinate(nextX, nextY);
@@ -106,10 +106,10 @@ class BoardTest {
 
     @Test
     void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
-        int nextX = -1;
-        int nextY = 0;
+        int pieceX = 1;
+        int pieceY = 0;
+        int nextX = 0;
+        int nextY = -2;
 
         Coordinate pieceC = new Coordinate(pieceX, pieceY); // White Knight
         assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(nextX, nextY));
@@ -121,15 +121,16 @@ class BoardTest {
 
     @Test
     void movePiece_toValidSameColourOccupiedCoordinate_noPieceMovedAndNoFewerPieces() {
-        int pieceX = 0;
-        int pieceY = 1;
-        int nextX = 1;
-        int nextY = 3;
+        int pieceX = 1;
+        int pieceY = 0;
+        int nextX = 2;
+        int nextY = 2;
 
         Coordinate source = new Coordinate(pieceX, pieceY); // White Knight
         Coordinate target = new Coordinate(nextX, nextY); // White Pawn
 
         Board board = new Board();
+        board.movePiece(Coordinate.at(nextX, 1), Coordinate.at(nextX, nextY));
         board.movePiece(source, target);
 
         assertNotNull(board.getPiece(source));
@@ -155,7 +156,7 @@ class BoardTest {
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
-        assertEquals(Colour.WHITE, board.getPiece(target).getColour());
+        assertEquals(Colour.BLACK, board.getPiece(target).getColour());
         assertEquals(32, board.count());
     }
 
@@ -170,7 +171,7 @@ class BoardTest {
         Coordinate target = new Coordinate(nextX, nextY); // Black Pawn
 
         Board board = new Board();
-        board.getPieces()[1][0] = null; // Can be sufficient for path checks
+        board.getPieces()[0][1] = null; // Can be sufficient for path checks
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
