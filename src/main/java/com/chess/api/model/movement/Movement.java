@@ -3,6 +3,7 @@ package com.chess.api.model.movement;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -11,47 +12,40 @@ import lombok.NonNull;
 @Getter
 public class Movement {
 
-    private final Map<Integer, Coordinate> coordinateBlueprint;
+    private final Path originalPath;
     private final MovementType type;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
 
     public Movement() {
-        this.coordinateBlueprint = new HashMap<>();
-        this.type = MovementType.JUMP;
+        this.originalPath = new Path();
+        this.type = MovementType.ADVANCE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> blueprintCoordinates) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-
-        Map<Integer, Coordinate> coordinateHashMap = new HashMap<>();
-        for (Coordinate c : blueprintCoordinates) {
-            coordinateHashMap.put(c.hashCode(), c);
-        }
-        this.coordinateBlueprint = coordinateHashMap;
+        this.originalPath = new Path(coordinates);
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate... blueprintCoordinates) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-
-        Map<Integer, Coordinate> coordinateHashMap = new HashMap<>();
-        for (Coordinate c : blueprintCoordinates) {
-            coordinateHashMap.put(c.hashCode(), c);
-        }
-        this.coordinateBlueprint = coordinateHashMap;
+        this.originalPath = new Path(end);
     }
 
-    public Map<Integer, Coordinate> getCoordinates() {
-        return coordinateBlueprint;
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
+        this.type = type;
+        this.mirrorXAxis = mirrorXAxis;
+        this.mirrorYAxis = mirrorYAxis;
+        this.originalPath = new Path(start, end);
     }
 
-    public Map<Integer, Coordinate> getCoordinates(@NonNull Coordinate offset, @NonNull Colour colour) {
+    public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
         if (Colour.WHITE.equals(colour)) {
             return this.getWhiteCoordinates(offset.getX(), offset.getY());
         } else {
@@ -61,7 +55,7 @@ public class Movement {
 
     private Map<Integer, Coordinate> getWhiteCoordinates(final int offsetX, final int offsetY) {
         Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : coordinateBlueprint.values()) {
+        for (Coordinate coordinate : this.originalPath) {
             int baseOffsetX = coordinate.getX() + offsetX;
             int baseOffsetY = coordinate.getY() + offsetY;
             int mirrorOffsetX = offsetX - coordinate.getX();
@@ -93,7 +87,7 @@ public class Movement {
 
     private Map<Integer, Coordinate> getBlackCoordinates(int offsetX, int offsetY) {
         Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : coordinateBlueprint.values()) {
+        for (Coordinate coordinate : this.originalPath) {
             int baseOffsetX = coordinate.getX() + offsetX;
             int baseOffsetY = coordinate.getY() + offsetY;
             int mirrorOffsetX = offsetX - coordinate.getX();
@@ -123,9 +117,37 @@ public class Movement {
         return map;
     }
 
-    public boolean validCoordinate(@NonNull Colour colour, @NonNull Coordinate source, @NonNull Coordinate destination) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(source, colour);
+    public boolean isValidCoordinate(@NonNull Colour colour, @NonNull Coordinate source,
+            @NonNull Coordinate destination) {
+        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, source);
         return coordinates.get(destination.hashCode()) != null;
+    }
+
+    public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
+        // Determine direction
+        int diffX = end.getX() - start.getX();
+        int diffY = end.getY() - start.getY();
+        boolean negX = diffX != 0 && diffX / Math.abs(diffX) == -1;
+        boolean negY = diffY != 0 && diffY / Math.abs(diffY) == -1;
+        boolean isBlack = Colour.BLACK.equals(colour);
+
+        // Invalid direction cases
+        if ((!negX && isBlack && !this.mirrorXAxis)
+                || (negX && !isBlack && !this.mirrorXAxis)
+                || (negY && !this.mirrorYAxis)) {
+            return new Path();
+        }
+
+        List<Coordinate> coordinates = new LinkedList<>();
+        for (Coordinate coordinate : this.getOriginalPath()) {
+            int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
+            int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
+            if (nextX < 0 || nextX > Coordinate.MAX_X || nextY < 0 || nextY > Coordinate.MAX_Y) {
+                break;
+            }
+            coordinates.add(Coordinate.at(nextX, nextY));
+        }
+        return new Path(coordinates);
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
@@ -133,12 +155,17 @@ public class Movement {
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(offset, colour);
+        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, offset);
         boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
         for (Coordinate c : coordinates.values()) {
             boardMove[c.getX()][c.getY()] = true;
         }
         return boardMove;
+    }
+
+    @Override
+    public String toString() {
+        return this.toString(Colour.WHITE, Coordinate.origin());
     }
 
     public String toString(@NonNull Colour colour, @NonNull Coordinate offset) {

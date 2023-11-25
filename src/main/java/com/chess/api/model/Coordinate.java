@@ -43,36 +43,6 @@ public class Coordinate implements Comparable<Coordinate> {
         return new Coordinate(0, 0);
     }
 
-    public static List<Coordinate> vertical(Coordinate source) {
-        List<Coordinate> list = new ArrayList<>();
-        for (int y = 0; y <= Coordinate.MAX_Y; y++) {
-            if (y != source.getY()) {
-                list.add(new Coordinate(source.getX(), y));
-            }
-        }
-        return list;
-    }
-
-    public static List<Coordinate> horizontal(Coordinate source) {
-        List<Coordinate> list = new ArrayList<>();
-        for (int x = 0; x <= Coordinate.MAX_X; x++) {
-            if (x != source.getX()) {
-                list.add(new Coordinate(x, source.getY()));
-            }
-        }
-        return list;
-    }
-
-    public static List<Coordinate> diagonal(Coordinate source) {
-        List<Coordinate> list = new ArrayList<>();
-        for (int i = 0; i <= Coordinate.MAX_X; i++) {
-            if (i != source.getX()) {
-                list.add(new Coordinate(i, i));
-            }
-        }
-        return list;
-    }
-
     @Override
     public int compareTo(Coordinate o) {
         if (o == null) {
