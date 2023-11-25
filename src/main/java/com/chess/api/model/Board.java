@@ -114,7 +114,7 @@ public class Board {
         while (movementIterator.hasNext() && !hasValidPath) {
             Movement movement = movementIterator.next();
             // Todo: validate movement condition is passed
-            hasValidPath = this.isValidPath(source.getColour(), movement.getPath(source.getColour(), start, end));
+            hasValidPath = this.isValidPath(movement.getPath(source.getColour(), start, end));
         }
         if (!hasValidPath) {
             return;
@@ -126,19 +126,17 @@ public class Board {
         pieces[start.getX()][start.getY()] = null;
     }
 
-    private boolean isValidPath(@NonNull Colour colour, Path path) {
+    private boolean isValidPath(Path path) {
         if (path == null || path.isEmpty()) {
             return false;
         }
 
-        boolean hasPiece = false;
-        for (Coordinate coordinate : path) {
-            Piece piece = this.getPiece(coordinate);
-            if (piece != null) {
-                if (hasPiece || colour.equals(piece.getColour())) {
-                    return false;
-                }
-                hasPiece = true;
+        Iterator<Coordinate> iterator = path.iterator();
+        while (iterator.hasNext()) {
+            Coordinate coordinate = iterator.next();
+            if (this.getPiece(coordinate) != null && iterator.hasNext()) {
+                // Piece is in the middle of the path
+                return false;
             }
         }
         return true;
