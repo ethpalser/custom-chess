@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 
 @Getter
 public class Coordinate implements Comparable<Coordinate> {

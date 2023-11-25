@@ -48,11 +48,11 @@ public class Piece {
     public boolean verifyMove(@NonNull Coordinate destination) {
         for (Movement move : movementList) {
             boolean valid = move.validCoordinate(this.colour, this.position, destination);
-            if (!valid) {
-                return false;
+            if (valid) {
+                return true;
             }
         }
-        return !movementList.isEmpty();
+        return false;
     }
 
     public void performMove(@NonNull Coordinate destination) {
@@ -65,7 +65,7 @@ public class Piece {
         return this.type.getCode() + position.toString();
     }
 
-    // region Static methods
+    // region Static methods - Specific Chess Pieces
 
     public static Piece PAWN(@NonNull Colour colour, @NonNull Coordinate coordinate) {
         Movement pawnBaseMove = new Movement(MovementType.ADVANCE, false, false, new Coordinate(0, 1));
@@ -87,7 +87,8 @@ public class Piece {
     }
 
     public static Piece KNIGHT(@NonNull Colour colour, @NonNull Coordinate coordinate) {
-        Movement knightBaseMove = new Movement(MovementType.JUMP, true, true, new Coordinate(1, 2), new Coordinate(2, 1));
+        Movement knightBaseMove = new Movement(MovementType.JUMP, true, true, new Coordinate(1, 2),
+                new Coordinate(2, 1));
         return new Piece(PieceType.KNIGHT, colour, coordinate, knightBaseMove);
     }
 
@@ -105,14 +106,14 @@ public class Piece {
         baseCoordinates.addAll(Coordinate.vertical(origin));
         baseCoordinates.addAll(Coordinate.horizontal(origin));
         baseCoordinates.addAll(Coordinate.diagonal(origin));
-        
+
         Movement queenBaseMove = new Movement(MovementType.ADVANCE, true, true, baseCoordinates);
         return new Piece(PieceType.QUEEN, colour, coordinate, queenBaseMove);
     }
 
     public static Piece KING(@NonNull Colour colour, @NonNull Coordinate coordinate) {
-        Movement kingBaseMove = new Movement(MovementType.ADVANCE, true, true, new Coordinate(0, 1), new Coordinate(1, 1),
-                new Coordinate(1, 0));
+        Movement kingBaseMove = new Movement(MovementType.ADVANCE, true, true, new Coordinate(0, 1),
+                new Coordinate(1, 1), new Coordinate(1, 0));
         return new Piece(PieceType.KING, colour, coordinate, kingBaseMove);
     }
 
