@@ -130,6 +130,7 @@ class BoardTest {
         Coordinate target = new Coordinate(nextX, nextY); // White Pawn
 
         Board board = new Board();
+        board.movePiece(Coordinate.at(nextX, 1), Coordinate.at(nextX, nextY));
         board.movePiece(source, target);
 
         assertNotNull(board.getPiece(source));
