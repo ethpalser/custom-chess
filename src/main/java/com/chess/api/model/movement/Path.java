@@ -1,13 +1,14 @@
 package com.chess.api.model.movement;
 
 import com.chess.api.model.Coordinate;
-import jakarta.annotation.Nullable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import lombok.Getter;
 
 public class Path implements Iterable<Coordinate> {
 
+    @Getter
     private final LinkedHashMap<Integer, Coordinate> map;
 
     public Path() {
@@ -16,16 +17,38 @@ public class Path implements Iterable<Coordinate> {
 
     public Path(List<Coordinate> coordinates) {
         LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
-        for (Coordinate coordinate : coordinates) {
-            linkedHashMap.put(coordinate.hashCode(), coordinate);
+        if (coordinates != null) {
+            for (Coordinate coordinate : coordinates) {
+                if (coordinate != null) {
+                    linkedHashMap.put(coordinate.hashCode(), coordinate);
+                }
+            }
         }
         this.map = linkedHashMap;
     }
 
-    public Path(Coordinate start, Coordinate end, @Nullable Coordinate... between) {
+    public Path(Coordinate end) {
         LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
+        if (end != null) {
+            linkedHashMap.put(end.hashCode(), end);
+        }
+        this.map = linkedHashMap;
+    }
 
-        PathType pathType = PathType.findType(start, end);
+    public Path(Coordinate start, Coordinate end) {
+        LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
+        if (start == null || end == null) {
+            this.map = linkedHashMap;
+            return;
+        }
+
+        PathType pathType;
+        if (start.equals(end)) {
+            pathType = PathType.CUSTOM;
+        } else {
+            pathType = PathType.findType(start, end);
+        }
+
         int x = start.getX();
         int y = start.getY();
         switch (pathType) {
@@ -62,15 +85,37 @@ public class Path implements Iterable<Coordinate> {
             }
             case CUSTOM -> {
                 linkedHashMap.put(start.hashCode(), start);
-                if (between != null) {
-                    for (Coordinate coordinate : between) {
-                        linkedHashMap.put(coordinate.hashCode(), coordinate);
-                    }
-                }
                 linkedHashMap.put(end.hashCode(), end);
             }
         }
         this.map = linkedHashMap;
+    }
+
+    public int size() {
+        if (!this.map.containsValue(null)) {
+            return this.map.size();
+        }
+        // Ignore all incorrectly added null values
+        int size = 0;
+        for (Coordinate coordinate : this) {
+            if (coordinate != null) {
+                size++;
+            }
+        }
+        return size;
+    }
+
+    public boolean isEmpty() {
+        if (!this.map.containsValue(null)) {
+            return this.map.isEmpty();
+        }
+        // Ignore all incorrectly added null values
+        for (Coordinate coordinate : this) {
+            if (coordinate != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
