@@ -70,7 +70,8 @@ public class Piece {
     public static Piece pawn(@NonNull Colour colour, @NonNull Coordinate coordinate) {
         Movement pawnBaseMove = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(0, 1));
         // Todo: Add conditions to these moves
-        Movement fastAdvance = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(0, 2));
+        Movement fastAdvance = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(0, 1),
+                Coordinate.at(0, 2));
         Movement capture = new Movement(MovementType.ADVANCE, false, true, Coordinate.at(1, 1));
         Movement enPassant = new Movement(MovementType.ADVANCE, false, true, Coordinate.at(1, 1));
         return new Piece(PieceType.PAWN, colour, coordinate, pawnBaseMove, fastAdvance, capture, enPassant);
