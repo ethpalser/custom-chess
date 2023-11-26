@@ -1,13 +1,12 @@
 package com.chess.api.model.piece;
 
 public enum PieceType {
-    PAWN("p"),
-    ROOK("r"),
-    KNIGHT("k"),
-    BISHOP("b"),
-    QUEEN("q"),
-    KING("k"),
-    CUSTOM("z");
+    PAWN(""),
+    ROOK("R"),
+    KNIGHT("N"),
+    BISHOP("B"),
+    QUEEN("Q"),
+    KING("K");
 
     private final String code;
 
