@@ -163,7 +163,7 @@ public class Movement {
         for (Coordinate coordinate : this.getOriginalPath()) {
             int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
             int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
-            if (nextX < 0 || nextX > Coordinate.MAX_X || nextY < 0 || nextY > Coordinate.MAX_Y) {
+            if (!Coordinate.isValid(nextX, nextY)) {
                 break;
             }
             coordinates.add(Coordinate.at(nextX, nextY));
