@@ -2,6 +2,7 @@ package com.chess.api.model.movement;
 
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
+import com.chess.api.model.movement.condition.Condition;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,33 +17,53 @@ public class Movement {
     private final MovementType type;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
+    private final List<Condition> conditions;
 
     public Movement() {
         this.originalPath = new Path();
         this.type = MovementType.ADVANCE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
+        this.conditions = null;
     }
 
     public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates) {
+        this(type, mirrorXAxis, mirrorYAxis, coordinates, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
+        this(type, mirrorXAxis, mirrorYAxis, end, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
+        this(type, mirrorXAxis, mirrorYAxis, start, end, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(coordinates);
+        this.conditions = conditions;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(end);
+        this.conditions = conditions;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(start, end);
+        this.conditions = conditions;
     }
 
     public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
