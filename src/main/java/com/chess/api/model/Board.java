@@ -2,6 +2,7 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
+import com.chess.api.model.movement.condition.Condition;
 import com.chess.api.model.piece.Piece;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import lombok.NonNull;
 public class Board {
 
     private final Piece[][] pieces;
+    private Piece lastMoved;
 
     public Board() {
         Piece[][] pieceList = new Piece[8][8];
@@ -51,6 +53,7 @@ public class Board {
             });
         }
         this.pieces = pieceList;
+        this.lastMoved = null;
     }
 
     public int count() {
@@ -113,10 +116,17 @@ public class Board {
         Iterator<Movement> movementIterator = source.getMovementList().listIterator();
         while (movementIterator.hasNext() && !hasValidPath) {
             Movement movement = movementIterator.next();
-            // Todo: validate movement condition is passed
-            hasValidPath = this.isValidPath(movement.getPath(source.getColour(), start, end));
+            boolean hasValidConditions = true;
+            for (Condition condition : movement.getConditions()) {
+                if(!condition.evaluate(this, start, end)) {
+                    hasValidConditions = false;
+                    break;
+                }
+            }
+            hasValidPath = hasValidConditions && this.isValidPath(movement.getPath(source.getColour(), start, end));
         }
         if (!hasValidPath) {
+            // Piece is in the middle of the path
             return;
         }
         // Update the piece's internal position
@@ -124,6 +134,7 @@ public class Board {
         // Update the piece on the board
         pieces[end.getX()][end.getY()] = pieces[start.getX()][start.getY()];
         pieces[start.getX()][start.getY()] = null;
+        this.lastMoved = pieces[end.getX()][end.getY()];
     }
 
     private boolean isValidPath(Path path) {
