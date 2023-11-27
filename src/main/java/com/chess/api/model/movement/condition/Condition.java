@@ -6,7 +6,9 @@ import com.chess.api.model.piece.Piece;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public class Condition {
 
     private final Reference reference;
