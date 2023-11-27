@@ -48,7 +48,7 @@ public class Condition {
                                 && propVal.equals(this.expected);
                 case OPPOSITE -> {
                     // The start piece is implied for OPPOSITE, as the condition's value is not known until runtime
-                    Piece currPiece = board.getAt(start);
+                    Piece currPiece = board.getPiece(start);
                     Object currVal = this.property.fetch(currPiece);
                     result = (currVal == null && propVal == null) ||
                             currVal != null && propVal != null
@@ -67,11 +67,11 @@ public class Condition {
         List<Piece> pieces = new ArrayList<>();
         switch (reference.location()) {
             case LAST_MOVED -> pieces.add(board.getLastMoved());
-            case AT_START -> pieces.add(board.getAt(start));
-            case AT_DESTINATION -> pieces.add(board.getAt(end));
-            case AT_COORDINATE -> pieces.add(board.getAt(reference.coordinate()));
-            case PATH_TO_DESTINATION -> pieces = board.getAtPath(start, end);
-            case PATH_TO_COORDINATE -> pieces = board.getAtPath(start, reference.coordinate());
+            case AT_START -> pieces.add(board.getPiece(start));
+            case AT_DESTINATION -> pieces.add(board.getPiece(end));
+            case AT_COORDINATE -> pieces.add(board.getPiece(reference.coordinate()));
+            case PATH_TO_DESTINATION -> pieces = board.getPieces(start, end);
+            case PATH_TO_COORDINATE -> pieces = board.getPieces(start, reference.coordinate());
         }
         return pieces;
     }
