@@ -2,6 +2,8 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
+import com.chess.api.model.movement.condition.Condition;
+import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import lombok.NonNull;
 public class Board {
 
     private final Piece[][] pieces;
+    private Piece lastMoved;
 
     public Board() {
         Piece[][] pieceList = new Piece[8][8];
@@ -51,6 +54,7 @@ public class Board {
             });
         }
         this.pieces = pieceList;
+        this.lastMoved = null;
     }
 
     public int count() {
@@ -111,12 +115,20 @@ public class Board {
 
         boolean hasValidPath = false;
         Iterator<Movement> movementIterator = source.getMovementList().listIterator();
+        Movement movement = null;
         while (movementIterator.hasNext() && !hasValidPath) {
-            Movement movement = movementIterator.next();
-            // Todo: validate movement condition is passed
-            hasValidPath = this.isValidPath(movement.getPath(source.getColour(), start, end));
+            movement = movementIterator.next();
+            boolean hasValidConditions = true;
+            for (Condition condition : movement.getConditions()) {
+                if (!condition.evaluate(this, start, end)) {
+                    hasValidConditions = false;
+                    break;
+                }
+            }
+            hasValidPath = hasValidConditions && movement.isValidCoordinate(source.getColour(), start, end) && this.isValidPath(movement.getPath(source.getColour(), start, end));
         }
-        if (!hasValidPath) {
+        if (movement == null || !hasValidPath) {
+            // Piece is in the middle of the path
             return;
         }
         // Update the piece's internal position
@@ -124,6 +136,10 @@ public class Board {
         // Update the piece on the board
         pieces[end.getX()][end.getY()] = pieces[start.getX()][start.getY()];
         pieces[start.getX()][start.getY()] = null;
+        this.lastMoved = pieces[end.getX()][end.getY()];
+        if (movement.getExtraMovement() != null) {
+            movement.getExtraMovement().move(this, start);
+        }
     }
 
     private boolean isValidPath(Path path) {
@@ -140,6 +156,33 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public List<Piece> getReferencePiece(Reference reference, Coordinate start, Coordinate end) {
+        if (reference == null) {
+            return List.of();
+        }
+        List<Piece> pieces = new ArrayList<>();
+        switch (reference.location()) {
+            case LAST_MOVED -> pieces.add(this.getLastMoved());
+            case AT_START -> pieces.add(this.getPiece(start));
+            case AT_DESTINATION -> pieces.add(this.getPiece(end));
+            case AT_COORDINATE -> pieces.add(this.getPiece(reference.coordinate()));
+            case PATH_TO_DESTINATION -> pieces = this.getPieces(start, end);
+            case PATH_TO_COORDINATE -> pieces = this.getPieces(start, reference.coordinate());
+            case BELOW_DESTINATION -> pieces.add(this.getPiece(end.getX(), end.getY() - 1));
+        }
+        return pieces;
+    }
+
+    public void updatePieceLocation(@NonNull Coordinate start, Coordinate destination) {
+        if (pieces[start.getX()][start.getY()] == null) {
+            return;
+        }
+        if (destination != null) {
+            pieces[destination.getX()][destination.getY()] = pieces[start.getX()][start.getY()];
+        }
+        pieces[start.getX()][start.getY()] = null;
     }
 
 }

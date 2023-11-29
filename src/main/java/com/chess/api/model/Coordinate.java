@@ -43,6 +43,10 @@ public class Coordinate implements Comparable<Coordinate> {
         return new Coordinate(0, 0);
     }
 
+    public static boolean isValid(int x, int y) {
+        return x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y;
+    }
+
     @Override
     public int compareTo(Coordinate o) {
         if (o == null) {

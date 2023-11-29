@@ -219,4 +219,70 @@ class BoardTest {
         assertEquals(31, board.count()); // One fewer piece from forced removal
     }
 
+    @Test
+    void movePiece_castleKingSideAndValid_kingAndRookMovedAndNoFewerPieces() {
+        Coordinate source = new Coordinate(4, 0);
+        Coordinate target = new Coordinate(6, 0);
+
+        Board board = new Board();
+        board.getPieces()[5][0] = null;
+        board.getPieces()[6][0] = null;
+
+        board.movePiece(source, target);
+        assertNull(board.getPiece(7, 0));
+        assertNull(board.getPiece(4, 0));
+        assertNotNull(board.getPiece(target));
+        assertNotNull(board.getPiece(5,0));
+    }
+
+
+    @Test
+    void movePiece_castleQueenSideAndValid_kingAndRookMovedAndNoFewerPieces() {
+        Coordinate source = new Coordinate(4, 0);
+        Coordinate target = new Coordinate(2, 0);
+
+        Board board = new Board();
+        board.getPieces()[1][0] = null;
+        board.getPieces()[2][0] = null;
+        board.getPieces()[3][0] = null;
+
+        board.movePiece(source, target);
+        assertNull(board.getPiece(0, 0));
+        assertNull(board.getPiece(4, 0));
+        assertNotNull(board.getPiece(target));
+        assertNotNull(board.getPiece(3,0));
+    }
+
+    @Test
+    void movePiece_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
+        Coordinate source = new Coordinate(4, 6);
+        Coordinate target = new Coordinate(4, 4);
+
+        Board board = new Board();
+        board.movePiece(Coordinate.at(3, 1), Coordinate.at(3,3));
+        board.movePiece(Coordinate.at(3,3), Coordinate.at(3, 4));
+
+        board.movePiece(source, target);
+        board.movePiece(Coordinate.at(3, 4), Coordinate.at(4, 5)); // En Passant
+        assertNull(board.getPiece(3,4));
+        assertNull(board.getPiece(4,4));
+        assertNotNull(board.getPiece(4,5));
+    }
+
+    @Test
+    void movePiece_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
+        Coordinate source = new Coordinate(2, 6);
+        Coordinate target = new Coordinate(2, 4);
+
+        Board board = new Board();
+        board.movePiece(Coordinate.at(3, 1), Coordinate.at(3,3));
+        board.movePiece(Coordinate.at(3,3), Coordinate.at(3, 4));
+
+        board.movePiece(source, target);
+        board.movePiece(Coordinate.at(3, 4), Coordinate.at(4, 5)); // En Passant
+        assertNull(board.getPiece(3,4));
+        assertNull(board.getPiece(4,4));
+        assertNotNull(board.getPiece(4,5));
+    }
+
 }

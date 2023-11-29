@@ -2,13 +2,16 @@ package com.chess.api.model.movement;
 
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
+import com.chess.api.model.movement.condition.Condition;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
+@AllArgsConstructor
 @Getter
 public class Movement {
 
@@ -16,33 +19,74 @@ public class Movement {
     private final MovementType type;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
+    private final List<Condition> conditions;
+    private final ExtraMovement extraMovement;
+    private final boolean lockedQuadrant;
 
     public Movement() {
         this.originalPath = new Path();
         this.type = MovementType.ADVANCE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
+        this.conditions = null;
+        this.extraMovement = null;
+        this.lockedQuadrant = false;
     }
 
     public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates) {
+        this(type, mirrorXAxis, mirrorYAxis, coordinates, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
+        this(type, mirrorXAxis, mirrorYAxis, end, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
+        this(type, mirrorXAxis, mirrorYAxis, start, end, List.of());
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(coordinates);
+        this.conditions = conditions;
+        this.extraMovement = null;
+        this.lockedQuadrant = false;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(end);
+        this.conditions = conditions;
+        this.extraMovement = null;
+        this.lockedQuadrant = false;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
+            List<Condition> conditions, ExtraMovement extraMovement, boolean lockedQuadrant) {
+        this.type = type;
+        this.mirrorXAxis = mirrorXAxis;
+        this.mirrorYAxis = mirrorYAxis;
+        this.originalPath = new Path(end);
+        this.conditions = conditions;
+        this.extraMovement = extraMovement;
+        this.lockedQuadrant = lockedQuadrant;
+    }
+
+    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end,
+            List<Condition> conditions) {
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.originalPath = new Path(start, end);
+        this.conditions = conditions;
+        this.extraMovement = null;
+        this.lockedQuadrant = false;
     }
 
     public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
@@ -60,6 +104,39 @@ public class Movement {
             int baseOffsetY = coordinate.getY() + offsetY;
             int mirrorOffsetX = offsetX - coordinate.getX();
             int mirrorOffsetY = offsetY - coordinate.getY();
+
+            if (lockedQuadrant) {
+                if (!mirrorXAxis) {
+                    if (!mirrorYAxis) {
+                        // Q1 Top Right
+                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
+                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
+                            map.put(offsetCo.hashCode(), offsetCo);
+                        }
+                    } else {
+                        // Q2 Bottom Right
+                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
+                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
+                            map.put(mirrorX.hashCode(), mirrorX);
+                        }
+                    }
+                } else {
+                    if (!mirrorYAxis) {
+                        // Q3 Bottom Left
+                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
+                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
+                            map.put(mirrorXY.hashCode(), mirrorXY);
+                        }
+                    } else {
+                        // Q4 Top Left
+                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
+                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
+                            map.put(mirrorY.hashCode(), mirrorY);
+                        }
+                    }
+                }
+                break;
+            }
 
             // Q1 Top Right
             if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
@@ -92,6 +169,39 @@ public class Movement {
             int baseOffsetY = coordinate.getY() + offsetY;
             int mirrorOffsetX = offsetX - coordinate.getX();
             int mirrorOffsetY = offsetY - coordinate.getY();
+
+            if (lockedQuadrant) {
+                if (!mirrorXAxis) {
+                    if (!mirrorYAxis) {
+                        // Q2 Bottom Right
+                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
+                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
+                            map.put(mirrorX.hashCode(), mirrorX);
+                        }
+                    } else {
+                        // Q1 Top Right
+                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
+                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
+                            map.put(offsetCo.hashCode(), offsetCo);
+                        }
+                    }
+                } else {
+                    if (!mirrorYAxis) {
+                        // Q4 Top Left
+                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
+                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
+                            map.put(mirrorY.hashCode(), mirrorY);
+                        }
+                    } else {
+                        // Q3 Bottom Left
+                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
+                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
+                            map.put(mirrorXY.hashCode(), mirrorXY);
+                        }
+                    }
+                }
+                break;
+            }
 
             // Q1 Top Right
             if (this.mirrorXAxis && baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
@@ -142,7 +252,7 @@ public class Movement {
         for (Coordinate coordinate : this.getOriginalPath()) {
             int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
             int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
-            if (nextX < 0 || nextX > Coordinate.MAX_X || nextY < 0 || nextY > Coordinate.MAX_Y) {
+            if (!Coordinate.isValid(nextX, nextY)) {
                 break;
             }
             coordinates.add(Coordinate.at(nextX, nextY));
