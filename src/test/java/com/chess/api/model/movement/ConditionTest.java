@@ -143,7 +143,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0HasMoved_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE_FIXED, new Coordinate(0, 0)),
+        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
 
         Board board = new Board();
@@ -158,7 +158,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE_FIXED, new Coordinate(1, 0)), null,
+        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();
@@ -175,9 +175,9 @@ class ConditionTest {
         // Given
         Condition conditionA = new Condition(new Reference(Location.AT_START), new Property<>("hasMoved"),
                 PropertyState.FALSE, null);
-        Condition conditionB = new Condition(new Reference(Location.AT_COORDINATE_FIXED, new Coordinate(0, 0)),
+        Condition conditionB = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
-        Condition conditionC = new Condition(new Reference(Location.AT_COORDINATE_FIXED, new Coordinate(1, 0)), null,
+        Condition conditionC = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();

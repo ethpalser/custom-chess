@@ -2,6 +2,7 @@ package com.chess.api.model.piece;
 
 import com.chess.api.model.Colour;
 import com.chess.api.model.Coordinate;
+import com.chess.api.model.movement.ExtraMovement;
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.MovementType;
 import com.chess.api.model.movement.condition.Condition;
@@ -159,8 +160,9 @@ public class Piece {
                 .reference(new Reference(Location.PATH_TO_COORDINATE, Coordinate.at(7, 0)))
                 .propertyState(PropertyState.DOES_NOT_EXIST)
                 .build();
-        Movement castleKingSide = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(6, 0),
-                List.of(castleCond1, castleKingSideCond2, castleKingSideCond3));
+        ExtraMovement kingSideRookMovement = new ExtraMovement(Coordinate.at(7,0), Coordinate.at(5, 0));
+        Movement castleKingSide = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(2, 0),
+                List.of(castleCond1, castleKingSideCond2, castleKingSideCond3), kingSideRookMovement, true);
 
         Condition castleQueenSideCond2 = Condition.builder()
                 .reference(new Reference(Location.AT_COORDINATE, Coordinate.at(0, 0)))
@@ -171,8 +173,9 @@ public class Piece {
                 .reference(new Reference(Location.PATH_TO_COORDINATE, Coordinate.at(0, 0)))
                 .propertyState(PropertyState.DOES_NOT_EXIST)
                 .build();
-        Movement castleQueenSide = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(2, 0),
-                List.of(castleCond1, castleQueenSideCond2, castleQueenSideCond3));
+        ExtraMovement queenSideRookMovement = new ExtraMovement(Coordinate.at(0, 0), Coordinate.at(3, 0));
+        Movement castleQueenSide = new Movement(MovementType.ADVANCE, true, false, Coordinate.at(2, 0),
+                List.of(castleCond1, castleQueenSideCond2, castleQueenSideCond3), queenSideRookMovement, true);
         return new Piece(PieceType.KING, colour, coordinate, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD, castleKingSide, castleQueenSide);
     }
 

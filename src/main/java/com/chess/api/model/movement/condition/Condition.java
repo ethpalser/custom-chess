@@ -28,7 +28,7 @@ public class Condition {
     }
 
     public Boolean evaluate(Board board, Coordinate start, Coordinate end) {
-        List<Piece> list = this.getReferencePiece(board, start, end);
+        List<Piece> list = board.getReferencePiece(this.reference, start, end);
         Iterator<Piece> iterator = list.iterator();
         boolean result = true;
 
@@ -63,19 +63,6 @@ public class Condition {
             }
         }
         return result;
-    }
-
-    private List<Piece> getReferencePiece(Board board, Coordinate start, Coordinate end) {
-        List<Piece> pieces = new ArrayList<>();
-        switch (reference.location()) {
-            case LAST_MOVED -> pieces.add(board.getLastMoved());
-            case AT_START -> pieces.add(board.getPiece(start));
-            case AT_DESTINATION -> pieces.add(board.getPiece(end));
-            case AT_COORDINATE -> pieces.add(board.getPiece(reference.coordinate()));
-            case PATH_TO_DESTINATION -> pieces = board.getPieces(start, end);
-            case PATH_TO_COORDINATE -> pieces = board.getPieces(start, reference.coordinate());
-        }
-        return pieces;
     }
 }
 
