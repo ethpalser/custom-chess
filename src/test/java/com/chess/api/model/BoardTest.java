@@ -253,4 +253,36 @@ class BoardTest {
         assertNotNull(board.getPiece(3,0));
     }
 
+    @Test
+    void movePiece_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
+        Coordinate source = new Coordinate(4, 6);
+        Coordinate target = new Coordinate(4, 4);
+
+        Board board = new Board();
+        board.movePiece(Coordinate.at(3, 1), Coordinate.at(3,3));
+        board.movePiece(Coordinate.at(3,3), Coordinate.at(3, 4));
+
+        board.movePiece(source, target);
+        board.movePiece(Coordinate.at(3, 4), Coordinate.at(4, 5)); // En Passant
+        assertNull(board.getPiece(3,4));
+        assertNull(board.getPiece(4,4));
+        assertNotNull(board.getPiece(4,5));
+    }
+
+    @Test
+    void movePiece_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
+        Coordinate source = new Coordinate(2, 6);
+        Coordinate target = new Coordinate(2, 4);
+
+        Board board = new Board();
+        board.movePiece(Coordinate.at(3, 1), Coordinate.at(3,3));
+        board.movePiece(Coordinate.at(3,3), Coordinate.at(3, 4));
+
+        board.movePiece(source, target);
+        board.movePiece(Coordinate.at(3, 4), Coordinate.at(4, 5)); // En Passant
+        assertNull(board.getPiece(3,4));
+        assertNull(board.getPiece(4,4));
+        assertNotNull(board.getPiece(4,5));
+    }
+
 }

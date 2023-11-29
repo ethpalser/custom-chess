@@ -7,4 +7,5 @@ public enum Location {
     AT_COORDINATE,
     PATH_TO_DESTINATION,
     PATH_TO_COORDINATE,
+    BELOW_DESTINATION,
 }

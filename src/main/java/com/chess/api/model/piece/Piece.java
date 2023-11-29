@@ -22,6 +22,7 @@ public class Piece {
     private final Colour colour;
     private Coordinate position;
     private List<Movement> movementList;
+    private int lastMoveDistance;
 
     @Getter(AccessLevel.NONE)
     private boolean hasMoved;
@@ -31,6 +32,7 @@ public class Piece {
         this.colour = Colour.WHITE;
         this.position = new Coordinate(0, 0);
         this.hasMoved = false;
+        this.lastMoveDistance = 0;
     }
 
     public Piece(PieceType pieceType, Colour colour, Coordinate coordinate) {
@@ -39,11 +41,13 @@ public class Piece {
         this.position = coordinate;
         this.hasMoved = false;
         this.movementList = List.of();
+        this.lastMoveDistance = 0;
     }
 
     public Piece(PieceType pieceType, Colour colour, Coordinate coordinate, Movement... movements) {
         this(pieceType, colour, coordinate);
         this.movementList = List.of(movements);
+        this.lastMoveDistance = 0;
     }
 
     public boolean getHasMoved() {
@@ -61,6 +65,8 @@ public class Piece {
     }
 
     public void performMove(@NonNull Coordinate destination) {
+        this.lastMoveDistance = Math.max(Math.abs(destination.getX() - position.getX()),
+                Math.abs(destination.getY() - position.getY()));
         this.position = destination;
         this.hasMoved = true;
     }
@@ -102,12 +108,21 @@ public class Piece {
                 .propertyState(PropertyState.EQUAL)
                 .expected(PieceType.PAWN)
                 .build();
-        // Last moved had moved two (fast advance)
-        // Last moved is beside this piece
-        // Destination is empty
-        // (Removes the last moved from board)
+        Condition enPassantCond2 = Condition.builder()
+                .reference(new Reference(Location.LAST_MOVED))
+                .propertyState(PropertyState.EQUAL)
+                .compare(new Reference(Location.BELOW_DESTINATION))
+                .build();
+        Condition enPassantCond3 = Condition.builder()
+                .reference(new Reference(Location.LAST_MOVED))
+                .property(new Property<>("lastMoveDistance"))
+                .propertyState(PropertyState.EQUAL)
+                .expected(2)
+                .build();
+
+        ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.BELOW_DESTINATION), null, null, false);
         Movement enPassant = new Movement(MovementType.ADVANCE, false, true, Coordinate.at(1, 1),
-                List.of(enPassantCond1));
+                List.of(baseCondition, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement, false);
         return new Piece(PieceType.PAWN, colour, coordinate, pawnBaseMove, fastAdvance, capture, enPassant);
     }
 
@@ -160,7 +175,7 @@ public class Piece {
                 .reference(new Reference(Location.PATH_TO_COORDINATE, Coordinate.at(7, 0)))
                 .propertyState(PropertyState.DOES_NOT_EXIST)
                 .build();
-        ExtraMovement kingSideRookMovement = new ExtraMovement(Coordinate.at(7,0), Coordinate.at(5, 0));
+        ExtraMovement kingSideRookMovement = new ExtraMovement(Coordinate.at(7, 0), Coordinate.at(5, 0));
         Movement castleKingSide = new Movement(MovementType.ADVANCE, false, false, Coordinate.at(2, 0),
                 List.of(castleCond1, castleKingSideCond2, castleKingSideCond3), kingSideRookMovement, true);
 
@@ -176,7 +191,8 @@ public class Piece {
         ExtraMovement queenSideRookMovement = new ExtraMovement(Coordinate.at(0, 0), Coordinate.at(3, 0));
         Movement castleQueenSide = new Movement(MovementType.ADVANCE, true, false, Coordinate.at(2, 0),
                 List.of(castleCond1, castleQueenSideCond2, castleQueenSideCond3), queenSideRookMovement, true);
-        return new Piece(PieceType.KING, colour, coordinate, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD, castleKingSide, castleQueenSide);
+        return new Piece(PieceType.KING, colour, coordinate, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
+                castleKingSide, castleQueenSide);
     }
 
     // endregion

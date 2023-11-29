@@ -170,6 +170,7 @@ public class Board {
             case AT_COORDINATE -> pieces.add(this.getPiece(reference.coordinate()));
             case PATH_TO_DESTINATION -> pieces = this.getPieces(start, end);
             case PATH_TO_COORDINATE -> pieces = this.getPieces(start, reference.coordinate());
+            case BELOW_DESTINATION -> pieces.add(this.getPiece(end.getX(), end.getY() - 1));
         }
         return pieces;
     }
