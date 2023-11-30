@@ -2,6 +2,7 @@ package com.chess.api.model.movement.condition;
 
 import com.chess.api.model.Board;
 import com.chess.api.model.Coordinate;
+import com.chess.api.model.movement.Path;
 import com.chess.api.model.piece.Piece;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,7 @@ public class Condition {
     }
 
     public Boolean evaluate(Board board, Coordinate start, Coordinate end) {
-        List<Piece> list = board.getReferencePiece(this.reference, start, end);
+        List<Piece> list = board.getReferencePieces(this.reference, start, end);
         Iterator<Piece> iterator = list.iterator();
         boolean result = true;
 
@@ -54,7 +55,7 @@ public class Condition {
                         (this.expected != null && propVal != null
                                 && propVal.getClass().equals(this.expected.getClass())
                                 && propVal.equals(this.expected))
-                        || (this.compare != null && piece.equals(board.getReferencePiece(this.compare, start, end).get(0)));
+                        || (this.compare != null && piece.equals(board.getReferencePieces(this.compare, start, end).get(0)));
                 case OPPOSITE -> {
                     // The start piece is implied for OPPOSITE, as the condition's value is not known until runtime
                     Piece currPiece = board.getPiece(start);

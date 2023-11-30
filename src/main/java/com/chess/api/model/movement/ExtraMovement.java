@@ -54,7 +54,7 @@ public class ExtraMovement {
         }
         Piece piece;
         if (this.reference != null) {
-            piece = board.getReferencePiece(this.reference, offset, offset).get(0);
+            piece = board.getReferencePieces(this.reference, offset, offset).get(0);
         } else {
             piece = board.getPiece(location);
         }

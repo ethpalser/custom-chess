@@ -2,8 +2,8 @@ package com.chess.api.model;
 
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.PieceType;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 class BoardTest {
@@ -11,16 +11,15 @@ class BoardTest {
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
         Board board = new Board();
-        Piece[][] pieces = board.getPieces();
 
-        assertEquals(8, pieces.length);
-        assertEquals(8, pieces[0].length);
+        assertEquals(8, board.length());
+        assertEquals(8, board.width());
         assertEquals(32, board.count());
 
         Piece piece;
-        for (int x = 0; x < board.getPieces().length; x++) {
-            for (int y = 0; y < board.getPieces()[x].length; y++) {
-                piece = board.getPieces()[x][y];
+        for (int x = 0; x < board.width(); x++) {
+            for (int y = 0; y < board.length(); y++) {
+                piece = board.getPiece(x, y);
                 if (piece == null) {
                     continue;
                 }
@@ -58,13 +57,13 @@ class BoardTest {
     void count_playedBoardWithNoPawns_has16Pieces() {
         Board board = new Board();
         int y = 1;
-        for (int x = 0; x < board.getPieces().length; x++) {
-            board.getPieces()[x][y] = null;
+        for (int x = 0; x < board.width(); x++) {
+            board.setPiece(Coordinate.at(x, y), null);
         }
 
         y = 6;
-        for (int x = 0; x < board.getPieces().length; x++) {
-            board.getPieces()[x][y] = null;
+        for (int x = 0; x < board.width(); x++) {
+            board.setPiece(Coordinate.at(x, y), null);
         }
         assertEquals(16, board.count());
 
@@ -83,7 +82,7 @@ class BoardTest {
         Board board = new Board();
         board.movePiece(pieceC, nextC);
 
-        assertNull(board.getPieces()[pieceX][pieceY]);
+        assertNull(board.getPiece(pieceX, pieceY));
         assertEquals(32, board.count());
     }
 
@@ -100,7 +99,7 @@ class BoardTest {
         Board board = new Board();
         board.movePiece(pieceC, nextC);
 
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
+        assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
         assertEquals(32, board.count());
     }
 
@@ -115,7 +114,7 @@ class BoardTest {
         assertThrows(IndexOutOfBoundsException.class, () -> new Coordinate(nextX, nextY));
 
         Board board = new Board();
-        assertEquals(Colour.WHITE, board.getPieces()[pieceX][pieceY].getColour());
+        assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
         assertEquals(32, board.count());
     }
 
@@ -171,7 +170,7 @@ class BoardTest {
         Coordinate target = new Coordinate(nextX, nextY); // Black Pawn
 
         Board board = new Board();
-        board.getPieces()[0][1] = null; // Can be sufficient for path checks
+        board.setPiece(Coordinate.at(0, 1), null); // Can be sufficient for path checks
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
@@ -210,7 +209,7 @@ class BoardTest {
         Coordinate target = new Coordinate(nextX, nextY); // Empty
 
         Board board = new Board();
-        board.getPieces()[3][1] = null; // Clearing the path for a Bishop's move
+        board.setPiece(Coordinate.at(3, 1), null); // Clearing the path for a Bishop's move
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
@@ -225,8 +224,8 @@ class BoardTest {
         Coordinate target = new Coordinate(6, 0);
 
         Board board = new Board();
-        board.getPieces()[5][0] = null;
-        board.getPieces()[6][0] = null;
+        board.setPiece(Coordinate.at(5, 0), null);
+        board.setPiece(Coordinate.at(6, 0), null);
 
         board.movePiece(source, target);
         assertNull(board.getPiece(7, 0));
@@ -242,9 +241,9 @@ class BoardTest {
         Coordinate target = new Coordinate(2, 0);
 
         Board board = new Board();
-        board.getPieces()[1][0] = null;
-        board.getPieces()[2][0] = null;
-        board.getPieces()[3][0] = null;
+        board.setPiece(Coordinate.at(1, 0), null);
+        board.setPiece(Coordinate.at(2, 0), null);
+        board.setPiece(Coordinate.at(3, 0), null);
 
         board.movePiece(source, target);
         assertNull(board.getPiece(0, 0));
