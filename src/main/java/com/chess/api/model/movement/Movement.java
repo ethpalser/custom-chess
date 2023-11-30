@@ -90,138 +90,47 @@ public class Movement {
     }
 
     public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
-        if (Colour.WHITE.equals(colour)) {
-            return this.getWhiteCoordinates(offset.getX(), offset.getY());
-        } else {
-            return this.getBlackCoordinates(offset.getX(), offset.getY());
-        }
-    }
+        boolean isWhite = Colour.WHITE.equals(colour);
+        boolean isUp = isWhite && !mirrorXAxis || !isWhite && mirrorXAxis;
+        boolean isRight = !mirrorYAxis;
+        boolean hasUp = isWhite || mirrorXAxis;
+        boolean hasDown = !isWhite || mirrorXAxis;
 
-    private Map<Integer, Coordinate> getWhiteCoordinates(final int offsetX, final int offsetY) {
         Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : this.originalPath) {
-            int baseOffsetX = coordinate.getX() + offsetX;
-            int baseOffsetY = coordinate.getY() + offsetY;
-            int mirrorOffsetX = offsetX - coordinate.getX();
-            int mirrorOffsetY = offsetY - coordinate.getY();
+        for (Coordinate coordinate : this.getOriginalPath()) {
+            int baseX = coordinate.getX() + offset.getX();
+            int baseY = coordinate.getY() + offset.getY();
+            int mirrorX = offset.getX() - coordinate.getX();
+            int mirrorY = offset.getY() - coordinate.getY();
 
-            if (lockedQuadrant) {
-                if (!mirrorXAxis) {
-                    if (!mirrorYAxis) {
-                        // Q1 Top Right
-                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                            map.put(offsetCo.hashCode(), offsetCo);
-                        }
-                    } else {
-                        // Q2 Bottom Right
-                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                            map.put(mirrorX.hashCode(), mirrorX);
-                        }
-                    }
-                } else {
-                    if (!mirrorYAxis) {
-                        // Q3 Bottom Left
-                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                            map.put(mirrorXY.hashCode(), mirrorXY);
-                        }
-                    } else {
-                        // Q4 Top Left
-                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                            map.put(mirrorY.hashCode(), mirrorY);
-                        }
-                    }
+            Coordinate upRight = Coordinate.isValid(baseX, baseY) ? Coordinate.at(baseX, baseY) : null;
+            Coordinate upLeft = Coordinate.isValid(mirrorX, baseY) ? Coordinate.at(mirrorX, baseY) : null;
+            Coordinate downRight = Coordinate.isValid(baseX, mirrorY) ? Coordinate.at(baseX, mirrorY) : null;
+            Coordinate downLeft = Coordinate.isValid(mirrorX, mirrorY) ? Coordinate.at(mirrorX, mirrorY) : null;
+
+            if (this.lockedQuadrant) {
+                if (isUp && isRight && upRight != null) {
+                    map.put(upRight.hashCode(), upRight);
+                } else if (isUp && !isRight && upLeft != null) {
+                    map.put(upLeft.hashCode(), upLeft);
+                } else if (!isUp && isRight && downRight != null) {
+                    map.put(downRight.hashCode(), downRight);
+                } else if (!isUp && !isRight && downLeft != null) {
+                    map.put(downLeft.hashCode(), downLeft);
                 }
-                break;
-            }
-
-            // Q1 Top Right
-            if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                map.put(offsetCo.hashCode(), offsetCo);
-            }
-            // Q2 Bottom Right
-            if (this.mirrorXAxis && baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorX.hashCode(), mirrorX);
-            }
-            // Q3 Bottom Left
-            if (this.mirrorXAxis && this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
-            }
-            // Q4 Top Left
-            if (this.mirrorYAxis && mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                map.put(mirrorY.hashCode(), mirrorY);
-            }
-        }
-        return map;
-    }
-
-    private Map<Integer, Coordinate> getBlackCoordinates(int offsetX, int offsetY) {
-        Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : this.originalPath) {
-            int baseOffsetX = coordinate.getX() + offsetX;
-            int baseOffsetY = coordinate.getY() + offsetY;
-            int mirrorOffsetX = offsetX - coordinate.getX();
-            int mirrorOffsetY = offsetY - coordinate.getY();
-
-            if (lockedQuadrant) {
-                if (!mirrorXAxis) {
-                    if (!mirrorYAxis) {
-                        // Q2 Bottom Right
-                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                            map.put(mirrorX.hashCode(), mirrorX);
-                        }
-                    } else {
-                        // Q1 Top Right
-                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                            map.put(offsetCo.hashCode(), offsetCo);
-                        }
-                    }
-                } else {
-                    if (!mirrorYAxis) {
-                        // Q4 Top Left
-                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                            map.put(mirrorY.hashCode(), mirrorY);
-                        }
-                    } else {
-                        // Q3 Bottom Left
-                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                            map.put(mirrorXY.hashCode(), mirrorXY);
-                        }
-                    }
+            } else {
+                if (hasUp) {
+                    if (upRight != null)
+                        map.put(upRight.hashCode(), upRight);
+                    if (this.mirrorYAxis && upLeft != null)
+                        map.put(upLeft.hashCode(), upLeft);
                 }
-                break;
-            }
-
-            // Q1 Top Right
-            if (this.mirrorXAxis && baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                map.put(offsetCo.hashCode(), offsetCo);
-            }
-            // Q2 Bottom Right
-            if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorX.hashCode(), mirrorX);
-            }
-            // Q3 Bottom Left
-            if (this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
-            }
-            // Q4 Top Left
-            if (this.mirrorXAxis && this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
+                if (hasDown) {
+                    if (downRight != null)
+                        map.put(downRight.hashCode(), downRight);
+                    if (this.mirrorYAxis && downLeft != null)
+                        map.put(downLeft.hashCode(), downLeft);
+                }
             }
         }
         return map;
