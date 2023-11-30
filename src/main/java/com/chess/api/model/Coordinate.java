@@ -47,7 +47,7 @@ public class Coordinate implements Comparable<Coordinate> {
     }
 
     public static boolean isValid(int x, int y) {
-        return x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y;
+        return 0 <= x && x <= MAX_X && 0 <= y && y <= MAX_Y;
     }
 
     @Override
@@ -55,12 +55,13 @@ public class Coordinate implements Comparable<Coordinate> {
         if (o == null) {
             return -1;
         }
-        return (this.y * MAX_X + this.x) - (o.getY() * MAX_X + o.getX());
+        // The hashCodes are unique for every x,y combination
+        return this.hashCode() - o.hashCode();
     }
 
     @Override
     public int hashCode() {
-        return this.y * MAX_X + this.x;
+        return this.y * (MAX_X + 1) + this.x;
     }
 
     @Override
@@ -73,11 +74,8 @@ public class Coordinate implements Comparable<Coordinate> {
             return false;
 
         Coordinate coordinate = (Coordinate) o;
-        if (coordinate.getX() != this.x)
-            return false;
-        if (coordinate.getY() != this.y)
-            return false;
-        return true;
+        // When x and y are equal, their hashCodes are equal
+        return this.hashCode() == coordinate.hashCode();
     }
 
     @Override
