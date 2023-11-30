@@ -1,7 +1,5 @@
 package com.chess.api.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import lombok.Getter;
 
@@ -13,6 +11,11 @@ public class Coordinate implements Comparable<Coordinate> {
 
     private final int x;
     private final int y;
+
+    public Coordinate() {
+        this.x = 0;
+        this.y = 0;
+    }
 
     public Coordinate(int x, int y) {
         if (x > MAX_X || x < 0 || y > MAX_Y || y < 0) {

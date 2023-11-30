@@ -77,14 +77,6 @@ public class Board {
         return Coordinate.MAX_X + 1;
     }
 
-    public void setPiece(@NonNull Coordinate coordinate, Piece piece) {
-        if (piece == null) {
-            this.pieceMap.remove(coordinate);
-        } else {
-            this.pieceMap.put(coordinate, piece);
-        }
-    }
-
     public Piece getPiece(int x, int y) {
         if (x < 0 || x > Coordinate.MAX_X || y < 0 || y > Coordinate.MAX_Y) {
             return null;
@@ -97,6 +89,14 @@ public class Board {
             return null;
         }
         return pieceMap.get(coordinate);
+    }
+
+    public void setPiece(@NonNull Coordinate coordinate, Piece piece) {
+        if (piece == null) {
+            this.pieceMap.remove(coordinate);
+        } else {
+            this.pieceMap.put(coordinate, piece);
+        }
     }
 
     public List<Piece> getPieces() {
@@ -206,16 +206,6 @@ public class Board {
             }
         }
         return true;
-    }
-
-    public void updatePieceLocation(@NonNull Coordinate start, Coordinate destination) {
-        if (this.getPiece(start) == null) {
-            return;
-        }
-        if (destination != null) {
-            this.setPiece(destination, this.getPiece(start));
-        }
-        this.setPiece(start, null);
     }
 
 }

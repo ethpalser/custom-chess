@@ -61,7 +61,7 @@ public class ExtraMovement {
         if (piece != null) {
             piece.performMove(this.destination);
         }
-        board.updatePieceLocation(this.source, this.destination);
+        board.setPiece(this.destination, piece);
     }
 
 
