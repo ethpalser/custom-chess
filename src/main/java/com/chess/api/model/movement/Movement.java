@@ -88,6 +88,33 @@ public class Movement {
         this.extraMovement = null;
         this.lockedQuadrant = false;
     }
+    
+    public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
+        // Determine direction
+        int diffX = end.getX() - start.getX();
+        int diffY = end.getY() - start.getY();
+        boolean negX = diffX != 0 && diffX / Math.abs(diffX) == -1;
+        boolean negY = diffY != 0 && diffY / Math.abs(diffY) == -1;
+        boolean isBlack = Colour.BLACK.equals(colour);
+
+        // Invalid direction cases
+        if ((!negX && isBlack && !this.mirrorXAxis)
+                || (negX && !isBlack && !this.mirrorXAxis)
+                || (negY && !this.mirrorYAxis)) {
+            return new Path();
+        }
+
+        List<Coordinate> coordinates = new LinkedList<>();
+        for (Coordinate coordinate : this.getOriginalPath()) {
+            int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
+            int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
+            if (!Coordinate.isValid(nextX, nextY)) {
+                break;
+            }
+            coordinates.add(Coordinate.at(nextX, nextY));
+        }
+        return new Path(coordinates);
+    }
 
     public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
         boolean isWhite = Colour.WHITE.equals(colour);
@@ -140,33 +167,6 @@ public class Movement {
             @NonNull Coordinate destination) {
         Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, source);
         return coordinates.get(destination.hashCode()) != null;
-    }
-
-    public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
-        // Determine direction
-        int diffX = end.getX() - start.getX();
-        int diffY = end.getY() - start.getY();
-        boolean negX = diffX != 0 && diffX / Math.abs(diffX) == -1;
-        boolean negY = diffY != 0 && diffY / Math.abs(diffY) == -1;
-        boolean isBlack = Colour.BLACK.equals(colour);
-
-        // Invalid direction cases
-        if ((!negX && isBlack && !this.mirrorXAxis)
-                || (negX && !isBlack && !this.mirrorXAxis)
-                || (negY && !this.mirrorYAxis)) {
-            return new Path();
-        }
-
-        List<Coordinate> coordinates = new LinkedList<>();
-        for (Coordinate coordinate : this.getOriginalPath()) {
-            int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
-            int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
-            if (!Coordinate.isValid(nextX, nextY)) {
-                break;
-            }
-            coordinates.add(Coordinate.at(nextX, nextY));
-        }
-        return new Path(coordinates);
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
