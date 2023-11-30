@@ -2,6 +2,7 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.MovementType;
+import com.chess.api.model.movement.Path;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +32,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceNoMirror_isOffsetByCoordinateAndOnlyForward() {
-        Movement movement = new Movement(MovementType.ADVANCE, false, false, rookCoordinates());
+        Movement movement = new Movement(new Path(rookCoordinates()), MovementType.ADVANCE, false, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Coordinate co = new Coordinate(3, 3);
@@ -67,7 +68,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorX_isOffsetByCoordinateAndOnlyForwardAndBehind() {
-        Movement movement = new Movement(MovementType.ADVANCE, true, false, rookCoordinates());
+        Movement movement = new Movement(new Path(rookCoordinates()), MovementType.ADVANCE, true, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Coordinate co = new Coordinate(3, 3);
@@ -103,7 +104,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorY_isOffsetByCoordinateAndOnlyForwardRightAndForwardLeft() {
-        Movement movement = new Movement(MovementType.ADVANCE, false, true, bishopCoordinates());
+        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, true);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Coordinate co = new Coordinate(3, 3);
@@ -139,7 +140,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorXAndY_isOffsetByCoordinateAndMovesInAllDirections() {
-        Movement movement = new Movement(MovementType.ADVANCE, true, true, bishopCoordinates());
+        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, true);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Coordinate co = new Coordinate(3, 3);
@@ -175,7 +176,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceReverseForBlack_isOffsetByCoordinateAndMovesBackwards() {
-        Movement movement = new Movement(MovementType.ADVANCE, false, false, bishopCoordinates());
+        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Coordinate co = new Coordinate(3, 3);

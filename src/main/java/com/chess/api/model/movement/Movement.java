@@ -8,10 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-@AllArgsConstructor
 @Getter
 public class Movement {
 
@@ -19,76 +19,38 @@ public class Movement {
     private final MovementType type;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
+    private final boolean specificQuadrant;
     private final List<Condition> conditions;
     private final ExtraMovement extraMovement;
-    private final boolean lockedQuadrant;
 
     public Movement() {
         this.originalPath = new Path();
         this.type = MovementType.ADVANCE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
+        this.specificQuadrant = false;
         this.conditions = null;
         this.extraMovement = null;
-        this.lockedQuadrant = false;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates) {
-        this(type, mirrorXAxis, mirrorYAxis, coordinates, List.of());
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
+        this(path, type, mirrorXAxis, mirrorYAxis, false, List.of(), null);
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
-        this(type, mirrorXAxis, mirrorYAxis, end, List.of());
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions) {
+        this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
-        this(type, mirrorXAxis, mirrorYAxis, start, end, List.of());
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates,
-            List<Condition> conditions) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions, ExtraMovement extraMovement) {
+        this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(coordinates);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
-            List<Condition> conditions) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(end);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
-            List<Condition> conditions, ExtraMovement extraMovement, boolean lockedQuadrant) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(end);
+        this.specificQuadrant = specificQuadrant;
         this.conditions = conditions;
         this.extraMovement = extraMovement;
-        this.lockedQuadrant = lockedQuadrant;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end,
-            List<Condition> conditions) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(start, end);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-    
     public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
         // Determine direction
         int diffX = end.getX() - start.getX();
@@ -135,7 +97,7 @@ public class Movement {
             Coordinate downRight = Coordinate.isValid(baseX, mirrorY) ? Coordinate.at(baseX, mirrorY) : null;
             Coordinate downLeft = Coordinate.isValid(mirrorX, mirrorY) ? Coordinate.at(mirrorX, mirrorY) : null;
 
-            if (this.lockedQuadrant) {
+            if (this.specificQuadrant) {
                 if (isUp && isRight && upRight != null) {
                     map.put(upRight.hashCode(), upRight);
                 } else if (isUp && !isRight && upLeft != null) {
