@@ -33,7 +33,7 @@ public class Condition {
         this.compare = compare;
     }
 
-    public Boolean evaluate(Board board, Vector2D start, Vector2D end) {
+    public boolean evaluate(Board board, Vector2D start, Vector2D end) {
         List<Piece> list = board.getReferencePieces(this.reference, start, end);
         Iterator<Piece> iterator = list.iterator();
         boolean result = true;
@@ -42,7 +42,7 @@ public class Condition {
             Piece piece = iterator.next();
             if (PropertyState.EXIST.equals(this.propertyState) && piece == null) {
                 return false;
-            } if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
+            } else if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
                 return false;
             } else if (piece == null) {
                 continue;
