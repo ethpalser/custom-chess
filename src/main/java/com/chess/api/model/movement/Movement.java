@@ -21,7 +21,7 @@ public class Movement {
     private final boolean mirrorYAxis;
     private final boolean specificQuadrant;
     private final List<Conditional> conditions;
-    private final ExtraMovement extraMovement;
+    private final ExtraAction extraAction;
 
     public Movement() {
         this.originalPath = new Path();
@@ -30,7 +30,7 @@ public class Movement {
         this.mirrorYAxis = false;
         this.specificQuadrant = false;
         this.conditions = null;
-        this.extraMovement = null;
+        this.extraAction = null;
     }
 
     public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
@@ -41,14 +41,14 @@ public class Movement {
         this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraMovement extraMovement) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraAction extraAction) {
         this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.specificQuadrant = specificQuadrant;
         this.conditions = conditions;
-        this.extraMovement = extraMovement;
+        this.extraAction = extraAction;
     }
 
     public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
@@ -60,10 +60,10 @@ public class Movement {
         boolean isBlack = Colour.BLACK.equals(colour);
 
         // Invalid direction cases
-        if ((!negX && isBlack && !this.mirrorXAxis)
-                || (negX && !isBlack && !this.mirrorXAxis)
-                || (negY && !this.mirrorYAxis)) {
-            return new Path();
+        if ((!negY && isBlack && !this.mirrorXAxis)
+                || (negY && !isBlack && !this.mirrorXAxis)
+                || (negX && !this.mirrorYAxis)) {
+            return null;
         }
 
         List<Vector2D> vectors = new LinkedList<>();
@@ -80,7 +80,6 @@ public class Movement {
             }
         }
         if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
-
             return null; // No path that reaches this end from this start
         }
         return new Path(vectors);

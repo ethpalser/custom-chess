@@ -2,12 +2,9 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
-import com.chess.api.model.movement.condition.Direction;
-import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.PieceFactory;
 import com.chess.api.model.piece.PieceType;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -141,11 +138,19 @@ public class Board {
             return;
         }
         atStart.setPosition(end);
-        // Update the piece on the board
         this.pieceMap.put(end, atStart);
         this.pieceMap.remove(start);
-        if (movement.getExtraMovement() != null) {
 
+        if (movement.getExtraAction() != null) {
+            Action action = movement.getExtraAction().getAction(this, new Action(atStart.getColour(), start, end));
+            Piece toForceMove = this.getPiece(action.start());
+            if (toForceMove != null) {
+                if (action.end() != null) {
+                    this.setPiece(action.end(), toForceMove);
+                }
+                // If the piece had not moved the intent is to remove it
+                this.setPiece(action.start(), null);
+            }
         }
         this.lastMoved = atStart;
     }
