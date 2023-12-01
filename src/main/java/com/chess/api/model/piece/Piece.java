@@ -1,8 +1,10 @@
 package com.chess.api.model.piece;
 
+import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.Movement;
+import com.chess.api.model.movement.Path;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,55 +15,49 @@ public class Piece {
 
     private final PieceType type;
     private final Colour colour;
+    private final List<Movement> movements;
     private Vector2D position;
-    private List<Movement> movementList;
     private int lastMoveDistance;
 
     @Getter(AccessLevel.NONE)
     private boolean hasMoved;
 
     public Piece() {
-        this.type = PieceType.PAWN;
-        this.colour = Colour.WHITE;
-        this.position = new Vector2D(0, 0);
-        this.hasMoved = false;
-        this.lastMoveDistance = 0;
+        this(PieceType.PAWN, Colour.WHITE, new Vector2D());
     }
 
     public Piece(PieceType pieceType, Colour colour, Vector2D vector) {
-        this.type = pieceType;
-        this.colour = colour;
-        this.position = vector;
-        this.hasMoved = false;
-        this.movementList = List.of();
-        this.lastMoveDistance = 0;
+        this(pieceType, colour, vector, (Movement) null);
     }
 
     public Piece(PieceType pieceType, Colour colour, Vector2D vector, Movement... movements) {
-        this(pieceType, colour, vector);
-        this.movementList = List.of(movements);
+        this.type = pieceType;
+        this.colour = colour;
+        this.position = vector;
+        this.movements = List.of(movements);
+        this.hasMoved = false;
         this.lastMoveDistance = 0;
+    }
+
+    public void setPosition(@NonNull Vector2D destination) {
+        this.lastMoveDistance = Math.max(Math.abs(destination.getX() - position.getX()),
+                Math.abs(destination.getY() - position.getY()));
+        this.position = destination;
+        this.hasMoved = true;
     }
 
     public boolean getHasMoved() {
         return hasMoved;
     }
 
-    public boolean verifyMove(@NonNull Vector2D destination) {
-        for (Movement move : movementList) {
-            boolean valid = move.isValidCoordinate(this.colour, this.position, destination);
-            if (valid) {
-                return true;
+    public Movement getMovement(@NonNull Board board, @NonNull Vector2D destination) {
+        for (Movement move : this.movements) {
+            Path path = move.getPath(this.colour, this.position, destination);
+            if (path != null && path.isTraversable(board) && move.passesConditions(board, this.position, destination)) {
+                return move;
             }
         }
-        return false;
-    }
-
-    public void performMove(@NonNull Vector2D destination) {
-        this.lastMoveDistance = Math.max(Math.abs(destination.getX() - position.getX()),
-                Math.abs(destination.getY() - position.getY()));
-        this.position = destination;
-        this.hasMoved = true;
+        return null;
     }
 
     @Override

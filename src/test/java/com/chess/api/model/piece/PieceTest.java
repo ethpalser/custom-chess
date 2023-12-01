@@ -23,7 +23,7 @@ class PieceTest {
         Piece bishop = new Piece(PieceType.BISHOP, Colour.WHITE, start);
 
         Vector2D next = new Vector2D(x, y);
-        bishop.performMove(next);
+        bishop.setPosition(next);
         assertEquals(x, bishop.getPosition().getX());
         assertEquals(y, bishop.getPosition().getY());
         assertFalse(bishop.getHasMoved());
@@ -39,10 +39,10 @@ class PieceTest {
         int nextX = 3;
         int nextY = 1;
         Vector2D moved = new Vector2D(nextX, nextY);
-        bishop.performMove(moved);
+        bishop.setPosition(moved);
 
         Vector2D next = new Vector2D(nextX, nextY);
-        bishop.performMove(next);
+        bishop.setPosition(next);
         assertEquals(nextX, bishop.getPosition().getX());
         assertEquals(nextY, bishop.getPosition().getY());
         assertTrue(bishop.getHasMoved());
@@ -58,7 +58,7 @@ class PieceTest {
         int nextX = 3;
         int nextY = 1;
         Vector2D next = new Vector2D(nextX, nextY);
-        bishop.performMove(next);
+        bishop.setPosition(next);
         assertEquals(nextX, bishop.getPosition().getX());
         assertEquals(nextY, bishop.getPosition().getY());
         assertTrue(bishop.getHasMoved());

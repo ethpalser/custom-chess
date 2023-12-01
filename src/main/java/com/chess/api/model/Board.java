@@ -2,7 +2,6 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
-import com.chess.api.model.movement.condition.Condition;
 import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.PieceFactory;
@@ -10,7 +9,6 @@ import com.chess.api.model.piece.PieceType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -150,62 +148,23 @@ public class Board {
      * @param end
      */
     public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
-        Piece source = this.getPiece(start);
-        Piece target = this.getPiece(end);
-
-        if (source == null || source.equals(target) || (target != null && source.getColour().equals(target.getColour()))) {
-            // Cannot move a piece if there is no piece, both are the same piece, or both are the same colour
+        Piece atStart = this.getPiece(start);
+        Piece atEnd = this.getPiece(end);
+        if (atStart == null || atStart.equals(atEnd) || (atEnd != null && atStart.getColour().equals(atEnd.getColour()))) {
             return;
         }
-        if (!source.verifyMove(end)) {
-            // Not a valid location for the piece to move to
+        Movement movement = atStart.getMovement(this, end);
+        if (movement == null) {
             return;
         }
-
-        boolean hasValidPath = false;
-        Iterator<Movement> movementIterator = source.getMovementList().listIterator();
-        Movement movement = null;
-        while (movementIterator.hasNext() && !hasValidPath) {
-            movement = movementIterator.next();
-            boolean hasValidConditions = true;
-            for (Condition condition : movement.getConditions()) {
-                if (!condition.evaluate(this, start, end)) {
-                    hasValidConditions = false;
-                    break;
-                }
-            }
-            hasValidPath =
-                    hasValidConditions && movement.isValidCoordinate(source.getColour(), start, end) && this.isValidPath(movement.getPath(source.getColour(), start, end));
-        }
-        if (movement == null || !hasValidPath) {
-            // Piece is in the middle of the path
-            return;
-        }
-        // Update the piece's internal position
-        source.performMove(end);
+        atStart.setPosition(end);
         // Update the piece on the board
-        this.pieceMap.put(end, source);
+        this.pieceMap.put(end, atStart);
         this.pieceMap.remove(start);
-        this.lastMoved = source;
         if (movement.getExtraMovement() != null) {
-            movement.getExtraMovement().move(this, end); // Must be 'end' to work for en passant. Todo: Fix inflexibility
-        }
-    }
 
-    private boolean isValidPath(Path path) {
-        if (path == null) {
-            return false;
         }
-
-        Iterator<Vector2D> iterator = path.iterator();
-        while (iterator.hasNext()) {
-            Vector2D vector = iterator.next();
-            if (this.getPiece(vector) != null && iterator.hasNext()) {
-                // Piece is in the middle of the path
-                return false;
-            }
-        }
-        return true;
+        this.lastMoved = atStart;
     }
 
     @Override

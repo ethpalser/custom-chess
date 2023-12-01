@@ -1,5 +1,6 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.condition.Condition;
@@ -73,6 +74,9 @@ public class Movement {
             }
             vectors.add(Vector2D.at(nextX, nextY));
         }
+        if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
+            return null; // No path that reaches this end from this start
+        }
         return new Path(vectors);
     }
 
@@ -123,10 +127,13 @@ public class Movement {
         return map;
     }
 
-    public boolean isValidCoordinate(@NonNull Colour colour, @NonNull Vector2D source,
-            @NonNull Vector2D destination) {
-        Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, source);
-        return coordinates.get(destination.hashCode()) != null;
+    public boolean passesConditions(@NonNull Board board, @NonNull Vector2D start, @NonNull Vector2D end) {
+        for (Condition condition : this.conditions) {
+            if (!condition.evaluate(board, start, end)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
