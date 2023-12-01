@@ -117,38 +117,6 @@ public class Board {
         return lastMoved;
     }
 
-    public List<Piece> getReferencePieces(Reference reference, Vector2D pathStart, Vector2D pathEnd) {
-        if (reference == null) {
-            return List.of();
-        }
-
-        Direction direction = reference.direction();
-        Vector2D shiftedStart = this.shiftVector(pathStart, direction);
-        Vector2D shiftedEnd = this.shiftVector(pathEnd, direction);
-        Vector2D shiftedReference = this.shiftVector(reference.vector(), direction);
-        return switch (reference.location()) {
-            case LAST_MOVED -> List.of(this.lastMoved);
-            case START -> List.of(this.getPiece(shiftedStart));
-            case DESTINATION -> List.of(this.getPiece(shiftedEnd));
-            case VECTOR -> List.of(this.getPiece(shiftedReference));
-            case PATH_TO_DESTINATION -> this.getPieces(new Path(shiftedStart, shiftedEnd));
-            case PATH_TO_VECTOR -> this.getPieces(new Path(shiftedStart, shiftedReference));
-        };
-    }
-    private Vector2D shiftVector(Vector2D vector, Direction direction) {
-        int shiftX = 0;
-        int shiftY = 0;
-        switch (direction) {
-            case FRONT -> shiftY = 1;
-            case BACK -> shiftY = -1;
-            case RIGHT -> shiftX = 1;
-            case LEFT -> shiftX = -1;
-            default -> {/* Do nothing */}
-        }
-        return Vector2D.fromVector2D(vector, shiftX, shiftY);
-    }
-
-
     /**
      * Move a piece to a new coordinate within the board.
      * <p>For a piece to move the following must be valid:</p>

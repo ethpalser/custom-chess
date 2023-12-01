@@ -1,5 +1,6 @@
 package com.chess.api.model.piece;
 
+import com.chess.api.model.Action;
 import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
@@ -53,7 +54,8 @@ public class Piece {
     public Movement getMovement(@NonNull Board board, @NonNull Vector2D destination) {
         for (Movement move : this.movements) {
             Path path = move.getPath(this.colour, this.position, destination);
-            if (path != null && path.isTraversable(board) && move.passesConditions(board, this.position, destination)) {
+            if (path != null && path.isTraversable(board)
+                    && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
                 return move;
             }
         }

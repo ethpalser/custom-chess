@@ -6,12 +6,14 @@ import com.chess.api.model.movement.ExtraMovement;
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.MovementType;
 import com.chess.api.model.movement.Path;
-import com.chess.api.model.movement.condition.Condition;
+import com.chess.api.model.movement.condition.Comparator;
+import com.chess.api.model.movement.condition.Conditional;
 import com.chess.api.model.movement.condition.Direction;
 import com.chess.api.model.movement.condition.Location;
 import com.chess.api.model.movement.condition.Property;
-import com.chess.api.model.movement.condition.PropertyState;
+import com.chess.api.model.movement.condition.PropertyCondition;
 import com.chess.api.model.movement.condition.Reference;
+import com.chess.api.model.movement.condition.ReferenceCondition;
 import java.util.List;
 
 public class PieceFactory {
@@ -29,26 +31,6 @@ public class PieceFactory {
     }
 
     public Piece build(PieceType type, Colour colour, Vector2D vector) {
-        // Common and basic conditions
-        Condition noPieceAtDestination = Condition.builder()
-                .reference(new Reference(Location.DESTINATION))
-                .propertyState(PropertyState.DOES_NOT_EXIST)
-                .build();
-        Condition hasPieceAtDestination = Condition.builder()
-                .reference(new Reference(Location.DESTINATION))
-                .propertyState(PropertyState.EXIST)
-                .build();
-        Condition oppositeColour = Condition.builder()
-                .reference(new Reference(Location.DESTINATION))
-                .property(new Property<>("colour"))
-                .propertyState(PropertyState.OPPOSITE)
-                .build();
-        Condition selfNotMoved = Condition.builder()
-                .reference(new Reference(Location.START))
-                .property(new Property<>("hasMoved"))
-                .propertyState(PropertyState.FALSE)
-                .build();
-
         Path vertical = new Path(Vector2D.at(0, 1), Vector2D.at(0, Vector2D.MAX_Y));
         Path horizontal = new Path(Vector2D.at(1, 0), Vector2D.at(Vector2D.MAX_X, 0));
         Path diagonal = new Path(Vector2D.at(1, 1), Vector2D.at(Vector2D.MAX_X, Vector2D.MAX_Y));
@@ -79,34 +61,28 @@ public class PieceFactory {
                 Movement kingBaseMoveH = new Movement(new Path(Vector2D.at(1, 0)), MovementType.ADVANCE, false, true);
                 Movement kingBaseMoveD = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, true, true);
 
-                Condition castleKingSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.VECTOR, Vector2D.at(7, 0)))
-                        .property(new Property<>("hasMoved"))
-                        .propertyState(PropertyState.FALSE)
-                        .build();
-                Condition castleKingSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_VECTOR, Vector2D.at(7, 0)))
-                        .propertyState(PropertyState.DOES_NOT_EXIST)
-                        .build();
+                Vector2D kingSideRook = new Vector2D(7, 0);
+                Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
+                        Comparator.FALSE, new Property<>("hasMoved"), false);
+                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
+                        kingSideRook),
+                        Comparator.DOES_NOT_EXIST, null);
                 ExtraMovement kingSideRookMovement = new ExtraMovement(Vector2D.at(7, 0), Vector2D.at(5, 0));
-
-                Movement castleKingSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE, false,
-                        false, true, List.of(selfNotMoved, castleKingSideCond2, castleKingSideCond3),
+                Movement castleKingSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE,
+                        false, false, true,
+                        List.of(PropertyCondition.startNotMoved(), castleKingSideCond2, castleKingSideCond3),
                         kingSideRookMovement);
 
-                Condition castleQueenSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.VECTOR, Vector2D.at(0, 0)))
-                        .property(new Property<>("hasMoved"))
-                        .propertyState(PropertyState.FALSE)
-                        .build();
-                Condition castleQueenSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_VECTOR, Vector2D.at(0, 0)))
-                        .propertyState(PropertyState.DOES_NOT_EXIST)
-                        .build();
+                Vector2D queenSideRook = new Vector2D(0, 0);
+                Conditional castleQueenSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, queenSideRook),
+                        Comparator.FALSE, new Property<>("hasMoved"), false);
+                Conditional castleQueenSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
+                        queenSideRook),
+                        Comparator.DOES_NOT_EXIST, null);
                 ExtraMovement queenSideRookMovement = new ExtraMovement(Vector2D.at(0, 0), Vector2D.at(3, 0));
-
-                Movement castleQueenSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE, false,
-                        true, true, List.of(selfNotMoved, castleQueenSideCond2, castleQueenSideCond3),
+                Movement castleQueenSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE,
+                        false, true, true,
+                        List.of(PropertyCondition.startNotMoved(), castleQueenSideCond2, castleQueenSideCond3),
                         queenSideRookMovement);
 
                 return new Piece(PieceType.KING, colour, vector, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
@@ -114,35 +90,30 @@ public class PieceFactory {
             }
             case PAWN -> {
                 Movement pawnBaseMove = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, false,
-                        false, false, List.of(noPieceAtDestination));
+                        false, false, List.of(PropertyCondition.destinationEmpty()));
                 Movement fastAdvance = new Movement(new Path(Vector2D.at(0, 1), Vector2D.at(0, 2)),
-                        MovementType.ADVANCE, false, false, true, List.of(selfNotMoved, noPieceAtDestination));
+                        MovementType.ADVANCE, false, false, true,
+                        List.of(PropertyCondition.destinationEmpty(), PropertyCondition.startNotMoved()));
 
-                Movement capture = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true, false,
-                        List.of(oppositeColour, hasPieceAtDestination));
+                Movement capture = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE,
+                        false, true, false,
+                        List.of(PropertyCondition.destinationNotEmpty(),
+                                PropertyCondition.destinationColourNotEqual()));
 
-                Condition enPassantCond1 = Condition.builder()
-                        .reference(new Reference(Location.LAST_MOVED))
-                        .property(new Property<>("type"))
-                        .propertyState(PropertyState.EQUAL)
-                        .expected(PieceType.PAWN)
-                        .build();
-                Condition enPassantCond2 = Condition.builder()
-                        .reference(new Reference(Location.LAST_MOVED))
-                        .propertyState(PropertyState.EQUAL)
-                        .compare(new Reference(Location.DESTINATION, Direction.BACK, null))
-                        .build();
-                Condition enPassantCond3 = Condition.builder()
-                        .reference(new Reference(Location.LAST_MOVED))
-                        .property(new Property<>("lastMoveDistance"))
-                        .propertyState(PropertyState.EQUAL)
-                        .expected(2)
-                        .build();
+                Conditional enPassantCond1 = new PropertyCondition(new Reference(Location.LAST_MOVED),
+                        Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
+                Conditional enPassantCond2 = new ReferenceCondition(new Reference(Location.LAST_MOVED),
+                        Comparator.EQUAL, new Reference(Location.DESTINATION, Direction.BACK, null));
+                Conditional enPassantCond3 = new PropertyCondition(new Reference(Location.LAST_MOVED),
+                        Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
-                ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.DESTINATION, Direction.BACK, null),
+                ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.DESTINATION, Direction.BACK,
+                        null),
                         new Vector2D(), new Vector2D(), false);
-                Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true,
-                        false, List.of(noPieceAtDestination, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement);
+                Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE,
+                        false, true, false,
+                        List.of(PropertyCondition.destinationEmpty(), enPassantCond1, enPassantCond2, enPassantCond3),
+                        extraMovement);
                 return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, fastAdvance, capture, enPassant);
             }
         }

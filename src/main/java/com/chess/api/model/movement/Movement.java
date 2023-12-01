@@ -1,9 +1,10 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Action;
 import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
-import com.chess.api.model.movement.condition.Condition;
+import com.chess.api.model.movement.condition.Conditional;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class Movement {
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean specificQuadrant;
-    private final List<Condition> conditions;
+    private final List<Conditional> conditions;
     private final ExtraMovement extraMovement;
 
     public Movement() {
@@ -36,11 +37,11 @@ public class Movement {
         this(path, type, mirrorXAxis, mirrorYAxis, false, List.of(), null);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions) {
         this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions, ExtraMovement extraMovement) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraMovement extraMovement) {
         this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
@@ -73,8 +74,13 @@ public class Movement {
                 break;
             }
             vectors.add(Vector2D.at(nextX, nextY));
+            // Destination has been added, so there is no need to add more
+            if (end.getX() == nextX && end.getY() == nextY) {
+                break;
+            }
         }
         if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
+
             return null; // No path that reaches this end from this start
         }
         return new Path(vectors);
@@ -127,9 +133,9 @@ public class Movement {
         return map;
     }
 
-    public boolean passesConditions(@NonNull Board board, @NonNull Vector2D start, @NonNull Vector2D end) {
-        for (Condition condition : this.conditions) {
-            if (!condition.evaluate(board, start, end)) {
+    public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
+        for (Conditional condition : this.conditions) {
+            if (!condition.isExpected(board, action)) {
                 return false;
             }
         }

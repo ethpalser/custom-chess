@@ -1,6 +1,8 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Action;
 import com.chess.api.model.Board;
+import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
@@ -54,7 +56,7 @@ public class ExtraMovement {
         }
         Piece piece;
         if (this.reference != null) {
-            piece = board.getReferencePieces(this.reference, offset, offset).get(0);
+            piece = this.reference.getPieces(board, new Action(Colour.WHITE, new Vector2D(), offset)).get(0);
         } else {
             piece = board.getPiece(location);
         }
