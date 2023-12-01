@@ -1,17 +1,16 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.condition.Condition;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
-@AllArgsConstructor
 @Getter
 public class Movement {
 
@@ -19,221 +18,39 @@ public class Movement {
     private final MovementType type;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
+    private final boolean specificQuadrant;
     private final List<Condition> conditions;
     private final ExtraMovement extraMovement;
-    private final boolean lockedQuadrant;
 
     public Movement() {
         this.originalPath = new Path();
         this.type = MovementType.ADVANCE;
         this.mirrorXAxis = false;
         this.mirrorYAxis = false;
+        this.specificQuadrant = false;
         this.conditions = null;
         this.extraMovement = null;
-        this.lockedQuadrant = false;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates) {
-        this(type, mirrorXAxis, mirrorYAxis, coordinates, List.of());
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
+        this(path, type, mirrorXAxis, mirrorYAxis, false, List.of(), null);
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end) {
-        this(type, mirrorXAxis, mirrorYAxis, end, List.of());
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions) {
+        this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end) {
-        this(type, mirrorXAxis, mirrorYAxis, start, end, List.of());
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, List<Coordinate> coordinates,
-            List<Condition> conditions) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions, ExtraMovement extraMovement) {
+        this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(coordinates);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
-            List<Condition> conditions) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(end);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate end,
-            List<Condition> conditions, ExtraMovement extraMovement, boolean lockedQuadrant) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(end);
+        this.specificQuadrant = specificQuadrant;
         this.conditions = conditions;
         this.extraMovement = extraMovement;
-        this.lockedQuadrant = lockedQuadrant;
     }
 
-    public Movement(MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, Coordinate start, Coordinate end,
-            List<Condition> conditions) {
-        this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.originalPath = new Path(start, end);
-        this.conditions = conditions;
-        this.extraMovement = null;
-        this.lockedQuadrant = false;
-    }
-
-    public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
-        if (Colour.WHITE.equals(colour)) {
-            return this.getWhiteCoordinates(offset.getX(), offset.getY());
-        } else {
-            return this.getBlackCoordinates(offset.getX(), offset.getY());
-        }
-    }
-
-    private Map<Integer, Coordinate> getWhiteCoordinates(final int offsetX, final int offsetY) {
-        Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : this.originalPath) {
-            int baseOffsetX = coordinate.getX() + offsetX;
-            int baseOffsetY = coordinate.getY() + offsetY;
-            int mirrorOffsetX = offsetX - coordinate.getX();
-            int mirrorOffsetY = offsetY - coordinate.getY();
-
-            if (lockedQuadrant) {
-                if (!mirrorXAxis) {
-                    if (!mirrorYAxis) {
-                        // Q1 Top Right
-                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                            map.put(offsetCo.hashCode(), offsetCo);
-                        }
-                    } else {
-                        // Q2 Bottom Right
-                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                            map.put(mirrorX.hashCode(), mirrorX);
-                        }
-                    }
-                } else {
-                    if (!mirrorYAxis) {
-                        // Q3 Bottom Left
-                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                            map.put(mirrorXY.hashCode(), mirrorXY);
-                        }
-                    } else {
-                        // Q4 Top Left
-                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                            map.put(mirrorY.hashCode(), mirrorY);
-                        }
-                    }
-                }
-                break;
-            }
-
-            // Q1 Top Right
-            if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                map.put(offsetCo.hashCode(), offsetCo);
-            }
-            // Q2 Bottom Right
-            if (this.mirrorXAxis && baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorX.hashCode(), mirrorX);
-            }
-            // Q3 Bottom Left
-            if (this.mirrorXAxis && this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
-            }
-            // Q4 Top Left
-            if (this.mirrorYAxis && mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                map.put(mirrorY.hashCode(), mirrorY);
-            }
-        }
-        return map;
-    }
-
-    private Map<Integer, Coordinate> getBlackCoordinates(int offsetX, int offsetY) {
-        Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : this.originalPath) {
-            int baseOffsetX = coordinate.getX() + offsetX;
-            int baseOffsetY = coordinate.getY() + offsetY;
-            int mirrorOffsetX = offsetX - coordinate.getX();
-            int mirrorOffsetY = offsetY - coordinate.getY();
-
-            if (lockedQuadrant) {
-                if (!mirrorXAxis) {
-                    if (!mirrorYAxis) {
-                        // Q2 Bottom Right
-                        if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                            Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                            map.put(mirrorX.hashCode(), mirrorX);
-                        }
-                    } else {
-                        // Q1 Top Right
-                        if (baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                            map.put(offsetCo.hashCode(), offsetCo);
-                        }
-                    }
-                } else {
-                    if (!mirrorYAxis) {
-                        // Q4 Top Left
-                        if (mirrorOffsetX >= 0 && baseOffsetY <= Coordinate.MAX_Y) {
-                            Coordinate mirrorY = new Coordinate(mirrorOffsetX, baseOffsetY);
-                            map.put(mirrorY.hashCode(), mirrorY);
-                        }
-                    } else {
-                        // Q3 Bottom Left
-                        if (mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                            Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                            map.put(mirrorXY.hashCode(), mirrorXY);
-                        }
-                    }
-                }
-                break;
-            }
-
-            // Q1 Top Right
-            if (this.mirrorXAxis && baseOffsetX <= Coordinate.MAX_X && baseOffsetY <= Coordinate.MAX_Y) {
-                Coordinate offsetCo = new Coordinate(baseOffsetX, baseOffsetY);
-                map.put(offsetCo.hashCode(), offsetCo);
-            }
-            // Q2 Bottom Right
-            if (baseOffsetX <= Coordinate.MAX_X && mirrorOffsetY >= 0) {
-                Coordinate mirrorX = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorX.hashCode(), mirrorX);
-            }
-            // Q3 Bottom Left
-            if (this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(mirrorOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
-            }
-            // Q4 Top Left
-            if (this.mirrorXAxis && this.mirrorYAxis && mirrorOffsetX >= 0 && mirrorOffsetY >= 0) {
-                Coordinate mirrorXY = new Coordinate(baseOffsetX, mirrorOffsetY);
-                map.put(mirrorXY.hashCode(), mirrorXY);
-            }
-        }
-        return map;
-    }
-
-    public boolean isValidCoordinate(@NonNull Colour colour, @NonNull Coordinate source,
-            @NonNull Coordinate destination) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, source);
-        return coordinates.get(destination.hashCode()) != null;
-    }
-
-    public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
+    public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
         // Determine direction
         int diffX = end.getX() - start.getX();
         int diffY = end.getY() - start.getY();
@@ -248,26 +65,85 @@ public class Movement {
             return new Path();
         }
 
-        List<Coordinate> coordinates = new LinkedList<>();
-        for (Coordinate coordinate : this.getOriginalPath()) {
-            int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
-            int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
-            if (!Coordinate.isValid(nextX, nextY)) {
+        List<Vector2D> vectors = new LinkedList<>();
+        for (Vector2D vector : this.getOriginalPath()) {
+            int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
+            int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
+            if (!Vector2D.isValid(nextX, nextY)) {
                 break;
             }
-            coordinates.add(Coordinate.at(nextX, nextY));
+            vectors.add(Vector2D.at(nextX, nextY));
         }
-        return new Path(coordinates);
+        if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
+            return null; // No path that reaches this end from this start
+        }
+        return new Path(vectors);
+    }
+
+    public Map<Integer, Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+        boolean isWhite = Colour.WHITE.equals(colour);
+        boolean isUp = isWhite && !mirrorXAxis || !isWhite && mirrorXAxis;
+        boolean isRight = !mirrorYAxis;
+        boolean hasUp = isWhite || mirrorXAxis;
+        boolean hasDown = !isWhite || mirrorXAxis;
+
+        Map<Integer, Vector2D> map = new HashMap<>();
+        for (Vector2D vector : this.getOriginalPath()) {
+            int baseX = vector.getX() + offset.getX();
+            int baseY = vector.getY() + offset.getY();
+            int mirrorX = offset.getX() - vector.getX();
+            int mirrorY = offset.getY() - vector.getY();
+
+            Vector2D upRight = Vector2D.isValid(baseX, baseY) ? Vector2D.at(baseX, baseY) : null;
+            Vector2D upLeft = Vector2D.isValid(mirrorX, baseY) ? Vector2D.at(mirrorX, baseY) : null;
+            Vector2D downRight = Vector2D.isValid(baseX, mirrorY) ? Vector2D.at(baseX, mirrorY) : null;
+            Vector2D downLeft = Vector2D.isValid(mirrorX, mirrorY) ? Vector2D.at(mirrorX, mirrorY) : null;
+
+            if (this.specificQuadrant) {
+                if (isUp && isRight && upRight != null) {
+                    map.put(upRight.hashCode(), upRight);
+                } else if (isUp && !isRight && upLeft != null) {
+                    map.put(upLeft.hashCode(), upLeft);
+                } else if (!isUp && isRight && downRight != null) {
+                    map.put(downRight.hashCode(), downRight);
+                } else if (!isUp && !isRight && downLeft != null) {
+                    map.put(downLeft.hashCode(), downLeft);
+                }
+            } else {
+                if (hasUp) {
+                    if (upRight != null)
+                        map.put(upRight.hashCode(), upRight);
+                    if (this.mirrorYAxis && upLeft != null)
+                        map.put(upLeft.hashCode(), upLeft);
+                }
+                if (hasDown) {
+                    if (downRight != null)
+                        map.put(downRight.hashCode(), downRight);
+                    if (this.mirrorYAxis && downLeft != null)
+                        map.put(downLeft.hashCode(), downLeft);
+                }
+            }
+        }
+        return map;
+    }
+
+    public boolean passesConditions(@NonNull Board board, @NonNull Vector2D start, @NonNull Vector2D end) {
+        for (Condition condition : this.conditions) {
+            if (!condition.evaluate(board, start, end)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
-        return this.drawCoordinates(colour, new Coordinate(0, 0));
+        return this.drawCoordinates(colour, new Vector2D(0, 0));
     }
 
-    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, offset);
-        boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
-        for (Coordinate c : coordinates.values()) {
+    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+        Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, offset);
+        boolean[][] boardMove = new boolean[Vector2D.MAX_X + 1][Vector2D.MAX_Y + 1];
+        for (Vector2D c : coordinates.values()) {
             boardMove[c.getX()][c.getY()] = true;
         }
         return boardMove;
@@ -275,10 +151,10 @@ public class Movement {
 
     @Override
     public String toString() {
-        return this.toString(Colour.WHITE, Coordinate.origin());
+        return this.toString(Colour.WHITE, Vector2D.origin());
     }
 
-    public String toString(@NonNull Colour colour, @NonNull Coordinate offset) {
+    public String toString(@NonNull Colour colour, @NonNull Vector2D offset) {
         boolean[][] boardMove = this.drawCoordinates(colour, offset);
         StringBuilder sb = new StringBuilder();
         for (int y = boardMove[0].length - 1; y >= 0; y--) {

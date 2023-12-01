@@ -1,7 +1,7 @@
 package com.chess.api.model.movement.condition;
 
 import com.chess.api.model.Board;
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.piece.Piece;
 import java.util.Iterator;
 import java.util.List;
@@ -33,14 +33,16 @@ public class Condition {
         this.compare = compare;
     }
 
-    public Boolean evaluate(Board board, Coordinate start, Coordinate end) {
-        List<Piece> list = board.getReferencePiece(this.reference, start, end);
+    public boolean evaluate(Board board, Vector2D start, Vector2D end) {
+        List<Piece> list = board.getReferencePieces(this.reference, start, end);
         Iterator<Piece> iterator = list.iterator();
         boolean result = true;
 
         while (result && iterator.hasNext()) {
             Piece piece = iterator.next();
-            if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
+            if (PropertyState.EXIST.equals(this.propertyState) && piece == null) {
+                return false;
+            } else if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
                 return false;
             } else if (piece == null) {
                 continue;
@@ -54,13 +56,12 @@ public class Condition {
                         (this.expected != null && propVal != null
                                 && propVal.getClass().equals(this.expected.getClass())
                                 && propVal.equals(this.expected))
-                        || (this.compare != null && piece.equals(board.getReferencePiece(this.compare, start, end).get(0)));
+                        || (this.compare != null && piece.equals(board.getReferencePieces(this.compare, start, end).get(0)));
                 case OPPOSITE -> {
                     // The start piece is implied for OPPOSITE, as the condition's value is not known until runtime
                     Piece currPiece = board.getPiece(start);
                     Object currVal = this.property != null ? this.property.fetch(currPiece) : null;
-                    result = (currVal == null && propVal == null) ||
-                            currVal != null && propVal != null
+                    result = currVal != null && propVal != null
                                     && propVal.getClass().equals(currVal.getClass())
                                     && propVal.equals(currVal);
                 }
@@ -70,6 +71,20 @@ public class Condition {
             }
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Vector: ").append(reference).append("\n");
+        if (compare != null) {
+            sb.append("Vector to compare against: ").append(compare).append("\n");
+        } else {
+            sb.append("Property: ").append(property == null ? null : property.key()).append("\n");
+            sb.append("State: ").append(propertyState).append("\n");
+            sb.append("Expected value of property: ").append(expected).append("\n");
+        }
+        return sb.toString();
     }
 }
 

@@ -1,6 +1,6 @@
 package com.chess.api.model.movement;
 
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 
 public enum PathType {
     VERTICAL,
@@ -8,7 +8,7 @@ public enum PathType {
     DIAGONAL,
     CUSTOM;
 
-    public static PathType findType(Coordinate start, Coordinate end) {
+    public static PathType findType(Vector2D start, Vector2D end) {
         int diffX = Math.abs(end.getX() - start.getX());
         int diffY = Math.abs(end.getY() - start.getY());
 
