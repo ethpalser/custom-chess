@@ -81,6 +81,6 @@ public class Vector2D implements Comparable<Vector2D> {
     @Override
     public String toString() {
         char xChar = (char) ('a' + this.x);
-        return "" + xChar + this.y;
+        return "" + xChar + (this.y + 1);
     }
 }
