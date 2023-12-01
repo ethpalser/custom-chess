@@ -1,9 +1,10 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Action;
 import com.chess.api.model.Board;
 import com.chess.api.model.Colour;
 import com.chess.api.model.Vector2D;
-import com.chess.api.model.movement.condition.Condition;
+import com.chess.api.model.movement.condition.Conditional;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,8 +20,8 @@ public class Movement {
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean specificQuadrant;
-    private final List<Condition> conditions;
-    private final ExtraMovement extraMovement;
+    private final List<Conditional> conditions;
+    private final ExtraAction extraAction;
 
     public Movement() {
         this.originalPath = new Path();
@@ -29,25 +30,25 @@ public class Movement {
         this.mirrorYAxis = false;
         this.specificQuadrant = false;
         this.conditions = null;
-        this.extraMovement = null;
+        this.extraAction = null;
     }
 
     public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
         this(path, type, mirrorXAxis, mirrorYAxis, false, List.of(), null);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions) {
         this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Condition> conditions, ExtraMovement extraMovement) {
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraAction extraAction) {
         this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.specificQuadrant = specificQuadrant;
         this.conditions = conditions;
-        this.extraMovement = extraMovement;
+        this.extraAction = extraAction;
     }
 
     public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
@@ -59,10 +60,10 @@ public class Movement {
         boolean isBlack = Colour.BLACK.equals(colour);
 
         // Invalid direction cases
-        if ((!negX && isBlack && !this.mirrorXAxis)
-                || (negX && !isBlack && !this.mirrorXAxis)
-                || (negY && !this.mirrorYAxis)) {
-            return new Path();
+        if ((!negY && isBlack && !this.mirrorXAxis)
+                || (negY && !isBlack && !this.mirrorXAxis)
+                || (negX && !this.mirrorYAxis)) {
+            return null;
         }
 
         List<Vector2D> vectors = new LinkedList<>();
@@ -73,6 +74,10 @@ public class Movement {
                 break;
             }
             vectors.add(Vector2D.at(nextX, nextY));
+            // Destination has been added, so there is no need to add more
+            if (end.getX() == nextX && end.getY() == nextY) {
+                break;
+            }
         }
         if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
             return null; // No path that reaches this end from this start
@@ -127,9 +132,9 @@ public class Movement {
         return map;
     }
 
-    public boolean passesConditions(@NonNull Board board, @NonNull Vector2D start, @NonNull Vector2D end) {
-        for (Condition condition : this.conditions) {
-            if (!condition.evaluate(board, start, end)) {
+    public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
+        for (Conditional condition : this.conditions) {
+            if (!condition.isExpected(board, action)) {
                 return false;
             }
         }

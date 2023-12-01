@@ -38,6 +38,17 @@ public class Vector2D implements Comparable<Vector2D> {
         return new Vector2D(chars[0], chars[1]);
     }
 
+    public static Vector2D fromVector2D(Vector2D vector) {
+        return fromVector2D(vector, 0, 0);
+    }
+
+    public static Vector2D fromVector2D(Vector2D vector, int shiftX, int shiftY) {
+        if (vector == null || !isValid(vector.getX() + shiftX, vector.getY() + shiftY)) {
+            return null;
+        }
+        return new Vector2D(vector.getX() + shiftX, vector.getY() + shiftY);
+    }
+
     public static Vector2D at(int x, int y) {
         return new Vector2D(x, y);
     }

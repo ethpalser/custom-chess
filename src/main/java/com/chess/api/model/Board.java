@@ -2,11 +2,9 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
-import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.PieceFactory;
 import com.chess.api.model.piece.PieceType;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -116,24 +114,6 @@ public class Board {
         return lastMoved;
     }
 
-    public List<Piece> getReferencePieces(Reference reference, Vector2D pathStart, Vector2D pathEnd) {
-        if (reference == null) {
-            return List.of();
-        }
-        List<Piece> pieces = new ArrayList<>();
-        switch (reference.location()) {
-            case LAST_MOVED -> pieces.add(this.getLastMoved());
-            case AT_START -> pieces.add(this.getPiece(pathStart));
-            case AT_DESTINATION -> pieces.add(this.getPiece(pathEnd));
-            case AT_COORDINATE -> pieces.add(this.getPiece(reference.vector()));
-            case PATH_TO_DESTINATION -> pieces = this.getPieces(new Path(pathStart, pathEnd));
-            case PATH_TO_COORDINATE -> pieces = this.getPieces(new Path(pathStart, reference.vector()));
-            case BELOW_DESTINATION -> pieces.add(this.getPiece(pathEnd.getX(), pathEnd.getY() - 1));
-        }
-        return pieces;
-    }
-
-
     /**
      * Move a piece to a new coordinate within the board.
      * <p>For a piece to move the following must be valid:</p>
@@ -158,11 +138,19 @@ public class Board {
             return;
         }
         atStart.setPosition(end);
-        // Update the piece on the board
         this.pieceMap.put(end, atStart);
         this.pieceMap.remove(start);
-        if (movement.getExtraMovement() != null) {
 
+        if (movement.getExtraAction() != null) {
+            Action action = movement.getExtraAction().getAction(this, new Action(atStart.getColour(), start, end));
+            Piece toForceMove = this.getPiece(action.start());
+            if (toForceMove != null) {
+                if (action.end() != null) {
+                    this.setPiece(action.end(), toForceMove);
+                }
+                // If the piece had not moved the intent is to remove it
+                this.setPiece(action.start(), null);
+            }
         }
         this.lastMoved = atStart;
     }
