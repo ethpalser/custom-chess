@@ -7,6 +7,7 @@ import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.MovementType;
 import com.chess.api.model.movement.Path;
 import com.chess.api.model.movement.condition.Condition;
+import com.chess.api.model.movement.condition.Direction;
 import com.chess.api.model.movement.condition.Location;
 import com.chess.api.model.movement.condition.Property;
 import com.chess.api.model.movement.condition.PropertyState;
@@ -30,20 +31,20 @@ public class PieceFactory {
     public Piece build(PieceType type, Colour colour, Vector2D vector) {
         // Common and basic conditions
         Condition noPieceAtDestination = Condition.builder()
-                .reference(new Reference(Location.AT_DESTINATION))
+                .reference(new Reference(Location.DESTINATION))
                 .propertyState(PropertyState.DOES_NOT_EXIST)
                 .build();
         Condition hasPieceAtDestination = Condition.builder()
-                .reference(new Reference(Location.AT_DESTINATION))
+                .reference(new Reference(Location.DESTINATION))
                 .propertyState(PropertyState.EXIST)
                 .build();
         Condition oppositeColour = Condition.builder()
-                .reference(new Reference(Location.AT_DESTINATION))
+                .reference(new Reference(Location.DESTINATION))
                 .property(new Property<>("colour"))
                 .propertyState(PropertyState.OPPOSITE)
                 .build();
         Condition selfNotMoved = Condition.builder()
-                .reference(new Reference(Location.AT_START))
+                .reference(new Reference(Location.START))
                 .property(new Property<>("hasMoved"))
                 .propertyState(PropertyState.FALSE)
                 .build();
@@ -79,12 +80,12 @@ public class PieceFactory {
                 Movement kingBaseMoveD = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, true, true);
 
                 Condition castleKingSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.AT_COORDINATE, Vector2D.at(7, 0)))
+                        .reference(new Reference(Location.VECTOR, Vector2D.at(7, 0)))
                         .property(new Property<>("hasMoved"))
                         .propertyState(PropertyState.FALSE)
                         .build();
                 Condition castleKingSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_COORDINATE, Vector2D.at(7, 0)))
+                        .reference(new Reference(Location.PATH_TO_VECTOR, Vector2D.at(7, 0)))
                         .propertyState(PropertyState.DOES_NOT_EXIST)
                         .build();
                 ExtraMovement kingSideRookMovement = new ExtraMovement(Vector2D.at(7, 0), Vector2D.at(5, 0));
@@ -94,12 +95,12 @@ public class PieceFactory {
                         kingSideRookMovement);
 
                 Condition castleQueenSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.AT_COORDINATE, Vector2D.at(0, 0)))
+                        .reference(new Reference(Location.VECTOR, Vector2D.at(0, 0)))
                         .property(new Property<>("hasMoved"))
                         .propertyState(PropertyState.FALSE)
                         .build();
                 Condition castleQueenSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_COORDINATE, Vector2D.at(0, 0)))
+                        .reference(new Reference(Location.PATH_TO_VECTOR, Vector2D.at(0, 0)))
                         .propertyState(PropertyState.DOES_NOT_EXIST)
                         .build();
                 ExtraMovement queenSideRookMovement = new ExtraMovement(Vector2D.at(0, 0), Vector2D.at(3, 0));
@@ -129,7 +130,7 @@ public class PieceFactory {
                 Condition enPassantCond2 = Condition.builder()
                         .reference(new Reference(Location.LAST_MOVED))
                         .propertyState(PropertyState.EQUAL)
-                        .compare(new Reference(Location.BELOW_DESTINATION))
+                        .compare(new Reference(Location.DESTINATION, Direction.BACK, null))
                         .build();
                 Condition enPassantCond3 = Condition.builder()
                         .reference(new Reference(Location.LAST_MOVED))
@@ -138,7 +139,7 @@ public class PieceFactory {
                         .expected(2)
                         .build();
 
-                ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.BELOW_DESTINATION),
+                ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.DESTINATION, Direction.BACK, null),
                         new Vector2D(), new Vector2D(), false);
                 Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true,
                         false, List.of(noPieceAtDestination, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement);

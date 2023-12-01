@@ -2,6 +2,7 @@ package com.chess.api.model;
 
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.Path;
+import com.chess.api.model.movement.condition.Direction;
 import com.chess.api.model.movement.condition.Reference;
 import com.chess.api.model.piece.Piece;
 import com.chess.api.model.piece.PieceFactory;
@@ -120,17 +121,31 @@ public class Board {
         if (reference == null) {
             return List.of();
         }
-        List<Piece> pieces = new ArrayList<>();
-        switch (reference.location()) {
-            case LAST_MOVED -> pieces.add(this.getLastMoved());
-            case AT_START -> pieces.add(this.getPiece(pathStart));
-            case AT_DESTINATION -> pieces.add(this.getPiece(pathEnd));
-            case AT_COORDINATE -> pieces.add(this.getPiece(reference.vector()));
-            case PATH_TO_DESTINATION -> pieces = this.getPieces(new Path(pathStart, pathEnd));
-            case PATH_TO_COORDINATE -> pieces = this.getPieces(new Path(pathStart, reference.vector()));
-            case BELOW_DESTINATION -> pieces.add(this.getPiece(pathEnd.getX(), pathEnd.getY() - 1));
+
+        Direction direction = reference.direction();
+        Vector2D shiftedStart = this.shiftVector(pathStart, direction);
+        Vector2D shiftedEnd = this.shiftVector(pathEnd, direction);
+        Vector2D shiftedReference = this.shiftVector(reference.vector(), direction);
+        return switch (reference.location()) {
+            case LAST_MOVED -> List.of(this.lastMoved);
+            case START -> List.of(this.getPiece(shiftedStart));
+            case DESTINATION -> List.of(this.getPiece(shiftedEnd));
+            case VECTOR -> List.of(this.getPiece(shiftedReference));
+            case PATH_TO_DESTINATION -> this.getPieces(new Path(shiftedStart, shiftedEnd));
+            case PATH_TO_VECTOR -> this.getPieces(new Path(shiftedStart, shiftedReference));
+        };
+    }
+    private Vector2D shiftVector(Vector2D vector, Direction direction) {
+        int shiftX = 0;
+        int shiftY = 0;
+        switch (direction) {
+            case FRONT -> shiftY = 1;
+            case BACK -> shiftY = -1;
+            case RIGHT -> shiftX = 1;
+            case LEFT -> shiftX = -1;
+            default -> {/* Do nothing */}
         }
-        return pieces;
+        return Vector2D.fromVector2D(vector, shiftX, shiftY);
     }
 
 

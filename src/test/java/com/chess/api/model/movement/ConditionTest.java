@@ -17,7 +17,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_START), new Property<>("type"),
+        Condition condition = new Condition(new Reference(Location.START), new Property<>("type"),
                 PropertyState.EQUAL, PieceType.PAWN);
 
         Board board = new Board();
@@ -113,7 +113,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_START), new Property<>("type"),
+        Condition condition = new Condition(new Reference(Location.START), new Property<>("type"),
                 PropertyState.EQUAL, PieceType.KING);
 
         Board board = new Board();
@@ -128,7 +128,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_START), new Property<>("hasMoved"),
+        Condition condition = new Condition(new Reference(Location.START), new Property<>("hasMoved"),
                 PropertyState.FALSE, null);
 
         Board board = new Board();
@@ -143,7 +143,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0HasMoved_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(0, 0)),
+        Condition condition = new Condition(new Reference(Location.VECTOR, new Vector2D(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
 
         Board board = new Board();
@@ -158,7 +158,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(1, 0)), null,
+        Condition condition = new Condition(new Reference(Location.VECTOR, new Vector2D(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();
@@ -173,11 +173,11 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Condition conditionA = new Condition(new Reference(Location.AT_START), new Property<>("hasMoved"),
+        Condition conditionA = new Condition(new Reference(Location.START), new Property<>("hasMoved"),
                 PropertyState.FALSE, null);
-        Condition conditionB = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(0, 0)),
+        Condition conditionB = new Condition(new Reference(Location.VECTOR, new Vector2D(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
-        Condition conditionC = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(1, 0)), null,
+        Condition conditionC = new Condition(new Reference(Location.VECTOR, new Vector2D(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();
