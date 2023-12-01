@@ -59,7 +59,7 @@ public class ExtraMovement {
             piece = board.getPiece(location);
         }
         if (piece != null) {
-            piece.performMove(this.destination);
+            piece.setPosition(this.destination);
         }
         board.setPiece(this.destination, piece);
     }
