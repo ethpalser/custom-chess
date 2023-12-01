@@ -1,7 +1,7 @@
 package com.chess.api.model.movement;
 
 import com.chess.api.model.Board;
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.condition.Condition;
 import com.chess.api.model.movement.condition.Location;
 import com.chess.api.model.movement.condition.Property;
@@ -21,8 +21,8 @@ class ConditionTest {
                 PropertyState.EQUAL, PieceType.PAWN);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -36,8 +36,8 @@ class ConditionTest {
                 PropertyState.TRUE, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -51,8 +51,8 @@ class ConditionTest {
                 PropertyState.EQUAL, 1);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -66,8 +66,8 @@ class ConditionTest {
                 PropertyState.EQUAL, 1);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -81,8 +81,8 @@ class ConditionTest {
                 PropertyState.OPPOSITE, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -100,8 +100,8 @@ class ConditionTest {
                 PropertyState.OPPOSITE, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         boolean result = conditionA.evaluate(board, selected, destination)
                 && conditionB.evaluate(board, selected, destination)
@@ -117,8 +117,8 @@ class ConditionTest {
                 PropertyState.EQUAL, PieceType.KING);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -132,8 +132,8 @@ class ConditionTest {
                 PropertyState.FALSE, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -143,12 +143,12 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0HasMoved_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(0, 0)),
+        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -158,12 +158,12 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(1, 0)), null,
+        Condition condition = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         Boolean result = condition.evaluate(board, selected, destination);
         // Then
@@ -175,14 +175,14 @@ class ConditionTest {
         // Given
         Condition conditionA = new Condition(new Reference(Location.AT_START), new Property<>("hasMoved"),
                 PropertyState.FALSE, null);
-        Condition conditionB = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(0, 0)),
+        Condition conditionB = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(0, 0)),
                 new Property<>("hasMoved"), PropertyState.FALSE, null);
-        Condition conditionC = new Condition(new Reference(Location.AT_COORDINATE, new Coordinate(1, 0)), null,
+        Condition conditionC = new Condition(new Reference(Location.AT_COORDINATE, new Vector2D(1, 0)), null,
                 PropertyState.DOES_NOT_EXIST, null);
 
         Board board = new Board();
-        Coordinate selected = new Coordinate(4, 1);
-        Coordinate destination = new Coordinate(5, 2);
+        Vector2D selected = new Vector2D(4, 1);
+        Vector2D destination = new Vector2D(5, 2);
         // When
         boolean result = conditionA.evaluate(board, selected, destination)
                 && conditionB.evaluate(board, selected, destination)

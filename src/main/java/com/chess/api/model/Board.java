@@ -18,42 +18,42 @@ import lombok.NonNull;
 
 public class Board {
 
-    private final Map<Coordinate, Piece> pieceMap;
+    private final Map<Vector2D, Piece> pieceMap;
     private Piece lastMoved;
 
     public Board() {
-        Map<Coordinate, Piece> map = new HashMap<>();
+        Map<Vector2D, Piece> map = new HashMap<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
-        map.putAll(this.generatePiecesInRank(Coordinate.MAX_Y - 1));
-        map.putAll(this.generatePiecesInRank(Coordinate.MAX_Y));
+        map.putAll(this.generatePiecesInRank(Vector2D.MAX_Y - 1));
+        map.putAll(this.generatePiecesInRank(Vector2D.MAX_Y));
         this.pieceMap = map;
         this.lastMoved = null;
     }
 
-    private Map<Coordinate, Piece> generatePiecesInRank(int y) {
-        Map<Coordinate, Piece> map = new HashMap<>();
-        Colour colour = y < Coordinate.MAX_Y / 2 ? Colour.WHITE : Colour.BLACK;
+    private Map<Vector2D, Piece> generatePiecesInRank(int y) {
+        Map<Vector2D, Piece> map = new HashMap<>();
+        Colour colour = y < Vector2D.MAX_Y / 2 ? Colour.WHITE : Colour.BLACK;
 
         PieceFactory pieceFactory = PieceFactory.getInstance();
-        if (y == 0 || y == Coordinate.MAX_Y) {
+        if (y == 0 || y == Vector2D.MAX_Y) {
             for (int x = 0; x < 8; x++) {
-                Coordinate coordinate = new Coordinate(x, y);
+                Vector2D vector = new Vector2D(x, y);
                 Piece piece = switch (x) {
-                    case 0, 7 -> pieceFactory.build(PieceType.ROOK, colour, coordinate);
-                    case 1, 6 -> pieceFactory.build(PieceType.KNIGHT, colour, coordinate);
-                    case 2, 5 -> pieceFactory.build(PieceType.BISHOP, colour, coordinate);
-                    case 3 -> pieceFactory.build(PieceType.QUEEN, colour, coordinate);
-                    case 4 -> pieceFactory.build(PieceType.KING, colour, coordinate);
+                    case 0, 7 -> pieceFactory.build(PieceType.ROOK, colour, vector);
+                    case 1, 6 -> pieceFactory.build(PieceType.KNIGHT, colour, vector);
+                    case 2, 5 -> pieceFactory.build(PieceType.BISHOP, colour, vector);
+                    case 3 -> pieceFactory.build(PieceType.QUEEN, colour, vector);
+                    case 4 -> pieceFactory.build(PieceType.KING, colour, vector);
                     default -> null;
                 };
-                map.put(coordinate, piece);
+                map.put(vector, piece);
             }
-        } else if (y == 1 || y == Coordinate.MAX_Y - 1) {
+        } else if (y == 1 || y == Vector2D.MAX_Y - 1) {
             for (int x = 0; x < 8; x++) {
-                Coordinate coordinate = new Coordinate(x, y);
-                Piece piece = pieceFactory.build(PieceType.PAWN, colour, coordinate);
-                map.put(coordinate, piece);
+                Vector2D vector = new Vector2D(x, y);
+                Piece piece = pieceFactory.build(PieceType.PAWN, colour, vector);
+                map.put(vector, piece);
             }
         }
         return map;
@@ -70,32 +70,32 @@ public class Board {
     }
 
     public int length() {
-        return Coordinate.MAX_Y + 1;
+        return Vector2D.MAX_Y + 1;
     }
 
     public int width() {
-        return Coordinate.MAX_X + 1;
+        return Vector2D.MAX_X + 1;
     }
 
     public Piece getPiece(int x, int y) {
-        if (x < 0 || x > Coordinate.MAX_X || y < 0 || y > Coordinate.MAX_Y) {
+        if (x < 0 || x > Vector2D.MAX_X || y < 0 || y > Vector2D.MAX_Y) {
             return null;
         }
-        return pieceMap.get(Coordinate.at(x, y));
+        return pieceMap.get(Vector2D.at(x, y));
     }
 
-    public Piece getPiece(Coordinate coordinate) {
-        if (coordinate == null) {
+    public Piece getPiece(Vector2D vector) {
+        if (vector == null) {
             return null;
         }
-        return pieceMap.get(coordinate);
+        return pieceMap.get(vector);
     }
 
-    public void setPiece(@NonNull Coordinate coordinate, Piece piece) {
+    public void setPiece(@NonNull Vector2D vector, Piece piece) {
         if (piece == null) {
-            this.pieceMap.remove(coordinate);
+            this.pieceMap.remove(vector);
         } else {
-            this.pieceMap.put(coordinate, piece);
+            this.pieceMap.put(vector, piece);
         }
     }
 
@@ -108,8 +108,8 @@ public class Board {
             return this.getPieces();
         }
         List<Piece> pieceList = new LinkedList<>();
-        for (Coordinate coordinate : path) {
-            pieceList.add(this.getPiece(coordinate));
+        for (Vector2D vector : path) {
+            pieceList.add(this.getPiece(vector));
         }
         return pieceList;
     }
@@ -118,7 +118,7 @@ public class Board {
         return lastMoved;
     }
 
-    public List<Piece> getReferencePieces(Reference reference, Coordinate pathStart, Coordinate pathEnd) {
+    public List<Piece> getReferencePieces(Reference reference, Vector2D pathStart, Vector2D pathEnd) {
         if (reference == null) {
             return List.of();
         }
@@ -127,9 +127,9 @@ public class Board {
             case LAST_MOVED -> pieces.add(this.getLastMoved());
             case AT_START -> pieces.add(this.getPiece(pathStart));
             case AT_DESTINATION -> pieces.add(this.getPiece(pathEnd));
-            case AT_COORDINATE -> pieces.add(this.getPiece(reference.coordinate()));
+            case AT_COORDINATE -> pieces.add(this.getPiece(reference.vector()));
             case PATH_TO_DESTINATION -> pieces = this.getPieces(new Path(pathStart, pathEnd));
-            case PATH_TO_COORDINATE -> pieces = this.getPieces(new Path(pathStart, reference.coordinate()));
+            case PATH_TO_COORDINATE -> pieces = this.getPieces(new Path(pathStart, reference.vector()));
             case BELOW_DESTINATION -> pieces.add(this.getPiece(pathEnd.getX(), pathEnd.getY() - 1));
         }
         return pieces;
@@ -149,7 +149,7 @@ public class Board {
      * @param start
      * @param end
      */
-    public void movePiece(@NonNull Coordinate start, @NonNull Coordinate end) {
+    public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
         Piece source = this.getPiece(start);
         Piece target = this.getPiece(end);
 
@@ -197,10 +197,10 @@ public class Board {
             return false;
         }
 
-        Iterator<Coordinate> iterator = path.iterator();
+        Iterator<Vector2D> iterator = path.iterator();
         while (iterator.hasNext()) {
-            Coordinate coordinate = iterator.next();
-            if (this.getPiece(coordinate) != null && iterator.hasNext()) {
+            Vector2D vector = iterator.next();
+            if (this.getPiece(vector) != null && iterator.hasNext()) {
                 // Piece is in the middle of the path
                 return false;
             }

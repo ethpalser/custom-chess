@@ -1,8 +1,8 @@
 package com.chess.api.model.movement.condition;
 
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 
-public record Reference(Location location, Coordinate coordinate) {
+public record Reference(Location location, Vector2D vector) {
 
     public Reference() {
         this(Location.AT_START);
@@ -12,12 +12,12 @@ public record Reference(Location location, Coordinate coordinate) {
         this(location, null);
     }
 
-    public Reference(Location location, Coordinate coordinate) {
+    public Reference(Location location, Vector2D vector) {
         this.location = location;
         if (location == Location.AT_COORDINATE) {
-            this.coordinate = coordinate;
+            this.vector = vector;
         } else {
-            this.coordinate = null;
+            this.vector = null;
         }
     }
 }

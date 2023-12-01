@@ -1,14 +1,12 @@
 package com.chess.api.model.movement;
 
 import com.chess.api.model.Colour;
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.condition.Condition;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -51,7 +49,7 @@ public class Movement {
         this.extraMovement = extraMovement;
     }
 
-    public Path getPath(@NonNull Colour colour, @NonNull Coordinate start, @NonNull Coordinate end) {
+    public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
         // Determine direction
         int diffX = end.getX() - start.getX();
         int diffY = end.getY() - start.getY();
@@ -66,36 +64,36 @@ public class Movement {
             return new Path();
         }
 
-        List<Coordinate> coordinates = new LinkedList<>();
-        for (Coordinate coordinate : this.getOriginalPath()) {
-            int nextX = !negX ? coordinate.getX() + start.getX() : start.getX() - coordinate.getX();
-            int nextY = !negY ? coordinate.getY() + start.getY() : start.getY() - coordinate.getY();
-            if (!Coordinate.isValid(nextX, nextY)) {
+        List<Vector2D> vectors = new LinkedList<>();
+        for (Vector2D vector : this.getOriginalPath()) {
+            int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
+            int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
+            if (!Vector2D.isValid(nextX, nextY)) {
                 break;
             }
-            coordinates.add(Coordinate.at(nextX, nextY));
+            vectors.add(Vector2D.at(nextX, nextY));
         }
-        return new Path(coordinates);
+        return new Path(vectors);
     }
 
-    public Map<Integer, Coordinate> getCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
+    public Map<Integer, Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
         boolean isWhite = Colour.WHITE.equals(colour);
         boolean isUp = isWhite && !mirrorXAxis || !isWhite && mirrorXAxis;
         boolean isRight = !mirrorYAxis;
         boolean hasUp = isWhite || mirrorXAxis;
         boolean hasDown = !isWhite || mirrorXAxis;
 
-        Map<Integer, Coordinate> map = new HashMap<>();
-        for (Coordinate coordinate : this.getOriginalPath()) {
-            int baseX = coordinate.getX() + offset.getX();
-            int baseY = coordinate.getY() + offset.getY();
-            int mirrorX = offset.getX() - coordinate.getX();
-            int mirrorY = offset.getY() - coordinate.getY();
+        Map<Integer, Vector2D> map = new HashMap<>();
+        for (Vector2D vector : this.getOriginalPath()) {
+            int baseX = vector.getX() + offset.getX();
+            int baseY = vector.getY() + offset.getY();
+            int mirrorX = offset.getX() - vector.getX();
+            int mirrorY = offset.getY() - vector.getY();
 
-            Coordinate upRight = Coordinate.isValid(baseX, baseY) ? Coordinate.at(baseX, baseY) : null;
-            Coordinate upLeft = Coordinate.isValid(mirrorX, baseY) ? Coordinate.at(mirrorX, baseY) : null;
-            Coordinate downRight = Coordinate.isValid(baseX, mirrorY) ? Coordinate.at(baseX, mirrorY) : null;
-            Coordinate downLeft = Coordinate.isValid(mirrorX, mirrorY) ? Coordinate.at(mirrorX, mirrorY) : null;
+            Vector2D upRight = Vector2D.isValid(baseX, baseY) ? Vector2D.at(baseX, baseY) : null;
+            Vector2D upLeft = Vector2D.isValid(mirrorX, baseY) ? Vector2D.at(mirrorX, baseY) : null;
+            Vector2D downRight = Vector2D.isValid(baseX, mirrorY) ? Vector2D.at(baseX, mirrorY) : null;
+            Vector2D downLeft = Vector2D.isValid(mirrorX, mirrorY) ? Vector2D.at(mirrorX, mirrorY) : null;
 
             if (this.specificQuadrant) {
                 if (isUp && isRight && upRight != null) {
@@ -125,20 +123,20 @@ public class Movement {
         return map;
     }
 
-    public boolean isValidCoordinate(@NonNull Colour colour, @NonNull Coordinate source,
-            @NonNull Coordinate destination) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, source);
+    public boolean isValidCoordinate(@NonNull Colour colour, @NonNull Vector2D source,
+            @NonNull Vector2D destination) {
+        Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, source);
         return coordinates.get(destination.hashCode()) != null;
     }
 
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
-        return this.drawCoordinates(colour, new Coordinate(0, 0));
+        return this.drawCoordinates(colour, new Vector2D(0, 0));
     }
 
-    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Coordinate offset) {
-        Map<Integer, Coordinate> coordinates = this.getCoordinates(colour, offset);
-        boolean[][] boardMove = new boolean[Coordinate.MAX_X + 1][Coordinate.MAX_Y + 1];
-        for (Coordinate c : coordinates.values()) {
+    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+        Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, offset);
+        boolean[][] boardMove = new boolean[Vector2D.MAX_X + 1][Vector2D.MAX_Y + 1];
+        for (Vector2D c : coordinates.values()) {
             boardMove[c.getX()][c.getY()] = true;
         }
         return boardMove;
@@ -146,10 +144,10 @@ public class Movement {
 
     @Override
     public String toString() {
-        return this.toString(Colour.WHITE, Coordinate.origin());
+        return this.toString(Colour.WHITE, Vector2D.origin());
     }
 
-    public String toString(@NonNull Colour colour, @NonNull Coordinate offset) {
+    public String toString(@NonNull Colour colour, @NonNull Vector2D offset) {
         boolean[][] boardMove = this.drawCoordinates(colour, offset);
         StringBuilder sb = new StringBuilder();
         for (int y = boardMove[0].length - 1; y >= 0; y--) {

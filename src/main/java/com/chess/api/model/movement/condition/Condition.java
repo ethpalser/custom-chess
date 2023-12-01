@@ -1,8 +1,7 @@
 package com.chess.api.model.movement.condition;
 
 import com.chess.api.model.Board;
-import com.chess.api.model.Coordinate;
-import com.chess.api.model.movement.Path;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.piece.Piece;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +33,7 @@ public class Condition {
         this.compare = compare;
     }
 
-    public Boolean evaluate(Board board, Coordinate start, Coordinate end) {
+    public Boolean evaluate(Board board, Vector2D start, Vector2D end) {
         List<Piece> list = board.getReferencePieces(this.reference, start, end);
         Iterator<Piece> iterator = list.iterator();
         boolean result = true;

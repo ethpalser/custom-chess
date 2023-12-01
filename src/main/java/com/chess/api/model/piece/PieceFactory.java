@@ -1,7 +1,7 @@
 package com.chess.api.model.piece;
 
 import com.chess.api.model.Colour;
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import com.chess.api.model.movement.ExtraMovement;
 import com.chess.api.model.movement.Movement;
 import com.chess.api.model.movement.MovementType;
@@ -27,7 +27,7 @@ public class PieceFactory {
         return factory;
     }
 
-    public Piece build(PieceType type, Colour colour, Coordinate coordinate) {
+    public Piece build(PieceType type, Colour colour, Vector2D vector) {
         // Common and basic conditions
         Condition noCapture = Condition.builder()
                 .reference(new Reference(Location.AT_DESTINATION))
@@ -44,76 +44,76 @@ public class PieceFactory {
                 .propertyState(PropertyState.FALSE)
                 .build();
 
-        Path vertical = new Path(Coordinate.at(0, 1), Coordinate.at(0, Coordinate.MAX_Y));
-        Path horizontal = new Path(Coordinate.at(1, 0), Coordinate.at(Coordinate.MAX_X, 0));
-        Path diagonal = new Path(Coordinate.at(1, 1), Coordinate.at(Coordinate.MAX_X, Coordinate.MAX_Y));
+        Path vertical = new Path(Vector2D.at(0, 1), Vector2D.at(0, Vector2D.MAX_Y));
+        Path horizontal = new Path(Vector2D.at(1, 0), Vector2D.at(Vector2D.MAX_X, 0));
+        Path diagonal = new Path(Vector2D.at(1, 1), Vector2D.at(Vector2D.MAX_X, Vector2D.MAX_Y));
 
         switch (type) {
             case KNIGHT -> {
-                Movement knightBaseMove1 = new Movement(new Path(Coordinate.at(1, 2)), MovementType.JUMP, true, true);
-                Movement knightBaseMove2 = new Movement(new Path(Coordinate.at(2, 1)), MovementType.JUMP, true, true);
-                return new Piece(PieceType.KNIGHT, colour, coordinate, knightBaseMove1, knightBaseMove2);
+                Movement knightBaseMove1 = new Movement(new Path(Vector2D.at(1, 2)), MovementType.JUMP, true, true);
+                Movement knightBaseMove2 = new Movement(new Path(Vector2D.at(2, 1)), MovementType.JUMP, true, true);
+                return new Piece(PieceType.KNIGHT, colour, vector, knightBaseMove1, knightBaseMove2);
             }
             case ROOK -> {
                 Movement rookBaseMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
                 Movement rookBaseMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
-                return new Piece(PieceType.ROOK, colour, coordinate, rookBaseMoveV, rookBaseMoveH);
+                return new Piece(PieceType.ROOK, colour, vector, rookBaseMoveV, rookBaseMoveH);
             }
             case BISHOP -> {
                 Movement bishopBaseMove = new Movement(diagonal, MovementType.ADVANCE, true, true);
-                return new Piece(PieceType.BISHOP, colour, coordinate, bishopBaseMove);
+                return new Piece(PieceType.BISHOP, colour, vector, bishopBaseMove);
             }
             case QUEEN -> {
                 Movement queenBaseMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
                 Movement queenBaseMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
                 Movement queenBaseMoveD = new Movement(diagonal, MovementType.ADVANCE, true, true);
-                return new Piece(PieceType.QUEEN, colour, coordinate, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
+                return new Piece(PieceType.QUEEN, colour, vector, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
             }
             case KING -> {
-                Movement kingBaseMoveV = new Movement(new Path(Coordinate.at(0, 1)), MovementType.ADVANCE, true, false);
-                Movement kingBaseMoveH = new Movement(new Path(Coordinate.at(1, 0)), MovementType.ADVANCE, false, true);
-                Movement kingBaseMoveD = new Movement(new Path(Coordinate.at(1, 1)), MovementType.ADVANCE, true, true);
+                Movement kingBaseMoveV = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, true, false);
+                Movement kingBaseMoveH = new Movement(new Path(Vector2D.at(1, 0)), MovementType.ADVANCE, false, true);
+                Movement kingBaseMoveD = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, true, true);
 
                 Condition castleKingSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.AT_COORDINATE, Coordinate.at(7, 0)))
+                        .reference(new Reference(Location.AT_COORDINATE, Vector2D.at(7, 0)))
                         .property(new Property<>("hasMoved"))
                         .propertyState(PropertyState.FALSE)
                         .build();
                 Condition castleKingSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_COORDINATE, Coordinate.at(7, 0)))
+                        .reference(new Reference(Location.PATH_TO_COORDINATE, Vector2D.at(7, 0)))
                         .propertyState(PropertyState.DOES_NOT_EXIST)
                         .build();
-                ExtraMovement kingSideRookMovement = new ExtraMovement(Coordinate.at(7, 0), Coordinate.at(5, 0));
+                ExtraMovement kingSideRookMovement = new ExtraMovement(Vector2D.at(7, 0), Vector2D.at(5, 0));
 
-                Movement castleKingSide = new Movement(new Path(Coordinate.at(2, 0)), MovementType.ADVANCE, false,
+                Movement castleKingSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE, false,
                         false, true, List.of(selfNotMoved, castleKingSideCond2, castleKingSideCond3),
                         kingSideRookMovement);
 
                 Condition castleQueenSideCond2 = Condition.builder()
-                        .reference(new Reference(Location.AT_COORDINATE, Coordinate.at(0, 0)))
+                        .reference(new Reference(Location.AT_COORDINATE, Vector2D.at(0, 0)))
                         .property(new Property<>("hasMoved"))
                         .propertyState(PropertyState.FALSE)
                         .build();
                 Condition castleQueenSideCond3 = Condition.builder()
-                        .reference(new Reference(Location.PATH_TO_COORDINATE, Coordinate.at(0, 0)))
+                        .reference(new Reference(Location.PATH_TO_COORDINATE, Vector2D.at(0, 0)))
                         .propertyState(PropertyState.DOES_NOT_EXIST)
                         .build();
-                ExtraMovement queenSideRookMovement = new ExtraMovement(Coordinate.at(0, 0), Coordinate.at(3, 0));
+                ExtraMovement queenSideRookMovement = new ExtraMovement(Vector2D.at(0, 0), Vector2D.at(3, 0));
 
-                Movement castleQueenSide = new Movement(new Path(Coordinate.at(2, 0)), MovementType.ADVANCE, false,
+                Movement castleQueenSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE, false,
                         true, true, List.of(selfNotMoved, castleQueenSideCond2, castleQueenSideCond3),
                         queenSideRookMovement);
 
-                return new Piece(PieceType.KING, colour, coordinate, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
+                return new Piece(PieceType.KING, colour, vector, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
                         castleKingSide, castleQueenSide);
             }
             case PAWN -> {
-                Movement pawnBaseMove = new Movement(new Path(Coordinate.at(0, 1)), MovementType.ADVANCE, false,
+                Movement pawnBaseMove = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, false,
                         false, false, List.of(noCapture));
-                Movement fastAdvance = new Movement(new Path(Coordinate.at(0, 1), Coordinate.at(0, 2)),
+                Movement fastAdvance = new Movement(new Path(Vector2D.at(0, 1), Vector2D.at(0, 2)),
                         MovementType.ADVANCE, false, false, true, List.of(selfNotMoved, noCapture));
 
-                Movement capture = new Movement(new Path(Coordinate.at(1, 1)), MovementType.ADVANCE, false, true, false,
+                Movement capture = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true, false,
                         List.of(onlyCapture));
 
                 Condition enPassantCond1 = Condition.builder()
@@ -136,9 +136,9 @@ public class PieceFactory {
 
                 ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.BELOW_DESTINATION),
                         null, null, false);
-                Movement enPassant = new Movement(new Path(Coordinate.at(1, 1)), MovementType.ADVANCE, false, true,
+                Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true,
                         false, List.of(noCapture, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement);
-                return new Piece(PieceType.PAWN, colour, coordinate, pawnBaseMove, fastAdvance, capture, enPassant);
+                return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, fastAdvance, capture, enPassant);
             }
         }
         return new Piece();

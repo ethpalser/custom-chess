@@ -1,42 +1,42 @@
 package com.chess.api.model.movement;
 
-import com.chess.api.model.Coordinate;
+import com.chess.api.model.Vector2D;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import lombok.Getter;
 
-public class Path implements Iterable<Coordinate> {
+public class Path implements Iterable<Vector2D> {
 
     @Getter
-    private final LinkedHashMap<Integer, Coordinate> map;
+    private final LinkedHashMap<Integer, Vector2D> map;
 
     public Path() {
         this.map = new LinkedHashMap<>();
     }
 
-    public Path(List<Coordinate> coordinates) {
-        LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
-        if (coordinates != null) {
-            for (Coordinate coordinate : coordinates) {
-                if (coordinate != null) {
-                    linkedHashMap.put(coordinate.hashCode(), coordinate);
+    public Path(List<Vector2D> vectors) {
+        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
+        if (vectors != null) {
+            for (Vector2D vector : vectors) {
+                if (vector != null) {
+                    linkedHashMap.put(vector.hashCode(), vector);
                 }
             }
         }
         this.map = linkedHashMap;
     }
 
-    public Path(Coordinate end) {
-        LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
+    public Path(Vector2D end) {
+        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
         if (end != null) {
             linkedHashMap.put(end.hashCode(), end);
         }
         this.map = linkedHashMap;
     }
 
-    public Path(Coordinate start, Coordinate end) {
-        LinkedHashMap<Integer, Coordinate> linkedHashMap = new LinkedHashMap<>();
+    public Path(Vector2D start, Vector2D end) {
+        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
         if (start == null || end == null) {
             this.map = linkedHashMap;
             return;
@@ -56,8 +56,8 @@ public class Path implements Iterable<Coordinate> {
                 while (y != end.getY()) {
                     int diff = end.getY() - start.getY();
                     int dir = diff / Math.abs(diff);
-                    Coordinate coordinate = Coordinate.at(x, y);
-                    linkedHashMap.put(coordinate.hashCode(), coordinate);
+                    Vector2D vector = Vector2D.at(x, y);
+                    linkedHashMap.put(vector.hashCode(), vector);
                     y = y + dir;
                 }
             }
@@ -65,8 +65,8 @@ public class Path implements Iterable<Coordinate> {
                 while (x != end.getX()) {
                     int diff = end.getX() - start.getX();
                     int dir = diff / Math.abs(diff);
-                    Coordinate coordinate = Coordinate.at(x, y);
-                    linkedHashMap.put(coordinate.hashCode(), coordinate);
+                    Vector2D vector = Vector2D.at(x, y);
+                    linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dir;
                 }
             }
@@ -77,8 +77,8 @@ public class Path implements Iterable<Coordinate> {
                     int dirX = diffX / Math.abs(diffX);
                     int dirY = diffY / Math.abs(diffY);
 
-                    Coordinate coordinate = Coordinate.at(x, y);
-                    linkedHashMap.put(coordinate.hashCode(), coordinate);
+                    Vector2D vector = Vector2D.at(x, y);
+                    linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dirX;
                     y = y + dirY;
                 }
@@ -97,8 +97,8 @@ public class Path implements Iterable<Coordinate> {
         }
         // Ignore all incorrectly added null values
         int size = 0;
-        for (Coordinate coordinate : this) {
-            if (coordinate != null) {
+        for (Vector2D vector : this) {
+            if (vector != null) {
                 size++;
             }
         }
@@ -110,8 +110,8 @@ public class Path implements Iterable<Coordinate> {
             return this.map.isEmpty();
         }
         // Ignore all incorrectly added null values
-        for (Coordinate coordinate : this) {
-            if (coordinate != null) {
+        for (Vector2D vector : this) {
+            if (vector != null) {
                 return false;
             }
         }
@@ -119,7 +119,7 @@ public class Path implements Iterable<Coordinate> {
     }
 
     @Override
-    public Iterator<Coordinate> iterator() {
+    public Iterator<Vector2D> iterator() {
         return this.map.values().iterator();
     }
 
@@ -136,8 +136,8 @@ public class Path implements Iterable<Coordinate> {
     public int hashCode() {
         int prime = 31;
         int result = 1;
-        for (Coordinate coordinate : this) {
-            result = result * prime + coordinate.hashCode();
+        for (Vector2D vector : this) {
+            result = result * prime + vector.hashCode();
         }
         return result;
     }
@@ -145,7 +145,7 @@ public class Path implements Iterable<Coordinate> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        Iterator<Coordinate> iterator = this.iterator();
+        Iterator<Vector2D> iterator = this.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
             if (iterator.hasNext()) {

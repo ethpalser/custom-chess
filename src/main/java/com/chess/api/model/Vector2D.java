@@ -4,7 +4,7 @@ import java.util.Locale;
 import lombok.Getter;
 
 @Getter
-public class Coordinate implements Comparable<Coordinate> {
+public class Vector2D implements Comparable<Vector2D> {
 
     public static final int MAX_X = 7;
     public static final int MAX_Y = 7;
@@ -12,12 +12,12 @@ public class Coordinate implements Comparable<Coordinate> {
     private final int x;
     private final int y;
 
-    public Coordinate() {
+    public Vector2D() {
         this.x = 0;
         this.y = 0;
     }
 
-    public Coordinate(int x, int y) {
+    public Vector2D(int x, int y) {
         if (x > MAX_X || x < 0 || y > MAX_Y || y < 0) {
             throw new IndexOutOfBoundsException();
         }
@@ -26,24 +26,24 @@ public class Coordinate implements Comparable<Coordinate> {
         this.y = y;
     }
 
-    public Coordinate(char x, char y) {
+    public Vector2D(char x, char y) {
         this(x - 'a', y - '1');
     }
 
-    public static Coordinate parseString(String str) {
+    public static Vector2D parseString(String str) {
         if (str.length() != 2) {
             throw new IllegalArgumentException();
         }
         char[] chars = str.toLowerCase(Locale.ROOT).toCharArray();
-        return new Coordinate(chars[0], chars[1]);
+        return new Vector2D(chars[0], chars[1]);
     }
 
-    public static Coordinate at(int x, int y) {
-        return new Coordinate(x, y);
+    public static Vector2D at(int x, int y) {
+        return new Vector2D(x, y);
     }
 
-    public static Coordinate origin() {
-        return new Coordinate(0, 0);
+    public static Vector2D origin() {
+        return new Vector2D(0, 0);
     }
 
     public static boolean isValid(int x, int y) {
@@ -51,7 +51,7 @@ public class Coordinate implements Comparable<Coordinate> {
     }
 
     @Override
-    public int compareTo(Coordinate o) {
+    public int compareTo(Vector2D o) {
         if (o == null) {
             return -1;
         }
@@ -73,9 +73,9 @@ public class Coordinate implements Comparable<Coordinate> {
         if (o.getClass() != this.getClass())
             return false;
 
-        Coordinate coordinate = (Coordinate) o;
+        Vector2D vector = (Vector2D) o;
         // When x and y are equal, their hashCodes are equal
-        return this.hashCode() == coordinate.hashCode();
+        return this.hashCode() == vector.hashCode();
     }
 
     @Override
