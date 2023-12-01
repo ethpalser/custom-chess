@@ -225,10 +225,8 @@ class BoardTest {
         Board board = new Board();
         board.setPiece(Vector2D.at(5, 0), null);
         board.setPiece(Vector2D.at(6, 0), null);
-        System.out.println(board);
 
         board.movePiece(source, target);
-        System.out.println(board);
 
         assertNull(board.getPiece(4, 0));
         assertNull(board.getPiece(7, 0));
@@ -246,10 +244,8 @@ class BoardTest {
         board.setPiece(Vector2D.at(1, 0), null);
         board.setPiece(Vector2D.at(2, 0), null);
         board.setPiece(Vector2D.at(3, 0), null);
-        System.out.println(board);
 
         board.movePiece(source, target);
-        System.out.println(board);
 
         assertNull(board.getPiece(4, 0));
         assertNull(board.getPiece(0, 0));
@@ -284,7 +280,6 @@ class BoardTest {
 
         board.movePiece(source, target);
         board.movePiece(Vector2D.at(3, 4), Vector2D.at(2, 5)); // En Passant
-        System.out.println(board);
 
         assertNull(board.getPiece(3,4));
         assertNull(board.getPiece(2,4));
