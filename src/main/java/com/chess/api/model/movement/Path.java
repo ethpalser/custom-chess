@@ -53,30 +53,32 @@ public class Path implements Iterable<Vector2D> {
         int y = start.getY();
         switch (pathType) {
             case VERTICAL -> {
-                while (y != end.getY()) {
-                    int diff = end.getY() - start.getY();
-                    int dir = diff / Math.abs(diff);
+                int diff = end.getY() - start.getY();
+                int dir = diff / Math.abs(diff);
+
+                while (y != end.getY() + dir) {
                     Vector2D vector = Vector2D.at(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     y = y + dir;
                 }
             }
             case HORIZONTAL -> {
-                while (x != end.getX()) {
-                    int diff = end.getX() - start.getX();
-                    int dir = diff / Math.abs(diff);
+                int diff = end.getX() - start.getX();
+                int dir = diff / Math.abs(diff);
+
+                while (x != end.getX() + dir) {
                     Vector2D vector = Vector2D.at(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dir;
                 }
             }
             case DIAGONAL -> {
-                while (x != end.getX() && y != end.getY()) {
-                    int diffX = end.getX() - start.getX();
-                    int diffY = end.getY() - start.getY();
-                    int dirX = diffX / Math.abs(diffX);
-                    int dirY = diffY / Math.abs(diffY);
+                int diffX = end.getX() - start.getX();
+                int diffY = end.getY() - start.getY();
+                int dirX = diffX / Math.abs(diffX);
+                int dirY = diffY / Math.abs(diffY);
 
+                while (x != end.getX() + dirX && y != end.getY() + dirY) {
                     Vector2D vector = Vector2D.at(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dirX;
