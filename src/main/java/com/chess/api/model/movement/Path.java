@@ -1,10 +1,12 @@
 package com.chess.api.model.movement;
 
+import com.chess.api.model.Board;
 import com.chess.api.model.Vector2D;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import lombok.Getter;
+import lombok.NonNull;
 
 public class Path implements Iterable<Vector2D> {
 
@@ -15,6 +17,10 @@ public class Path implements Iterable<Vector2D> {
         this.map = new LinkedHashMap<>();
     }
 
+    public Path(Vector2D end) {
+        this(List.of(end));
+    }
+
     public Path(List<Vector2D> vectors) {
         LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
         if (vectors != null) {
@@ -23,14 +29,6 @@ public class Path implements Iterable<Vector2D> {
                     linkedHashMap.put(vector.hashCode(), vector);
                 }
             }
-        }
-        this.map = linkedHashMap;
-    }
-
-    public Path(Vector2D end) {
-        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
-        if (end != null) {
-            linkedHashMap.put(end.hashCode(), end);
         }
         this.map = linkedHashMap;
     }
@@ -114,6 +112,18 @@ public class Path implements Iterable<Vector2D> {
         // Ignore all incorrectly added null values
         for (Vector2D vector : this) {
             if (vector != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isTraversable(@NonNull Board board) {
+        Iterator<Vector2D> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            Vector2D vector = iterator.next();
+            if (board.getPiece(vector) != null && iterator.hasNext()) {
+                // Piece is in the middle of the path
                 return false;
             }
         }
