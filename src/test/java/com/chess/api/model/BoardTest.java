@@ -227,8 +227,8 @@ class BoardTest {
         board.setPiece(Vector2D.at(6, 0), null);
 
         board.movePiece(source, target);
-        assertNull(board.getPiece(7, 0));
         assertNull(board.getPiece(4, 0));
+        assertNull(board.getPiece(7, 0));
         assertNotNull(board.getPiece(target));
         assertNotNull(board.getPiece(5,0));
     }
@@ -245,8 +245,9 @@ class BoardTest {
         board.setPiece(Vector2D.at(3, 0), null);
 
         board.movePiece(source, target);
-        assertNull(board.getPiece(0, 0));
+
         assertNull(board.getPiece(4, 0));
+        assertNull(board.getPiece(0, 0));
         assertNotNull(board.getPiece(target));
         assertNotNull(board.getPiece(3,0));
     }
@@ -277,10 +278,12 @@ class BoardTest {
         board.movePiece(Vector2D.at(3,3), Vector2D.at(3, 4));
 
         board.movePiece(source, target);
-        board.movePiece(Vector2D.at(3, 4), Vector2D.at(4, 5)); // En Passant
+        board.movePiece(Vector2D.at(3, 4), Vector2D.at(2, 5)); // En Passant
+        System.out.println(board);
+
         assertNull(board.getPiece(3,4));
-        assertNull(board.getPiece(4,4));
-        assertNotNull(board.getPiece(4,5));
+        assertNull(board.getPiece(2,4));
+        assertNotNull(board.getPiece(2,5));
     }
 
 }
