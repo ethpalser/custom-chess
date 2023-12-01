@@ -188,12 +188,12 @@ public class Board {
         this.pieceMap.remove(start);
         this.lastMoved = source;
         if (movement.getExtraMovement() != null) {
-            movement.getExtraMovement().move(this, start);
+            movement.getExtraMovement().move(this, end); // Must be 'end' to work for en passant. Todo: Fix inflexibility
         }
     }
 
     private boolean isValidPath(Path path) {
-        if (path == null || path.isEmpty()) {
+        if (path == null) {
             return false;
         }
 
@@ -206,6 +206,28 @@ public class Board {
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = Vector2D.MAX_Y; y >= 0; y--) {
+            for (int x = 0; x <= Vector2D.MAX_X; x++) {
+                Piece piece = getPiece(x, y);
+                if (piece == null) {
+                    sb.append("|   ");
+                } else {
+                    sb.append("| ");
+                    if (PieceType.PAWN.equals(piece.getType())) {
+                        sb.append("P ");
+                    } else {
+                        sb.append(piece.getType().getCode()).append(" ");
+                    }
+                }
+            }
+            sb.append("|\n");
+        }
+        return sb.toString();
     }
 
 }
