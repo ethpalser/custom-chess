@@ -40,7 +40,9 @@ public class Condition {
 
         while (result && iterator.hasNext()) {
             Piece piece = iterator.next();
-            if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
+            if (PropertyState.EXIST.equals(this.propertyState) && piece == null) {
+                return false;
+            } if (PropertyState.DOES_NOT_EXIST.equals(this.propertyState) && piece != null) {
                 return false;
             } else if (piece == null) {
                 continue;
@@ -59,8 +61,7 @@ public class Condition {
                     // The start piece is implied for OPPOSITE, as the condition's value is not known until runtime
                     Piece currPiece = board.getPiece(start);
                     Object currVal = this.property != null ? this.property.fetch(currPiece) : null;
-                    result = (currVal == null && propVal == null) ||
-                            currVal != null && propVal != null
+                    result = currVal != null && propVal != null
                                     && propVal.getClass().equals(currVal.getClass())
                                     && propVal.equals(currVal);
                 }
@@ -70,6 +71,20 @@ public class Condition {
             }
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Vector: ").append(reference).append("\n");
+        if (compare != null) {
+            sb.append("Vector to compare against: ").append(compare).append("\n");
+        } else {
+            sb.append("Property: ").append(property == null ? null : property.key()).append("\n");
+            sb.append("State: ").append(propertyState).append("\n");
+            sb.append("Expected value of property: ").append(expected).append("\n");
+        }
+        return sb.toString();
     }
 }
 
