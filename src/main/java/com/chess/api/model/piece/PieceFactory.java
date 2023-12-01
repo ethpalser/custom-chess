@@ -29,11 +29,15 @@ public class PieceFactory {
 
     public Piece build(PieceType type, Colour colour, Vector2D vector) {
         // Common and basic conditions
-        Condition noCapture = Condition.builder()
+        Condition noPieceAtDestination = Condition.builder()
                 .reference(new Reference(Location.AT_DESTINATION))
                 .propertyState(PropertyState.DOES_NOT_EXIST)
                 .build();
-        Condition onlyCapture = Condition.builder()
+        Condition hasPieceAtDestination = Condition.builder()
+                .reference(new Reference(Location.AT_DESTINATION))
+                .propertyState(PropertyState.EXIST)
+                .build();
+        Condition oppositeColour = Condition.builder()
                 .reference(new Reference(Location.AT_DESTINATION))
                 .property(new Property<>("colour"))
                 .propertyState(PropertyState.OPPOSITE)
@@ -109,12 +113,12 @@ public class PieceFactory {
             }
             case PAWN -> {
                 Movement pawnBaseMove = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, false,
-                        false, false, List.of(noCapture));
+                        false, false, List.of(noPieceAtDestination));
                 Movement fastAdvance = new Movement(new Path(Vector2D.at(0, 1), Vector2D.at(0, 2)),
-                        MovementType.ADVANCE, false, false, true, List.of(selfNotMoved, noCapture));
+                        MovementType.ADVANCE, false, false, true, List.of(selfNotMoved, noPieceAtDestination));
 
                 Movement capture = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true, false,
-                        List.of(onlyCapture));
+                        List.of(oppositeColour, hasPieceAtDestination));
 
                 Condition enPassantCond1 = Condition.builder()
                         .reference(new Reference(Location.LAST_MOVED))
@@ -135,9 +139,9 @@ public class PieceFactory {
                         .build();
 
                 ExtraMovement extraMovement = new ExtraMovement(new Reference(Location.BELOW_DESTINATION),
-                        null, null, false);
+                        new Vector2D(), new Vector2D(), false);
                 Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, false, true,
-                        false, List.of(noCapture, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement);
+                        false, List.of(noPieceAtDestination, enPassantCond1, enPassantCond2, enPassantCond3), extraMovement);
                 return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, fastAdvance, capture, enPassant);
             }
         }
