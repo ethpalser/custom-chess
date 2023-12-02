@@ -41,6 +41,12 @@ public class Piece {
         this.lastMoveDistance = 0;
     }
 
+    /**
+     * Updates this piece's position to the new {@link Vector2D} destination. If this destination is not the same
+     * as its current position then it is considered to have moved.
+     *
+     * @param destination representing the new location of this piece.
+     */
     public void setPosition(@NonNull Vector2D destination) {
         if (destination.equals(this.position)) {
             return;
@@ -52,10 +58,23 @@ public class Piece {
         this.hasMoved = true;
     }
 
+    /**
+     * Retrieves the value of hasMoved.
+     *
+     * @return true or false
+     */
     public boolean getHasMoved() {
         return hasMoved;
     }
 
+    /**
+     * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
+     * be traversed and has all its conditions met.
+     *
+     * @param board {@link Board} used for reference
+     * @param destination {@link Vector2D} the piece is requested to move to
+     * @return Movement if any are valid, otherwise null
+     */
     public Movement getMovement(@NonNull Board board, @NonNull Vector2D destination) {
         for (Movement move : this.movements) {
             Path path = move.getPath(this.colour, this.position, destination);
