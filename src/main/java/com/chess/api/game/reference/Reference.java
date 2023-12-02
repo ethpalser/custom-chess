@@ -35,6 +35,14 @@ public record Reference(Location location, Direction direction, Vector2D vector)
         }
     }
 
+    /**
+     * Get one or more {@link Piece}s that this reference is for using the current state of the board and action
+     * being attempted.
+     *
+     * @param board {@link Board} used for reference
+     * @param action {@link Action} used for reference containing a single piece's position and destination
+     * @return List of Pieces of the location is a Path, otherwise a List of one Piece
+     */
     public List<Piece> getPieces(@NonNull Board board, @NonNull Action action) {
         Direction direction = this.direction;
         Vector2D shiftedStart = this.shiftInDirection(action.colour(), direction, action.start());

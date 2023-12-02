@@ -125,8 +125,8 @@ public class Board {
      * <li>The piece can move to that location after restrictions apply by moving or capturing</li>
      * </ol>
      *
-     * @param start
-     * @param end
+     * @param start {@link Vector2D} location of the Piece that will be moved
+     * @param end   {@link Vector2D} location that the Piece is requested to end on, if possible
      */
     public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
         Piece atStart = this.getPiece(start);

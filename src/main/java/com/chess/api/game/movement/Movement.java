@@ -52,6 +52,15 @@ public class Movement {
         this.extraAction = extraAction;
     }
 
+    /**
+     * Determines the direction that the end vector is relative to the start and builds a path in that direction
+     * based off of this movement's path blueprint.
+     *
+     * @param colour Colour of the Piece, which determines which direction is forward
+     * @param start Location of the piece
+     * @param end Location the piece is requested to move to
+     * @return {@link Path}
+     */
     public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
         // Determine direction
         int diffX = end.getX() - start.getX();
@@ -86,6 +95,13 @@ public class Movement {
         return new Path(vectors);
     }
 
+    /**
+     * Retrieves all possible vectors that the Piece with this colour at this location can move to.
+     *
+     * @param colour {@link Colour} representing the colour of the piece this movement is for
+     * @param offset {@link Vector2D} representing the position of the piece
+     * @return Map of {@link Vector2D}
+     */
     public Map<Integer, Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
         boolean isWhite = Colour.WHITE.equals(colour);
         boolean isUp = isWhite && !mirrorXAxis || !isWhite && mirrorXAxis;
@@ -133,6 +149,13 @@ public class Movement {
         return map;
     }
 
+    /**
+     * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
+     *
+     * @param board {@link Board} for the Condition to verify with
+     * @param action {@link Action} representing the movement attempted for a Piece at a location to a destination
+     * @return true if all Condition pass, otherwise false
+     */
     public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
         for (Conditional condition : this.conditions) {
             if (!condition.isExpected(board, action)) {
@@ -142,10 +165,24 @@ public class Movement {
         return true;
     }
 
+    /**
+     * Marks all locations valid for this piece to move to, before referencing the board, from origin. This matches
+     * the original path of this movement for White pieces.
+     *
+     * @param colour Colour of the piece, to determine which direction is forward.
+     * @return 2D boolean array, true are valid locations
+     */
     public boolean[][] drawCoordinates(@NonNull Colour colour) {
         return this.drawCoordinates(colour, new Vector2D(0, 0));
     }
 
+    /**
+     * Marks all locations valid for this piece to move to, before referencing the board, from origin. This matches
+     * the original path of this movement for White pieces.
+     *
+     * @param colour Colour of the piece, to determine which direction is forward.
+     * @return 2D boolean array, true are valid locations
+     */
     public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
         Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, offset);
         boolean[][] boardMove = new boolean[Vector2D.MAX_X + 1][Vector2D.MAX_Y + 1];

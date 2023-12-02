@@ -33,6 +33,12 @@ public class Path implements Iterable<Vector2D> {
         this.map = linkedHashMap;
     }
 
+    /**
+     * Creates a Path moving in a linear direction (vertical, horizontal or diagonal) from start to end {@link Vector2D}.
+     *
+     * @param start {@link Vector2D} representing the first vector of the path
+     * @param end {@link Vector2D} representing the last vector of the path
+     */
     public Path(Vector2D start, Vector2D end) {
         LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
         if (start == null || end == null) {
@@ -91,6 +97,11 @@ public class Path implements Iterable<Vector2D> {
         this.map = linkedHashMap;
     }
 
+    /**
+     * Iterates through all vectors of this path to count all non-null elements.
+     *
+     * @return int of non-null elements in path
+     */
     public int size() {
         if (!this.map.containsValue(null)) {
             return this.map.size();
@@ -105,19 +116,12 @@ public class Path implements Iterable<Vector2D> {
         return size;
     }
 
-    public boolean isEmpty() {
-        if (!this.map.containsValue(null)) {
-            return this.map.isEmpty();
-        }
-        // Ignore all incorrectly added null values
-        for (Vector2D vector : this) {
-            if (vector != null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Iterates through the path to determine if there is a piece in the path between the start and end.
+     *
+     * @param board {@link Board} referred to for checking pieces
+     * @return true if no piece is in the middle of the path, false otherwise
+     */
     public boolean isTraversable(@NonNull Board board) {
         Iterator<Vector2D> iterator = this.iterator();
         while (iterator.hasNext()) {

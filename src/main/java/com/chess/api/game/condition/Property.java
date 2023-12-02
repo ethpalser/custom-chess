@@ -6,6 +6,14 @@ import java.lang.reflect.Method;
 
 public record Property<T>(String key) {
 
+    /**
+     * Uses the given object and reflection to find the field of the object that matches the key of this Property.
+     * This requires using the class's getter method for that field, so if there is no get method or does not begin
+     * with "get" this will fail.
+     *
+     * @param obj Object to fetch the field value from
+     * @return Object that matches the field class and value of the object, if it exists. Otherwise, null.
+     */
     public Object fetch(T obj) {
         if (this.key == null) {
             return null;
