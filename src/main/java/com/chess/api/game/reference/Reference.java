@@ -1,7 +1,6 @@
 package com.chess.api.game.reference;
 
 import com.chess.api.game.Board;
-import com.chess.api.game.Colour;
 import com.chess.api.game.Vector2D;
 import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Path;
@@ -24,6 +23,10 @@ public record Reference(Location location, Direction direction, Vector2D vector)
         this(location, Direction.AT, vector);
     }
 
+    public Reference(Location location, Direction direction) {
+        this(location, direction, null);
+    }
+
     public Reference(Location location, Direction direction, Vector2D vector) {
         this.location = location;
         this.direction = direction;
@@ -39,15 +42,17 @@ public record Reference(Location location, Direction direction, Vector2D vector)
      * Get one or more {@link Piece}s that this reference is for using the current state of the board and action
      * being attempted.
      *
-     * @param board {@link Board} used for reference
+     * @param board  {@link Board} used for reference
      * @param action {@link Action} used for reference containing a single piece's position and destination
      * @return List of Pieces of the location is a Path, otherwise a List of one Piece
      */
     public List<Piece> getPieces(@NonNull Board board, @NonNull Action action) {
-        Direction direction = this.direction;
-        Vector2D shiftedStart = this.shiftInDirection(action.colour(), direction, action.start());
-        Vector2D shiftedEnd = this.shiftInDirection(action.colour(), direction, action.end());
-        Vector2D shiftedReference = this.shiftInDirection(action.colour(), direction, this.vector);
+        if (action.start() == null || action.end() == null) {
+            throw new IllegalArgumentException("Action has null start or end vector.");
+        }
+        Vector2D shiftedStart = action.start().shift(action.colour(), this.direction);
+        Vector2D shiftedEnd = action.end().shift(action.colour(), this.direction);
+        Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.colour(), this.direction);
 
         List<Piece> list = new ArrayList<>();
         switch (this.location) {
@@ -58,21 +63,7 @@ public record Reference(Location location, Direction direction, Vector2D vector)
             case PATH_TO_DESTINATION -> list = board.getPieces(new Path(shiftedStart, shiftedEnd));
             case PATH_TO_VECTOR -> list = board.getPieces(new Path(shiftedStart, shiftedReference));
         }
-        ;
         return list;
     }
 
-    private Vector2D shiftInDirection(@NonNull Colour colour, @NonNull Direction direction, Vector2D vector) {
-        boolean isWhite = Colour.WHITE.equals(colour);
-        int shiftX = 0;
-        int shiftY = 0;
-        switch (direction) {
-            case FRONT -> shiftY = isWhite ? 1 : -1;
-            case BACK -> shiftY = isWhite ? -1 : 1;
-            case RIGHT -> shiftX = 1;
-            case LEFT -> shiftX = -1;
-            default -> {/* Do nothing */}
-        }
-        return Vector2D.fromVector2D(vector, shiftX, shiftY);
-    }
 }

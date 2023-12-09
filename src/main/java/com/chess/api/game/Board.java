@@ -15,25 +15,29 @@ import lombok.NonNull;
 
 public class Board {
 
+    private final int length;
+    private final int width;
     private final Map<Vector2D, Piece> pieceMap;
     private Piece lastMoved;
 
     public Board() {
+        this.length = 8;
+        this.width = 8;
         Map<Vector2D, Piece> map = new HashMap<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
-        map.putAll(this.generatePiecesInRank(Vector2D.MAX_Y - 1));
-        map.putAll(this.generatePiecesInRank(Vector2D.MAX_Y));
+        map.putAll(this.generatePiecesInRank(this.length - 2));
+        map.putAll(this.generatePiecesInRank(this.length - 1));
         this.pieceMap = map;
         this.lastMoved = null;
     }
 
     private Map<Vector2D, Piece> generatePiecesInRank(int y) {
         Map<Vector2D, Piece> map = new HashMap<>();
-        Colour colour = y < Vector2D.MAX_Y / 2 ? Colour.WHITE : Colour.BLACK;
+        Colour colour = y < (this.length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
 
         PieceFactory pieceFactory = PieceFactory.getInstance();
-        if (y == 0 || y == Vector2D.MAX_Y) {
+        if (y == 0 || y == this.length - 1) {
             for (int x = 0; x < 8; x++) {
                 Vector2D vector = new Vector2D(x, y);
                 Piece piece = switch (x) {
@@ -46,7 +50,7 @@ public class Board {
                 };
                 map.put(vector, piece);
             }
-        } else if (y == 1 || y == Vector2D.MAX_Y - 1) {
+        } else if (y == 1 || y == this.length - 2) {
             for (int x = 0; x < 8; x++) {
                 Vector2D vector = new Vector2D(x, y);
                 Piece piece = pieceFactory.build(PieceType.PAWN, colour, vector);
@@ -67,18 +71,18 @@ public class Board {
     }
 
     public int length() {
-        return Vector2D.MAX_Y + 1;
+        return this.length;
     }
 
     public int width() {
-        return Vector2D.MAX_X + 1;
+        return this.width;
     }
 
     public Piece getPiece(int x, int y) {
-        if (x < 0 || x > Vector2D.MAX_X || y < 0 || y > Vector2D.MAX_Y) {
+        if (x < 0 || x > this.width - 1 || y < 0 || y > this.length - 1) {
             return null;
         }
-        return pieceMap.get(Vector2D.at(x, y));
+        return pieceMap.get(new Vector2D(x, y));
     }
 
     public Piece getPiece(Vector2D vector) {
@@ -129,6 +133,10 @@ public class Board {
      * @param end   {@link Vector2D} location that the Piece is requested to end on, if possible
      */
     public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
+        if (!start.isValid() || !end.isValid()) {
+            throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
+        }
+
         Piece atStart = this.getPiece(start);
         Piece atEnd = this.getPiece(end);
         if (atStart == null || atStart.equals(atEnd) || (atEnd != null && atStart.getColour().equals(atEnd.getColour()))) {
@@ -159,8 +167,8 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int y = Vector2D.MAX_Y; y >= 0; y--) {
-            for (int x = 0; x <= Vector2D.MAX_X; x++) {
+        for (int y = this.length - 1; y >= 0; y--) {
+            for (int x = 0; x <= this.width - 1; x++) {
                 Piece piece = getPiece(x, y);
                 if (piece == null) {
                     sb.append("|   ");

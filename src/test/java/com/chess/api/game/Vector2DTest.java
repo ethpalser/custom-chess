@@ -6,48 +6,14 @@ import org.junit.jupiter.api.Test;
 class Vector2DTest {
 
     @Test
-    void initialize_fromIntegersAndOutOfBounds_throwsIndexOutOfBoundsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D(0, 8));
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D(0, -1));
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D(8, 0));
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D(-1, 0));
-    }
-
-    @Test
     void initialize_fromIntegersAndInBounds_isNotNull() {
         Vector2D vector = new Vector2D(0, 0);
         assertNotNull(vector);
     }
 
     @Test
-    void initialize_fromCharsAndOutOfBounds_throwsIndexOutOfBoundsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D('a', 'a'));
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D('1', '1'));
-    }
-
-    @Test
     void initialize_fromCharsAndInBounds_isNotNull() {
         Vector2D vector = new Vector2D('a', '1');
-        assertNotNull(vector);
-        assertEquals(0, vector.getX());
-        assertEquals(0, vector.getY());
-    }
-
-    @Test
-    void parseString_invalidFormat_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> Vector2D.parseString("a"));
-        assertThrows(IllegalArgumentException.class, () -> Vector2D.parseString("abc"));
-    }
-
-    @Test
-    void parseString_outOfBounds_throwsIndexOutOfBoundsException() {
-        assertThrows(IndexOutOfBoundsException.class, () -> Vector2D.parseString("a9"));
-        assertThrows(IndexOutOfBoundsException.class, () -> Vector2D.parseString("i1"));
-    }
-
-    @Test
-    void parseString_inBounds_isNotNull() {
-        Vector2D vector = Vector2D.parseString("a1");
         assertNotNull(vector);
         assertEquals(0, vector.getX());
         assertEquals(0, vector.getY());

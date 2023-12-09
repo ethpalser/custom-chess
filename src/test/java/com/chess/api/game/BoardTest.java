@@ -57,12 +57,12 @@ class BoardTest {
         Board board = new Board();
         int y = 1;
         for (int x = 0; x < board.width(); x++) {
-            board.setPiece(Vector2D.at(x, y), null);
+            board.setPiece(new Vector2D(x, y), null);
         }
 
         y = 6;
         for (int x = 0; x < board.width(); x++) {
-            board.setPiece(Vector2D.at(x, y), null);
+            board.setPiece(new Vector2D(x, y), null);
         }
         assertEquals(16, board.count());
 
@@ -110,9 +110,11 @@ class BoardTest {
         int nextY = -2;
 
         Vector2D pieceC = new Vector2D(pieceX, pieceY); // White Knight
-        assertThrows(IndexOutOfBoundsException.class, () -> new Vector2D(nextX, nextY));
+        Vector2D invalid = new Vector2D(nextX, nextY);
 
         Board board = new Board();
+        assertThrows(IndexOutOfBoundsException.class, () -> board.movePiece(pieceC, invalid));
+
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
         assertEquals(32, board.count());
     }
@@ -128,7 +130,7 @@ class BoardTest {
         Vector2D target = new Vector2D(nextX, nextY); // White Pawn
 
         Board board = new Board();
-        board.movePiece(Vector2D.at(nextX, 1), Vector2D.at(nextX, nextY));
+        board.movePiece(new Vector2D(nextX, 1), new Vector2D(nextX, nextY));
         board.movePiece(source, target);
 
         assertNotNull(board.getPiece(source));
@@ -169,7 +171,7 @@ class BoardTest {
         Vector2D target = new Vector2D(nextX, nextY); // Black Pawn
 
         Board board = new Board();
-        board.setPiece(Vector2D.at(0, 1), null); // Can be sufficient for path checks
+        board.setPiece(new Vector2D(0, 1), null); // Can be sufficient for path checks
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
@@ -208,7 +210,7 @@ class BoardTest {
         Vector2D target = new Vector2D(nextX, nextY); // Empty
 
         Board board = new Board();
-        board.setPiece(Vector2D.at(3, 1), null); // Clearing the path for a Bishop's move
+        board.setPiece(new Vector2D(3, 1), null); // Clearing the path for a Bishop's move
         board.movePiece(source, target);
 
         assertNull(board.getPiece(source));
@@ -223,8 +225,8 @@ class BoardTest {
         Vector2D target = new Vector2D(6, 0);
 
         Board board = new Board();
-        board.setPiece(Vector2D.at(5, 0), null);
-        board.setPiece(Vector2D.at(6, 0), null);
+        board.setPiece(new Vector2D(5, 0), null);
+        board.setPiece(new Vector2D(6, 0), null);
 
         board.movePiece(source, target);
 
@@ -241,9 +243,9 @@ class BoardTest {
         Vector2D target = new Vector2D(2, 0);
 
         Board board = new Board();
-        board.setPiece(Vector2D.at(1, 0), null);
-        board.setPiece(Vector2D.at(2, 0), null);
-        board.setPiece(Vector2D.at(3, 0), null);
+        board.setPiece(new Vector2D(1, 0), null);
+        board.setPiece(new Vector2D(2, 0), null);
+        board.setPiece(new Vector2D(3, 0), null);
 
         board.movePiece(source, target);
 
@@ -259,11 +261,11 @@ class BoardTest {
         Vector2D target = new Vector2D(4, 4);
 
         Board board = new Board();
-        board.movePiece(Vector2D.at(3, 1), Vector2D.at(3,3));
-        board.movePiece(Vector2D.at(3,3), Vector2D.at(3, 4));
+        board.movePiece(new Vector2D(3, 1), new Vector2D(3,3));
+        board.movePiece(new Vector2D(3,3), new Vector2D(3, 4));
 
         board.movePiece(source, target);
-        board.movePiece(Vector2D.at(3, 4), Vector2D.at(4, 5)); // En Passant
+        board.movePiece(new Vector2D(3, 4), new Vector2D(4, 5)); // En Passant
         assertNull(board.getPiece(3,4));
         assertNull(board.getPiece(4,4));
         assertNotNull(board.getPiece(4,5));
@@ -275,11 +277,11 @@ class BoardTest {
         Vector2D target = new Vector2D(2, 4);
 
         Board board = new Board();
-        board.movePiece(Vector2D.at(3, 1), Vector2D.at(3,3));
-        board.movePiece(Vector2D.at(3,3), Vector2D.at(3, 4));
+        board.movePiece(new Vector2D(3, 1), new Vector2D(3,3));
+        board.movePiece(new Vector2D(3,3), new Vector2D(3, 4));
 
         board.movePiece(source, target);
-        board.movePiece(Vector2D.at(3, 4), Vector2D.at(2, 5)); // En Passant
+        board.movePiece(new Vector2D(3, 4), new Vector2D(2, 5)); // En Passant
 
         assertNull(board.getPiece(3,4));
         assertNull(board.getPiece(2,4));
