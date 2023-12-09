@@ -34,26 +34,23 @@ public class Game {
         if (!start.isValid() || !end.isValid()) {
             throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
         }
-
-        Piece piece = board.getPiece(start);
-        if (piece == null || !turn.equals(piece.getColour())) {
+        // Check if the piece exists and the destination is valid
+        Piece pStart = this.board.getPiece(start);
+        Piece pEnd = this.board.getPiece(end);
+        if (pStart == null || pStart.equals(pEnd) || (pEnd != null && pStart.getColour().equals(pEnd.getColour()))) {
             return;
         }
-
-        Piece atStart = board.getPiece(start);
-        Piece atEnd = board.getPiece(end);
-        if (atStart == null || atStart.equals(atEnd) || (atEnd != null && atStart.getColour().equals(atEnd.getColour()))) {
-            return;
-        }
-        Movement movement = atStart.getMovement(this.board, end);
+        // Get the movement if the piece can move there
+        Movement movement = pStart.getMovement(this.board, end);
         if (movement == null) {
             return;
         }
-        this.board.setPiece(end, atStart);
-
+        // Move the piece on the board
+        this.board.setPiece(end, pStart);
+        // If the movement has an extra action, perform it
         if (movement.getExtraAction() != null) {
-            Action action = movement.getExtraAction().getAction(this.board, new Action(atStart.getColour(), start, end));
-            Piece toForceMove = board.getPiece(action.start());
+            Action action = movement.getExtraAction().getAction(this.board, new Action(pStart.getColour(), start, end));
+            Piece toForceMove = this.board.getPiece(action.start());
             if (toForceMove != null) {
                 if (action.end() != null) {
                     this.board.setPiece(action.end(), toForceMove);
@@ -62,8 +59,7 @@ public class Game {
                 this.board.setPiece(action.start(), null);
             }
         }
-        this.board.setLastMoved(atStart);
-
+        this.board.setLastMoved(pStart);
         this.turn = turn.equals(Colour.WHITE) ? Colour.BLACK : Colour.WHITE;
     }
 
