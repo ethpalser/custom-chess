@@ -1,7 +1,5 @@
 package com.chess.api.game;
 
-import com.chess.api.game.movement.Action;
-import com.chess.api.game.movement.Movement;
 import com.chess.api.game.movement.Path;
 import com.chess.api.game.piece.Piece;
 import com.chess.api.game.piece.PieceFactory;
@@ -96,7 +94,10 @@ public class Board {
         if (piece == null) {
             this.pieceMap.remove(vector);
         } else {
+            this.pieceMap.remove(piece.getPosition());
             this.pieceMap.put(vector, piece);
+            piece.setPosition(vector);
+            this.lastMoved = piece;
         }
     }
 
@@ -117,51 +118,6 @@ public class Board {
 
     public Piece getLastMoved() {
         return lastMoved;
-    }
-
-    /**
-     * Move a piece to a new coordinate within the board.
-     * <p>For a piece to move the following must be valid:</p>
-     * <ol>
-     * <li>The piece to move exists</li>
-     * <li>The end location is not occupied by a piece with the same colour</li>
-     * <li>The piece can end on that location by moving or capturing</li>
-     * <li>The piece can move to that location after restrictions apply by moving or capturing</li>
-     * </ol>
-     *
-     * @param start {@link Vector2D} location of the Piece that will be moved
-     * @param end   {@link Vector2D} location that the Piece is requested to end on, if possible
-     */
-    public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
-        if (!start.isValid() || !end.isValid()) {
-            throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
-        }
-
-        Piece atStart = this.getPiece(start);
-        Piece atEnd = this.getPiece(end);
-        if (atStart == null || atStart.equals(atEnd) || (atEnd != null && atStart.getColour().equals(atEnd.getColour()))) {
-            return;
-        }
-        Movement movement = atStart.getMovement(this, end);
-        if (movement == null) {
-            return;
-        }
-        atStart.setPosition(end);
-        this.pieceMap.put(end, atStart);
-        this.pieceMap.remove(start);
-
-        if (movement.getExtraAction() != null) {
-            Action action = movement.getExtraAction().getAction(this, new Action(atStart.getColour(), start, end));
-            Piece toForceMove = this.getPiece(action.start());
-            if (toForceMove != null) {
-                if (action.end() != null) {
-                    this.setPiece(action.end(), toForceMove);
-                }
-                // If the piece had not moved the intent is to remove it
-                this.setPiece(action.start(), null);
-            }
-        }
-        this.lastMoved = atStart;
     }
 
     @Override
