@@ -97,7 +97,6 @@ public class Board {
             this.pieceMap.remove(piece.getPosition());
             this.pieceMap.put(vector, piece);
             piece.setPosition(vector);
-            this.lastMoved = piece;
         }
     }
 
@@ -118,6 +117,10 @@ public class Board {
 
     public Piece getLastMoved() {
         return lastMoved;
+    }
+
+    public void setLastMoved(Piece piece) {
+        this.lastMoved = piece;
     }
 
     @Override

@@ -62,6 +62,7 @@ public class Game {
                 this.board.setPiece(action.start(), null);
             }
         }
+        this.board.setLastMoved(atStart);
 
         this.turn = turn.equals(Colour.WHITE) ? Colour.BLACK : Colour.WHITE;
     }

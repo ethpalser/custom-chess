@@ -118,6 +118,7 @@ class ConditionTest {
         board.setPiece(new Vector2D(4, 4), white);
         Piece black = board.getPiece(5, 6);
         board.setPiece(new Vector2D(5, 4), black);
+        board.setLastMoved(black);
 
         // When
         Vector2D selected = new Vector2D(4, 4);
