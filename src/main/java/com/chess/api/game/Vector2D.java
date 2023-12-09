@@ -1,13 +1,11 @@
 package com.chess.api.game;
 
-import java.util.Locale;
+import com.chess.api.game.reference.Direction;
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class Vector2D implements Comparable<Vector2D> {
-
-    public static final int MAX_X = 7;
-    public static final int MAX_Y = 7;
 
     private final int x;
     private final int y;
@@ -18,10 +16,6 @@ public class Vector2D implements Comparable<Vector2D> {
     }
 
     public Vector2D(int x, int y) {
-        if (x > MAX_X || x < 0 || y > MAX_Y || y < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-
         this.x = x;
         this.y = y;
     }
@@ -30,35 +24,45 @@ public class Vector2D implements Comparable<Vector2D> {
         this(x - 'a', y - '1');
     }
 
-    public static Vector2D parseString(String str) {
-        if (str.length() != 2) {
-            throw new IllegalArgumentException();
-        }
-        char[] chars = str.toLowerCase(Locale.ROOT).toCharArray();
-        return new Vector2D(chars[0], chars[1]);
-    }
-
-    public static Vector2D fromVector2D(Vector2D vector) {
-        return fromVector2D(vector, 0, 0);
-    }
-
-    public static Vector2D fromVector2D(Vector2D vector, int shiftX, int shiftY) {
-        if (vector == null || !isValid(vector.getX() + shiftX, vector.getY() + shiftY)) {
-            return null;
-        }
-        return new Vector2D(vector.getX() + shiftX, vector.getY() + shiftY);
-    }
-
-    public static Vector2D at(int x, int y) {
-        return new Vector2D(x, y);
-    }
-
-    public static Vector2D origin() {
-        return new Vector2D(0, 0);
-    }
-
+    /**
+     * Checks if the given x and y coordinates are within the bounds of the board. This is fixed at a min of 0 and
+     * max of 7 for both x and y coordinates.
+     *
+     * @param x int
+     * @param y int
+     * @return true if 0 <= x <= 7 and 0 <= y <= 7, otherwise false
+     */
     public static boolean isValid(int x, int y) {
-        return 0 <= x && x <= MAX_X && 0 <= y && y <= MAX_Y;
+        return 0 <= x && x <= 7 && 0 <= y && y <= 7;
+    }
+
+    /**
+     * Checks if the current vector is within the bounds of the board. This is fixed at a min of 0 and max of 7
+     * for both x and y coordinates.
+     *
+     * @return true if 0 <= x <= 7 and 0 <= y <= 7, otherwise false
+     */
+    public boolean isValid() {
+        return Vector2D.isValid(this.x, this.y);
+    }
+
+    /**
+     * Creates a new Vector from the current Vector shifted one space in the given direction.
+     *
+     * @param colour {@link Colour} of the piece which the player is facing.
+     * @param direction {@link Direction} relative to the piece. Left is always White's left side.
+     * @return {@link Vector2D}
+     */
+    public Vector2D shift(@NonNull Colour colour, @NonNull Direction direction) {
+        // The direction the piece will shift towards. Black's directions are the opposite of White's
+        int dir = Colour.WHITE.equals(colour) ? 1 : -1;
+        return switch (direction) {
+            case AT -> this;
+            case FRONT -> new Vector2D(this.x, this.y + dir);
+            case BACK -> new Vector2D(this.x, this.y - dir);
+            case RIGHT -> new Vector2D(this.x + dir, this.y);
+            case LEFT -> new Vector2D(this.x - dir, this.y);
+        };
     }
 
     @Override
@@ -72,7 +76,8 @@ public class Vector2D implements Comparable<Vector2D> {
 
     @Override
     public int hashCode() {
-        return this.y * (MAX_X + 1) + this.x;
+        // Using a prime number to ensure uniqueness, and will enforce that the board cannot be greater than 16x16
+        return this.y * 17 + this.x;
     }
 
     @Override

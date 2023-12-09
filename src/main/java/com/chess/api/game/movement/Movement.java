@@ -83,7 +83,7 @@ public class Movement {
             if (!Vector2D.isValid(nextX, nextY)) {
                 break;
             }
-            vectors.add(Vector2D.at(nextX, nextY));
+            vectors.add(new Vector2D(nextX, nextY));
             // Destination has been added, so there is no need to add more
             if (end.getX() == nextX && end.getY() == nextY) {
                 break;
@@ -116,10 +116,10 @@ public class Movement {
             int mirrorX = offset.getX() - vector.getX();
             int mirrorY = offset.getY() - vector.getY();
 
-            Vector2D upRight = Vector2D.isValid(baseX, baseY) ? Vector2D.at(baseX, baseY) : null;
-            Vector2D upLeft = Vector2D.isValid(mirrorX, baseY) ? Vector2D.at(mirrorX, baseY) : null;
-            Vector2D downRight = Vector2D.isValid(baseX, mirrorY) ? Vector2D.at(baseX, mirrorY) : null;
-            Vector2D downLeft = Vector2D.isValid(mirrorX, mirrorY) ? Vector2D.at(mirrorX, mirrorY) : null;
+            Vector2D upRight = Vector2D.isValid(baseX, baseY) ? new Vector2D(baseX, baseY) : null;
+            Vector2D upLeft = Vector2D.isValid(mirrorX, baseY) ? new Vector2D(mirrorX, baseY) : null;
+            Vector2D downRight = Vector2D.isValid(baseX, mirrorY) ? new Vector2D(baseX, mirrorY) : null;
+            Vector2D downLeft = Vector2D.isValid(mirrorX, mirrorY) ? new Vector2D(mirrorX, mirrorY) : null;
 
             if (this.specificQuadrant) {
                 if (isUp && isRight && upRight != null) {
@@ -185,7 +185,7 @@ public class Movement {
      */
     public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
         Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, offset);
-        boolean[][] boardMove = new boolean[Vector2D.MAX_X + 1][Vector2D.MAX_Y + 1];
+        boolean[][] boardMove = new boolean[8][8];
         for (Vector2D c : coordinates.values()) {
             boardMove[c.getX()][c.getY()] = true;
         }
@@ -194,7 +194,7 @@ public class Movement {
 
     @Override
     public String toString() {
-        return this.toString(Colour.WHITE, Vector2D.origin());
+        return this.toString(Colour.WHITE, new Vector2D());
     }
 
     public String toString(@NonNull Colour colour, @NonNull Vector2D offset) {

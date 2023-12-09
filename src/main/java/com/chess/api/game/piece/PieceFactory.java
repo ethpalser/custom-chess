@@ -31,14 +31,14 @@ public class PieceFactory {
     }
 
     public Piece build(PieceType type, Colour colour, Vector2D vector) {
-        Path vertical = new Path(Vector2D.at(0, 1), Vector2D.at(0, Vector2D.MAX_Y));
-        Path horizontal = new Path(Vector2D.at(1, 0), Vector2D.at(Vector2D.MAX_X, 0));
-        Path diagonal = new Path(Vector2D.at(1, 1), Vector2D.at(Vector2D.MAX_X, Vector2D.MAX_Y));
+        Path vertical = new Path(new Vector2D(0, 1), new Vector2D(0, 7));
+        Path horizontal = new Path(new Vector2D(1, 0), new Vector2D(7, 0));
+        Path diagonal = new Path(new Vector2D(1, 1), new Vector2D(7, 7));
 
         switch (type) {
             case KNIGHT -> {
-                Movement knightBaseMove1 = new Movement(new Path(Vector2D.at(1, 2)), MovementType.JUMP, true, true);
-                Movement knightBaseMove2 = new Movement(new Path(Vector2D.at(2, 1)), MovementType.JUMP, true, true);
+                Movement knightBaseMove1 = new Movement(new Path(new Vector2D(1, 2)), MovementType.JUMP, true, true);
+                Movement knightBaseMove2 = new Movement(new Path(new Vector2D(2, 1)), MovementType.JUMP, true, true);
                 return new Piece(PieceType.KNIGHT, colour, vector, knightBaseMove1, knightBaseMove2);
             }
             case ROOK -> {
@@ -57,9 +57,9 @@ public class PieceFactory {
                 return new Piece(PieceType.QUEEN, colour, vector, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
             }
             case KING -> {
-                Movement kingBaseMoveV = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, true, false);
-                Movement kingBaseMoveH = new Movement(new Path(Vector2D.at(1, 0)), MovementType.ADVANCE, false, true);
-                Movement kingBaseMoveD = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE, true, true);
+                Movement kingBaseMoveV = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, true, false);
+                Movement kingBaseMoveH = new Movement(new Path(new Vector2D(1, 0)), MovementType.ADVANCE, false, true);
+                Movement kingBaseMoveD = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE, true, true);
 
                 Vector2D kingSideRook = new Vector2D(7, 0);
                 Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
@@ -67,9 +67,9 @@ public class PieceFactory {
                 Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                ExtraAction kingSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, Vector2D.at(7, 0)),
-                        Vector2D.at(5, 0));
-                Movement castleKingSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE,
+                ExtraAction kingSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, new Vector2D(7, 0)),
+                        new Vector2D(5, 0));
+                Movement castleKingSide = new Movement(new Path(new Vector2D(2, 0)), MovementType.ADVANCE,
                         false, false, true,
                         List.of(PropertyCondition.startNotMoved(), castleKingSideCond2, castleKingSideCond3),
                         kingSideRookMovement);
@@ -80,9 +80,9 @@ public class PieceFactory {
                 Conditional castleQueenSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         queenSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                ExtraAction queenSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, Vector2D.at(0, 0)),
-                        Vector2D.at(3, 0));
-                Movement castleQueenSide = new Movement(new Path(Vector2D.at(2, 0)), MovementType.ADVANCE,
+                ExtraAction queenSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, new Vector2D(0, 0)),
+                        new Vector2D(3, 0));
+                Movement castleQueenSide = new Movement(new Path(new Vector2D(2, 0)), MovementType.ADVANCE,
                         false, true, true,
                         List.of(PropertyCondition.startNotMoved(), castleQueenSideCond2, castleQueenSideCond3),
                         queenSideRookMovement);
@@ -91,13 +91,13 @@ public class PieceFactory {
                         castleKingSide, castleQueenSide);
             }
             case PAWN -> {
-                Movement pawnBaseMove = new Movement(new Path(Vector2D.at(0, 1)), MovementType.ADVANCE, false,
+                Movement pawnBaseMove = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, false,
                         false, false, List.of(PropertyCondition.destinationEmpty()));
-                Movement fastAdvance = new Movement(new Path(Vector2D.at(0, 1), Vector2D.at(0, 2)),
+                Movement fastAdvance = new Movement(new Path(new Vector2D(0, 1), new Vector2D(0, 2)),
                         MovementType.ADVANCE, false, false, true,
                         List.of(PropertyCondition.destinationEmpty(), PropertyCondition.startNotMoved()));
 
-                Movement capture = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE,
+                Movement capture = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE,
                         false, true, false,
                         List.of(PropertyCondition.destinationNotEmpty(),
                                 PropertyCondition.destinationColourNotEqual()));
@@ -111,7 +111,7 @@ public class PieceFactory {
 
                 ExtraAction extraAction = new ExtraAction(new Reference(Location.DESTINATION, Direction.BACK, null),
                         null);
-                Movement enPassant = new Movement(new Path(Vector2D.at(1, 1)), MovementType.ADVANCE,
+                Movement enPassant = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE,
                         false, true, false,
                         List.of(PropertyCondition.destinationEmpty(), enPassantCond1, enPassantCond2, enPassantCond3),
                         extraAction);

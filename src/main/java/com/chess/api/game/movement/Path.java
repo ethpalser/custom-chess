@@ -61,7 +61,7 @@ public class Path implements Iterable<Vector2D> {
                 int dir = diff / Math.abs(diff);
 
                 while (y != end.getY() + dir) {
-                    Vector2D vector = Vector2D.at(x, y);
+                    Vector2D vector = new Vector2D(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     y = y + dir;
                 }
@@ -71,7 +71,7 @@ public class Path implements Iterable<Vector2D> {
                 int dir = diff / Math.abs(diff);
 
                 while (x != end.getX() + dir) {
-                    Vector2D vector = Vector2D.at(x, y);
+                    Vector2D vector = new Vector2D(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dir;
                 }
@@ -83,7 +83,7 @@ public class Path implements Iterable<Vector2D> {
                 int dirY = diffY / Math.abs(diffY);
 
                 while (x != end.getX() + dirX && y != end.getY() + dirY) {
-                    Vector2D vector = Vector2D.at(x, y);
+                    Vector2D vector = new Vector2D(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dirX;
                     y = y + dirY;
