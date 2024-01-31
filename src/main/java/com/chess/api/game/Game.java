@@ -1,8 +1,12 @@
 package com.chess.api.game;
 
+import com.chess.api.game.exception.IllegalActionException;
 import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
 import com.chess.api.game.piece.Piece;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -10,11 +14,17 @@ import lombok.NonNull;
 public class Game {
 
     private final Board board;
+    private final Map<Vector2D, Set<Piece>> threats;
     private Colour turn;
+    private boolean whiteInCheck;
+    private boolean blackInCheck;
 
     public Game() {
         this.board = new Board();
+        this.threats = new HashMap<>();
         this.turn = Colour.WHITE;
+        this.whiteInCheck = false;
+        this.blackInCheck = false;
     }
 
     /**
@@ -34,33 +44,58 @@ public class Game {
         if (!start.isValid() || !end.isValid()) {
             throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
         }
-        // Check if the piece exists and the destination is valid
-        Piece pStart = this.board.getPiece(start);
-        Piece pEnd = this.board.getPiece(end);
-        if (pStart == null || pStart.equals(pEnd) || (pEnd != null && pStart.getColour().equals(pEnd.getColour()))) {
-            return;
+        Piece pStart = this.getPieceToMove(start);
+        this.verifyDestination(pStart, end);
+
+        Movement movement = this.getMovement(pStart, end);
+        this.performMovement(pStart, movement, start, end);
+
+        this.board.setLastMoved(pStart);
+        this.turn = turn.equals(Colour.WHITE) ? Colour.BLACK : Colour.WHITE;
+    }
+
+    private Piece getPieceToMove(@NonNull Vector2D start) {
+        Piece piece = this.board.getPiece(start);
+        if (piece == null) {
+            throw new IllegalActionException("The piece at " + start + " does not exist.");
         }
-        // Get the movement if the piece can move there
-        Movement movement = pStart.getMovement(this.board, end);
+        return piece;
+    }
+
+    private void verifyDestination(@NonNull Piece selected, @NonNull Vector2D dest) {
+        Piece destination = this.board.getPiece(dest);
+        if (selected.equals(destination)) {
+            throw new IllegalActionException("The destination " + dest + " is the selected piece's current location.");
+        } else if (destination != null && selected.getColour().equals(destination.getColour())) {
+            throw new IllegalActionException("The destination " + dest + " is occupied by a piece of the same colour.");
+        }
+    }
+
+    private Movement getMovement(@NonNull Piece selected, @NonNull Vector2D dest) {
+        Movement movement = selected.getMovement(this.board, dest);
         if (movement == null) {
-            return;
+            throw new IllegalActionException("The selected piece does not have a movement to " + dest);
         }
-        // Move the piece on the board
-        this.board.setPiece(end, pStart);
+        return movement;
+    }
+
+    private void performMovement(@NonNull Piece selected, @NonNull Movement movement, @NonNull Vector2D start,
+            @NonNull Vector2D dest) {
+        this.board.setPiece(dest, selected);
+
         // If the movement has an extra action, perform it
         if (movement.getExtraAction() != null) {
-            Action action = movement.getExtraAction().getAction(this.board, new Action(pStart.getColour(), start, end));
+            Action action = movement.getExtraAction()
+                    .getAction(this.board, new Action(selected.getColour(), start, dest));
             Piece toForceMove = this.board.getPiece(action.start());
             if (toForceMove != null) {
                 if (action.end() != null) {
                     this.board.setPiece(action.end(), toForceMove);
                 }
-                // If the piece had not moved the intent is to remove it
+                // Remove this piece from its original location. If it did not move the intent is to capture it.
                 this.board.setPiece(action.start(), null);
             }
         }
-        this.board.setLastMoved(pStart);
-        this.turn = turn.equals(Colour.WHITE) ? Colour.BLACK : Colour.WHITE;
     }
 
 }
