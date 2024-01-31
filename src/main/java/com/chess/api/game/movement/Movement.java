@@ -4,10 +4,11 @@ import com.chess.api.game.Board;
 import com.chess.api.game.Colour;
 import com.chess.api.game.Vector2D;
 import com.chess.api.game.condition.Conditional;
-import java.util.HashMap;
+import com.chess.api.game.piece.Piece;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -57,8 +58,8 @@ public class Movement {
      * based off of this movement's path blueprint.
      *
      * @param colour Colour of the Piece, which determines which direction is forward
-     * @param start Location of the piece
-     * @param end Location the piece is requested to move to
+     * @param start  Location of the piece
+     * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
     public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
@@ -102,57 +103,103 @@ public class Movement {
      * @param offset {@link Vector2D} representing the position of the piece
      * @return Map of {@link Vector2D}
      */
-    public Map<Integer, Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
-        boolean isWhite = Colour.WHITE.equals(colour);
-        boolean isUp = isWhite && !mirrorXAxis || !isWhite && mirrorXAxis;
+    public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+        return this.getCoordinates(colour, offset, null);
+    }
+
+    public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset, Board board) {
+        if (this.specificQuadrant) {
+            return getVectorsInSpecificQuadrant(offset, colour, board);
+        } else {
+            return getVectorsInAllQuadrants(offset, colour, board);
+        }
+    }
+
+    private Set<Vector2D> getVectorsInSpecificQuadrant(@NonNull Vector2D offset, @NonNull Colour colour, Board board) {
         boolean isRight = !mirrorYAxis;
-        boolean hasUp = isWhite || mirrorXAxis;
-        boolean hasDown = !isWhite || mirrorXAxis;
+        boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
-        Map<Integer, Vector2D> map = new HashMap<>();
+        Set<Vector2D> set = new HashSet<>();
         for (Vector2D vector : this.getOriginalPath()) {
-            int baseX = vector.getX() + offset.getX();
-            int baseY = vector.getY() + offset.getY();
-            int mirrorX = offset.getX() - vector.getX();
-            int mirrorY = offset.getY() - vector.getY();
+            Vector2D v = getVectorInQuadrant(vector, offset, isRight, isUp);
+            if (canMoveInQuadrant(v, colour, board))
+                set.add(v);
+            if (isBlockedInQuadrant(v, board))
+                break;
+        }
+        return set;
+    }
 
-            Vector2D upRight = Vector2D.isValid(baseX, baseY) ? new Vector2D(baseX, baseY) : null;
-            Vector2D upLeft = Vector2D.isValid(mirrorX, baseY) ? new Vector2D(mirrorX, baseY) : null;
-            Vector2D downRight = Vector2D.isValid(baseX, mirrorY) ? new Vector2D(baseX, mirrorY) : null;
-            Vector2D downLeft = Vector2D.isValid(mirrorX, mirrorY) ? new Vector2D(mirrorX, mirrorY) : null;
+    private Set<Vector2D> getVectorsInAllQuadrants(@NonNull Vector2D offset, @NonNull Colour colour, Board board) {
+        boolean blockTopRight = false;
+        boolean blockTopLeft = false;
+        boolean blockBotRight = false;
+        boolean blockBotLeft = false;
 
-            if (this.specificQuadrant) {
-                if (isUp && isRight && upRight != null) {
-                    map.put(upRight.hashCode(), upRight);
-                } else if (isUp && !isRight && upLeft != null) {
-                    map.put(upLeft.hashCode(), upLeft);
-                } else if (!isUp && isRight && downRight != null) {
-                    map.put(downRight.hashCode(), downRight);
-                } else if (!isUp && !isRight && downLeft != null) {
-                    map.put(downLeft.hashCode(), downLeft);
+        Set<Vector2D> set = new HashSet<>();
+        for (Vector2D vector : this.getOriginalPath()) {
+            if (mirrorXAxis || Colour.WHITE.equals(colour)) {
+                if (!blockTopRight) {
+                    Vector2D topRight = getVectorInQuadrant(vector, offset, true, true);
+                    if (canMoveInQuadrant(topRight, colour, board))
+                        set.add(topRight);
+                    blockTopRight = isBlockedInQuadrant(topRight, board);
                 }
-            } else {
-                if (hasUp) {
-                    if (upRight != null)
-                        map.put(upRight.hashCode(), upRight);
-                    if (this.mirrorYAxis && upLeft != null)
-                        map.put(upLeft.hashCode(), upLeft);
+                if (this.mirrorYAxis && !blockTopLeft) {
+                    Vector2D topLeft = getVectorInQuadrant(vector, offset, false, true);
+                    if (canMoveInQuadrant(topLeft, colour, board))
+                        set.add(topLeft);
+                    blockTopLeft = isBlockedInQuadrant(topLeft, board);
                 }
-                if (hasDown) {
-                    if (downRight != null)
-                        map.put(downRight.hashCode(), downRight);
-                    if (this.mirrorYAxis && downLeft != null)
-                        map.put(downLeft.hashCode(), downLeft);
+            }
+            if (mirrorXAxis || !Colour.WHITE.equals(colour)) {
+                if (!blockBotRight) {
+                    Vector2D bottomRight = getVectorInQuadrant(vector, offset, true, false);
+                    if (canMoveInQuadrant(bottomRight, colour, board))
+                        set.add(bottomRight);
+                    blockBotRight = isBlockedInQuadrant(bottomRight, board);
+                }
+                if (this.mirrorYAxis && !blockBotLeft) {
+                    Vector2D bottomLeft = getVectorInQuadrant(vector, offset, false, false);
+                    if (canMoveInQuadrant(bottomLeft, colour, board))
+                        set.add(bottomLeft);
+                    blockBotLeft = isBlockedInQuadrant(bottomLeft, board);
                 }
             }
         }
-        return map;
+        return set;
+    }
+
+    private Vector2D getVectorInQuadrant(@NonNull Vector2D vector, @NonNull Vector2D offset, boolean isRight,
+            boolean isUp) {
+        int x = isRight ? offset.getX() + vector.getX() : offset.getX() - vector.getX();
+        int y = isUp ? offset.getY() + vector.getY() : offset.getY() - vector.getY();
+        return new Vector2D(x, y);
+    }
+
+    private boolean canMoveInQuadrant(@NonNull Vector2D vector, @NonNull Colour colour, Board board) {
+        if (!vector.isValid()) {
+            return false;
+        }
+        if (board != null) {
+            Piece p = board.getPiece(vector);
+            if (p != null) {
+                return !colour.equals(p.getColour());
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    private boolean isBlockedInQuadrant(@NonNull Vector2D vector, Board board) {
+        return !vector.isValid() || (board != null && board.getPiece(vector) != null);
     }
 
     /**
      * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
      *
-     * @param board {@link Board} for the Condition to verify with
+     * @param board  {@link Board} for the Condition to verify with
      * @param action {@link Action} representing the movement attempted for a Piece at a location to a destination
      * @return true if all Condition pass, otherwise false
      */
@@ -184,9 +231,9 @@ public class Movement {
      * @return 2D boolean array, true are valid locations
      */
     public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
-        Map<Integer, Vector2D> coordinates = this.getCoordinates(colour, offset);
+        Set<Vector2D> coordinates = this.getCoordinates(colour, offset);
         boolean[][] boardMove = new boolean[8][8];
-        for (Vector2D c : coordinates.values()) {
+        for (Vector2D c : coordinates) {
             boardMove[c.getX()][c.getY()] = true;
         }
         return boardMove;
