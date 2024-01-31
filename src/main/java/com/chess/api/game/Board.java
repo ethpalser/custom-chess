@@ -16,6 +16,8 @@ public class Board {
     private final int length;
     private final int width;
     private final Map<Vector2D, Piece> pieceMap;
+    private Vector2D vWhiteKing;
+    private Vector2D vBlackKing;
     private Piece lastMoved;
 
     public Board() {
@@ -26,6 +28,8 @@ public class Board {
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length - 2));
         map.putAll(this.generatePiecesInRank(this.length - 1));
+        this.vWhiteKing = new Vector2D(4, 0);
+        this.vBlackKing = new Vector2D(4, 7);
         this.pieceMap = map;
         this.lastMoved = null;
     }
@@ -97,6 +101,14 @@ public class Board {
             this.pieceMap.remove(piece.getPosition());
             this.pieceMap.put(vector, piece);
             piece.setPosition(vector);
+            // Update the king position if it moved
+            if (piece.getType().equals(PieceType.KING)) {
+                if (piece.getColour().equals(Colour.WHITE)) {
+                    this.vWhiteKing = vector;
+                } else {
+                    this.vBlackKing = vector;
+                }
+            }
         }
     }
 
@@ -121,6 +133,14 @@ public class Board {
 
     public void setLastMoved(Piece piece) {
         this.lastMoved = piece;
+    }
+
+    public Vector2D getKingLocation(@NonNull Colour colour) {
+        if (colour.equals(Colour.WHITE)) {
+            return this.vWhiteKing;
+        } else {
+            return this.vBlackKing;
+        }
     }
 
     @Override
