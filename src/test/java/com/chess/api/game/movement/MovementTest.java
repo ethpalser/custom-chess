@@ -1,8 +1,7 @@
-package com.chess.api.game;
+package com.chess.api.game.movement;
 
-import com.chess.api.game.movement.Movement;
-import com.chess.api.game.movement.MovementType;
-import com.chess.api.game.movement.Path;
+import com.chess.api.game.Colour;
+import com.chess.api.game.Vector2D;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,17 +13,6 @@ class MovementTest {
     private static final int MAX_X = 7;
     private static final int MAX_Y = 7;
 
-    private List<Vector2D> rookCoordinates() {
-        List<Vector2D> list = new ArrayList<>();
-        for (int x = 1; x <= MAX_X; x++) {
-            list.add(new Vector2D(x, 0));
-        }
-        for (int y = 1; y <= MAX_Y; y++) {
-            list.add(new Vector2D(0, y));
-        }
-        return list;
-    }
-
     private List<Vector2D> bishopCoordinates() {
         List<Vector2D> list = new ArrayList<>();
         for (int i = 1; i <= MAX_X; i++) {
@@ -35,7 +23,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceNoMirror_isOffsetByCoordinateAndOnlyForward() {
-        Movement movement = new Movement(new Path(rookCoordinates()), MovementType.ADVANCE, false, false);
+        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Vector2D co = new Vector2D(3, 3);
@@ -71,7 +59,7 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorX_isOffsetByCoordinateAndOnlyForwardAndBehind() {
-        Movement movement = new Movement(new Path(rookCoordinates()), MovementType.ADVANCE, true, false);
+        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
         Vector2D co = new Vector2D(3, 3);
