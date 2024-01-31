@@ -7,7 +7,9 @@ import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
 import com.chess.api.game.movement.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -84,6 +86,14 @@ public class Piece {
             }
         }
         return null;
+    }
+
+    public Set<Vector2D> getMovementSet(@NonNull Board board, @NonNull Vector2D location) {
+        Set<Vector2D> set = new HashSet<>();
+        for (Movement move : this.movements) {
+            set.addAll(move.getCoordinates(this.colour, location, board));
+        }
+        return set;
     }
 
     @Override
