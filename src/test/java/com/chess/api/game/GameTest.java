@@ -1,12 +1,13 @@
 package com.chess.api.game;
 
+import com.chess.api.game.exception.IllegalActionException;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class GameTest {
 
     @Test
-    void movePiece_noPieceAtCoordinate_noPieceMovedAndNoFewerPieces() {
+    void movePiece_noPieceAtCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 2;
         int pieceY = 2;
@@ -17,7 +18,7 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(pieceC, nextC);
+        assertThrows(IllegalActionException.class, () -> game.movePiece(pieceC, nextC));
 
         // Then
         Board board = game.getBoard();
@@ -26,7 +27,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toSameCoordinate_noPieceMovedAndNoFewerPieces() {
+    void movePiece_toSameCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -37,7 +38,7 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(pieceC, nextC);
+        assertThrows(IllegalActionException.class, () -> game.movePiece(pieceC, nextC));
 
         // Then
         Board board = game.getBoard();
@@ -46,7 +47,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
+    void movePiece_toInvalidCoordinate_throwsIndexOutOfBoundsException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -66,7 +67,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidSameColourOccupiedCoordinate_noPieceMovedAndNoFewerPieces() {
+    void movePiece_toValidSameColourOccupiedCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -79,7 +80,7 @@ class GameTest {
         game.movePiece(new Vector2D(0, 6), new Vector2D(0, 5)); // Filler
 
         // When
-        game.movePiece(source, target);
+        assertThrows(IllegalActionException.class, () -> game.movePiece(source, target));
 
         // Then
         Board board = game.getBoard();
@@ -91,7 +92,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidOppositeColourOccupiedCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
+    void movePiece_toValidOppositeColourOccupiedCoordinatePathBlocked_throwsIllegalActionException() {
         // Given
         int pieceX = 0;
         int pieceY = 0;
@@ -102,7 +103,7 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(source, target);
+        assertThrows(IllegalActionException.class, () -> game.movePiece(source, target));
 
         // Then
         Board board = game.getBoard();
@@ -137,7 +138,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidEmptyCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
+    void movePiece_toValidEmptyCoordinatePathBlocked_throwsIllegalActionException() {
         // Given
         int pieceX = 2;
         int pieceY = 0;
@@ -148,7 +149,7 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(source, target);
+        assertThrows(IllegalActionException.class, () -> game.movePiece(source, target));
 
         // Then
         Board board = game.getBoard();
