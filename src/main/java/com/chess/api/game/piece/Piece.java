@@ -88,10 +88,14 @@ public class Piece {
         return null;
     }
 
-    public Set<Vector2D> getMovementSet(@NonNull Board board, @NonNull Vector2D location) {
+    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board) {
+        return this.getMovementSet(location, board, false);
+    }
+
+    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board, boolean withDefend) {
         Set<Vector2D> set = new HashSet<>();
         for (Movement move : this.movements) {
-            set.addAll(move.getCoordinates(this.colour, location, board));
+            set.addAll(move.getCoordinates(this.colour, location, board, withDefend));
         }
         return set;
     }
