@@ -4,9 +4,6 @@ import com.chess.api.game.exception.IllegalActionException;
 import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
 import com.chess.api.game.piece.Piece;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -14,79 +11,73 @@ import lombok.NonNull;
 public class Game {
 
     private final Board board;
-    private final Map<Vector2D, Set<Piece>> threats;
     private Colour turn;
-    private boolean whiteInCheck;
-    private boolean blackInCheck;
 
     public Game() {
         this.board = new Board();
-        this.threats = new HashMap<>();
         this.turn = Colour.WHITE;
-        this.whiteInCheck = false;
-        this.blackInCheck = false;
     }
 
-    /**
-     * Move a piece to a new coordinate within the board.
-     * <p>For a piece to move the following must be valid:</p>
-     * <ol>
-     * <li>The piece to move exists</li>
-     * <li>The end location is not occupied by a piece with the same colour</li>
-     * <li>The piece can end on that location by moving or capturing</li>
-     * <li>The piece can move to that location after restrictions apply by moving or capturing</li>
-     * </ol>
-     *
-     * @param start {@link Vector2D} location of the Piece that will be moved
-     * @param end   {@link Vector2D} location that the Piece is requested to end on, if possible
-     */
-    public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
+    public void executeAction(@NonNull Action action) {
+        Colour player = action.colour();
+        Vector2D start = action.start();
+        Vector2D end = action.end();
+        if (!this.turn.equals(player)) {
+            throw new IllegalActionException("Acting player is not the turn player!");
+        }
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("Action does not have both a start and end.");
+        }
         if (!start.isValid() || !end.isValid()) {
             throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
         }
-        Piece pStart = this.getPieceToMove(start);
-        this.verifyDestination(pStart, end);
 
-        Movement movement = this.getMovement(pStart, end);
-        this.performMovement(pStart, movement, start, end);
-
-        this.board.setLastMoved(pStart);
-        this.turn = turn.equals(Colour.WHITE) ? Colour.BLACK : Colour.WHITE;
+        Piece toMove = this.getPieceToMove(player, start);
+        this.verifyDestination(toMove, end);
+        Movement movement = this.getMovement(toMove, end);
+        this.performMovement(player, movement, start, end);
+        if ((this.turn.equals(Colour.WHITE) && this.board.getKingCheck(Colour.BLACK))
+                || (this.turn.equals(Colour.BLACK) && this.board.getKingCheck(Colour.WHITE))) {
+            // Todo: Determine if checkmate
+        }
+        this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
 
-    private Piece getPieceToMove(@NonNull Vector2D start) {
+    private Piece getPieceToMove(@NonNull Colour player, @NonNull Vector2D start) {
         Piece piece = this.board.getPiece(start);
         if (piece == null) {
             throw new IllegalActionException("The piece at " + start + " does not exist.");
+        } else if (!player.equals(piece.getColour())) {
+            throw new IllegalActionException("The piece at " + start + " is not the current player's piece!");
         }
         return piece;
     }
 
-    private void verifyDestination(@NonNull Piece selected, @NonNull Vector2D dest) {
-        Piece destination = this.board.getPiece(dest);
-        if (selected.equals(destination)) {
-            throw new IllegalActionException("The destination " + dest + " is the selected piece's current location.");
+    private void verifyDestination(@NonNull Piece selected, @NonNull Vector2D end) {
+        Piece destination = this.board.getPiece(end);
+        if (selected.getPosition().equals(end)) {
+            throw new IllegalActionException("The destination " + end + " is the selected piece's current location.");
         } else if (destination != null && selected.getColour().equals(destination.getColour())) {
-            throw new IllegalActionException("The destination " + dest + " is occupied by a piece of the same colour.");
+            throw new IllegalActionException("The destination " + end + " is occupied by a piece of the same colour.");
         }
     }
 
-    private Movement getMovement(@NonNull Piece selected, @NonNull Vector2D dest) {
-        Movement movement = selected.getMovement(this.board, dest);
+    private Movement getMovement(@NonNull Piece selected, @NonNull Vector2D end) {
+        Movement movement = selected.getMovement(this.board, end);
         if (movement == null) {
-            throw new IllegalActionException("The selected piece does not have a movement to " + dest);
+            throw new IllegalActionException("The selected piece does not have a movement to " + end);
         }
         return movement;
     }
 
-    private void performMovement(@NonNull Piece selected, @NonNull Movement movement, @NonNull Vector2D start,
-            @NonNull Vector2D dest) {
-        this.board.setPiece(dest, selected);
+    private void performMovement(@NonNull Colour player, @NonNull Movement movement, @NonNull Vector2D start,
+            @NonNull Vector2D end) {
+        this.board.movePiece(start, end);
 
         // If the movement has an extra action, perform it
         if (movement.getExtraAction() != null) {
             Action action = movement.getExtraAction()
-                    .getAction(this.board, new Action(selected.getColour(), start, dest));
+                    .getAction(this.board, new Action(player, start, end));
             Piece toForceMove = this.board.getPiece(action.start());
             if (toForceMove != null) {
                 if (action.end() != null) {
