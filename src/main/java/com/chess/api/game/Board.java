@@ -1,14 +1,17 @@
 package com.chess.api.game;
 
+import com.chess.api.game.exception.IllegalActionException;
 import com.chess.api.game.movement.Path;
 import com.chess.api.game.piece.Piece;
 import com.chess.api.game.piece.PieceFactory;
 import com.chess.api.game.piece.PieceType;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.NonNull;
 
 public class Board {
@@ -16,8 +19,11 @@ public class Board {
     private final int length;
     private final int width;
     private final Map<Vector2D, Piece> pieceMap;
+    private final Map<Vector2D, Set<Piece>> threats;
     private Vector2D vWhiteKing;
     private Vector2D vBlackKing;
+    private boolean whiteInCheck;
+    private boolean blackInCheck;
     private Piece lastMoved;
 
     public Board() {
@@ -31,6 +37,13 @@ public class Board {
         this.vWhiteKing = new Vector2D(4, 0);
         this.vBlackKing = new Vector2D(4, 7);
         this.pieceMap = map;
+        Map<Vector2D, Set<Piece>> threatMap = new HashMap<>();
+        for (Vector2D v : map.keySet()) {
+            threatMap.computeIfAbsent(v, k -> new HashSet<>()).add(this.getPiece(v));
+        }
+        this.threats = threatMap;
+        this.whiteInCheck = false;
+        this.blackInCheck = false;
         this.lastMoved = null;
     }
 
@@ -141,6 +154,77 @@ public class Board {
         } else {
             return this.vBlackKing;
         }
+    }
+
+    public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
+        Piece pMoved = this.getPiece(start);
+        Piece pCaptured = this.getPiece(end);
+        this.setPiece(end, pMoved);
+
+        if (pCaptured != null) {
+            this.updatePieceThreats(pCaptured, end, null);
+        }
+        this.updateLocationThreats(start);
+        // Check if piece is pinned
+        if ((pMoved.getColour().equals(Colour.WHITE) && this.isKingInCheck(Colour.BLACK))
+                || (!pMoved.getColour().equals(Colour.WHITE) && this.isKingInCheck(Colour.WHITE))) {
+            // Undo move and threats
+            this.setPiece(start, pMoved);
+            this.setPiece(end, pCaptured);
+            if (pCaptured != null)
+                this.updatePieceThreats(pCaptured, null, end);
+            this.updateLocationThreats(start);
+            throw new IllegalActionException("Cannot move piece at " + start + " as player's king will be in check.");
+        }
+        this.updatePieceThreats(pMoved, start, end);
+        this.updateLocationThreats(end);
+        this.blackInCheck = pMoved.getColour().equals(Colour.WHITE) && isKingInCheck(Colour.BLACK);
+        this.whiteInCheck = pMoved.getColour().equals(Colour.BLACK) && isKingInCheck(Colour.WHITE);
+        this.setLastMoved(pMoved);
+    }
+
+    private void updatePieceThreats(@NonNull Piece moving, Vector2D start, Vector2D end) {
+        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, true) : new HashSet<>();
+        Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, true) : new HashSet<>();
+        this.updateThreats(moving, mStart, mEnd);
+    }
+
+    private void updateLocationThreats(@NonNull Vector2D vector) {
+        Set<Piece> vThreats = this.threats.get(vector);
+        if (vThreats == null) {
+            return;
+        }
+        for (Piece p : vThreats) {
+            Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null);
+            Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, true);
+            this.updateThreats(p, movesIgnoringBoard, movesWithBoard);
+        }
+    }
+
+    private void updateThreats(@NonNull Piece piece, @NonNull Set<Vector2D> before, @NonNull Set<Vector2D> after) {
+        before.removeAll(after);
+        // Remove all old threats of this piece
+        for (Vector2D v : before) {
+            this.threats.computeIfAbsent(v, k -> new HashSet<>()).remove(piece);
+        }
+        // Add all new threats of this piece (including overlap)
+        for (Vector2D v : after) {
+            this.threats.computeIfAbsent(v, k -> new HashSet<>()).add(piece);
+        }
+    }
+
+    private boolean isKingInCheck(@NonNull Colour kingColour) {
+        Set<Piece> threatsAtKing = this.threats.get(this.getKingLocation(kingColour));
+        for (Piece piece : threatsAtKing) {
+            if (!kingColour.equals(piece.getColour())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean getKingCheck(@NonNull Colour kingColour) {
+        return kingColour.equals(Colour.WHITE) ? whiteInCheck : blackInCheck;
     }
 
     @Override
