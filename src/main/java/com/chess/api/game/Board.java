@@ -5,6 +5,7 @@ import com.chess.api.game.movement.Path;
 import com.chess.api.game.piece.Piece;
 import com.chess.api.game.piece.PieceFactory;
 import com.chess.api.game.piece.PieceType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,6 +157,10 @@ public class Board {
         }
     }
 
+    public Piece getKing(@NonNull Colour colour) {
+        return pieceMap.get(this.getKingLocation(colour));
+    }
+
     public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
         Piece pMoved = this.getPiece(start);
         Piece pCaptured = this.getPiece(end);
@@ -213,6 +218,10 @@ public class Board {
         }
     }
 
+    public List<Piece> getLocationThreats(@NonNull Vector2D vector2D) {
+        return this.threats.get(vector2D).stream().toList();
+    }
+
     private boolean isKingInCheck(@NonNull Colour kingColour) {
         Set<Piece> threatsAtKing = this.threats.get(this.getKingLocation(kingColour));
         for (Piece piece : threatsAtKing) {
@@ -225,6 +234,17 @@ public class Board {
 
     public boolean getKingCheck(@NonNull Colour kingColour) {
         return kingColour.equals(Colour.WHITE) ? whiteInCheck : blackInCheck;
+    }
+
+    public List<Piece> getPiecesCausingCheck(@NonNull Colour kingColour) {
+        Set<Piece> threatsAtKing = this.threats.get(this.getKingLocation(kingColour));
+        List<Piece> pieces = new ArrayList<>();
+        for (Piece p : threatsAtKing) {
+            if (!kingColour.equals(p.getColour())) {
+                pieces.add(p);
+            }
+        }
+        return pieces;
     }
 
     @Override
