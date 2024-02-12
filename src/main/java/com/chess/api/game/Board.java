@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.NonNull;
 
 public class Board {
@@ -20,11 +21,12 @@ public class Board {
     private final int length;
     private final int width;
     private final Map<Vector2D, Piece> pieceMap;
-    private final Map<Vector2D, Set<Piece>> threats;
-    private Vector2D vWhiteKing;
-    private Vector2D vBlackKing;
-    private boolean whiteInCheck;
-    private boolean blackInCheck;
+    private final Map<Vector2D, Set<Piece>> wThreats;
+    private final Map<Vector2D, Set<Piece>> bThreats;
+    private Vector2D wKing;
+    private Vector2D bKing;
+    private boolean wCheck;
+    private boolean bCheck;
     private Piece lastMoved;
 
     public Board() {
@@ -35,16 +37,23 @@ public class Board {
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length - 2));
         map.putAll(this.generatePiecesInRank(this.length - 1));
-        this.vWhiteKing = new Vector2D(4, 0);
-        this.vBlackKing = new Vector2D(4, 7);
+        this.wKing = new Vector2D(4, 0);
+        this.bKing = new Vector2D(4, 7);
         this.pieceMap = map;
-        Map<Vector2D, Set<Piece>> threatMap = new HashMap<>();
+        Map<Vector2D, Set<Piece>> wThreatMap = new HashMap<>();
+        Map<Vector2D, Set<Piece>> bThreatMap = new HashMap<>();
         for (Vector2D v : map.keySet()) {
-            threatMap.computeIfAbsent(v, k -> new HashSet<>()).add(this.getPiece(v));
+            Piece p = this.getPiece(v);
+            if (Colour.WHITE.equals(p.getColour())) {
+                wThreatMap.computeIfAbsent(v, k -> new HashSet<>()).add(p);
+            } else {
+                bThreatMap.computeIfAbsent(v, k -> new HashSet<>()).add(p);
+            }
         }
-        this.threats = threatMap;
-        this.whiteInCheck = false;
-        this.blackInCheck = false;
+        this.wThreats = wThreatMap;
+        this.bThreats = bThreatMap;
+        this.wCheck = false;
+        this.bCheck = false;
         this.lastMoved = null;
     }
 
@@ -118,9 +127,9 @@ public class Board {
             // Update the king position if it moved
             if (piece.getType().equals(PieceType.KING)) {
                 if (piece.getColour().equals(Colour.WHITE)) {
-                    this.vWhiteKing = vector;
+                    this.wKing = vector;
                 } else {
-                    this.vBlackKing = vector;
+                    this.bKing = vector;
                 }
             }
         }
@@ -151,9 +160,9 @@ public class Board {
 
     public Vector2D getKingLocation(@NonNull Colour colour) {
         if (colour.equals(Colour.WHITE)) {
-            return this.vWhiteKing;
+            return this.wKing;
         } else {
-            return this.vBlackKing;
+            return this.bKing;
         }
     }
 
@@ -183,8 +192,8 @@ public class Board {
         }
         this.updatePieceThreats(pMoved, start, end);
         this.updateLocationThreats(end);
-        this.blackInCheck = pMoved.getColour().equals(Colour.WHITE) && isKingInCheck(Colour.BLACK);
-        this.whiteInCheck = pMoved.getColour().equals(Colour.BLACK) && isKingInCheck(Colour.WHITE);
+        this.bCheck = pMoved.getColour().equals(Colour.WHITE) && isKingInCheck(Colour.BLACK);
+        this.wCheck = pMoved.getColour().equals(Colour.BLACK) && isKingInCheck(Colour.WHITE);
         this.setLastMoved(pMoved);
     }
 
@@ -195,35 +204,40 @@ public class Board {
     }
 
     private void updateLocationThreats(@NonNull Vector2D vector) {
-        Set<Piece> vThreats = this.threats.get(vector);
-        if (vThreats == null) {
-            return;
-        }
-        for (Piece p : vThreats) {
+        Stream.concat(wThreats.get(vector).stream(), bThreats.get(vector).stream()).forEach(p -> {
             Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null);
             Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, true);
             this.updateThreats(p, movesIgnoringBoard, movesWithBoard);
-        }
+        });
     }
 
     private void updateThreats(@NonNull Piece piece, @NonNull Set<Vector2D> before, @NonNull Set<Vector2D> after) {
         before.removeAll(after);
-        // Remove all old threats of this piece
-        for (Vector2D v : before) {
-            this.threats.computeIfAbsent(v, k -> new HashSet<>()).remove(piece);
-        }
-        // Add all new threats of this piece (including overlap)
-        for (Vector2D v : after) {
-            this.threats.computeIfAbsent(v, k -> new HashSet<>()).add(piece);
+        if (piece.getColour().equals(Colour.WHITE)) {
+            // Remove all old threats of this piece
+            for (Vector2D v : before) {
+                this.wThreats.computeIfAbsent(v, k -> new HashSet<>()).remove(piece);
+            }
+            // Add all new threats of this piece (including overlap)
+            for (Vector2D v : after) {
+                this.wThreats.computeIfAbsent(v, k -> new HashSet<>()).add(piece);
+            }
+        } else {
+            for (Vector2D v : before) {
+                this.bThreats.computeIfAbsent(v, k -> new HashSet<>()).remove(piece);
+            }
+            for (Vector2D v : after) {
+                this.bThreats.computeIfAbsent(v, k -> new HashSet<>()).add(piece);
+            }
         }
     }
 
     public List<Piece> getLocationThreats(@NonNull Vector2D vector2D) {
-        return this.threats.get(vector2D).stream().toList();
+        return this.wThreats.get(vector2D).stream().toList();
     }
 
     private boolean isKingInCheck(@NonNull Colour kingColour) {
-        Set<Piece> threatsAtKing = this.threats.get(this.getKingLocation(kingColour));
+        Set<Piece> threatsAtKing = this.wThreats.get(this.getKingLocation(kingColour));
         for (Piece piece : threatsAtKing) {
             if (!kingColour.equals(piece.getColour())) {
                 return true;
@@ -233,11 +247,11 @@ public class Board {
     }
 
     public boolean getKingCheck(@NonNull Colour kingColour) {
-        return kingColour.equals(Colour.WHITE) ? whiteInCheck : blackInCheck;
+        return kingColour.equals(Colour.WHITE) ? wCheck : bCheck;
     }
 
     public List<Piece> getPiecesCausingCheck(@NonNull Colour kingColour) {
-        Set<Piece> threatsAtKing = this.threats.get(this.getKingLocation(kingColour));
+        Set<Piece> threatsAtKing = this.wThreats.get(this.getKingLocation(kingColour));
         List<Piece> pieces = new ArrayList<>();
         for (Piece p : threatsAtKing) {
             if (!kingColour.equals(p.getColour())) {
