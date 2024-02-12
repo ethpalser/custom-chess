@@ -3,7 +3,10 @@ package com.chess.api.game;
 import com.chess.api.game.exception.IllegalActionException;
 import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
+import com.chess.api.game.movement.Path;
 import com.chess.api.game.piece.Piece;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -12,10 +15,20 @@ public class Game {
 
     private final Board board;
     private Colour turn;
+    private Colour winner;
 
     public Game() {
         this.board = new Board();
         this.turn = Colour.WHITE;
+        this.winner = null;
+    }
+
+    public Colour getTurnColour() {
+        return this.turn;
+    }
+
+    public Colour getTurnOppColour() {
+        return Colour.WHITE.equals(this.turn) ? Colour.WHITE : Colour.BLACK;
     }
 
     public void executeAction(@NonNull Action action) {
@@ -36,9 +49,8 @@ public class Game {
         this.verifyDestination(toMove, end);
         Movement movement = this.getMovement(toMove, end);
         this.performMovement(player, movement, start, end);
-        if ((this.turn.equals(Colour.WHITE) && this.board.getKingCheck(Colour.BLACK))
-                || (this.turn.equals(Colour.BLACK) && this.board.getKingCheck(Colour.WHITE))) {
-            // Todo: Determine if checkmate
+        if (this.isCheckmate()) {
+            this.winner = this.turn;
         }
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
@@ -87,6 +99,38 @@ public class Game {
                 this.board.setPiece(action.start(), null);
             }
         }
+    }
+
+    private boolean isCheckmate() {
+        Piece king = this.board.getKing(this.getTurnOppColour());
+        Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
+        if (!kingMoves.isEmpty()) {
+            return false;
+        }
+
+        Vector2D kingPosition = king.getPosition();
+        for (Piece p : this.board.getPiecesCausingCheck(this.getTurnColour())) {
+            List<Piece> attackers = this.board.getLocationThreats(p.getPosition());
+            for (Piece a : attackers) {
+                // An opponent piece can move to prevent checkmate by attacking this threatening piece
+                if (a != null && !a.getColour().equals(this.getTurnColour())){
+                    return false;
+                }
+            }
+
+            Movement pMove = this.getMovement(p, kingPosition);
+            Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
+            for (Vector2D v : pPath) {
+                List<Piece> blockers = this.board.getLocationThreats(v);
+                for (Piece b : blockers) {
+                    // An opponent piece can move to prevent checkmate by blocking
+                    if (!this.turn.equals(b.getColour())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 }
