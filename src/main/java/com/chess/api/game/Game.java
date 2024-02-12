@@ -16,11 +16,13 @@ public class Game {
     private final Board board;
     private Colour turn;
     private Colour winner;
+    private boolean isComplete;
 
     public Game() {
         this.board = new Board();
         this.turn = Colour.WHITE;
         this.winner = null;
+        this.isComplete = false;
     }
 
     public Colour getTurnColour() {
@@ -32,6 +34,10 @@ public class Game {
     }
 
     public void executeAction(@NonNull Action action) {
+        if (this.isComplete) {
+            throw new IllegalActionException("Game has ended. No further moves are allowed.");
+        }
+
         Colour player = action.colour();
         Vector2D start = action.start();
         Vector2D end = action.end();
@@ -51,6 +57,7 @@ public class Game {
         this.performMovement(player, movement, start, end);
         if (this.isCheckmate()) {
             this.winner = this.turn;
+            this.isComplete = true;
         }
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
@@ -88,8 +95,7 @@ public class Game {
 
         // If the movement has an extra action, perform it
         if (movement.getExtraAction() != null) {
-            Action action = movement.getExtraAction()
-                    .getAction(this.board, new Action(player, start, end));
+            Action action = movement.getExtraAction().getAction(this.board, new Action(player, start, end));
             Piece toForceMove = this.board.getPiece(action.start());
             if (toForceMove != null) {
                 if (action.end() != null) {
@@ -113,7 +119,7 @@ public class Game {
             List<Piece> attackers = this.board.getLocationThreats(p.getPosition());
             for (Piece a : attackers) {
                 // An opponent piece can move to prevent checkmate by attacking this threatening piece
-                if (a != null && !a.getColour().equals(this.getTurnColour())){
+                if (a != null && !a.getColour().equals(this.getTurnColour())) {
                     return false;
                 }
             }
