@@ -15,6 +15,8 @@ import com.chess.api.game.reference.Direction;
 import com.chess.api.game.reference.Location;
 import com.chess.api.game.reference.Reference;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PieceFactory {
 
@@ -28,6 +30,21 @@ public class PieceFactory {
             factory = new PieceFactory();
         }
         return factory;
+    }
+
+    public Piece build(String string) {
+        Pattern pattern = Pattern.compile("^[A-Ga-g][1-8]#[wb][PRNBQK|[A-F0-9]{7}]\\*?");
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            String[] parts = string.split("#");
+            Vector2D vector2D = new Vector2D(parts[0].charAt(0), parts[0].charAt(1));
+            Piece piece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0, 1)),
+                    vector2D);
+            piece.setHasMoved(parts[1].contains("*"));
+            return piece;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public Piece build(PieceType type, Colour colour, Vector2D vector) {
