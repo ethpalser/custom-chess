@@ -4,7 +4,9 @@ import com.chess.api.game.Board;
 import com.chess.api.game.Colour;
 import com.chess.api.game.Vector2D;
 import com.chess.api.game.condition.Conditional;
+import com.chess.api.game.condition.PropertyCondition;
 import com.chess.api.game.piece.Piece;
+import com.chess.api.game.reference.Reference;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,20 +50,27 @@ public class Movement {
 
     public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
             List<Conditional> conditions, ExtraAction extraAction) {
-        this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, extraAction, true, true);
+        this(path, type, true, true, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, extraAction);
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
-            List<Conditional> conditions, ExtraAction extraAction, boolean isAttack, boolean isMove) {
+    public Movement(Path path, MovementType type, boolean isAttack, boolean isMove, boolean mirrorXAxis,
+            boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraAction extraAction) {
         this.originalPath = path;
         this.type = type;
-        this.mirrorXAxis = mirrorXAxis;
-        this.mirrorYAxis = mirrorYAxis;
-        this.specificQuadrant = specificQuadrant;
-        this.conditions = conditions;
-        this.extraAction = extraAction;
         this.isAttack = isAttack;
         this.isMove = isMove;
+        // Determines direction
+        this.mirrorXAxis = mirrorXAxis;
+        this.mirrorYAxis = mirrorYAxis;
+        // Determines relativity
+        this.specificQuadrant = specificQuadrant;
+        // For special actions
+        this.conditions = conditions;
+        this.extraAction = extraAction;
+
+        if (isMove && !isAttack) {
+            this.conditions.add(new PropertyCondition());
+        }
     }
 
     /**
