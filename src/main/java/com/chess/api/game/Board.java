@@ -57,6 +57,39 @@ public class Board {
         this.lastMoved = null;
     }
 
+    public Board(List<String> pieces) {
+        this.length = 8;
+        this.width = 8;
+        Map<Vector2D, Piece> map = new HashMap<>();
+        PieceFactory pf = PieceFactory.getInstance();
+        for (String s : pieces) {
+            Piece piece = pf.build(s);
+            map.put(piece.getPosition(), piece);
+            if (PieceType.KING.equals(piece.getType())) {
+                if (Colour.WHITE.equals(piece.getColour()))
+                    this.wKing = piece.getPosition();
+                else
+                    this.bKing = piece.getPosition();
+            }
+        }
+        this.pieceMap = map;
+        Map<Vector2D, Set<Piece>> wThreatMap = new HashMap<>();
+        Map<Vector2D, Set<Piece>> bThreatMap = new HashMap<>();
+        for (Vector2D v : map.keySet()) {
+            Piece p = this.getPiece(v);
+            if (Colour.WHITE.equals(p.getColour())) {
+                wThreatMap.computeIfAbsent(v, k -> new HashSet<>()).add(p);
+            } else {
+                bThreatMap.computeIfAbsent(v, k -> new HashSet<>()).add(p);
+            }
+        }
+        this.wThreats = wThreatMap;
+        this.bThreats = bThreatMap;
+        this.wCheck = false;
+        this.bCheck = false;
+        this.lastMoved = null;
+    }
+
     private Map<Vector2D, Piece> generatePiecesInRank(int y) {
         Map<Vector2D, Piece> map = new HashMap<>();
         Colour colour = y < (this.length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
