@@ -58,6 +58,8 @@ public class Game {
         if (this.isCheckmate()) {
             this.winner = this.turn;
             this.isComplete = true;
+        } else if (this.isStalemate()) {
+            this.isComplete = true;
         }
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
@@ -134,6 +136,24 @@ public class Game {
                         return false;
                     }
                 }
+            }
+        }
+        return true;
+    }
+
+    private boolean isStalemate() {
+        Piece king = this.board.getKing(this.getTurnOppColour());
+        Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
+        if (!kingMoves.isEmpty()) {
+            return false;
+        }
+
+        List<Piece> playerPieces = this.board.getPieces().stream()
+                .filter(p -> this.getTurnOppColour().equals(p.getColour())).toList();
+        for (Piece p : playerPieces) {
+            Set<Vector2D> moves = p.getMovementSet(p.getPosition(), board);
+            if (!moves.isEmpty()) {
+                return false;
             }
         }
         return true;
