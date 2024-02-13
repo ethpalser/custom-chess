@@ -69,11 +69,15 @@ public class Piece {
         return hasMoved;
     }
 
+    public void setHasMoved(boolean bool) {
+        this.hasMoved = bool;
+    }
+
     /**
      * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
      * be traversed and has all its conditions met.
      *
-     * @param board {@link Board} used for reference
+     * @param board       {@link Board} used for reference
      * @param destination {@link Vector2D} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
