@@ -118,7 +118,7 @@ public class Game {
 
         Vector2D kingPosition = king.getPosition();
         for (Piece p : this.board.getPiecesCausingCheck(this.getTurnColour())) {
-            List<Piece> attackers = this.board.getLocationThreats(p.getPosition());
+            List<Piece> attackers = this.board.getLocationThreats(p.getPosition(), this.getTurnOppColour());
             for (Piece a : attackers) {
                 // An opponent piece can move to prevent checkmate by attacking this threatening piece
                 if (a != null && !a.getColour().equals(this.getTurnColour())) {
@@ -129,7 +129,7 @@ public class Game {
             Movement pMove = this.getMovement(p, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
             for (Vector2D v : pPath) {
-                List<Piece> blockers = this.board.getLocationThreats(v);
+                List<Piece> blockers = this.board.getLocationThreats(v, this.getTurnOppColour());
                 for (Piece b : blockers) {
                     // An opponent piece can move to prevent checkmate by blocking
                     if (!this.turn.equals(b.getColour())) {
@@ -145,7 +145,12 @@ public class Game {
         Piece king = this.board.getKing(this.getTurnOppColour());
         Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
-            return false;
+            for (Vector2D v : kingMoves) {
+                if (this.board.getLocationThreats(v, this.getTurnColour()).isEmpty()) {
+                    // King can move to a location that is not threatened by an opponent's piece
+                    return false;
+                }
+            }
         }
 
         List<Piece> playerPieces = this.board.getPieces().stream()
