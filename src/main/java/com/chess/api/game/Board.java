@@ -198,15 +198,15 @@ public class Board {
     }
 
     private void updatePieceThreats(@NonNull Piece moving, Vector2D start, Vector2D end) {
-        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, true) : new HashSet<>();
-        Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, true) : new HashSet<>();
+        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, false, true, true) : new HashSet<>();
+        Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, false, true, true) : new HashSet<>();
         this.updateThreats(moving, mStart, mEnd);
     }
 
     private void updateLocationThreats(@NonNull Vector2D vector) {
         Stream.concat(wThreats.get(vector).stream(), bThreats.get(vector).stream()).forEach(p -> {
-            Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null);
-            Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, true);
+            Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null, false, true, false);
+            Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, false, true, true);
             this.updateThreats(p, movesIgnoringBoard, movesWithBoard);
         });
     }

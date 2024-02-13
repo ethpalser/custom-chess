@@ -22,6 +22,8 @@ public class Movement {
     private final boolean specificQuadrant;
     private final List<Conditional> conditions;
     private final ExtraAction extraAction;
+    private final boolean isAttack;
+    private final boolean isMove;
 
     public Movement() {
         this.originalPath = new Path();
@@ -31,6 +33,8 @@ public class Movement {
         this.specificQuadrant = false;
         this.conditions = null;
         this.extraAction = null;
+        this.isAttack = true;
+        this.isMove = true;
     }
 
     public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
@@ -44,6 +48,11 @@ public class Movement {
 
     public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
             List<Conditional> conditions, ExtraAction extraAction) {
+        this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, extraAction, true, true);
+    }
+
+    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
+            List<Conditional> conditions, ExtraAction extraAction, boolean isAttack, boolean isMove) {
         this.originalPath = path;
         this.type = type;
         this.mirrorXAxis = mirrorXAxis;
@@ -51,6 +60,8 @@ public class Movement {
         this.specificQuadrant = specificQuadrant;
         this.conditions = conditions;
         this.extraAction = extraAction;
+        this.isAttack = isAttack;
+        this.isMove = isMove;
     }
 
     /**
