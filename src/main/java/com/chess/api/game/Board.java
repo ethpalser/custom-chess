@@ -232,8 +232,14 @@ public class Board {
         }
     }
 
-    public List<Piece> getLocationThreats(@NonNull Vector2D vector2D) {
-        return this.wThreats.get(vector2D).stream().toList();
+    public List<Piece> getLocationThreats(@NonNull Vector2D vector2D, Colour colour) {
+        if (colour == null) {
+            return Stream.concat(this.wThreats.get(vector2D).stream(), this.bThreats.get(vector2D).stream()).toList();
+        } else if (Colour.WHITE.equals(colour)) {
+            return this.wThreats.get(vector2D).stream().toList();
+        } else {
+            return this.bThreats.get(vector2D).stream().toList();
+        }
     }
 
     private boolean isKingInCheck(@NonNull Colour kingColour) {
