@@ -55,14 +55,17 @@ public record Reference(Location location, Direction direction, Vector2D vector)
         Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.colour(), this.direction);
 
         List<Piece> list = new ArrayList<>();
+        Piece toAdd = null;
         switch (this.location) {
-            case LAST_MOVED -> list.add(board.getLastMoved());
-            case START -> list.add(board.getPiece(shiftedStart));
-            case DESTINATION -> list.add(board.getPiece(shiftedEnd));
-            case VECTOR -> list.add(board.getPiece(shiftedReference));
+            case LAST_MOVED -> toAdd = board.getLastMoved();
+            case START -> toAdd = board.getPiece(shiftedStart);
+            case DESTINATION -> toAdd = board.getPiece(shiftedEnd);
+            case VECTOR -> toAdd = board.getPiece(shiftedReference);
             case PATH_TO_DESTINATION -> list = board.getPieces(new Path(shiftedStart, shiftedEnd));
             case PATH_TO_VECTOR -> list = board.getPieces(new Path(shiftedStart, shiftedReference));
         }
+        if (toAdd != null)
+            list.add(toAdd);
         return list;
     }
 

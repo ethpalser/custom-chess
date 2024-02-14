@@ -93,15 +93,24 @@ public class Piece {
     }
 
     public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board) {
-        return this.getMovementSet(location, board, true, true, false);
+        return this.getMovementSet(location, board, true, true, false, false);
     }
 
     public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board, boolean includeMove,
-            boolean includeAttack, boolean includeDefend) {
+            boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
         Set<Vector2D> set = new HashSet<>();
         for (Movement move : this.movements) {
-            if (includeMove && move.isMove() || includeAttack && move.isAttack()) {
-                set.addAll(move.getCoordinates(this.colour, location, board, includeDefend));
+            if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
+                Set<Vector2D> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
+                if (board != null) {
+                    for (Vector2D v : vectorSet) {
+                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(), v))) {
+                            set.add(v);
+                        }
+                    }
+                } else {
+                    set.addAll(vectorSet);
+                }
             }
         }
         return set;

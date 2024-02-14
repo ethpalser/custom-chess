@@ -6,6 +6,7 @@ import com.chess.api.game.Vector2D;
 import com.chess.api.game.condition.Conditional;
 import com.chess.api.game.condition.PropertyCondition;
 import com.chess.api.game.piece.Piece;
+import com.chess.api.game.piece.PieceType;
 import com.chess.api.game.reference.Reference;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -124,36 +125,36 @@ public class Movement {
      * @return Map of {@link Vector2D}
      */
     public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
-        return this.getCoordinates(colour, offset, null, false);
+        return this.getCoordinates(colour, offset, null, false, false);
     }
 
     public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset, Board board,
-            boolean withDefend) {
+            boolean withDefend, boolean ignoreKing) {
         if (this.specificQuadrant) {
-            return getVectorsInSpecificQuadrant(offset, colour, board, withDefend);
+            return getVectorsInSpecificQuadrant(offset, colour, board, withDefend, ignoreKing);
         } else {
-            return getVectorsInAllQuadrants(offset, colour, board, withDefend);
+            return getVectorsInAllQuadrants(offset, colour, board, withDefend, ignoreKing);
         }
     }
 
     private Set<Vector2D> getVectorsInSpecificQuadrant(@NonNull Vector2D offset, @NonNull Colour colour, Board board,
-            boolean withDefend) {
+            boolean withDefend, boolean ignoreKing) {
         boolean isRight = !mirrorYAxis;
         boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
         Set<Vector2D> set = new HashSet<>();
         for (Vector2D vector : this.getOriginalPath()) {
             Vector2D v = getVectorInQuadrant(vector, offset, isRight, isUp);
-            if (canMoveInQuadrant(v, colour, board, withDefend))
+            if (canMoveInQuadrant(v, colour, board, withDefend, ignoreKing))
                 set.add(v);
-            if (isBlockedInQuadrant(v, board))
+            if (isBlockedInQuadrant(v, board, ignoreKing))
                 break;
         }
         return set;
     }
 
     private Set<Vector2D> getVectorsInAllQuadrants(@NonNull Vector2D offset, @NonNull Colour colour, Board board,
-            boolean withDefend) {
+            boolean withDefend, boolean ignoreKing) {
         boolean blockTopRight = false;
         boolean blockTopLeft = false;
         boolean blockBotRight = false;
@@ -164,29 +165,29 @@ public class Movement {
             if (mirrorXAxis || Colour.WHITE.equals(colour)) {
                 if (!blockTopRight) {
                     Vector2D topRight = getVectorInQuadrant(vector, offset, true, true);
-                    if (canMoveInQuadrant(topRight, colour, board, withDefend))
+                    if (canMoveInQuadrant(topRight, colour, board, withDefend, ignoreKing))
                         set.add(topRight);
-                    blockTopRight = isBlockedInQuadrant(topRight, board);
+                    blockTopRight = isBlockedInQuadrant(topRight, board, ignoreKing);
                 }
                 if (this.mirrorYAxis && !blockTopLeft) {
                     Vector2D topLeft = getVectorInQuadrant(vector, offset, false, true);
-                    if (canMoveInQuadrant(topLeft, colour, board, withDefend))
+                    if (canMoveInQuadrant(topLeft, colour, board, withDefend, ignoreKing))
                         set.add(topLeft);
-                    blockTopLeft = isBlockedInQuadrant(topLeft, board);
+                    blockTopLeft = isBlockedInQuadrant(topLeft, board, ignoreKing);
                 }
             }
             if (mirrorXAxis || !Colour.WHITE.equals(colour)) {
                 if (!blockBotRight) {
                     Vector2D bottomRight = getVectorInQuadrant(vector, offset, true, false);
-                    if (canMoveInQuadrant(bottomRight, colour, board, withDefend))
+                    if (canMoveInQuadrant(bottomRight, colour, board, withDefend, ignoreKing))
                         set.add(bottomRight);
-                    blockBotRight = isBlockedInQuadrant(bottomRight, board);
+                    blockBotRight = isBlockedInQuadrant(bottomRight, board, ignoreKing);
                 }
                 if (this.mirrorYAxis && !blockBotLeft) {
                     Vector2D bottomLeft = getVectorInQuadrant(vector, offset, false, false);
-                    if (canMoveInQuadrant(bottomLeft, colour, board, withDefend))
+                    if (canMoveInQuadrant(bottomLeft, colour, board, withDefend, ignoreKing))
                         set.add(bottomLeft);
-                    blockBotLeft = isBlockedInQuadrant(bottomLeft, board);
+                    blockBotLeft = isBlockedInQuadrant(bottomLeft, board, ignoreKing);
                 }
             }
         }
@@ -201,14 +202,14 @@ public class Movement {
     }
 
     private boolean canMoveInQuadrant(@NonNull Vector2D vector, @NonNull Colour colour, Board board,
-            boolean withDefend) {
+            boolean withDefend, boolean ignoreKing) {
         if (!vector.isValid()) {
             return false;
         }
         if (board != null) {
             Piece p = board.getPiece(vector);
             if (p != null) {
-                return withDefend || !colour.equals(p.getColour());
+                return withDefend || !colour.equals(p.getColour()) || PieceType.KING.equals(p.getType()) && ignoreKing;
             } else {
                 return true;
             }
@@ -216,8 +217,12 @@ public class Movement {
         return true;
     }
 
-    private boolean isBlockedInQuadrant(@NonNull Vector2D vector, Board board) {
-        return !vector.isValid() || (board != null && board.getPiece(vector) != null);
+    private boolean isBlockedInQuadrant(@NonNull Vector2D vector, Board board, boolean ignoreKing) {
+        if (!vector.isValid() || board == null) {
+            return false;
+        }
+        Piece piece = board.getPiece(vector);
+        return piece != null && !(PieceType.KING.equals(piece.getType()) && ignoreKing);
     }
 
     /**
@@ -228,6 +233,18 @@ public class Movement {
      * @return true if all Condition pass, otherwise false
      */
     public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
+        if (!this.isAttack && this.isMove) {
+            Piece piece = board.getPiece(action.end());
+            if (piece != null) {
+                return false;
+            }
+        }
+        if (this.isAttack && !this.isMove) {
+            Piece piece = board.getPiece(action.end());
+            if (piece == null || piece.getColour().equals(board.getPiece(action.start()).getColour())) {
+                return false;
+            }
+        }
         for (Conditional condition : this.conditions) {
             if (!condition.isExpected(board, action)) {
                 return false;

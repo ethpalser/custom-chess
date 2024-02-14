@@ -287,5 +287,160 @@ class GameTest {
         assertNotNull(board.getPiece(2, 5));
     }
 
+    // region In Progress Game
+    @Test
+    void executeAction_kingH8PieceCanMove_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressPieceCanMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+
+    @Test
+    void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressPieceCanCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+
+    @Test
+    void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressNotOnlyKings);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '2'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+    // endregion
+    // region Stalemate Game
+    @Test
+    void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
+        // Given
+        Board board = new Board(BoardTestCases.stalematePieceCannotMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+
+    @Test
+    void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
+        Board board = new Board(BoardTestCases.stalematePieceCannotCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+
+    @Test
+    void executeAction_onlyKings_gameIsStalemate() {
+        Board board = new Board(BoardTestCases.stalemateOnlyKings);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('e', '1'), new Vector2D('e', '2'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+    // endregion
+    // region Check in Game
+    @Test
+    void executeAction_kingD8PieceCanCapture_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkPieceCanCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG8PieceCanBlock_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkPieceCanBlock);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG7KingCanMove_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkKingCanMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+    // endregion
+    // region Checkmate in Game
+    @Test
+    void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmatePieceCannotCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmatePieceCannotBlock);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmateKingCannotMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+    // endregion
 
 }

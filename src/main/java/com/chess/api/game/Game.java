@@ -5,6 +5,7 @@ import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
 import com.chess.api.game.movement.Path;
 import com.chess.api.game.piece.Piece;
+import com.chess.api.game.piece.PieceType;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
@@ -25,12 +26,17 @@ public class Game {
         this.isComplete = false;
     }
 
+    public Game(Board board, Colour turn) {
+        this.board = board;
+        this.turn = turn;
+    }
+
     public Colour getTurnColour() {
         return this.turn;
     }
 
     public Colour getTurnOppColour() {
-        return Colour.WHITE.equals(this.turn) ? Colour.WHITE : Colour.BLACK;
+        return Colour.WHITE.equals(this.turn) ? Colour.BLACK : Colour.WHITE;
     }
 
     public void executeAction(@NonNull Action action) {
@@ -110,18 +116,28 @@ public class Game {
     }
 
     private boolean isCheckmate() {
+        if (!this.board.getKingCheck(this.getTurnOppColour())) {
+            return false;
+        }
         Piece king = this.board.getKing(this.getTurnOppColour());
         Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
-            return false;
+            for (Vector2D v : kingMoves) {
+                if (this.board.getLocationThreats(v, this.getTurnColour()).isEmpty()) {
+                    // King can move to a location that is not threatened by an opponent's piece
+                    return false;
+                }
+            }
         }
 
         Vector2D kingPosition = king.getPosition();
-        for (Piece p : this.board.getPiecesCausingCheck(this.getTurnColour())) {
+        for (Piece p : this.board.getPiecesCausingCheck(this.getTurnOppColour())) {
             List<Piece> attackers = this.board.getLocationThreats(p.getPosition(), this.getTurnOppColour());
             for (Piece a : attackers) {
                 // An opponent piece can move to prevent checkmate by attacking this threatening piece
-                if (a != null && !a.getColour().equals(this.getTurnColour())) {
+                if (a != null && !a.getColour().equals(this.getTurnColour())
+                        && (!PieceType.KING.equals(a.getType()) || PieceType.KING.equals(a.getType())
+                        && this.board.getLocationThreats(p.getPosition(), this.getTurnColour()).isEmpty())) {
                     return false;
                 }
             }
@@ -129,7 +145,7 @@ public class Game {
             Movement pMove = this.getMovement(p, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
             for (Vector2D v : pPath) {
-                List<Piece> blockers = this.board.getLocationThreats(v, this.getTurnOppColour());
+                List<Piece> blockers = this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING)).toList();
                 for (Piece b : blockers) {
                     // An opponent piece can move to prevent checkmate by blocking
                     if (!this.turn.equals(b.getColour())) {
@@ -142,6 +158,11 @@ public class Game {
     }
 
     private boolean isStalemate() {
+        List<Piece> allPieces = this.board.getPieces();
+        if (allPieces.size() <= 2) {
+            return true;
+        }
+
         Piece king = this.board.getKing(this.getTurnOppColour());
         Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
@@ -153,8 +174,8 @@ public class Game {
             }
         }
 
-        List<Piece> playerPieces = this.board.getPieces().stream()
-                .filter(p -> this.getTurnOppColour().equals(p.getColour())).toList();
+        List<Piece> playerPieces = allPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
+                        && !p.getType().equals(PieceType.KING)).toList();
         for (Piece p : playerPieces) {
             Set<Vector2D> moves = p.getMovementSet(p.getPosition(), board);
             if (!moves.isEmpty()) {

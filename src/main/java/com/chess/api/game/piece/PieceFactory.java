@@ -33,17 +33,18 @@ public class PieceFactory {
     }
 
     public Piece build(String string) {
-        Pattern pattern = Pattern.compile("^[A-Ga-g][1-8]#[wb][PRNBQK|[A-F0-9]{7}]\\*?");
+        Pattern pattern = Pattern.compile("^[A-Ha-h][1-8]\\*?#[wb][PRNBQK]");
         Matcher matcher = pattern.matcher(string);
         if (matcher.find()) {
             String[] parts = string.split("#");
             Vector2D vector2D = new Vector2D(parts[0].charAt(0), parts[0].charAt(1));
-            Piece piece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0, 1)),
+            Piece piece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0,
+                            1)),
                     vector2D);
-            piece.setHasMoved(parts[1].contains("*"));
+            piece.setHasMoved(!parts[0].contains("*"));
             return piece;
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("String (" + string + ") does not match the required format.");
         }
     }
 
@@ -109,15 +110,14 @@ public class PieceFactory {
             }
             case PAWN -> {
                 Movement pawnBaseMove = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, false,
-                        false, false, List.of(PropertyCondition.destinationEmpty()));
+                        false, false, List.of(new ReferenceCondition(new Reference(Location.DESTINATION),
+                        Comparator.DOES_NOT_EXIST, null)));
                 Movement fastAdvance = new Movement(new Path(new Vector2D(0, 1), new Vector2D(0, 2)),
                         MovementType.ADVANCE, false, false, true,
                         List.of(PropertyCondition.destinationEmpty(), PropertyCondition.startNotMoved()));
 
                 Movement capture = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE,
-                        false, true, false,
-                        List.of(PropertyCondition.destinationNotEmpty(),
-                                PropertyCondition.destinationColourNotEqual()));
+                        true, false, false, true, false, List.of(), null);
 
                 Conditional enPassantCond1 = new PropertyCondition(new Reference(Location.LAST_MOVED),
                         Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
