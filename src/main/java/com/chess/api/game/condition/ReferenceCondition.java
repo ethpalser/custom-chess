@@ -28,7 +28,6 @@ public class ReferenceCondition implements Conditional {
     @Override
     public boolean isExpected(Board board, Action action) {
         List<Piece> pieces = this.target.getPieces(board, action);
-
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {
                 return pieces == null || pieces.isEmpty();

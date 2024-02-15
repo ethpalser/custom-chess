@@ -7,7 +7,9 @@ import com.chess.api.game.movement.Action;
 import com.chess.api.game.movement.Movement;
 import com.chess.api.game.movement.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -67,11 +69,15 @@ public class Piece {
         return hasMoved;
     }
 
+    public void setHasMoved(boolean bool) {
+        this.hasMoved = bool;
+    }
+
     /**
      * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
      * be traversed and has all its conditions met.
      *
-     * @param board {@link Board} used for reference
+     * @param board       {@link Board} used for reference
      * @param destination {@link Vector2D} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
@@ -84,6 +90,30 @@ public class Piece {
             }
         }
         return null;
+    }
+
+    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board) {
+        return this.getMovementSet(location, board, true, true, false, false);
+    }
+
+    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board, boolean includeMove,
+            boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
+        Set<Vector2D> set = new HashSet<>();
+        for (Movement move : this.movements) {
+            if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
+                Set<Vector2D> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
+                if (board != null) {
+                    for (Vector2D v : vectorSet) {
+                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(), v))) {
+                            set.add(v);
+                        }
+                    }
+                } else {
+                    set.addAll(vectorSet);
+                }
+            }
+        }
+        return set;
     }
 
     @Override

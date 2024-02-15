@@ -1,12 +1,14 @@
 package com.chess.api.game;
 
+import com.chess.api.game.exception.IllegalActionException;
+import com.chess.api.game.movement.Action;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class GameTest {
 
     @Test
-    void movePiece_noPieceAtCoordinate_noPieceMovedAndNoFewerPieces() {
+    void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 2;
         int pieceY = 2;
@@ -17,7 +19,8 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(pieceC, nextC);
+        Action action = new Action(Colour.WHITE, pieceC, nextC);
+        assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
         Board board = game.getBoard();
@@ -26,7 +29,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toSameCoordinate_noPieceMovedAndNoFewerPieces() {
+    void executeAction_toSameCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -37,7 +40,8 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(pieceC, nextC);
+        Action action = new Action(Colour.WHITE, pieceC, nextC);
+        assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
         Board board = game.getBoard();
@@ -46,7 +50,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toInvalidCoordinate_noPieceMovedAndNoFewerPieces() {
+    void executeAction_toInvalidCoordinate_throwsIndexOutOfBoundsException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -57,7 +61,8 @@ class GameTest {
         Game game = new Game();
 
         // When
-        assertThrows(IndexOutOfBoundsException.class, () -> game.movePiece(pieceC, invalid));
+        Action action = new Action(Colour.WHITE, pieceC, invalid);
+        assertThrows(IndexOutOfBoundsException.class, () -> game.executeAction(action));
 
         // Then
         Board board = game.getBoard();
@@ -66,7 +71,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidSameColourOccupiedCoordinate_noPieceMovedAndNoFewerPieces() {
+    void executeAction_toValidSameColourOccupiedCoordinate_throwsIllegalActionException() {
         // Given
         int pieceX = 1;
         int pieceY = 0;
@@ -75,14 +80,15 @@ class GameTest {
         Vector2D source = new Vector2D(pieceX, pieceY); // White Knight
         Vector2D target = new Vector2D(nextX, nextY); // White Pawn
         Game game = new Game();
-        game.movePiece(new Vector2D(nextX, 1), new Vector2D(nextX, nextY)); // Filler
-        game.movePiece(new Vector2D(0, 6), new Vector2D(0, 5)); // Filler
+        Board board = game.getBoard();
+        board.movePiece(new Vector2D(nextX, 1), new Vector2D(nextX, nextY)); // Filler
+        board.movePiece(new Vector2D(0, 6), new Vector2D(0, 5)); // Filler
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
@@ -91,7 +97,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidOppositeColourOccupiedCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
+    void executeAction_toValidOppositeColourOccupiedCoordinatePathBlocked_throwsIllegalActionException() {
         // Given
         int pieceX = 0;
         int pieceY = 0;
@@ -102,7 +108,8 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
         Board board = game.getBoard();
@@ -114,7 +121,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidOppositeColourOccupiedCoordinatePathOpen_pieceMovedAndOneFewerPieces() {
+    void executeAction_toValidOppositeColourOccupiedCoordinatePathOpen_pieceMovedAndOneFewerPieces() {
         // Given
         int pieceX = 0;
         int pieceY = 0;
@@ -127,7 +134,8 @@ class GameTest {
         board.setPiece(new Vector2D(0, 1), null); // Can be sufficient for path checks
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        game.executeAction(action);
 
         // Then
         assertNull(board.getPiece(source));
@@ -137,7 +145,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidEmptyCoordinatePathBlocked_noPieceMovedAndNoFewerPieces() {
+    void executeAction_toValidEmptyCoordinatePathBlocked_throwsIllegalActionException() {
         // Given
         int pieceX = 2;
         int pieceY = 0;
@@ -148,7 +156,8 @@ class GameTest {
         Game game = new Game();
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
         Board board = game.getBoard();
@@ -159,7 +168,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_toValidEmptyCoordinatePathOpen_pieceMovedAndNoFewerPieces() {
+    void executeAction_toValidEmptyCoordinatePathOpen_pieceMovedAndNoFewerPieces() {
         // Given
         int pieceX = 2;
         int pieceY = 0;
@@ -172,7 +181,8 @@ class GameTest {
         board.setPiece(new Vector2D(3, 1), null); // Clearing the path for a Bishop's move
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        game.executeAction(action);
 
         // Then
         assertNull(game.getBoard().getPiece(source));
@@ -182,7 +192,7 @@ class GameTest {
     }
 
     @Test
-    void movePiece_castleKingSideAndValid_kingAndRookMovedAndNoFewerPieces() {
+    void executeAction_castleKingSideAndValid_kingAndRookMovedAndNoFewerPieces() {
         // Given
         Vector2D source = new Vector2D(4, 0);
         Vector2D target = new Vector2D(6, 0);
@@ -192,7 +202,8 @@ class GameTest {
         board.setPiece(new Vector2D(6, 0), null);
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        game.executeAction(action);
 
         // Then
         assertNull(board.getPiece(4, 0));
@@ -203,7 +214,7 @@ class GameTest {
 
 
     @Test
-    void movePiece_castleQueenSideAndValid_kingAndRookMovedAndNoFewerPieces() {
+    void executeAction_castleQueenSideAndValid_kingAndRookMovedAndNoFewerPieces() {
         // Given
         Vector2D source = new Vector2D(4, 0);
         Vector2D target = new Vector2D(2, 0);
@@ -214,7 +225,8 @@ class GameTest {
         board.setPiece(new Vector2D(3, 0), null);
 
         // When
-        game.movePiece(source, target);
+        Action action = new Action(Colour.WHITE, source, target);
+        game.executeAction(action);
 
         // Then
         assertNull(board.getPiece(4, 0));
@@ -224,23 +236,24 @@ class GameTest {
     }
 
     @Test
-    void movePiece_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
+    void executeAction_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
         // Given
         Vector2D source = new Vector2D(4, 6);
         Vector2D target = new Vector2D(4, 4);
         Game game = new Game();
         Board board = game.getBoard();
         // White move
-        game.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
+        board.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
         // Black move (filler)
-        game.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
+        board.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
         // White move
-        game.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
+        board.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
         // Black move
-        game.movePiece(source, target);
+        board.movePiece(source, target);
 
         // When (White move)
-        game.movePiece(new Vector2D(3, 4), new Vector2D(4, 5)); // En Passant
+        Action action = new Action(Colour.WHITE, new Vector2D(3, 4), new Vector2D(4, 5));
+        game.executeAction(action); // En Passant
 
         // Then
         assertNull(board.getPiece(3, 4));
@@ -249,23 +262,24 @@ class GameTest {
     }
 
     @Test
-    void movePiece_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
+    void executeAction_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
         // Given
         Vector2D source = new Vector2D(2, 6);
         Vector2D target = new Vector2D(2, 4);
         Game game = new Game();
         Board board = game.getBoard();
         // White move
-        game.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
+        board.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
         // Black move (filler)
-        game.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
+        board.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
         // White move
-        game.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
+        board.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
         // Black move
-        game.movePiece(source, target);
+        board.movePiece(source, target);
 
         // When (White move)
-        game.movePiece(new Vector2D(3, 4), new Vector2D(2, 5)); // En Passant
+        Action action = new Action(Colour.WHITE, new Vector2D(3, 4), new Vector2D(2, 5));
+        game.executeAction(action); // En Passant
 
         // Then
         assertNull(board.getPiece(3, 4));
@@ -273,5 +287,160 @@ class GameTest {
         assertNotNull(board.getPiece(2, 5));
     }
 
+    // region In Progress Game
+    @Test
+    void executeAction_kingH8PieceCanMove_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressPieceCanMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+
+    @Test
+    void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressPieceCanCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+
+    @Test
+    void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
+        Board board = new Board(BoardTestCases.inProgressNotOnlyKings);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '2'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+    }
+    // endregion
+    // region Stalemate Game
+    @Test
+    void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
+        // Given
+        Board board = new Board(BoardTestCases.stalematePieceCannotMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+
+    @Test
+    void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
+        Board board = new Board(BoardTestCases.stalematePieceCannotCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+
+    @Test
+    void executeAction_onlyKings_gameIsStalemate() {
+        Board board = new Board(BoardTestCases.stalemateOnlyKings);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('e', '1'), new Vector2D('e', '2'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertTrue(game.isComplete());
+    }
+    // endregion
+    // region Check in Game
+    @Test
+    void executeAction_kingD8PieceCanCapture_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkPieceCanCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG8PieceCanBlock_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkPieceCanBlock);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG7KingCanMove_gameHasCheck() {
+        Board board = new Board(BoardTestCases.checkKingCanMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertNull(game.getWinner());
+        assertFalse(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+    // endregion
+    // region Checkmate in Game
+    @Test
+    void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmatePieceCannotCapture);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmatePieceCannotBlock);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+
+    @Test
+    void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
+        Board board = new Board(BoardTestCases.checkmateKingCannotMove);
+        Game game = new Game(board, Colour.WHITE);
+        // When
+        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        game.executeAction(action);
+        // Then
+        assertEquals(Colour.WHITE, game.getWinner());
+        assertTrue(game.isComplete());
+        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+    }
+    // endregion
 
 }

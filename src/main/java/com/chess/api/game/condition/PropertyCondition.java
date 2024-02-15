@@ -53,6 +53,7 @@ public class PropertyCondition implements Conditional {
                 return false;
             }
         }
+        // Does not exist check failing Todo: fix it!
         return hasPiece || Comparator.DOES_NOT_EXIST.equals(comparator);
     }
 
