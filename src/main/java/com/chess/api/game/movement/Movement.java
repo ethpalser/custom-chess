@@ -7,7 +7,6 @@ import com.chess.api.game.condition.Conditional;
 import com.chess.api.game.condition.PropertyCondition;
 import com.chess.api.game.piece.Piece;
 import com.chess.api.game.piece.PieceType;
-import com.chess.api.game.reference.Reference;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -233,17 +232,13 @@ public class Movement {
      * @return true if all Condition pass, otherwise false
      */
     public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
-        if (!this.isAttack && this.isMove) {
-            Piece piece = board.getPiece(action.end());
-            if (piece != null) {
-                return false;
-            }
+        Piece pStart = board.getPiece(action.start());
+        Piece pEnd = board.getPiece(action.end());
+        if (!this.isAttack && this.isMove && pEnd != null) {
+            return false;
         }
-        if (this.isAttack && !this.isMove) {
-            Piece piece = board.getPiece(action.end());
-            if (piece == null || piece.getColour().equals(board.getPiece(action.start()).getColour())) {
-                return false;
-            }
+        if (this.isAttack && !this.isMove && (pEnd == null || pStart.getColour().equals(pEnd.getColour()))) {
+            return false;
         }
         for (Conditional condition : this.conditions) {
             if (!condition.isExpected(board, action)) {
