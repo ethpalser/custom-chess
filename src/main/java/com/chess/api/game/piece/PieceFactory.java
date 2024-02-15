@@ -55,14 +55,14 @@ public class PieceFactory {
 
         switch (type) {
             case KNIGHT -> {
-                Movement knightBaseMove1 = new Movement(new Path(new Vector2D(1, 2)), MovementType.JUMP, true, true);
-                Movement knightBaseMove2 = new Movement(new Path(new Vector2D(2, 1)), MovementType.JUMP, true, true);
-                return new Piece(PieceType.KNIGHT, colour, vector, knightBaseMove1, knightBaseMove2);
+                Movement knightMove1 = new Movement(new Path(new Vector2D(1, 2)), MovementType.JUMP, true, true);
+                Movement knightMove2 = new Movement(new Path(new Vector2D(2, 1)), MovementType.JUMP, true, true);
+                return new Piece(PieceType.KNIGHT, colour, vector, knightMove1, knightMove2);
             }
             case ROOK -> {
-                Movement rookBaseMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
-                Movement rookBaseMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
-                return new Piece(PieceType.ROOK, colour, vector, rookBaseMoveV, rookBaseMoveH);
+                Movement rookMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
+                Movement rookMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
+                return new Piece(PieceType.ROOK, colour, vector, rookMoveV, rookMoveH);
             }
             case BISHOP -> {
                 Movement bishopBaseMove = new Movement(diagonal, MovementType.ADVANCE, true, true);
@@ -78,46 +78,59 @@ public class PieceFactory {
                 Movement kingBaseMoveV = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, true, false);
                 Movement kingBaseMoveH = new Movement(new Path(new Vector2D(1, 0)), MovementType.ADVANCE, false, true);
                 Movement kingBaseMoveD = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE, true, true);
-
+                // Castle - King side // Todo: Implement moving to a fixed location so this and queen-side can be intuitive
                 Vector2D kingSideRook = new Vector2D(7, 0);
                 Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
                 Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                ExtraAction kingSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, new Vector2D(7, 0)),
-                        new Vector2D(5, 0));
-                Movement castleKingSide = new Movement(new Path(new Vector2D(2, 0)), MovementType.ADVANCE,
-                        false, false, true,
-                        List.of(PropertyCondition.startNotMoved(), castleKingSideCond2, castleKingSideCond3),
-                        kingSideRookMovement);
-
+                Movement castleKingSide = new Movement.Builder(new Path(new Vector2D(2, 0)), MovementType.CHARGE)
+                        .isMirrorXAxis(false)
+                        .isMirrorYAxis(false)
+                        .isSpecificQuadrant(true)
+                        .isAttack(false)
+                        .conditions(List.of(PropertyCondition.startNotMoved(),castleKingSideCond2, castleKingSideCond3))
+                        .extraAction(new ExtraAction(new Reference(Location.VECTOR, kingSideRook), new Vector2D(5, 0)))
+                        .build();
+                // Castle - Queen side
                 Vector2D queenSideRook = new Vector2D(0, 0);
                 Conditional castleQueenSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, queenSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
                 Conditional castleQueenSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         queenSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                ExtraAction queenSideRookMovement = new ExtraAction(new Reference(Location.VECTOR, new Vector2D(0, 0)),
-                        new Vector2D(3, 0));
-                Movement castleQueenSide = new Movement(new Path(new Vector2D(2, 0)), MovementType.ADVANCE,
-                        false, true, true,
-                        List.of(PropertyCondition.startNotMoved(), castleQueenSideCond2, castleQueenSideCond3),
-                        queenSideRookMovement);
+                Movement castleQueenSide = new Movement.Builder(new Path(new Vector2D(2, 0)), MovementType.CHARGE)
+                        .isMirrorXAxis(false)
+                        .isMirrorYAxis(true)
+                        .isSpecificQuadrant(false)
+                        .isAttack(false)
+                        .conditions(List.of(PropertyCondition.startNotMoved(),castleQueenSideCond2, castleQueenSideCond3))
+                        .extraAction(new ExtraAction(new Reference(Location.VECTOR, new Vector2D(0, 0)),
+                                new Vector2D(3, 0)))
+                        .build();
 
                 return new Piece(PieceType.KING, colour, vector, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
                         castleKingSide, castleQueenSide);
             }
             case PAWN -> {
-                Movement pawnBaseMove = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, false,
-                        false, false, List.of(new ReferenceCondition(new Reference(Location.DESTINATION),
-                        Comparator.DOES_NOT_EXIST, null)));
-                Movement fastAdvance = new Movement(new Path(new Vector2D(0, 1), new Vector2D(0, 2)),
-                        MovementType.ADVANCE, false, false, true,
-                        List.of(PropertyCondition.destinationEmpty(), PropertyCondition.startNotMoved()));
-
-                Movement capture = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE,
-                        true, false, false, true, false, List.of(), null);
+                Movement pawnBaseMove = new Movement.Builder(new Path(new Vector2D(0, 1)), MovementType.ADVANCE)
+                        .isMirrorXAxis(false)
+                        .isMirrorYAxis(false)
+                        .isSpecificQuadrant(true)
+                        .isAttack(false)
+                        .build();
+                Movement pawnCharge = new Movement.Builder(new Path(new Vector2D(0, 1), new Vector2D(0, 2)), MovementType.CHARGE)
+                        .isMirrorXAxis(false)
+                        .isMirrorYAxis(false)
+                        .isSpecificQuadrant(true)
+                        .isAttack(false)
+                        .conditions(List.of(PropertyCondition.startNotMoved()))
+                        .build();
+                Movement pawnCapture = new Movement.Builder(new Path(new Vector2D(1, 1)), MovementType.ADVANCE)
+                        .isMirrorXAxis(false)
+                        .isMove(false)
+                        .build();
 
                 Conditional enPassantCond1 = new PropertyCondition(new Reference(Location.LAST_MOVED),
                         Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
@@ -128,11 +141,13 @@ public class PieceFactory {
 
                 ExtraAction extraAction = new ExtraAction(new Reference(Location.DESTINATION, Direction.BACK, null),
                         null);
-                Movement enPassant = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE,
-                        false, true, false,
-                        List.of(PropertyCondition.destinationEmpty(), enPassantCond1, enPassantCond2, enPassantCond3),
-                        extraAction);
-                return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, fastAdvance, capture, enPassant);
+                Movement enPassant = new Movement.Builder(new Path(new Vector2D(1, 1)), MovementType.ADVANCE)
+                        .isMirrorXAxis(false)
+                        .isAttack(false)
+                        .conditions(List.of(enPassantCond1, enPassantCond2, enPassantCond3))
+                        .extraAction(extraAction)
+                        .build();
+                return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, pawnCharge, pawnCapture, enPassant);
             }
         }
         return new Piece();
