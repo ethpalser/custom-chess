@@ -3,7 +3,6 @@ package com.chess.api.game.condition;
 import com.chess.api.game.Board;
 import com.chess.api.game.movement.Action;
 import com.chess.api.game.piece.Piece;
-import com.chess.api.game.reference.Location;
 import com.chess.api.game.reference.Reference;
 import java.util.List;
 import lombok.NonNull;
@@ -74,16 +73,6 @@ public class PropertyCondition implements Conditional {
                 return false;
             }
         }
-    }
-
-    public static Conditional startNotMoved() {
-        Reference reference = new Reference(Location.START);
-        return new PropertyCondition(reference, Comparator.FALSE, new Property<>("hasMoved"), false);
-    }
-
-    public static Conditional destinationEmpty() {
-        Reference reference = new Reference(Location.DESTINATION);
-        return new PropertyCondition(reference, Comparator.DOES_NOT_EXIST);
     }
 
     @Override

@@ -52,6 +52,8 @@ public class PieceFactory {
         Path vertical = new Path(new Vector2D(0, 1), new Vector2D(0, 7));
         Path horizontal = new Path(new Vector2D(1, 0), new Vector2D(7, 0));
         Path diagonal = new Path(new Vector2D(1, 1), new Vector2D(7, 7));
+        PropertyCondition notMoved = new PropertyCondition(new Reference(Location.START), Comparator.FALSE,
+                new Property<>("hasMoved"), false);
 
         switch (type) {
             case KNIGHT -> {
@@ -78,19 +80,18 @@ public class PieceFactory {
                 Movement kingBaseMoveV = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, true, false);
                 Movement kingBaseMoveH = new Movement(new Path(new Vector2D(1, 0)), MovementType.ADVANCE, false, true);
                 Movement kingBaseMoveD = new Movement(new Path(new Vector2D(1, 1)), MovementType.ADVANCE, true, true);
-                // Castle - King side // Todo: Implement moving to a fixed location so this and queen-side can be intuitive
+                // Castle - King side Todo: Implement moving to a fixed location so this and queen-side can be intuitive
                 Vector2D kingSideRook = new Vector2D(7, 0);
                 Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
-                        kingSideRook),
+                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR, kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
                 Movement castleKingSide = new Movement.Builder(new Path(new Vector2D(2, 0)), MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
                         .isAttack(false)
-                        .conditions(List.of(PropertyCondition.startNotMoved(),castleKingSideCond2, castleKingSideCond3))
+                        .conditions(List.of(notMoved,castleKingSideCond2, castleKingSideCond3))
                         .extraAction(new ExtraAction(new Reference(Location.VECTOR, kingSideRook), new Vector2D(5, 0)))
                         .build();
                 // Castle - Queen side
@@ -105,7 +106,7 @@ public class PieceFactory {
                         .isMirrorYAxis(true)
                         .isSpecificQuadrant(false)
                         .isAttack(false)
-                        .conditions(List.of(PropertyCondition.startNotMoved(),castleQueenSideCond2, castleQueenSideCond3))
+                        .conditions(List.of(notMoved,castleQueenSideCond2, castleQueenSideCond3))
                         .extraAction(new ExtraAction(new Reference(Location.VECTOR, new Vector2D(0, 0)),
                                 new Vector2D(3, 0)))
                         .build();
@@ -125,7 +126,7 @@ public class PieceFactory {
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
                         .isAttack(false)
-                        .conditions(List.of(PropertyCondition.startNotMoved()))
+                        .conditions(List.of(notMoved))
                         .build();
                 Movement pawnCapture = new Movement.Builder(new Path(new Vector2D(1, 1)), MovementType.ADVANCE)
                         .isMirrorXAxis(false)
