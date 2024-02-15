@@ -15,23 +15,15 @@ public class PropertyCondition implements Conditional {
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition() {
-        this(new Reference(), Comparator.EXIST, null, null);
+    public PropertyCondition(@NonNull Reference reference, @NonNull Comparator comparator) {
+        this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(@NonNull Reference reference,
-            Comparator comparator) {
-        if (!Comparator.canReferenceSelf(comparator)) {
+    public PropertyCondition(@NonNull Reference reference, @NonNull Comparator comparator, Property<Piece> property,
+            Object expected) {
+        if (property == null && !Comparator.canReferenceSelf(comparator)) {
             throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
         }
-        this.reference = reference;
-        this.comparator = comparator;
-        this.property = null;
-        this.expected = null;
-    }
-
-    public PropertyCondition(@NonNull Reference reference, Comparator comparator, Property<Piece> property,
-            Object expected) {
         this.reference = reference;
         this.comparator = comparator;
         this.property = property;
@@ -53,7 +45,6 @@ public class PropertyCondition implements Conditional {
                 return false;
             }
         }
-        // Does not exist check failing Todo: fix it!
         return hasPiece || Comparator.DOES_NOT_EXIST.equals(comparator);
     }
 
@@ -79,8 +70,10 @@ public class PropertyCondition implements Conditional {
                 return (this.expected == null && objProperty != null) || (objProperty != null
                         && !objProperty.equals(this.expected));
             }
+            default -> {
+                return false;
+            }
         }
-        return false;
     }
 
     public static Conditional startNotMoved() {
@@ -91,16 +84,6 @@ public class PropertyCondition implements Conditional {
     public static Conditional destinationEmpty() {
         Reference reference = new Reference(Location.DESTINATION);
         return new PropertyCondition(reference, Comparator.DOES_NOT_EXIST);
-    }
-
-    public static Conditional destinationNotEmpty() {
-        Reference reference = new Reference(Location.DESTINATION);
-        return new PropertyCondition(reference, Comparator.EXIST);
-    }
-
-    public static Conditional destinationColourNotEqual() {
-        Reference reference = new Reference(Location.DESTINATION);
-        return new PropertyCondition(reference, Comparator.NOT_EQUAL, new Property<>("colour"), null);
     }
 
     @Override

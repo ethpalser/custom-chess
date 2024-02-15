@@ -51,8 +51,10 @@ public class ReferenceCondition implements Conditional {
                 }
                 return false;
             }
+            default -> {
+                return false;
+            }
         }
-        return false;
     }
 
     @Override
