@@ -12,10 +12,6 @@ public class ReferenceCondition implements Conditional {
     private final Comparator comparator;
     private final Reference expected;
 
-    public ReferenceCondition() {
-        this(new Reference(), Comparator.EXIST, new Reference());
-    }
-
     public ReferenceCondition(Reference target, Comparator comparator, Reference expected) {
         if (expected == null && !Comparator.canReferenceSelf(comparator)) {
             throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
@@ -51,8 +47,10 @@ public class ReferenceCondition implements Conditional {
                 }
                 return false;
             }
+            default -> {
+                return false;
+            }
         }
-        return false;
     }
 
     @Override

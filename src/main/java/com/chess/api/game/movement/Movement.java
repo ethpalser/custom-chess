@@ -4,10 +4,8 @@ import com.chess.api.game.Board;
 import com.chess.api.game.Colour;
 import com.chess.api.game.Vector2D;
 import com.chess.api.game.condition.Conditional;
-import com.chess.api.game.condition.PropertyCondition;
 import com.chess.api.game.piece.Piece;
 import com.chess.api.game.piece.PieceType;
-import com.chess.api.game.reference.Reference;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,60 +16,96 @@ import lombok.NonNull;
 @Getter
 public class Movement {
 
-    private final Path originalPath;
-    private final MovementType type;
+    private final Path pathBase;
+    private final MovementType moveType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
-    private final boolean specificQuadrant;
+    private final boolean isSpecificQuadrant;
+    private final boolean isMove;
+    private final boolean isAttack;
     private final List<Conditional> conditions;
     private final ExtraAction extraAction;
-    private final boolean isAttack;
-    private final boolean isMove;
 
-    public Movement() {
-        this.originalPath = new Path();
-        this.type = MovementType.ADVANCE;
-        this.mirrorXAxis = false;
-        this.mirrorYAxis = false;
-        this.specificQuadrant = false;
-        this.conditions = null;
-        this.extraAction = null;
-        this.isAttack = true;
-        this.isMove = true;
+    public static class Builder {
+        // required
+        private final Path path;
+        private final MovementType moveType;
+        // optional
+        private boolean mirrorXAxis = true;
+        private boolean mirrorYAxis = true;
+        private boolean isSpecificQuadrant = false;
+        private boolean isAttack = true;
+        private boolean isMove = true;
+        private List<Conditional> conditions = List.of();
+        private ExtraAction extraAction = null;
+
+        public Builder(Path path, MovementType moveType) {
+            this.path = path;
+            this.moveType = moveType;
+        }
+
+        public Builder isMirrorXAxis(boolean bool) {
+            this.mirrorXAxis = bool;
+            return this;
+        }
+
+        public Builder isMirrorYAxis(boolean bool) {
+            this.mirrorYAxis = bool;
+            return this;
+        }
+
+        public Builder isSpecificQuadrant(boolean bool) {
+            this.isSpecificQuadrant = bool;
+            return this;
+        }
+
+        public Builder isAttack(boolean bool) {
+            this.isAttack = bool;
+            return this;
+        }
+
+        public Builder isMove(boolean bool) {
+            this.isMove = bool;
+            return this;
+        }
+
+        public Builder conditions(List<Conditional> conditions) {
+            this.conditions = conditions;
+            return this;
+        }
+
+        public Builder extraAction(ExtraAction extraAction) {
+            this.extraAction = extraAction;
+            return this;
+        }
+
+        public Movement build() {
+            return new Movement(this);
+        }
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis) {
-        this(path, type, mirrorXAxis, mirrorYAxis, false, List.of(), null);
+    public Movement(Builder builder) {
+        this.pathBase = builder.path;
+        this.moveType = builder.moveType;
+        this.mirrorXAxis = builder.mirrorXAxis;
+        this.mirrorYAxis = builder.mirrorYAxis;
+        this.isSpecificQuadrant = builder.isSpecificQuadrant;
+        this.isMove = builder.isMove;
+        this.isAttack = builder.isAttack;
+        this.conditions = builder.conditions;
+        this.extraAction = builder.extraAction;
     }
 
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
-            List<Conditional> conditions) {
-        this(path, type, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, null);
-    }
-
-    public Movement(Path path, MovementType type, boolean mirrorXAxis, boolean mirrorYAxis, boolean specificQuadrant,
-            List<Conditional> conditions, ExtraAction extraAction) {
-        this(path, type, true, true, mirrorXAxis, mirrorYAxis, specificQuadrant, conditions, extraAction);
-    }
-
-    public Movement(Path path, MovementType type, boolean isAttack, boolean isMove, boolean mirrorXAxis,
-            boolean mirrorYAxis, boolean specificQuadrant, List<Conditional> conditions, ExtraAction extraAction) {
-        this.originalPath = path;
-        this.type = type;
-        this.isAttack = isAttack;
-        this.isMove = isMove;
-        // Determines direction
+    public Movement(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
+        this.pathBase = path;
+        this.moveType = moveType;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
-        // Determines relativity
-        this.specificQuadrant = specificQuadrant;
-        // For special actions
-        this.conditions = conditions;
-        this.extraAction = extraAction;
-
-        if (isMove && !isAttack) {
-            this.conditions.add(new PropertyCondition());
-        }
+        this.isSpecificQuadrant = false;
+        this.isMove = true;
+        this.isAttack = true;
+        this.conditions = List.of();
+        this.extraAction = null;
     }
 
     /**
@@ -99,7 +133,7 @@ public class Movement {
         }
 
         List<Vector2D> vectors = new LinkedList<>();
-        for (Vector2D vector : this.getOriginalPath()) {
+        for (Vector2D vector : this.getPathBase()) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
             if (!Vector2D.isValid(nextX, nextY)) {
@@ -130,7 +164,7 @@ public class Movement {
 
     public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset, Board board,
             boolean withDefend, boolean ignoreKing) {
-        if (this.specificQuadrant) {
+        if (this.isSpecificQuadrant) {
             return getVectorsInSpecificQuadrant(offset, colour, board, withDefend, ignoreKing);
         } else {
             return getVectorsInAllQuadrants(offset, colour, board, withDefend, ignoreKing);
@@ -143,7 +177,7 @@ public class Movement {
         boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
         Set<Vector2D> set = new HashSet<>();
-        for (Vector2D vector : this.getOriginalPath()) {
+        for (Vector2D vector : this.getPathBase()) {
             Vector2D v = getVectorInQuadrant(vector, offset, isRight, isUp);
             if (canMoveInQuadrant(v, colour, board, withDefend, ignoreKing))
                 set.add(v);
@@ -161,7 +195,7 @@ public class Movement {
         boolean blockBotLeft = false;
 
         Set<Vector2D> set = new HashSet<>();
-        for (Vector2D vector : this.getOriginalPath()) {
+        for (Vector2D vector : this.getPathBase()) {
             if (mirrorXAxis || Colour.WHITE.equals(colour)) {
                 if (!blockTopRight) {
                     Vector2D topRight = getVectorInQuadrant(vector, offset, true, true);
@@ -233,17 +267,13 @@ public class Movement {
      * @return true if all Condition pass, otherwise false
      */
     public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
-        if (!this.isAttack && this.isMove) {
-            Piece piece = board.getPiece(action.end());
-            if (piece != null) {
-                return false;
-            }
+        Piece pStart = board.getPiece(action.start());
+        Piece pEnd = board.getPiece(action.end());
+        if (!this.isAttack && this.isMove && pEnd != null) {
+            return false;
         }
-        if (this.isAttack && !this.isMove) {
-            Piece piece = board.getPiece(action.end());
-            if (piece == null || piece.getColour().equals(board.getPiece(action.start()).getColour())) {
-                return false;
-            }
+        if (this.isAttack && !this.isMove && (pEnd == null || pStart.getColour().equals(pEnd.getColour()))) {
+            return false;
         }
         for (Conditional condition : this.conditions) {
             if (!condition.isExpected(board, action)) {
