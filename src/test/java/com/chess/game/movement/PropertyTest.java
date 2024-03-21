@@ -1,5 +1,6 @@
 package test.java.com.chess.game.movement;
 
+import main.java.com.chess.game.Colour;
 import main.java.com.chess.game.condition.Property;
 import main.java.com.chess.game.piece.Piece;
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,7 @@
 package test.java.com.chess.game;
 
 import main.java.com.chess.game.Board;
+import main.java.com.chess.game.Colour;
 import main.java.com.chess.game.Vector2D;
 import main.java.com.chess.game.piece.Piece;
 import main.java.com.chess.game.piece.PieceType;

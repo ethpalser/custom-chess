@@ -44,6 +44,10 @@ public class Game {
         return this.winner;
     }
 
+    public boolean isComplete() {
+        return this.isComplete;
+    }
+
     public void executeAction(Action action) {
         if (action == null) {
             throw new NullPointerException();
