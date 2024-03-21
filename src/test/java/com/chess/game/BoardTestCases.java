@@ -1,4 +1,4 @@
-package java.com.chess.game;
+package test.java.com.chess.game;
 
 import java.util.List;
 

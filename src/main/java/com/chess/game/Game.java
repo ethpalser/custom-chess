@@ -1,15 +1,15 @@
 package main.java.com.chess.game;
 
-import com.chess.api.game.exception.IllegalActionException;
-import com.chess.api.game.movement.Action;
-import com.chess.api.game.movement.Movement;
-import com.chess.api.game.movement.Path;
-import com.chess.api.game.piece.Piece;
-import com.chess.api.game.piece.PieceType;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
+import main.java.com.chess.game.exception.IllegalActionException;
+import main.java.com.chess.game.movement.Action;
+import main.java.com.chess.game.movement.Movement;
+import main.java.com.chess.game.movement.Path;
+import main.java.com.chess.game.piece.Piece;
+import main.java.com.chess.game.piece.PieceType;
 
 @Getter
 public class Game {
@@ -44,9 +44,9 @@ public class Game {
             throw new IllegalActionException("Game has ended. No further moves are allowed.");
         }
 
-        Colour player = action.colour();
-        Vector2D start = action.start();
-        Vector2D end = action.end();
+        Colour player = action.getColour();
+        Vector2D start = action.getStart();
+        Vector2D end = action.getEnd();
         if (!this.turn.equals(player)) {
             throw new IllegalActionException("Acting player is not the turn player!");
         }
@@ -104,13 +104,13 @@ public class Game {
         // If the movement has an extra action, perform it
         if (movement.getExtraAction() != null) {
             Action action = movement.getExtraAction().getAction(this.board, new Action(player, start, end));
-            Piece toForceMove = this.board.getPiece(action.start());
+            Piece toForceMove = this.board.getPiece(action.getStart());
             if (toForceMove != null) {
-                if (action.end() != null) {
-                    this.board.setPiece(action.end(), toForceMove);
+                if (action.getEnd() != null) {
+                    this.board.setPiece(action.getEnd(), toForceMove);
                 }
                 // Remove this piece from its original location. If it did not move the intent is to capture it.
-                this.board.setPiece(action.start(), null);
+                this.board.setPiece(action.getStart(), null);
             }
         }
     }
@@ -145,7 +145,8 @@ public class Game {
             Movement pMove = this.getMovement(p, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
             for (Vector2D v : pPath) {
-                List<Piece> blockers = this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING)).toList();
+                List<Piece> blockers =
+                        this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING)).toList();
                 for (Piece b : blockers) {
                     // An opponent piece can move to prevent checkmate by blocking
                     if (!this.turn.equals(b.getColour())) {
@@ -175,7 +176,7 @@ public class Game {
         }
 
         List<Piece> playerPieces = allPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
-                        && !p.getType().equals(PieceType.KING)).toList();
+                && !p.getType().equals(PieceType.KING)).toList();
         for (Piece p : playerPieces) {
             Set<Vector2D> moves = p.getMovementSet(p.getPosition(), board);
             if (!moves.isEmpty()) {

@@ -1,11 +1,5 @@
-package com.chess.api.game.piece;
+package main.java.com.chess.game.piece;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import com.chess.api.game.movement.Action;
-import com.chess.api.game.movement.Movement;
-import com.chess.api.game.movement.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +7,12 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import main.java.com.chess.game.Board;
+import main.java.com.chess.game.Colour;
+import main.java.com.chess.game.Vector2D;
+import main.java.com.chess.game.movement.Action;
+import main.java.com.chess.game.movement.Movement;
+import main.java.com.chess.game.movement.Path;
 
 @Getter
 public class Piece {
@@ -104,7 +104,8 @@ public class Piece {
                 Set<Vector2D> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
                 if (board != null) {
                     for (Vector2D v : vectorSet) {
-                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(), v))) {
+                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(),
+                                v))) {
                             set.add(v);
                         }
                     }

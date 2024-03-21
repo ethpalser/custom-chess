@@ -1,4 +1,4 @@
-package com.chess.api.game.movement;
+package main.java.com.chess.game.movement;
 
 import main.java.com.chess.game.Vector2D;
 

@@ -1,15 +1,19 @@
-package com.chess.api.game.reference;
+package main.java.com.chess.game.reference;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Vector2D;
-import com.chess.api.game.movement.Action;
-import com.chess.api.game.movement.Path;
-import com.chess.api.game.piece.Piece;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
+import main.java.com.chess.game.Board;
+import main.java.com.chess.game.Vector2D;
+import main.java.com.chess.game.movement.Action;
+import main.java.com.chess.game.movement.Path;
+import main.java.com.chess.game.piece.Piece;
 
-public record Reference(Location location, Direction direction, Vector2D vector) {
+public class Reference {
+
+    private final Location location;
+    private final Direction direction;
+    private final Vector2D vector;
 
     public Reference() {
         this(Location.START);
@@ -47,12 +51,12 @@ public record Reference(Location location, Direction direction, Vector2D vector)
      * @return List of Pieces of the location is a Path, otherwise a List of one Piece
      */
     public List<Piece> getPieces(@NonNull Board board, @NonNull Action action) {
-        if (action.start() == null || action.end() == null) {
+        if (action.getStart() == null || action.getEnd() == null) {
             throw new IllegalArgumentException("Action has null start or end vector.");
         }
-        Vector2D shiftedStart = action.start().shift(action.colour(), this.direction);
-        Vector2D shiftedEnd = action.end().shift(action.colour(), this.direction);
-        Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.colour(), this.direction);
+        Vector2D shiftedStart = action.getStart().shift(action.getColour(), this.direction);
+        Vector2D shiftedEnd = action.getEnd().shift(action.getColour(), this.direction);
+        Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.getColour(), this.direction);
 
         List<Piece> list = new ArrayList<>();
         Piece toAdd = null;

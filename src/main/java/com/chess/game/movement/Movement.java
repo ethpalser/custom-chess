@@ -1,17 +1,17 @@
-package com.chess.api.game.movement;
+package main.java.com.chess.game.movement;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import com.chess.api.game.condition.Conditional;
-import com.chess.api.game.piece.Piece;
-import com.chess.api.game.piece.PieceType;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
+import main.java.com.chess.game.Board;
+import main.java.com.chess.game.Colour;
+import main.java.com.chess.game.Vector2D;
+import main.java.com.chess.game.condition.Conditional;
+import main.java.com.chess.game.piece.Piece;
+import main.java.com.chess.game.piece.PieceType;
 
 @Getter
 public class Movement {
@@ -267,8 +267,8 @@ public class Movement {
      * @return true if all Condition pass, otherwise false
      */
     public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
-        Piece pStart = board.getPiece(action.start());
-        Piece pEnd = board.getPiece(action.end());
+        Piece pStart = board.getPiece(action.getStart());
+        Piece pEnd = board.getPiece(action.getEnd());
         if (!this.isAttack && this.isMove && pEnd != null) {
             return false;
         }

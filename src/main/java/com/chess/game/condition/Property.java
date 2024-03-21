@@ -1,10 +1,16 @@
-package com.chess.api.game.condition;
+package main.java.com.chess.game.condition;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public record Property<T>(String key) {
+public class Property<T> {
+
+    private final String key;
+
+    public Property(String key) {
+        this.key = key;
+    }
 
     /**
      * Uses the given object and reflection to find the field of the object that matches the key of this Property.

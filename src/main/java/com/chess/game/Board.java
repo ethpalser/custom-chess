@@ -1,10 +1,5 @@
 package main.java.com.chess.game;
 
-import com.chess.api.game.exception.IllegalActionException;
-import com.chess.api.game.movement.Path;
-import com.chess.api.game.piece.Piece;
-import com.chess.api.game.piece.PieceFactory;
-import com.chess.api.game.piece.PieceType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +11,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import lombok.NonNull;
+import main.java.com.chess.game.exception.IllegalActionException;
+import main.java.com.chess.game.movement.Path;
+import main.java.com.chess.game.piece.Piece;
+import main.java.com.chess.game.piece.PieceFactory;
+import main.java.com.chess.game.piece.PieceType;
 
 public class Board {
 

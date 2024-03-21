@@ -1,7 +1,11 @@
-package java.com.chess.game;
+package test.java.com.chess.game;
 
-import com.chess.api.game.exception.IllegalActionException;
-import com.chess.api.game.movement.Action;
+import main.java.com.chess.game.Board;
+import main.java.com.chess.game.Colour;
+import main.java.com.chess.game.Game;
+import main.java.com.chess.game.Vector2D;
+import main.java.com.chess.game.exception.IllegalActionException;
+import main.java.com.chess.game.movement.Action;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

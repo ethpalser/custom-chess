@@ -1,8 +1,8 @@
 package main.java.com.chess.game;
 
-import com.chess.api.game.reference.Direction;
 import lombok.Getter;
 import lombok.NonNull;
+import main.java.com.chess.game.reference.Direction;
 
 @Getter
 public class Vector2D implements Comparable<Vector2D> {

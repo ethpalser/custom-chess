@@ -1,4 +1,4 @@
-package com.chess.api.game.reference;
+package main.java.com.chess.game.reference;
 
 public enum Direction {
     AT,

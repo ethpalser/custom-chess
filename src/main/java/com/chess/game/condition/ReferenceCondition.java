@@ -1,10 +1,10 @@
-package com.chess.api.game.condition;
+package main.java.com.chess.game.condition;
 
-import main.java.com.chess.game.Board;
-import com.chess.api.game.movement.Action;
-import com.chess.api.game.piece.Piece;
-import com.chess.api.game.reference.Reference;
 import java.util.List;
+import main.java.com.chess.game.Board;
+import main.java.com.chess.game.movement.Action;
+import main.java.com.chess.game.piece.Piece;
+import main.java.com.chess.game.reference.Reference;
 
 public class ReferenceCondition implements Conditional {
 

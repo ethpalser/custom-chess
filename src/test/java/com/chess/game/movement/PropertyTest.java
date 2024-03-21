@@ -1,8 +1,7 @@
-package com.chess.api.game.movement;
+package test.java.com.chess.game.movement;
 
-import com.chess.api.game.Colour;
-import com.chess.api.game.condition.Property;
-import com.chess.api.game.piece.Piece;
+import main.java.com.chess.game.condition.Property;
+import main.java.com.chess.game.piece.Piece;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

@@ -1,22 +1,22 @@
-package com.chess.api.game.piece;
+package main.java.com.chess.game.piece;
 
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import com.chess.api.game.condition.Comparator;
-import com.chess.api.game.condition.Conditional;
-import com.chess.api.game.condition.Property;
-import com.chess.api.game.condition.PropertyCondition;
-import com.chess.api.game.condition.ReferenceCondition;
-import com.chess.api.game.movement.ExtraAction;
-import com.chess.api.game.movement.Movement;
-import com.chess.api.game.movement.MovementType;
-import com.chess.api.game.movement.Path;
-import com.chess.api.game.reference.Direction;
-import com.chess.api.game.reference.Location;
-import com.chess.api.game.reference.Reference;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import main.java.com.chess.game.Colour;
+import main.java.com.chess.game.Vector2D;
+import main.java.com.chess.game.condition.Comparator;
+import main.java.com.chess.game.condition.Conditional;
+import main.java.com.chess.game.condition.Property;
+import main.java.com.chess.game.condition.PropertyCondition;
+import main.java.com.chess.game.condition.ReferenceCondition;
+import main.java.com.chess.game.movement.ExtraAction;
+import main.java.com.chess.game.movement.Movement;
+import main.java.com.chess.game.movement.MovementType;
+import main.java.com.chess.game.movement.Path;
+import main.java.com.chess.game.reference.Direction;
+import main.java.com.chess.game.reference.Location;
+import main.java.com.chess.game.reference.Reference;
 
 public class PieceFactory {
 
@@ -84,14 +84,15 @@ public class PieceFactory {
                 Vector2D kingSideRook = new Vector2D(7, 0);
                 Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR, kingSideRook),
+                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
+                        kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
                 Movement castleKingSide = new Movement.Builder(new Path(new Vector2D(2, 0)), MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
                         .isAttack(false)
-                        .conditions(List.of(notMoved,castleKingSideCond2, castleKingSideCond3))
+                        .conditions(List.of(notMoved, castleKingSideCond2, castleKingSideCond3))
                         .extraAction(new ExtraAction(new Reference(Location.VECTOR, kingSideRook), new Vector2D(5, 0)))
                         .build();
                 // Castle - Queen side
@@ -106,7 +107,7 @@ public class PieceFactory {
                         .isMirrorYAxis(true)
                         .isSpecificQuadrant(false)
                         .isAttack(false)
-                        .conditions(List.of(notMoved,castleQueenSideCond2, castleQueenSideCond3))
+                        .conditions(List.of(notMoved, castleQueenSideCond2, castleQueenSideCond3))
                         .extraAction(new ExtraAction(new Reference(Location.VECTOR, new Vector2D(0, 0)),
                                 new Vector2D(3, 0)))
                         .build();
@@ -121,7 +122,8 @@ public class PieceFactory {
                         .isSpecificQuadrant(true)
                         .isAttack(false)
                         .build();
-                Movement pawnCharge = new Movement.Builder(new Path(new Vector2D(0, 1), new Vector2D(0, 2)), MovementType.CHARGE)
+                Movement pawnCharge = new Movement.Builder(new Path(new Vector2D(0, 1), new Vector2D(0, 2)),
+                        MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
