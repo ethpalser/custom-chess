@@ -4,8 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NonNull;
+import javax.naming.NoInitialContextException;
 import main.java.com.chess.game.Board;
 import main.java.com.chess.game.Colour;
 import main.java.com.chess.game.Vector2D;
@@ -13,7 +12,6 @@ import main.java.com.chess.game.condition.Conditional;
 import main.java.com.chess.game.piece.Piece;
 import main.java.com.chess.game.piece.PieceType;
 
-@Getter
 public class Movement {
 
     private final Path pathBase;
@@ -25,6 +23,14 @@ public class Movement {
     private final boolean isAttack;
     private final List<Conditional> conditions;
     private final ExtraAction extraAction;
+
+    public boolean isMove() {
+        return this.isMove;
+    }
+
+    public boolean isAttack() {
+        return this.isAttack;
+    }
 
     public static class Builder {
         // required
@@ -108,6 +114,18 @@ public class Movement {
         this.extraAction = null;
     }
 
+    public Path getBasePath() {
+        return this.pathBase;
+    }
+
+    public MovementType getMoveType() {
+        return this.moveType;
+    }
+
+    public ExtraAction getExtraAction() {
+        return this.extraAction;
+    }
+
     /**
      * Determines the direction that the end vector is relative to the start and builds a path in that direction
      * based off of this movement's path blueprint.
@@ -117,7 +135,11 @@ public class Movement {
      * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
-    public Path getPath(@NonNull Colour colour, @NonNull Vector2D start, @NonNull Vector2D end) {
+    public Path getPath(Colour colour, Vector2D start, Vector2D end) {
+        if (colour == null || start == null || end == null) {
+            throw new NullPointerException();
+        }
+
         // Determine direction
         int diffX = end.getX() - start.getX();
         int diffY = end.getY() - start.getY();
@@ -133,7 +155,7 @@ public class Movement {
         }
 
         List<Vector2D> vectors = new LinkedList<>();
-        for (Vector2D vector : this.getPathBase()) {
+        for (Vector2D vector : this.pathBase) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
             if (!Vector2D.isValid(nextX, nextY)) {
@@ -158,12 +180,18 @@ public class Movement {
      * @param offset {@link Vector2D} representing the position of the piece
      * @return Map of {@link Vector2D}
      */
-    public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+    public Set<Vector2D> getCoordinates(Colour colour, Vector2D offset) {
+        if (colour == null || offset == null) {
+            throw new NullPointerException();
+        }
         return this.getCoordinates(colour, offset, null, false, false);
     }
 
-    public Set<Vector2D> getCoordinates(@NonNull Colour colour, @NonNull Vector2D offset, Board board,
+    public Set<Vector2D> getCoordinates(Colour colour, Vector2D offset, Board board,
             boolean withDefend, boolean ignoreKing) {
+        if (colour == null || offset == null) {
+            throw new NullPointerException();
+        }
         if (this.isSpecificQuadrant) {
             return getVectorsInSpecificQuadrant(offset, colour, board, withDefend, ignoreKing);
         } else {
@@ -171,13 +199,16 @@ public class Movement {
         }
     }
 
-    private Set<Vector2D> getVectorsInSpecificQuadrant(@NonNull Vector2D offset, @NonNull Colour colour, Board board,
+    private Set<Vector2D> getVectorsInSpecificQuadrant(Vector2D offset, Colour colour, Board board,
             boolean withDefend, boolean ignoreKing) {
+        if (offset == null || colour == null) {
+            throw new NullPointerException();
+        }
         boolean isRight = !mirrorYAxis;
         boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
         Set<Vector2D> set = new HashSet<>();
-        for (Vector2D vector : this.getPathBase()) {
+        for (Vector2D vector : this.pathBase) {
             Vector2D v = getVectorInQuadrant(vector, offset, isRight, isUp);
             if (canMoveInQuadrant(v, colour, board, withDefend, ignoreKing))
                 set.add(v);
@@ -187,15 +218,18 @@ public class Movement {
         return set;
     }
 
-    private Set<Vector2D> getVectorsInAllQuadrants(@NonNull Vector2D offset, @NonNull Colour colour, Board board,
+    private Set<Vector2D> getVectorsInAllQuadrants(Vector2D offset, Colour colour, Board board,
             boolean withDefend, boolean ignoreKing) {
+        if (offset == null || colour == null) {
+            throw new NullPointerException();
+        }
         boolean blockTopRight = false;
         boolean blockTopLeft = false;
         boolean blockBotRight = false;
         boolean blockBotLeft = false;
 
         Set<Vector2D> set = new HashSet<>();
-        for (Vector2D vector : this.getPathBase()) {
+        for (Vector2D vector : this.pathBase) {
             if (mirrorXAxis || Colour.WHITE.equals(colour)) {
                 if (!blockTopRight) {
                     Vector2D topRight = getVectorInQuadrant(vector, offset, true, true);
@@ -228,15 +262,21 @@ public class Movement {
         return set;
     }
 
-    private Vector2D getVectorInQuadrant(@NonNull Vector2D vector, @NonNull Vector2D offset, boolean isRight,
+    private Vector2D getVectorInQuadrant(Vector2D vector, Vector2D offset, boolean isRight,
             boolean isUp) {
+        if (vector == null || offset == null) {
+            throw new NullPointerException();
+        }
         int x = isRight ? offset.getX() + vector.getX() : offset.getX() - vector.getX();
         int y = isUp ? offset.getY() + vector.getY() : offset.getY() - vector.getY();
         return new Vector2D(x, y);
     }
 
-    private boolean canMoveInQuadrant(@NonNull Vector2D vector, @NonNull Colour colour, Board board,
+    private boolean canMoveInQuadrant(Vector2D vector, Colour colour, Board board,
             boolean withDefend, boolean ignoreKing) {
+        if (vector == null || colour == null) {
+            throw new NullPointerException();
+        }
         if (!vector.isValid()) {
             return false;
         }
@@ -251,7 +291,10 @@ public class Movement {
         return true;
     }
 
-    private boolean isBlockedInQuadrant(@NonNull Vector2D vector, Board board, boolean ignoreKing) {
+    private boolean isBlockedInQuadrant(Vector2D vector, Board board, boolean ignoreKing) {
+        if (vector == null) {
+            throw new NullPointerException();
+        }
         if (!vector.isValid() || board == null) {
             return false;
         }
@@ -266,7 +309,10 @@ public class Movement {
      * @param action {@link Action} representing the movement attempted for a Piece at a location to a destination
      * @return true if all Condition pass, otherwise false
      */
-    public boolean passesConditions(@NonNull Board board, @NonNull Action action) {
+    public boolean passesConditions(Board board, Action action) {
+        if (board == null || action == null) {
+            throw new NullPointerException();
+        }
         Piece pStart = board.getPiece(action.getStart());
         Piece pEnd = board.getPiece(action.getEnd());
         if (!this.isAttack && this.isMove && pEnd != null) {
@@ -290,7 +336,10 @@ public class Movement {
      * @param colour Colour of the piece, to determine which direction is forward.
      * @return 2D boolean array, true are valid locations
      */
-    public boolean[][] drawCoordinates(@NonNull Colour colour) {
+    public boolean[][] drawCoordinates(Colour colour) {
+        if (colour == null) {
+            throw new NullPointerException();
+        }
         return this.drawCoordinates(colour, new Vector2D(0, 0));
     }
 
@@ -301,7 +350,10 @@ public class Movement {
      * @param colour Colour of the piece, to determine which direction is forward.
      * @return 2D boolean array, true are valid locations
      */
-    public boolean[][] drawCoordinates(@NonNull Colour colour, @NonNull Vector2D offset) {
+    public boolean[][] drawCoordinates(Colour colour, Vector2D offset) {
+        if (colour == null || offset == null) {
+            throw new NullPointerException();
+        }
         Set<Vector2D> coordinates = this.getCoordinates(colour, offset);
         boolean[][] boardMove = new boolean[8][8];
         for (Vector2D c : coordinates) {
@@ -315,7 +367,10 @@ public class Movement {
         return this.toString(Colour.WHITE, new Vector2D());
     }
 
-    public String toString(@NonNull Colour colour, @NonNull Vector2D offset) {
+    public String toString(Colour colour, Vector2D offset) {
+        if (colour == null || offset == null) {
+            throw new NullPointerException();
+        }
         boolean[][] boardMove = this.drawCoordinates(colour, offset);
         StringBuilder sb = new StringBuilder();
         for (int y = boardMove[0].length - 1; y >= 0; y--) {

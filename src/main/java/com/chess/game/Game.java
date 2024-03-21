@@ -2,8 +2,6 @@ package main.java.com.chess.game;
 
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NonNull;
 import main.java.com.chess.game.exception.IllegalActionException;
 import main.java.com.chess.game.movement.Action;
 import main.java.com.chess.game.movement.Movement;
@@ -11,7 +9,6 @@ import main.java.com.chess.game.movement.Path;
 import main.java.com.chess.game.piece.Piece;
 import main.java.com.chess.game.piece.PieceType;
 
-@Getter
 public class Game {
 
     private final Board board;
@@ -31,6 +28,10 @@ public class Game {
         this.turn = turn;
     }
 
+    public Board getBoard() {
+        return this.board;
+    }
+
     public Colour getTurnColour() {
         return this.turn;
     }
@@ -39,7 +40,14 @@ public class Game {
         return Colour.WHITE.equals(this.turn) ? Colour.BLACK : Colour.WHITE;
     }
 
-    public void executeAction(@NonNull Action action) {
+    public Colour getWinner() {
+        return this.winner;
+    }
+
+    public void executeAction(Action action) {
+        if (action == null) {
+            throw new NullPointerException();
+        }
         if (this.isComplete) {
             throw new IllegalActionException("Game has ended. No further moves are allowed.");
         }
@@ -70,7 +78,10 @@ public class Game {
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
 
-    private Piece getPieceToMove(@NonNull Colour player, @NonNull Vector2D start) {
+    private Piece getPieceToMove(Colour player, Vector2D start) {
+        if (player == null || start == null) {
+            throw new NullPointerException();
+        }
         Piece piece = this.board.getPiece(start);
         if (piece == null) {
             throw new IllegalActionException("The piece at " + start + " does not exist.");
@@ -80,7 +91,10 @@ public class Game {
         return piece;
     }
 
-    private void verifyDestination(@NonNull Piece selected, @NonNull Vector2D end) {
+    private void verifyDestination(Piece selected, Vector2D end) {
+        if (selected == null || end == null) {
+            throw new NullPointerException();
+        }
         Piece destination = this.board.getPiece(end);
         if (selected.getPosition().equals(end)) {
             throw new IllegalActionException("The destination " + end + " is the selected piece's current location.");
@@ -89,7 +103,10 @@ public class Game {
         }
     }
 
-    private Movement getMovement(@NonNull Piece selected, @NonNull Vector2D end) {
+    private Movement getMovement(Piece selected, Vector2D end) {
+        if (selected == null || end == null) {
+            throw new NullPointerException();
+        }
         Movement movement = selected.getMovement(this.board, end);
         if (movement == null) {
             throw new IllegalActionException("The selected piece does not have a movement to " + end);
@@ -97,8 +114,10 @@ public class Game {
         return movement;
     }
 
-    private void performMovement(@NonNull Colour player, @NonNull Movement movement, @NonNull Vector2D start,
-            @NonNull Vector2D end) {
+    private void performMovement(Colour player, Movement movement, Vector2D start, Vector2D end) {
+        if (player == null || movement == null || start == null || end == null){
+            throw new NullPointerException();
+        }
         this.board.movePiece(start, end);
 
         // If the movement has an extra action, perform it

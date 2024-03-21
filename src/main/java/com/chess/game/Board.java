@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-import lombok.NonNull;
 import main.java.com.chess.game.exception.IllegalActionException;
 import main.java.com.chess.game.movement.Path;
 import main.java.com.chess.game.piece.Piece;
@@ -157,7 +156,10 @@ public class Board {
         return pieceMap.get(vector);
     }
 
-    public void setPiece(@NonNull Vector2D vector, Piece piece) {
+    public void setPiece(Vector2D vector, Piece piece) {
+        if (vector == null) {
+            throw new NullPointerException();
+        }
         if (piece == null) {
             this.pieceMap.remove(vector);
         } else {
@@ -200,7 +202,10 @@ public class Board {
         this.lastMoved = piece;
     }
 
-    public Vector2D getKingLocation(@NonNull Colour colour) {
+    public Vector2D getKingLocation(Colour colour) {
+        if (colour == null) {
+            throw new NullPointerException();
+        }
         if (colour.equals(Colour.WHITE)) {
             return this.wKing;
         } else {
@@ -208,11 +213,17 @@ public class Board {
         }
     }
 
-    public Piece getKing(@NonNull Colour colour) {
+    public Piece getKing(Colour colour) {
+        if (colour == null) {
+            throw new NullPointerException();
+        }
         return pieceMap.get(this.getKingLocation(colour));
     }
 
-    public void movePiece(@NonNull Vector2D start, @NonNull Vector2D end) {
+    public void movePiece(Vector2D start, Vector2D end) {
+        if (start == null || end == null) {
+            throw new NullPointerException();
+        }
         Piece pMoved = this.getPiece(start);
         Piece pCaptured = this.getPiece(end);
         this.setPiece(end, pMoved);
@@ -239,13 +250,19 @@ public class Board {
         this.setLastMoved(pMoved);
     }
 
-    private void updatePieceThreats(@NonNull Piece moving, Vector2D start, Vector2D end) {
+    private void updatePieceThreats(Piece moving, Vector2D start, Vector2D end) {
+        if (moving == null) {
+            throw new NullPointerException();
+        }
         Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, false, true, true, true) : new HashSet<>();
         Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, false, true, true, true) : new HashSet<>();
         this.updateThreats(moving, mStart, mEnd);
     }
 
-    private void updateLocationThreats(@NonNull Vector2D vector) {
+    private void updateLocationThreats(Vector2D vector) {
+        if (vector == null) {
+            throw new NullPointerException();
+        }
         Set<Piece> wPieces = wThreats.get(vector);
         if (wPieces == null)
             wPieces = new HashSet<>();
@@ -260,7 +277,10 @@ public class Board {
         }
     }
 
-    private void updateThreats(@NonNull Piece piece, @NonNull Set<Vector2D> before, @NonNull Set<Vector2D> after) {
+    private void updateThreats(Piece piece, Set<Vector2D> before, Set<Vector2D> after) {
+        if (piece == null || before ==  null || after == null) {
+            throw new NullPointerException();
+        }
         before.removeAll(after);
         if (piece.getColour().equals(Colour.WHITE)) {
             // Remove all old threats of this piece
@@ -281,7 +301,10 @@ public class Board {
         }
     }
 
-    public List<Piece> getLocationThreats(@NonNull Vector2D vector2D, Colour colour) {
+    public List<Piece> getLocationThreats(Vector2D vector2D, Colour colour) {
+        if (vector2D == null) {
+            throw new NullPointerException();
+        }
         Set<Piece> wThreatPieces = this.wThreats.get(vector2D);
         if (wThreatPieces == null) {
             wThreatPieces = new HashSet<>();
@@ -299,7 +322,10 @@ public class Board {
         }
     }
 
-    private boolean isKingInCheck(@NonNull Colour kingColour) {
+    private boolean isKingInCheck(Colour kingColour) {
+        if (kingColour == null) {
+            throw new NullPointerException();
+        }
         Set<Piece> threatsAtKing = this.wThreats.get(this.getKingLocation(kingColour));
         if (threatsAtKing == null) {
             return false;
@@ -312,11 +338,17 @@ public class Board {
         return false;
     }
 
-    public boolean getKingCheck(@NonNull Colour kingColour) {
+    public boolean getKingCheck(Colour kingColour) {
+        if (kingColour == null) {
+            throw new NullPointerException();
+        }
         return kingColour.equals(Colour.WHITE) ? wCheck : bCheck;
     }
 
-    public List<Piece> getPiecesCausingCheck(@NonNull Colour kingColour) {
+    public List<Piece> getPiecesCausingCheck(Colour kingColour) {
+        if (kingColour == null) {
+            throw new NullPointerException();
+        }
         Vector2D kingLoc = this.getKingLocation(kingColour);
         Set<Piece> threats = Colour.WHITE.equals(kingColour) ? this.bThreats.get(kingLoc) : this.wThreats.get(kingLoc);
         if (threats == null) {
@@ -353,7 +385,10 @@ public class Board {
         return sb.toString();
     }
 
-    public String printThreats(@NonNull Colour colour) {
+    public String printThreats(Colour colour) {
+        if (colour == null) {
+            throw new NullPointerException();
+        }
         Map<Vector2D, Set<Piece>> threats = Colour.WHITE.equals(colour) ? wThreats : bThreats;
         StringBuilder sb = new StringBuilder();
         for (int y = this.length - 1; y >= 0; y--) {

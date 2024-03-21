@@ -1,6 +1,5 @@
 package main.java.com.chess.game.movement;
 
-import lombok.NonNull;
 import main.java.com.chess.game.Board;
 import main.java.com.chess.game.Vector2D;
 import main.java.com.chess.game.piece.Piece;
@@ -32,7 +31,10 @@ public class ExtraAction {
      * @param previousAction {@link Action} that this ExtraAction is following-up on
      * @return {@link Action}
      */
-    public Action getAction(@NonNull Board board, @NonNull Action previousAction) {
+    public Action getAction(Board board, Action previousAction) {
+        if (board == null || previousAction == null) {
+            throw new NullPointerException();
+        }
         if (this.reference == null) {
             return null;
         }

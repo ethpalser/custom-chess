@@ -1,7 +1,6 @@
 package main.java.com.chess.game.condition;
 
 import java.util.List;
-import lombok.NonNull;
 import main.java.com.chess.game.Board;
 import main.java.com.chess.game.movement.Action;
 import main.java.com.chess.game.piece.Piece;
@@ -14,12 +13,15 @@ public class PropertyCondition implements Conditional {
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition(@NonNull Reference reference, @NonNull Comparator comparator) {
+    public PropertyCondition(Reference reference, Comparator comparator) {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(@NonNull Reference reference, @NonNull Comparator comparator, Property<Piece> property,
+    public PropertyCondition(Reference reference, Comparator comparator, Property<Piece> property,
             Object expected) {
+        if (reference == null || comparator == null) {
+            throw new NullPointerException();
+        }
         if (property == null && !Comparator.canReferenceSelf(comparator)) {
             throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
         }

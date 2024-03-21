@@ -2,7 +2,6 @@ package main.java.com.chess.game.reference;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.NonNull;
 import main.java.com.chess.game.Board;
 import main.java.com.chess.game.Vector2D;
 import main.java.com.chess.game.movement.Action;
@@ -50,7 +49,10 @@ public class Reference {
      * @param action {@link Action} used for reference containing a single piece's position and destination
      * @return List of Pieces of the location is a Path, otherwise a List of one Piece
      */
-    public List<Piece> getPieces(@NonNull Board board, @NonNull Action action) {
+    public List<Piece> getPieces(Board board, Action action) {
+        if (board == null || action == null) {
+            throw new NullPointerException();
+        }
         if (action.getStart() == null || action.getEnd() == null) {
             throw new IllegalArgumentException("Action has null start or end vector.");
         }

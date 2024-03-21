@@ -1,10 +1,7 @@
 package main.java.com.chess.game;
 
-import lombok.Getter;
-import lombok.NonNull;
 import main.java.com.chess.game.reference.Direction;
 
-@Getter
 public class Vector2D implements Comparable<Vector2D> {
 
     private final int x;
@@ -22,6 +19,14 @@ public class Vector2D implements Comparable<Vector2D> {
 
     public Vector2D(char x, char y) {
         this(x - 'a', y - '1');
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
     }
 
     /**
@@ -53,7 +58,10 @@ public class Vector2D implements Comparable<Vector2D> {
      * @param direction {@link Direction} relative to the piece. Left is always White's left side.
      * @return {@link Vector2D}
      */
-    public Vector2D shift(@NonNull Colour colour, @NonNull Direction direction) {
+    public Vector2D shift(Colour colour, Direction direction) {
+        if (colour == null || direction == null) {
+            throw new NullPointerException();
+        }
         // The direction the piece will shift towards. Black's directions are the opposite of White's
         int dir = Colour.WHITE.equals(colour) ? 1 : -1;
         return switch (direction) {

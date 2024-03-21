@@ -5,13 +5,14 @@ import main.java.com.chess.game.Vector2D;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import lombok.Getter;
-import lombok.NonNull;
 
 public class Path implements Iterable<Vector2D> {
 
-    @Getter
     private final LinkedHashMap<Integer, Vector2D> map;
+
+    public LinkedHashMap<Integer, Vector2D> getMap() {
+        return this.map;
+    }
 
     public Path() {
         this.map = new LinkedHashMap<>();
@@ -122,7 +123,10 @@ public class Path implements Iterable<Vector2D> {
      * @param board {@link Board} referred to for checking pieces
      * @return true if no piece is in the middle of the path, false otherwise
      */
-    public boolean isTraversable(@NonNull Board board) {
+    public boolean isTraversable(Board board) {
+        if (board == null) {
+            throw new NullPointerException();
+        }
         Iterator<Vector2D> iterator = this.iterator();
         while (iterator.hasNext()) {
             Vector2D vector = iterator.next();

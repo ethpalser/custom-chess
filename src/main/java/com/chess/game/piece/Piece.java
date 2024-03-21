@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
 import main.java.com.chess.game.Board;
 import main.java.com.chess.game.Colour;
 import main.java.com.chess.game.Vector2D;
@@ -14,7 +11,6 @@ import main.java.com.chess.game.movement.Action;
 import main.java.com.chess.game.movement.Movement;
 import main.java.com.chess.game.movement.Path;
 
-@Getter
 public class Piece {
 
     private final PieceType type;
@@ -22,8 +18,6 @@ public class Piece {
     private final List<Movement> movements;
     private Vector2D position;
     private int lastMoveDistance;
-
-    @Getter(AccessLevel.NONE)
     private boolean hasMoved;
 
     public Piece() {
@@ -43,13 +37,32 @@ public class Piece {
         this.lastMoveDistance = 0;
     }
 
+    public PieceType getType() {
+        return this.type;
+    }
+
+    public Colour getColour() {
+        return this.colour;
+    }
+
+    public List<Movement> getMovements() {
+        return this.movements;
+    }
+
+    public Vector2D getPosition() {
+        return this.position;
+    }
+
     /**
      * Updates this piece's position to the new {@link Vector2D} destination. If this destination is not the same
      * as its current position then it is considered to have moved.
      *
      * @param destination representing the new location of this piece.
      */
-    public void setPosition(@NonNull Vector2D destination) {
+    public void setPosition(Vector2D destination) {
+        if (destination == null) {
+            throw new NullPointerException();
+        }
         if (destination.equals(this.position)) {
             return;
         }
@@ -58,6 +71,10 @@ public class Piece {
                 Math.abs(destination.getY() - position.getY()));
         this.position = destination;
         this.hasMoved = true;
+    }
+
+    public int getLastMoveDistance() {
+        return this.lastMoveDistance;
     }
 
     /**
@@ -81,7 +98,10 @@ public class Piece {
      * @param destination {@link Vector2D} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
-    public Movement getMovement(@NonNull Board board, @NonNull Vector2D destination) {
+    public Movement getMovement(Board board, Vector2D destination) {
+        if (board == null || destination == null) {
+            throw new NullPointerException();
+        }
         for (Movement move : this.movements) {
             Path path = move.getPath(this.colour, this.position, destination);
             if (path != null && path.isTraversable(board)
@@ -92,12 +112,18 @@ public class Piece {
         return null;
     }
 
-    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board) {
+    public Set<Vector2D> getMovementSet(Vector2D location, Board board) {
+        if (location == null) {
+            throw new NullPointerException();
+        }
         return this.getMovementSet(location, board, true, true, false, false);
     }
 
-    public Set<Vector2D> getMovementSet(@NonNull Vector2D location, Board board, boolean includeMove,
+    public Set<Vector2D> getMovementSet(Vector2D location, Board board, boolean includeMove,
             boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
+        if (location == null) {
+            throw new NullPointerException();
+        }
         Set<Vector2D> set = new HashSet<>();
         for (Movement move : this.movements) {
             if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
