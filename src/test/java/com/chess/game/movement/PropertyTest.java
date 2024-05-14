@@ -3,7 +3,6 @@ package com.chess.game.movement;
 import com.chess.game.Colour;
 import com.chess.game.condition.Property;
 import com.chess.game.piece.Piece;
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
