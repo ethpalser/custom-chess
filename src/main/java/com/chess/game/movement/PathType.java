@@ -1,6 +1,6 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
-import main.java.com.chess.game.Vector2D;
+import com.chess.game.Vector2D;
 
 public enum PathType {
     VERTICAL,

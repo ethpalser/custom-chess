@@ -1,16 +1,15 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
+import com.chess.game.Board;
+import com.chess.game.Colour;
+import com.chess.game.Vector2D;
+import com.chess.game.condition.Conditional;
+import com.chess.game.piece.Piece;
+import com.chess.game.piece.PieceType;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.naming.NoInitialContextException;
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.condition.Conditional;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.piece.PieceType;
 
 public class Movement {
 

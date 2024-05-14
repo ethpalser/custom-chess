@@ -1,7 +1,7 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Vector2D;
+import com.chess.game.Board;
+import com.chess.game.Vector2D;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,10 +35,11 @@ public class Path implements Iterable<Vector2D> {
     }
 
     /**
-     * Creates a Path moving in a linear direction (vertical, horizontal or diagonal) from start to end {@link Vector2D}.
+     * Creates a Path moving in a linear direction (vertical, horizontal or diagonal) from start to end
+     * {@link Vector2D}.
      *
      * @param start {@link Vector2D} representing the first vector of the path
-     * @param end {@link Vector2D} representing the last vector of the path
+     * @param end   {@link Vector2D} representing the last vector of the path
      */
     public Path(Vector2D start, Vector2D end) {
         LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();

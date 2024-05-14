@@ -1,7 +1,7 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
+import com.chess.game.Colour;
+import com.chess.game.Vector2D;
 
 /**
  * Container for an attempted piece movement for a Player of this colour, Vector2D start and Vector2D end

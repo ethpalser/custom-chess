@@ -1,6 +1,6 @@
-package main.java.com.chess.game;
+package com.chess.game;
 
-import main.java.com.chess.game.reference.Direction;
+import com.chess.game.reference.Direction;
 
 public class Vector2D implements Comparable<Vector2D> {
 
@@ -54,7 +54,7 @@ public class Vector2D implements Comparable<Vector2D> {
     /**
      * Creates a new Vector from the current Vector shifted one space in the given direction.
      *
-     * @param colour {@link Colour} of the piece which the player is facing.
+     * @param colour    {@link Colour} of the piece which the player is facing.
      * @param direction {@link Direction} relative to the piece. Left is always White's left side.
      * @return {@link Vector2D}
      */

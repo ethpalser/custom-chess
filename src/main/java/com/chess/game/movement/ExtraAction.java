@@ -1,9 +1,9 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.reference.Reference;
+import com.chess.game.Board;
+import com.chess.game.Vector2D;
+import com.chess.game.piece.Piece;
+import com.chess.game.reference.Reference;
 
 /**
  * Container of a follow-up movement with a reference to where the piece is relative to the previous action and

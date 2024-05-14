@@ -1,4 +1,4 @@
-package main.java.com.chess.game.movement;
+package com.chess.game.movement;
 
 public enum MovementType {
     JUMP,

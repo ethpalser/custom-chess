@@ -1,12 +1,12 @@
-package main.java.com.chess.game.reference;
+package com.chess.game.reference;
 
+import com.chess.game.Board;
+import com.chess.game.Vector2D;
+import com.chess.game.movement.Action;
+import com.chess.game.movement.Path;
+import com.chess.game.piece.Piece;
 import java.util.ArrayList;
 import java.util.List;
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.movement.Action;
-import main.java.com.chess.game.movement.Path;
-import main.java.com.chess.game.piece.Piece;
 
 public class Reference {
 

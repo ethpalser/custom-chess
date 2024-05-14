@@ -1,4 +1,4 @@
-package main.java.com.chess.game.condition;
+package com.chess.game.condition;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

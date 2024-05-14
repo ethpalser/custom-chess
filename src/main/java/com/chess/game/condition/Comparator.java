@@ -1,4 +1,4 @@
-package main.java.com.chess.game.condition;
+package com.chess.game.condition;
 
 public enum Comparator {
     FALSE,

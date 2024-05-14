@@ -1,4 +1,4 @@
-package main.java.com.chess.game.reference;
+package com.chess.game.reference;
 
 public enum Location {
     LAST_MOVED,

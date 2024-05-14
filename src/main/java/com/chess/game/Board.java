@@ -1,5 +1,10 @@
-package main.java.com.chess.game;
+package com.chess.game;
 
+import com.chess.game.exception.IllegalActionException;
+import com.chess.game.movement.Path;
+import com.chess.game.piece.Piece;
+import com.chess.game.piece.PieceFactory;
+import com.chess.game.piece.PieceType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,12 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import main.java.com.chess.game.exception.IllegalActionException;
-import main.java.com.chess.game.movement.Path;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.piece.PieceFactory;
-import main.java.com.chess.game.piece.PieceType;
 
 public class Board {
 
@@ -254,7 +255,8 @@ public class Board {
         if (moving == null) {
             throw new NullPointerException();
         }
-        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, false, true, true, true) : new HashSet<>();
+        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, false, true, true, true) :
+                new HashSet<>();
         Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, false, true, true, true) : new HashSet<>();
         this.updateThreats(moving, mStart, mEnd);
     }
@@ -267,9 +269,9 @@ public class Board {
         if (wPieces == null)
             wPieces = new HashSet<>();
         Set<Piece> bPieces = bThreats.get(vector);
-        if(bPieces == null)
+        if (bPieces == null)
             bPieces = new HashSet<>();
-        List<Piece> list = Stream.concat(wPieces.stream(), bPieces.stream()).toList();
+        List<Piece> list = Stream.concat(wPieces.stream(), bPieces.stream()).collect(Collectors.toList());
         for (Piece p : list) {
             Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null, false, true, false, false);
             Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, false, true, true, true);
@@ -278,7 +280,7 @@ public class Board {
     }
 
     private void updateThreats(Piece piece, Set<Vector2D> before, Set<Vector2D> after) {
-        if (piece == null || before ==  null || after == null) {
+        if (piece == null || before == null || after == null) {
             throw new NullPointerException();
         }
         before.removeAll(after);
@@ -314,11 +316,11 @@ public class Board {
             bThreatPieces = new HashSet<>();
         }
         if (colour == null) {
-            return Stream.concat(wThreatPieces.stream(), bThreatPieces.stream()).toList();
+            return Stream.concat(wThreatPieces.stream(), bThreatPieces.stream()).collect(Collectors.toList());
         } else if (Colour.WHITE.equals(colour)) {
-            return wThreatPieces.stream().toList();
+            return wThreatPieces.stream().collect(Collectors.toList());
         } else {
-            return bThreatPieces.stream().toList();
+            return bThreatPieces.stream().collect(Collectors.toList());
         }
     }
 
@@ -393,7 +395,8 @@ public class Board {
         StringBuilder sb = new StringBuilder();
         for (int y = this.length - 1; y >= 0; y--) {
             for (int x = 0; x <= this.width - 1; x++) {
-                boolean hasThreat = threats.get(new Vector2D(x, y)) != null && !threats.get(new Vector2D(x, y)).isEmpty();
+                boolean hasThreat =
+                        threats.get(new Vector2D(x, y)) != null && !threats.get(new Vector2D(x, y)).isEmpty();
                 if (!hasThreat) {
                     sb.append("|   ");
                 } else {

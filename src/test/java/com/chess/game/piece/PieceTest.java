@@ -1,9 +1,7 @@
-package test.java.com.chess.game.piece;
+package com.chess.game.piece;
 
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.piece.PieceType;
+import com.chess.game.Colour;
+import com.chess.game.Vector2D;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

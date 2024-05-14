@@ -1,11 +1,7 @@
-package test.java.com.chess.game;
+package com.chess.game;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Game;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.exception.IllegalActionException;
-import main.java.com.chess.game.movement.Action;
+import com.chess.game.exception.IllegalActionException;
+import com.chess.game.movement.Action;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -327,6 +323,7 @@ class GameTest {
         assertNull(game.getWinner());
         assertFalse(game.isComplete());
     }
+
     // endregion
     // region Stalemate Game
     @Test
@@ -365,6 +362,7 @@ class GameTest {
         assertNull(game.getWinner());
         assertTrue(game.isComplete());
     }
+
     // endregion
     // region Check in Game
     @Test
@@ -405,6 +403,7 @@ class GameTest {
         assertFalse(game.isComplete());
         assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
     }
+
     // endregion
     // region Checkmate in Game
     @Test

@@ -1,7 +1,7 @@
-package main.java.com.chess.game.condition;
+package com.chess.game.condition;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.movement.Action;
+import com.chess.game.Board;
+import com.chess.game.movement.Action;
 
 /**
  * Conditional describes an object that has conditions, rule or criteria, that it contains. The criteria will take

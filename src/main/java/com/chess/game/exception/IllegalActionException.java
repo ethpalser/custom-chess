@@ -1,4 +1,4 @@
-package main.java.com.chess.game.exception;
+package com.chess.game.exception;
 
 public class IllegalActionException extends IllegalArgumentException {
 

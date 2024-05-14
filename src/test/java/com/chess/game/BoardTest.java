@@ -1,11 +1,9 @@
-package test.java.com.chess.game;
+package com.chess.game;
 
-import main.java.com.chess.game.Board;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.piece.PieceType;
-import static org.junit.jupiter.api.Assertions.*;
+import com.chess.game.piece.Piece;
+import com.chess.game.piece.PieceType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
 class BoardTest {

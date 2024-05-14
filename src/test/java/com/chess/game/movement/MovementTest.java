@@ -1,12 +1,9 @@
-package test.java.com.chess.game.movement;
+package com.chess.game.movement;
 
+import com.chess.game.Colour;
+import com.chess.game.Vector2D;
 import java.util.ArrayList;
 import java.util.List;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.movement.Movement;
-import main.java.com.chess.game.movement.MovementType;
-import main.java.com.chess.game.movement.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;

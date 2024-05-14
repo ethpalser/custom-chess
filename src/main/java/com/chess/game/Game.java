@@ -1,13 +1,14 @@
-package main.java.com.chess.game;
+package com.chess.game;
 
+import com.chess.game.exception.IllegalActionException;
+import com.chess.game.movement.Action;
+import com.chess.game.movement.Movement;
+import com.chess.game.movement.Path;
+import com.chess.game.piece.Piece;
+import com.chess.game.piece.PieceType;
 import java.util.List;
 import java.util.Set;
-import main.java.com.chess.game.exception.IllegalActionException;
-import main.java.com.chess.game.movement.Action;
-import main.java.com.chess.game.movement.Movement;
-import main.java.com.chess.game.movement.Path;
-import main.java.com.chess.game.piece.Piece;
-import main.java.com.chess.game.piece.PieceType;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -119,7 +120,7 @@ public class Game {
     }
 
     private void performMovement(Colour player, Movement movement, Vector2D start, Vector2D end) {
-        if (player == null || movement == null || start == null || end == null){
+        if (player == null || movement == null || start == null || end == null) {
             throw new NullPointerException();
         }
         this.board.movePiece(start, end);
@@ -169,7 +170,8 @@ public class Game {
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
             for (Vector2D v : pPath) {
                 List<Piece> blockers =
-                        this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING)).toList();
+                        this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING))
+                                .collect(Collectors.toList());
                 for (Piece b : blockers) {
                     // An opponent piece can move to prevent checkmate by blocking
                     if (!this.turn.equals(b.getColour())) {
@@ -199,7 +201,7 @@ public class Game {
         }
 
         List<Piece> playerPieces = allPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
-                && !p.getType().equals(PieceType.KING)).toList();
+                && !p.getType().equals(PieceType.KING)).collect(Collectors.toList());
         for (Piece p : playerPieces) {
             Set<Vector2D> moves = p.getMovementSet(p.getPosition(), board);
             if (!moves.isEmpty()) {

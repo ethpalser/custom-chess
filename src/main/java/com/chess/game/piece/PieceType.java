@@ -1,4 +1,4 @@
-package main.java.com.chess.game.piece;
+package com.chess.game.piece;
 
 public enum PieceType {
     PAWN(""),

@@ -1,22 +1,22 @@
-package main.java.com.chess.game.piece;
+package com.chess.game.piece;
 
+import com.chess.game.Colour;
+import com.chess.game.Vector2D;
+import com.chess.game.condition.Comparator;
+import com.chess.game.condition.Conditional;
+import com.chess.game.condition.Property;
+import com.chess.game.condition.PropertyCondition;
+import com.chess.game.condition.ReferenceCondition;
+import com.chess.game.movement.ExtraAction;
+import com.chess.game.movement.Movement;
+import com.chess.game.movement.MovementType;
+import com.chess.game.movement.Path;
+import com.chess.game.reference.Direction;
+import com.chess.game.reference.Location;
+import com.chess.game.reference.Reference;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.Vector2D;
-import main.java.com.chess.game.condition.Comparator;
-import main.java.com.chess.game.condition.Conditional;
-import main.java.com.chess.game.condition.Property;
-import main.java.com.chess.game.condition.PropertyCondition;
-import main.java.com.chess.game.condition.ReferenceCondition;
-import main.java.com.chess.game.movement.ExtraAction;
-import main.java.com.chess.game.movement.Movement;
-import main.java.com.chess.game.movement.MovementType;
-import main.java.com.chess.game.movement.Path;
-import main.java.com.chess.game.reference.Direction;
-import main.java.com.chess.game.reference.Location;
-import main.java.com.chess.game.reference.Reference;
 
 public class PieceFactory {
 

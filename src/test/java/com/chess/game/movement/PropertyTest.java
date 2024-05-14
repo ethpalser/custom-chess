@@ -1,8 +1,9 @@
-package test.java.com.chess.game.movement;
+package com.chess.game.movement;
 
-import main.java.com.chess.game.Colour;
-import main.java.com.chess.game.condition.Property;
-import main.java.com.chess.game.piece.Piece;
+import com.chess.game.Colour;
+import com.chess.game.condition.Property;
+import com.chess.game.piece.Piece;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ class PropertyTest {
         // When
         Object result = property.fetch(piece);
         // Then
-        assertInstanceOf(Boolean.class, result);
+        assertEquals(Boolean.class, result.getClass());
     }
 
     @Test
@@ -65,7 +66,7 @@ class PropertyTest {
         // When
         Object result = property.fetch(piece);
         // Then
-        assertInstanceOf(Colour.class, result);
+        assertEquals(Colour.class, result.getClass());
     }
 
 }
