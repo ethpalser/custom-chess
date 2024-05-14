@@ -98,7 +98,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
 
     public Vector2D at(int x, int y) {
         if (x < minX || x > maxX || y < minY || y > maxY) {
-            String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space." + this.printBounds();
+            String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space. " + this.printBounds();
             throw new IndexOutOfBoundsException(errMsg);
         }
         return new Vector2D(x, y, this.minX, this.minY, this.maxX, this.maxY);
