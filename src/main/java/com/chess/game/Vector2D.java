@@ -7,18 +7,71 @@ public class Vector2D implements Comparable<Vector2D> {
     private final int x;
     private final int y;
 
+    private final int minX;
+    private final int minY;
+    private final int maxX;
+    private final int maxY;
+
     public Vector2D() {
         this.x = 0;
         this.y = 0;
+        // Default bounds
+        this.minX = 0;
+        this.minY = 0;
+        this.maxX = 31;
+        this.maxY = 31;
     }
 
+    /**
+     * Instantiate a Vector2D within the bounds of x [0:31] and y [0:31].
+     *
+     * @param x An integer between 0 and 31 along the x-axis.
+     * @param y An integer between 0 and 31 along the y-axis.
+     */
     public Vector2D(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this(x, y, 0, 0, 31, 31);
     }
 
+    /**
+     * Instantiate a Vector2D within the bounds of x [0:10] and y [0:10], but using characters in Chess' notation
+     * where x begins at 'a' and y begins at '1'. Bounds are limited to 10 as there are only ten numerical characters.
+     *
+     * @param x An integer between 0 and 10 along the x-axis.
+     * @param y An integer between 0 and 10 along the y-axis.
+     */
     public Vector2D(char x, char y) {
-        this(x - 'a', y - '1');
+        this(x - 'a', y - '1', 0, 0, 10, 10);
+    }
+
+    /**
+     * Instantiate a Vector2D with specified bounds. All Vector2D must have bounds for hashing. It is
+     * recommended to use a Factory method of a class with these bounds to ensure consistency and to abstract the
+     * min and max. Vector2Ds are most compatible with those with the same min and max, and to safely compare these
+     * vectors it is recommended to convert them into the same size.
+     *
+     * @param xVal
+     * @param yVal
+     * @param xBounds1
+     * @param yBounds1
+     * @param xBounds2
+     * @param yBounds2
+     */
+    public Vector2D(int xVal, int yVal, int xBounds1, int yBounds1, int xBounds2, int yBounds2) {
+        this.x = xVal;
+        this.y = yVal;
+        // width * height >= Integer.MAX_VALUE, using division to avoid overflow
+        if (Integer.MAX_VALUE / Math.abs(xBounds1 + xBounds2 + 1) <= Math.abs(yBounds1 + yBounds2 + 1)) {
+            throw new ArithmeticException("Bounds exceed allowed size of " + Integer.MAX_VALUE);
+        }
+        // Default bounds
+        this.minX = Math.min(xBounds1, xBounds2);
+        this.minY = Math.min(yBounds1, yBounds2);
+        this.maxX = Math.max(xBounds1, xBounds2);
+        this.maxY = Math.max(yBounds1, yBounds2);
+    }
+
+    public Vector2D(Vector2D copy) {
+        this(copy.x, copy.y, copy.minX, copy.minY, copy.maxX, copy.maxY);
     }
 
     public int getX() {
@@ -29,26 +82,55 @@ public class Vector2D implements Comparable<Vector2D> {
         return this.y;
     }
 
-    /**
-     * Checks if the given x and y coordinates are within the bounds of the board. This is fixed at a min of 0 and
-     * max of 7 for both x and y coordinates.
-     *
-     * @param x int
-     * @param y int
-     * @return true if 0 <= x <= 7 and 0 <= y <= 7, otherwise false
-     */
-    public static boolean isValid(int x, int y) {
-        return 0 <= x && x <= 7 && 0 <= y && y <= 7;
+    @Override
+    public int compareTo(Vector2D o) {
+        if (o == null) {
+            return -1;
+        }
+        // The hashCodes are unique for every x,y combination
+        return this.hashCode() - o.hashCode();
     }
 
-    /**
-     * Checks if the current vector is within the bounds of the board. This is fixed at a min of 0 and max of 7
-     * for both x and y coordinates.
-     *
-     * @return true if 0 <= x <= 7 and 0 <= y <= 7, otherwise false
-     */
-    public boolean isValid() {
-        return Vector2D.isValid(this.x, this.y);
+    @Override
+    public int hashCode() {
+        int quad = 0;
+        if (x < 0)
+            quad += 1;
+        if (y < 0)
+            quad += 2;
+        // Each x, y value maps to a distinct positive integer in a bounded space
+        return boundsWidth() * boundsHeight() * quad + Math.abs(this.y) * boundsWidth() + Math.abs(this.x);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (o.getClass() != this.getClass())
+            return false;
+
+        Vector2D vector = (Vector2D) o;
+        // Compares only x and y values, ignoring bounds
+        // These are not equal when inserting into hashmap
+        return this.x == vector.x && this.y == vector.y;
+    }
+
+    @Override
+    public String toString() {
+        char xChar = (char) ('a' + this.x);
+        return "" + xChar + (this.y + 1);
+    }
+
+    private int boundsWidth() {
+        // This can only be 1 or greater
+        return this.maxX - this.minX + 1;
+    }
+
+    private int boundsHeight() {
+        // This can only be 1 or greater
+        return this.maxY - this.minY + 1;
     }
 
     /**
@@ -66,45 +148,11 @@ public class Vector2D implements Comparable<Vector2D> {
         int dir = Colour.WHITE.equals(colour) ? 1 : -1;
         return switch (direction) {
             case AT -> this;
-            case FRONT -> new Vector2D(this.x, this.y + dir);
-            case BACK -> new Vector2D(this.x, this.y - dir);
-            case RIGHT -> new Vector2D(this.x + dir, this.y);
-            case LEFT -> new Vector2D(this.x - dir, this.y);
+            case FRONT -> new Vector2D(this.x, this.y + dir, this.minX, this.minY, this.maxX, this.maxY);
+            case BACK -> new Vector2D(this.x, this.y - dir, this.minX, this.minY, this.maxX, this.maxY);
+            case RIGHT -> new Vector2D(this.x + dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
+            case LEFT -> new Vector2D(this.x - dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
         };
     }
 
-    @Override
-    public int compareTo(Vector2D o) {
-        if (o == null) {
-            return -1;
-        }
-        // The hashCodes are unique for every x,y combination
-        return this.hashCode() - o.hashCode();
-    }
-
-    @Override
-    public int hashCode() {
-        // Using a prime number to ensure uniqueness, and will enforce that the board cannot be greater than 16x16
-        return this.y * 17 + this.x;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null)
-            return false;
-        if (o.getClass() != this.getClass())
-            return false;
-
-        Vector2D vector = (Vector2D) o;
-        // When x and y are equal, their hashCodes are equal
-        return this.hashCode() == vector.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        char xChar = (char) ('a' + this.x);
-        return "" + xChar + (this.y + 1);
-    }
 }
