@@ -49,12 +49,12 @@ public class Vector2D implements Comparable<Vector2D> {
      * min and max. Vector2Ds are most compatible with those with the same min and max, and to safely compare these
      * vectors it is recommended to convert them into the same size.
      *
-     * @param xVal
-     * @param yVal
-     * @param xBounds1
-     * @param yBounds1
-     * @param xBounds2
-     * @param yBounds2
+     * @param xVal Integer co-ordinate on x-axis
+     * @param yVal Integer co-ordinate on y-axis
+     * @param xBounds1 Represents one bound of the x-axis (ex. min. x value)
+     * @param yBounds1 Represents one bound of the y-axis (ex. min. y value)
+     * @param xBounds2 Represents one bound of the x-axis
+     * @param yBounds2 Represents one bound of the y-axis
      */
     public Vector2D(int xVal, int yVal, int xBounds1, int yBounds1, int xBounds2, int yBounds2) {
         this.x = xVal;
@@ -68,6 +68,10 @@ public class Vector2D implements Comparable<Vector2D> {
         this.minY = Math.min(yBounds1, yBounds2);
         this.maxX = Math.max(xBounds1, xBounds2);
         this.maxY = Math.max(yBounds1, yBounds2);
+
+        if (this.x < this.minX || this.x > this.maxX || this.y < this.minY || this.y > this.maxY) {
+            throw new IndexOutOfBoundsException("Either x and/or y are out of bounds.");
+        }
     }
 
     public Vector2D(Vector2D copy) {
