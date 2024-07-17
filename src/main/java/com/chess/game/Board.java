@@ -408,4 +408,12 @@ public class Board {
         return sb.toString();
     }
 
+    public boolean isValidLocation(int x, int y) {
+        return this.pieceMap.isValid(x, y);
+    }
+
+    public boolean isValidLocation(Vector2D point) {
+        return this.pieceMap.isValid(point.getX(), point.getY());
+    }
+
 }
