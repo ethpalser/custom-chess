@@ -103,7 +103,7 @@ public class Piece {
             throw new NullPointerException();
         }
         for (Movement move : this.movements) {
-            Path path = move.getPath(this.colour, this.position, destination);
+            Path path = move.getPath(this.colour, this.position, destination, board);
             if (path != null && path.isTraversable(board)
                     && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
                 return move;

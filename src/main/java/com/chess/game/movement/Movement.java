@@ -2,6 +2,7 @@ package com.chess.game.movement;
 
 import com.chess.game.Board;
 import com.chess.game.Colour;
+import com.chess.game.Space2D;
 import com.chess.game.Vector2D;
 import com.chess.game.condition.Conditional;
 import com.chess.game.piece.Piece;
@@ -134,7 +135,7 @@ public class Movement {
      * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
-    public Path getPath(Colour colour, Vector2D start, Vector2D end) {
+    public Path getPath(Colour colour, Vector2D start, Vector2D end, Board board) {
         if (colour == null || start == null || end == null) {
             throw new NullPointerException();
         }
@@ -157,7 +158,7 @@ public class Movement {
         for (Vector2D vector : this.pathBase) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
-            if (!Vector2D.isValid(nextX, nextY)) {
+            if (!board.isValidLocation(nextX, nextY)) {
                 break;
             }
             vectors.add(new Vector2D(nextX, nextY));
@@ -276,7 +277,7 @@ public class Movement {
         if (vector == null || colour == null) {
             throw new NullPointerException();
         }
-        if (!vector.isValid()) {
+        if (!board.isValidLocation(vector)) {
             return false;
         }
         if (board != null) {
@@ -294,7 +295,7 @@ public class Movement {
         if (vector == null) {
             throw new NullPointerException();
         }
-        if (!vector.isValid() || board == null) {
+        if (!board.isValidLocation(vector) || board == null) {
             return false;
         }
         Piece piece = board.getPiece(vector);

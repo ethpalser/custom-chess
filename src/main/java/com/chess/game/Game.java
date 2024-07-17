@@ -66,7 +66,7 @@ public class Game {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Action does not have both a start and end.");
         }
-        if (!start.isValid() || !end.isValid()) {
+        if (!board.isValidLocation(start) || !board.isValidLocation(end)) {
             throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
         }
 
@@ -167,7 +167,7 @@ public class Game {
             }
 
             Movement pMove = this.getMovement(p, kingPosition);
-            Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition);
+            Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition, this.board);
             for (Vector2D v : pPath) {
                 List<Piece> blockers =
                         this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING))
