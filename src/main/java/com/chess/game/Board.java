@@ -21,7 +21,7 @@ public class Board {
 
     private final int length;
     private final int width;
-    private final Map<Vector2D, Piece> pieceMap;
+    private final Space2D<Piece> pieceMap;
     private final Map<Vector2D, Set<Piece>> wThreats;
     private final Map<Vector2D, Set<Piece>> bThreats;
     private Vector2D wKing;
@@ -33,7 +33,7 @@ public class Board {
     public Board() {
         this.length = 8;
         this.width = 8;
-        Map<Vector2D, Piece> map = new HashMap<>();
+        Space2D<Piece> map = new Space2D<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length - 2));
@@ -64,7 +64,7 @@ public class Board {
     public Board(List<String> pieces) {
         this.length = 8;
         this.width = 8;
-        Map<Vector2D, Piece> map = new HashMap<>();
+        Space2D<Piece> map = new Space2D<>();
         PieceFactory pf = PieceFactory.getInstance();
         for (String s : pieces) {
             Piece piece = pf.build(s);
@@ -406,6 +406,14 @@ public class Board {
             sb.append("|\n");
         }
         return sb.toString();
+    }
+
+    public boolean isValidLocation(int x, int y) {
+        return this.pieceMap.isValid(x, y);
+    }
+
+    public boolean isValidLocation(Vector2D point) {
+        return this.pieceMap.isValid(point.getX(), point.getY());
     }
 
 }
