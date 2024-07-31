@@ -96,7 +96,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return space.values().iterator();
     }
 
-    public Vector2D at(int x, int y) {
+    public Vector2D at(int x, int y) throws IndexOutOfBoundsException {
         if (x < minX || x > maxX || y < minY || y > maxY) {
             String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space. " + this.printBounds();
             throw new IndexOutOfBoundsException(errMsg);
@@ -104,7 +104,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return new Vector2D(x, y, this.minX, this.minY, this.maxX, this.maxY);
     }
 
-    public Vector2D at(char x, char y) {
+    public Vector2D at(char x, char y) throws IndexOutOfBoundsException {
         // This has greater bounds than Vector2D's char constructor. Ensures consistency in hash value
         return this.at(x - 'a', y - '1');
     }
@@ -119,4 +119,19 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return minX <= x && x <= maxX && minY <= y && y <= maxY;
     }
 
+    public int getMinX() {
+        return this.minX;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
 }
