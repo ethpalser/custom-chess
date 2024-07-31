@@ -409,11 +409,11 @@ public class Board {
     }
 
     public boolean isValidLocation(int x, int y) {
-        return this.pieceMap.isValid(x, y);
+        return this.pieceMap.isInBounds(x, y);
     }
 
     public boolean isValidLocation(Vector2D point) {
-        return this.pieceMap.isValid(point.getX(), point.getY());
+        return this.pieceMap.isInBounds(point.getX(), point.getY());
     }
 
 }

@@ -11,7 +11,7 @@ public class Vector2DUtil {
         Set<Vector2D> set = new HashSet<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
-        while (inXBounds(board, start, start.getX() + x)) {
+        while (board.isInBounds(start.getX() + x, start.getY())) {
             Vector2D pos = new Vector2D(start.getX() + x, start.getY());
             if (board.get(pos) != null) {
                 if (board.get(pos).getColour() != colour) {
@@ -30,7 +30,7 @@ public class Vector2DUtil {
         Set<Vector2D> set = new HashSet<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
-        while (inYBounds(board, start, start.getY() + y)) {
+        while (board.isInBounds(start.getX(), start.getY() + y)) {
             Vector2D pos = new Vector2D(start.getX(), start.getY() + y);
             if (board.get(pos) != null) {
                 if (board.get(pos).getColour() != colour) {
@@ -50,7 +50,7 @@ public class Vector2DUtil {
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
         // while within the board's boundaries
-        while (inXBounds(board, start, start.getX() + x) && inYBounds(board, start, start.getY() + y)) {
+        while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Vector2D pos = new Vector2D(start.getX() + x, start.getY() + y);
             if (board.get(pos) != null) {
                 if (board.get(pos).getColour() != colour) {
@@ -63,14 +63,6 @@ public class Vector2DUtil {
             y = up ? y + 1 : y - 1;
         }
         return set;
-    }
-
-    private static boolean inXBounds(Space2D<?> board, Vector2D point, int x) {
-        return board.getMinX() <= point.getX() + x && point.getX() + x <= board.getMaxX();
-    }
-
-    private static boolean inYBounds(Space2D<?> board, Vector2D point, int y) {
-        return board.getMinY() <= point.getY() + y && point.getY() + y <= board.getMaxY();
     }
 
 }

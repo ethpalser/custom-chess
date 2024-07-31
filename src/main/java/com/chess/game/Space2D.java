@@ -115,23 +115,8 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return "x:" + xBounds + " y:" + yBounds;
     }
 
-    public boolean isValid(int x, int y) {
+    public boolean isInBounds(int x, int y) {
         return minX <= x && x <= maxX && minY <= y && y <= maxY;
     }
 
-    public int getMinX() {
-        return this.minX;
-    }
-
-    public int getMaxX() {
-        return maxX;
-    }
-
-    public int getMinY() {
-        return minY;
-    }
-
-    public int getMaxY() {
-        return maxY;
-    }
 }
