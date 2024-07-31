@@ -44,6 +44,16 @@ public class Vector2D implements Comparable<Vector2D> {
     }
 
     /**
+     * Instantiate a Vector2D using a String, parsing it for characters to utilize instantiation with char values.
+     * This throws a NullPointerException if the string is not at least two characters long.
+     *
+     * @param s String of a move in chess notation (ex. e6)
+     */
+    public Vector2D(String s) throws NullPointerException, IndexOutOfBoundsException {
+        this(s.charAt(s.length() - 2), s.charAt(s.length() - 1));
+    }
+
+    /**
      * Instantiate a Vector2D with specified bounds. All Vector2D must have bounds for hashing. It is
      * recommended to use a Factory method of a class with these bounds to ensure consistency and to abstract the
      * min and max. Vector2Ds are most compatible with those with the same min and max, and to safely compare these
