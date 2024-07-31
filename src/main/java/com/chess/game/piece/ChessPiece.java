@@ -1,5 +1,6 @@
 package com.chess.game.piece;
 
+import com.chess.game.Colour;
 import com.chess.game.Space2D;
 import com.chess.game.Vector2D;
 import com.chess.game.movement.ActionRecord;
@@ -10,8 +11,11 @@ public interface ChessPiece {
 
     String getCode();
 
-    Set<Vector2D> getMovement(Space2D<Piece> board);
+    Colour getColour();
 
-    boolean canPerformMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination);
+    Set<Vector2D> getMoves(Space2D<Piece> board);
 
+    boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination);
+
+    void move(Vector2D destination);
 }
