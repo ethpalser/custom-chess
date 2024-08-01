@@ -6,6 +6,29 @@ import java.util.Set;
 
 public class Vector2DUtil {
 
+    public static Vector2D generateValidPointOrNull(Space2D<Piece> board, Vector2D start, Colour colour, int xOffset,
+            int yOffset) {
+        Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
+        // not in bounds or (exists and matching colour)
+        if (!board.isInBounds(point.getX(), point.getY()) || (board.get(point) != null
+                && board.get(point).getColour() == colour)) {
+            return null;
+        }
+        return point;
+    }
+
+    public static Vector2D generateCapturePointOrNull(Space2D<Piece> board, Vector2D start, Colour colour, int xOffset,
+            int yOffset) {
+        Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
+        // not in bounds or empty or matching colour
+        if (!board.isInBounds(point.getX(), point.getY()) || board.get(point) == null
+                || board.get(point).getColour() == colour) {
+            return null;
+        }
+        // in bounds and opposite colour (i.e. can capture)
+        return point;
+    }
+
     public static Set<Vector2D> generateHorizontalMoves(Space2D<Piece> board, Vector2D start, Colour colour,
             boolean right) {
         Set<Vector2D> set = new HashSet<>();
