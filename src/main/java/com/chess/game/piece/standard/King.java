@@ -42,12 +42,36 @@ public class King implements ChessPiece {
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 1, -1)); // bottom right
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, -1)); // bottom
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, -1)); // bottom left
-        if (!hasMoved) {
-            // todo: Add castling
-            // todo: Need to use board for threats. Refactor is required
+        // not moved and not threatened
+        Colour opposite = this.colour == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
+        int startRank = this.colour == Colour.WHITE ? 0 : 7;
+        if (!hasMoved && !board.hasThreats(this.point, opposite)) {
+            // king side
+            ChessPiece kingSideRook = board.getPiece(new Vector2D(0, startRank));
+            if (kingSideRook != null && !kingSideRook.hasMoved()
+                    && isEmptyAndSafe(board, this.point.getX() - 1, this.point.getY(), this.colour)
+                    && isEmptyAndSafe(board, this.point.getX() - 2, this.point.getY(), this.colour)
+            ) {
+                set.add(new Vector2D(this.point.getX() - 2, this.point.getY()));
+                // How do I move the rook?
+            }
+            // queen side
+            ChessPiece queenSideRook = board.getPiece(new Vector2D(0, startRank));
+            if (queenSideRook != null && !queenSideRook.hasMoved()
+                    && isEmptyAndSafe(board, this.point.getX() + 1, this.point.getY(), this.colour)
+                    && isEmptyAndSafe(board, this.point.getX() + 2, this.point.getY(), this.colour)
+            ) {
+                set.add(new Vector2D(this.point.getX() + 2, this.point.getY()));
+                // How do I move the rook?
+            }
         }
         set.remove(null); // remove any case of null
         return set;
+    }
+
+    private boolean isEmptyAndSafe(ChessBoard board, int x, int y, Colour colour) {
+        Vector2D point = new Vector2D(x, y);
+        return board.getPiece(point) == null && !board.hasThreats(point, colour);
     }
 
     @Override
