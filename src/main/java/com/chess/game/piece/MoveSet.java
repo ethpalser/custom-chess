@@ -21,6 +21,10 @@ public class MoveSet {
         return this.moves;
     }
 
+    public void addMove(Move move) {
+        this.moves.add(move);
+    }
+
     public Set<Vector2D> getPoints() {
         return this.moves.stream().map(Move::getPoint).collect(Collectors.toSet());
     }
