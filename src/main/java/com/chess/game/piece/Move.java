@@ -1,6 +1,7 @@
 package com.chess.game.piece;
 
 import com.chess.game.Vector2D;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Move {
@@ -23,7 +24,20 @@ public class Move {
     }
 
     public Optional<MoveRecord> getFollowUpMove() {
-        return Optional.of(this.followUpMove);
+        return Optional.ofNullable(this.followUpMove);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Move move = (Move) o;
+        return Objects.equals(point, move.point) && Objects.equals(followUpMove, move.followUpMove);
+    }
+
+    @Override
+    public int hashCode() {
+        // FollowUp is irrelevant when used in a HashSet, as there cannot be overlap with points
+        return Objects.hash(point);
+    }
 }
