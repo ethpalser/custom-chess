@@ -1,12 +1,12 @@
 package com.chess.game.piece.standard;
 
+import com.chess.game.ChessBoard;
+import com.chess.game.ChessLog;
 import com.chess.game.Colour;
-import com.chess.game.Space2D;
+import com.chess.game.LogRecord;
 import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
-import com.chess.game.movement.ActionRecord;
 import com.chess.game.piece.ChessPiece;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<ChessPiece> board, Deque<ActionRecord> log) {
+    public Set<Vector2D> getMoves(ChessBoard board, ChessLog log) {
         Set<Vector2D> set = new HashSet<>();
         int y = this.colour == Colour.WHITE ? 1 : -1;
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
@@ -44,13 +44,13 @@ public class Pawn implements ChessPiece {
         }
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
-            ActionRecord lastMove = log.peek();
-            Vector2D start = lastMove.getAction().getStart();
-            Vector2D destination = lastMove.getAction().getEnd();
+            LogRecord lastMove = log.peek();
+            Vector2D start = lastMove.getStart();
+            Vector2D destination = lastMove.getEnd();
             // a pawn moved forward two
             if (lastMove.isFirstMove() && "P".equals(board.get(destination).getCode())
-                    && ((lastMove.getAction().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
-                    || (lastMove.getAction().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
+                    && ((lastMove.getMoved().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
+                    || (lastMove.getMoved().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
             ) {
                 // that pawn is beside this pawn
                 if (destination.getX() == this.point.getX() - 1) {
@@ -66,13 +66,21 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public boolean canMove(Space2D<ChessPiece> board, Deque<ActionRecord> log, Vector2D destination) {
+    public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
         return this.getMoves(board, log).contains(destination);
     }
 
     @Override
     public void move(Vector2D destination) {
+        if (destination == null) {
+            throw new IllegalArgumentException("destination cannot be null");
+        }
         this.point = destination;
         this.hasMoved = true;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return this.hasMoved;
     }
 }

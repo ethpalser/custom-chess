@@ -1,12 +1,11 @@
 package com.chess.game;
 
-import com.chess.game.piece.ChessPiece;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Vector2DUtil {
 
-    public static Vector2D generateValidPointOrNull(Space2D<ChessPiece> board, Vector2D start, Colour colour,
+    public static Vector2D generateValidPointOrNull(ChessBoard board, Vector2D start, Colour colour,
             int xOffset, int yOffset) {
         Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
@@ -17,7 +16,7 @@ public class Vector2DUtil {
         return point;
     }
 
-    public static Vector2D generateCapturePointOrNull(Space2D<ChessPiece> board, Vector2D start, Colour colour,
+    public static Vector2D generateCapturePointOrNull(ChessBoard board, Vector2D start, Colour colour,
             int xOffset, int yOffset) {
         Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
@@ -29,7 +28,7 @@ public class Vector2DUtil {
         return point;
     }
 
-    public static Set<Vector2D> generateHorizontalMoves(Space2D<ChessPiece> board, Vector2D start, Colour colour,
+    public static Set<Vector2D> generateHorizontalMoves(ChessBoard board, Vector2D start, Colour colour,
             boolean right) {
         Set<Vector2D> set = new HashSet<>();
         int x = right ? 1 : -1;
@@ -48,7 +47,7 @@ public class Vector2DUtil {
         return set;
     }
 
-    public static Set<Vector2D> generateVerticalMoves(Space2D<ChessPiece> board, Vector2D start, Colour colour,
+    public static Set<Vector2D> generateVerticalMoves(ChessBoard board, Vector2D start, Colour colour,
             boolean up) {
         Set<Vector2D> set = new HashSet<>();
         int y = up ? 1 : -1;
@@ -67,7 +66,7 @@ public class Vector2DUtil {
         return set;
     }
 
-    public static Set<Vector2D> generateDiagonalMoves(Space2D<ChessPiece> board, Vector2D start, Colour colour,
+    public static Set<Vector2D> generateDiagonalMoves(ChessBoard board, Vector2D start, Colour colour,
             boolean right, boolean up) {
         Set<Vector2D> set = new HashSet<>();
         int x = right ? 1 : -1;

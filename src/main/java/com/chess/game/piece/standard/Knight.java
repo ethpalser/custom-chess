@@ -1,12 +1,11 @@
 package com.chess.game.piece.standard;
 
+import com.chess.game.ChessBoard;
+import com.chess.game.ChessLog;
 import com.chess.game.Colour;
-import com.chess.game.Space2D;
 import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
-import com.chess.game.movement.ActionRecord;
 import com.chess.game.piece.ChessPiece;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ public class Knight implements ChessPiece {
 
     private final Colour colour;
     private Vector2D point;
+    private boolean hasMoved;
 
     public Knight(Colour colour, Vector2D point) {
         this.colour = colour;
@@ -31,7 +31,7 @@ public class Knight implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<ChessPiece> board, Deque<ActionRecord> log) {
+    public Set<Vector2D> getMoves(ChessBoard board, ChessLog log) {
         Set<Vector2D> set = new HashSet<>();
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
@@ -46,12 +46,21 @@ public class Knight implements ChessPiece {
     }
 
     @Override
-    public boolean canMove(Space2D<ChessPiece> board, Deque<ActionRecord> log, Vector2D destination) {
+    public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
         return this.getMoves(board, log).contains(destination);
     }
 
     @Override
     public void move(Vector2D destination) {
+        if (destination == null) {
+            throw new IllegalArgumentException("destination cannot be null");
+        }
         this.point = destination;
+        this.hasMoved = true;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return this.hasMoved;
     }
 }

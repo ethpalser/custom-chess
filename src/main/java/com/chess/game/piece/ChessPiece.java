@@ -1,10 +1,9 @@
 package com.chess.game.piece;
 
+import com.chess.game.ChessBoard;
+import com.chess.game.ChessLog;
 import com.chess.game.Colour;
-import com.chess.game.Space2D;
 import com.chess.game.Vector2D;
-import com.chess.game.movement.ActionRecord;
-import java.util.Deque;
 import java.util.Set;
 
 public interface ChessPiece {
@@ -13,9 +12,11 @@ public interface ChessPiece {
 
     Colour getColour();
 
-    Set<Vector2D> getMoves(Space2D<ChessPiece> board, Deque<ActionRecord> log);
+    Set<Vector2D> getMoves(ChessBoard board, ChessLog log);
 
-    boolean canMove(Space2D<ChessPiece> board, Deque<ActionRecord> log, Vector2D destination);
+    boolean canMove(ChessBoard board, ChessLog log, Vector2D destination);
 
     void move(Vector2D destination);
+
+    boolean hasMoved();
 }
