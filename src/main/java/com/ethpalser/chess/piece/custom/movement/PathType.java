@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 
 public enum PathType {
     VERTICAL,
@@ -8,7 +8,7 @@ public enum PathType {
     DIAGONAL,
     CUSTOM;
 
-    public static PathType findType(Vector2D start, Vector2D end) {
+    public static PathType findType(Point start, Point end) {
         int diffX = Math.abs(end.getX() - start.getX());
         int diffY = Math.abs(end.getY() - start.getY());
 

@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.ChessPiece;
 
 public class ActionRecord implements LogRecord {
@@ -11,7 +11,7 @@ public class ActionRecord implements LogRecord {
     private final ChessPiece captured;
     private final boolean isFirstMove;
 
-    public ActionRecord(Vector2D start, Vector2D end, ChessPiece moved) {
+    public ActionRecord(Point start, Point end, ChessPiece moved) {
         this(new Action(moved.getColour(), start, end), moved);
     }
 
@@ -33,8 +33,8 @@ public class ActionRecord implements LogRecord {
             split = log.split("x"); // Assumes the piece is not using an x in its code, which shouldn't happen
         }
 
-        Vector2D start = new Vector2D(split[0]);
-        Vector2D end = new Vector2D(split[1]);
+        Point start = new Point(split[0]);
+        Point end = new Point(split[1]);
         // This only works by recreating the log by simulating the game forward. This fails recreating in reverse.
         this.moved = board.getPiece(start);
         this.captured = board.getPiece(end);
@@ -43,12 +43,12 @@ public class ActionRecord implements LogRecord {
     }
 
     @Override
-    public Vector2D getStart() {
+    public Point getStart() {
         return this.action.getStart();
     }
 
     @Override
-    public Vector2D getEnd() {
+    public Point getEnd() {
         return this.action.getEnd();
     }
 

@@ -2,7 +2,7 @@ package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 
@@ -13,14 +13,14 @@ import com.ethpalser.chess.piece.custom.reference.Reference;
 public class ExtraAction {
 
     private final Reference reference;
-    private final Vector2D destination;
+    private final Point destination;
 
     public ExtraAction() {
         this.destination = null;
         this.reference = null;
     }
 
-    public ExtraAction(Reference reference, Vector2D destination) {
+    public ExtraAction(Reference reference, Point destination) {
         this.reference = reference;
         this.destination = destination;
     }

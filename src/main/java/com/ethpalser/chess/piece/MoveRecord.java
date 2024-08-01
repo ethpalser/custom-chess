@@ -1,13 +1,13 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 
 public interface MoveRecord {
 
     ChessPiece getMovingPiece();
 
-    Vector2D getStart();
+    Point getStart();
 
-    Vector2D getEnd();
+    Point getEnd();
 
 }

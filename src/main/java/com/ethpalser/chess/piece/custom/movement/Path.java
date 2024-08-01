@@ -1,16 +1,16 @@
 package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Path implements Iterable<Vector2D> {
+public class Path implements Iterable<Point> {
 
-    private final LinkedHashMap<Integer, Vector2D> map;
+    private final LinkedHashMap<Integer, Point> map;
 
-    public LinkedHashMap<Integer, Vector2D> getMap() {
+    public LinkedHashMap<Integer, Point> getMap() {
         return this.map;
     }
 
@@ -18,14 +18,14 @@ public class Path implements Iterable<Vector2D> {
         this.map = new LinkedHashMap<>();
     }
 
-    public Path(Vector2D end) {
+    public Path(Point end) {
         this(List.of(end));
     }
 
-    public Path(List<Vector2D> vectors) {
-        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
+    public Path(List<Point> vectors) {
+        LinkedHashMap<Integer, Point> linkedHashMap = new LinkedHashMap<>();
         if (vectors != null) {
-            for (Vector2D vector : vectors) {
+            for (Point vector : vectors) {
                 if (vector != null) {
                     linkedHashMap.put(vector.hashCode(), vector);
                 }
@@ -36,13 +36,13 @@ public class Path implements Iterable<Vector2D> {
 
     /**
      * Creates a Path moving in a linear direction (vertical, horizontal or diagonal) from start to end
-     * {@link Vector2D}.
+     * {@link Point}.
      *
-     * @param start {@link Vector2D} representing the first vector of the path
-     * @param end   {@link Vector2D} representing the last vector of the path
+     * @param start {@link Point} representing the first vector of the path
+     * @param end   {@link Point} representing the last vector of the path
      */
-    public Path(Vector2D start, Vector2D end) {
-        LinkedHashMap<Integer, Vector2D> linkedHashMap = new LinkedHashMap<>();
+    public Path(Point start, Point end) {
+        LinkedHashMap<Integer, Point> linkedHashMap = new LinkedHashMap<>();
         if (start == null || end == null) {
             this.map = linkedHashMap;
             return;
@@ -63,7 +63,7 @@ public class Path implements Iterable<Vector2D> {
                 int dir = diff / Math.abs(diff);
 
                 while (y != end.getY() + dir) {
-                    Vector2D vector = new Vector2D(x, y);
+                    Point vector = new Point(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     y = y + dir;
                 }
@@ -73,7 +73,7 @@ public class Path implements Iterable<Vector2D> {
                 int dir = diff / Math.abs(diff);
 
                 while (x != end.getX() + dir) {
-                    Vector2D vector = new Vector2D(x, y);
+                    Point vector = new Point(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dir;
                 }
@@ -85,7 +85,7 @@ public class Path implements Iterable<Vector2D> {
                 int dirY = diffY / Math.abs(diffY);
 
                 while (x != end.getX() + dirX && y != end.getY() + dirY) {
-                    Vector2D vector = new Vector2D(x, y);
+                    Point vector = new Point(x, y);
                     linkedHashMap.put(vector.hashCode(), vector);
                     x = x + dirX;
                     y = y + dirY;
@@ -110,7 +110,7 @@ public class Path implements Iterable<Vector2D> {
         }
         // Ignore all incorrectly added null values
         int size = 0;
-        for (Vector2D vector : this) {
+        for (Point vector : this) {
             if (vector != null) {
                 size++;
             }
@@ -128,9 +128,9 @@ public class Path implements Iterable<Vector2D> {
         if (board == null) {
             throw new NullPointerException();
         }
-        Iterator<Vector2D> iterator = this.iterator();
+        Iterator<Point> iterator = this.iterator();
         while (iterator.hasNext()) {
-            Vector2D vector = iterator.next();
+            Point vector = iterator.next();
             if (board.getPiece(vector) != null && iterator.hasNext()) {
                 // Piece is in the middle of the path
                 return false;
@@ -140,7 +140,7 @@ public class Path implements Iterable<Vector2D> {
     }
 
     @Override
-    public Iterator<Vector2D> iterator() {
+    public Iterator<Point> iterator() {
         return this.map.values().iterator();
     }
 
@@ -157,7 +157,7 @@ public class Path implements Iterable<Vector2D> {
     public int hashCode() {
         int prime = 31;
         int result = 1;
-        for (Vector2D vector : this) {
+        for (Point vector : this) {
             result = result * prime + vector.hashCode();
         }
         return result;
@@ -166,7 +166,7 @@ public class Path implements Iterable<Vector2D> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        Iterator<Vector2D> iterator = this.iterator();
+        Iterator<Point> iterator = this.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
             if (iterator.hasNext()) {

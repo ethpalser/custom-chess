@@ -2,7 +2,7 @@ package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.movement.Movement;
 import com.ethpalser.chess.piece.custom.movement.Path;
@@ -16,19 +16,19 @@ public class CustomPiece {
     private final PieceType type;
     private final Colour colour;
     private final List<Movement> movements;
-    private Vector2D position;
+    private Point position;
     private int lastMoveDistance;
     private boolean hasMoved;
 
     public CustomPiece() {
-        this(PieceType.PAWN, Colour.WHITE, new Vector2D());
+        this(PieceType.PAWN, Colour.WHITE, new Point());
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Vector2D vector) {
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
         this(pieceType, colour, vector, (Movement) null);
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Vector2D vector, Movement... movements) {
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, Movement... movements) {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;
@@ -49,17 +49,17 @@ public class CustomPiece {
         return this.movements;
     }
 
-    public Vector2D getPosition() {
+    public Point getPosition() {
         return this.position;
     }
 
     /**
-     * Updates this piece's position to the new {@link Vector2D} destination. If this destination is not the same
+     * Updates this piece's position to the new {@link Point} destination. If this destination is not the same
      * as its current position then it is considered to have moved.
      *
      * @param destination representing the new location of this piece.
      */
-    public void setPosition(Vector2D destination) {
+    public void setPosition(Point destination) {
         if (destination == null) {
             throw new NullPointerException();
         }
@@ -95,10 +95,10 @@ public class CustomPiece {
      * be traversed and has all its conditions met.
      *
      * @param board       {@link Board} used for reference
-     * @param destination {@link Vector2D} the piece is requested to move to
+     * @param destination {@link Point} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
-    public Movement getMovement(Board board, Vector2D destination) {
+    public Movement getMovement(Board board, Point destination) {
         if (board == null || destination == null) {
             throw new NullPointerException();
         }
@@ -112,24 +112,24 @@ public class CustomPiece {
         return null;
     }
 
-    public Set<Vector2D> getMovementSet(Vector2D location, Board board) {
+    public Set<Point> getMovementSet(Point location, Board board) {
         if (location == null) {
             throw new NullPointerException();
         }
         return this.getMovementSet(location, board, true, true, false, false);
     }
 
-    public Set<Vector2D> getMovementSet(Vector2D location, Board board, boolean includeMove,
+    public Set<Point> getMovementSet(Point location, Board board, boolean includeMove,
             boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
         if (location == null) {
             throw new NullPointerException();
         }
-        Set<Vector2D> set = new HashSet<>();
+        Set<Point> set = new HashSet<>();
         for (Movement move : this.movements) {
             if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
-                Set<Vector2D> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
+                Set<Point> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
                 if (board != null) {
-                    for (Vector2D v : vectorSet) {
+                    for (Point v : vectorSet) {
                         if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(),
                                 v))) {
                             set.add(v);

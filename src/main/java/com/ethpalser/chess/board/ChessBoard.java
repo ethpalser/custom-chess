@@ -6,15 +6,15 @@ import java.util.Set;
 
 public interface ChessBoard {
 
-    Space2D<ChessPiece> getPieces();
+    Plane<ChessPiece> getPieces();
 
-    ChessPiece getPiece(Vector2D point);
+    ChessPiece getPiece(Point point);
 
-    void movePiece(Vector2D start, Vector2D end);
+    void movePiece(Point start, Point end);
 
-    Set<ChessPiece> getThreats(Vector2D point, Colour colour);
+    Set<ChessPiece> getThreats(Point point, Colour colour);
 
-    default boolean hasThreats(Vector2D point, Colour colour) {
+    default boolean hasThreats(Point point, Colour colour) {
         if (point == null) {
             return false;
         }
@@ -23,7 +23,7 @@ public interface ChessBoard {
 
     boolean isInBounds(int x, int y);
 
-    default boolean isInBounds(Vector2D point) {
+    default boolean isInBounds(Point point) {
         return this.isInBounds(point.getX(), point.getY());
     }
 

@@ -3,7 +3,7 @@ package com.ethpalser.chess.board;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.reference.Direction;
 
-public class Vector2D implements Comparable<Vector2D> {
+public class Point implements Comparable<Point> {
 
     private final int x;
     private final int y;
@@ -13,7 +13,7 @@ public class Vector2D implements Comparable<Vector2D> {
     private final int maxX;
     private final int maxY;
 
-    public Vector2D() {
+    public Point() {
         this.x = 0;
         this.y = 0;
         // Default bounds
@@ -29,7 +29,7 @@ public class Vector2D implements Comparable<Vector2D> {
      * @param x An integer between 0 and 31 along the x-axis.
      * @param y An integer between 0 and 31 along the y-axis.
      */
-    public Vector2D(int x, int y) {
+    public Point(int x, int y) {
         this(x, y, 0, 0, 31, 31);
     }
 
@@ -40,7 +40,7 @@ public class Vector2D implements Comparable<Vector2D> {
      * @param x An integer between 0 and 10 along the x-axis.
      * @param y An integer between 0 and 10 along the y-axis.
      */
-    public Vector2D(char x, char y) {
+    public Point(char x, char y) {
         this(x - 'a', y - '1', 0, 0, 10, 10);
     }
 
@@ -50,7 +50,7 @@ public class Vector2D implements Comparable<Vector2D> {
      *
      * @param s String of a move in chess notation (ex. e6)
      */
-    public Vector2D(String s) throws NullPointerException, IndexOutOfBoundsException {
+    public Point(String s) throws NullPointerException, IndexOutOfBoundsException {
         this(s.charAt(s.length() - 2), s.charAt(s.length() - 1));
     }
 
@@ -67,7 +67,7 @@ public class Vector2D implements Comparable<Vector2D> {
      * @param xBounds2 Represents one bound of the x-axis
      * @param yBounds2 Represents one bound of the y-axis
      */
-    public Vector2D(int xVal, int yVal, int xBounds1, int yBounds1, int xBounds2, int yBounds2) {
+    public Point(int xVal, int yVal, int xBounds1, int yBounds1, int xBounds2, int yBounds2) {
         this.x = xVal;
         this.y = yVal;
         // width * height >= Integer.MAX_VALUE, using division to avoid overflow
@@ -85,7 +85,7 @@ public class Vector2D implements Comparable<Vector2D> {
         }
     }
 
-    public Vector2D(Vector2D copy) {
+    public Point(Point copy) {
         this(copy.x, copy.y, copy.minX, copy.minY, copy.maxX, copy.maxY);
     }
 
@@ -98,7 +98,7 @@ public class Vector2D implements Comparable<Vector2D> {
     }
 
     @Override
-    public int compareTo(Vector2D o) {
+    public int compareTo(Point o) {
         if (o == null) {
             return -1;
         }
@@ -126,7 +126,7 @@ public class Vector2D implements Comparable<Vector2D> {
         if (o.getClass() != this.getClass())
             return false;
 
-        Vector2D vector = (Vector2D) o;
+        Point vector = (Point) o;
         // Compares only x and y values, ignoring bounds
         // These are not equal when inserting into hashmap
         return this.x == vector.x && this.y == vector.y;
@@ -153,9 +153,9 @@ public class Vector2D implements Comparable<Vector2D> {
      *
      * @param colour    {@link Colour} of the piece which the player is facing.
      * @param direction {@link Direction} relative to the piece. Left is always White's left side.
-     * @return {@link Vector2D}
+     * @return {@link Point}
      */
-    public Vector2D shift(Colour colour, Direction direction) {
+    public Point shift(Colour colour, Direction direction) {
         if (colour == null || direction == null) {
             throw new NullPointerException();
         }
@@ -163,10 +163,10 @@ public class Vector2D implements Comparable<Vector2D> {
         int dir = Colour.WHITE.equals(colour) ? 1 : -1;
         return switch (direction) {
             case AT -> this;
-            case FRONT -> new Vector2D(this.x, this.y + dir, this.minX, this.minY, this.maxX, this.maxY);
-            case BACK -> new Vector2D(this.x, this.y - dir, this.minX, this.minY, this.maxX, this.maxY);
-            case RIGHT -> new Vector2D(this.x + dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
-            case LEFT -> new Vector2D(this.x - dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
+            case FRONT -> new Point(this.x, this.y + dir, this.minX, this.minY, this.maxX, this.maxY);
+            case BACK -> new Point(this.x, this.y - dir, this.minX, this.minY, this.maxX, this.maxY);
+            case RIGHT -> new Point(this.x + dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
+            case LEFT -> new Point(this.x - dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
         };
     }
 

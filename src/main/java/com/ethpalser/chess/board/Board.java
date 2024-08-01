@@ -22,11 +22,11 @@ public class Board {
 
     private final int length;
     private final int width;
-    private final Space2D<CustomPiece> pieceMap;
-    private final Map<Vector2D, Set<CustomPiece>> wThreats;
-    private final Map<Vector2D, Set<CustomPiece>> bThreats;
-    private Vector2D wKing;
-    private Vector2D bKing;
+    private final Plane<CustomPiece> pieceMap;
+    private final Map<Point, Set<CustomPiece>> wThreats;
+    private final Map<Point, Set<CustomPiece>> bThreats;
+    private Point wKing;
+    private Point bKing;
     private boolean wCheck;
     private boolean bCheck;
     private CustomPiece lastMoved;
@@ -34,20 +34,20 @@ public class Board {
     public Board() {
         this.length = 8;
         this.width = 8;
-        Space2D<CustomPiece> map = new Space2D<>();
+        Plane<CustomPiece> map = new Plane<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length - 2));
         map.putAll(this.generatePiecesInRank(this.length - 1));
-        this.wKing = new Vector2D(4, 0);
-        this.bKing = new Vector2D(4, 7);
+        this.wKing = new Point(4, 0);
+        this.bKing = new Point(4, 7);
         this.pieceMap = map;
-        Map<Vector2D, Set<CustomPiece>> wThreatMap = new HashMap<>();
-        Map<Vector2D, Set<CustomPiece>> bThreatMap = new HashMap<>();
-        for (Vector2D v : map.keySet()) {
+        Map<Point, Set<CustomPiece>> wThreatMap = new HashMap<>();
+        Map<Point, Set<CustomPiece>> bThreatMap = new HashMap<>();
+        for (Point v : map.keySet()) {
             CustomPiece p = this.getPiece(v);
-            Set<Vector2D> pMoves = p.getMovementSet(v, this, false, true, true, false);
-            for (Vector2D m : pMoves) {
+            Set<Point> pMoves = p.getMovementSet(v, this, false, true, true, false);
+            for (Point m : pMoves) {
                 if (Colour.WHITE.equals(p.getColour())) {
                     wThreatMap.computeIfAbsent(m, k -> new HashSet<>()).add(p);
                 } else {
@@ -65,7 +65,7 @@ public class Board {
     public Board(List<String> pieces) {
         this.length = 8;
         this.width = 8;
-        Space2D<CustomPiece> map = new Space2D<>();
+        Plane<CustomPiece> map = new Plane<>();
         CustomPieceFactory pf = CustomPieceFactory.getInstance();
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);
@@ -78,12 +78,12 @@ public class Board {
             }
         }
         this.pieceMap = map;
-        Map<Vector2D, Set<CustomPiece>> wThreatMap = new HashMap<>();
-        Map<Vector2D, Set<CustomPiece>> bThreatMap = new HashMap<>();
-        for (Vector2D v : map.keySet()) {
+        Map<Point, Set<CustomPiece>> wThreatMap = new HashMap<>();
+        Map<Point, Set<CustomPiece>> bThreatMap = new HashMap<>();
+        for (Point v : map.keySet()) {
             CustomPiece p = this.getPiece(v);
-            Set<Vector2D> pMoves = p.getMovementSet(v, this, false, true, true, false);
-            for (Vector2D m : pMoves) {
+            Set<Point> pMoves = p.getMovementSet(v, this, false, true, true, false);
+            for (Point m : pMoves) {
                 if (Colour.WHITE.equals(p.getColour())) {
                     wThreatMap.computeIfAbsent(m, k -> new HashSet<>()).add(p);
                 } else {
@@ -98,14 +98,14 @@ public class Board {
         this.lastMoved = null;
     }
 
-    private Map<Vector2D, CustomPiece> generatePiecesInRank(int y) {
-        Map<Vector2D, CustomPiece> map = new HashMap<>();
+    private Map<Point, CustomPiece> generatePiecesInRank(int y) {
+        Map<Point, CustomPiece> map = new HashMap<>();
         Colour colour = y < (this.length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
 
         CustomPieceFactory customPieceFactory = CustomPieceFactory.getInstance();
         if (y == 0 || y == this.length - 1) {
             for (int x = 0; x < 8; x++) {
-                Vector2D vector = new Vector2D(x, y);
+                Point vector = new Point(x, y);
                 CustomPiece customPiece = switch (x) {
                     case 0, 7 -> customPieceFactory.build(PieceType.ROOK, colour, vector);
                     case 1, 6 -> customPieceFactory.build(PieceType.KNIGHT, colour, vector);
@@ -118,7 +118,7 @@ public class Board {
             }
         } else if (y == 1 || y == this.length - 2) {
             for (int x = 0; x < 8; x++) {
-                Vector2D vector = new Vector2D(x, y);
+                Point vector = new Point(x, y);
                 CustomPiece customPiece = customPieceFactory.build(PieceType.PAWN, colour, vector);
                 map.put(vector, customPiece);
             }
@@ -148,17 +148,17 @@ public class Board {
         if (x < 0 || x > this.width - 1 || y < 0 || y > this.length - 1) {
             return null;
         }
-        return pieceMap.get(new Vector2D(x, y));
+        return pieceMap.get(new Point(x, y));
     }
 
-    public CustomPiece getPiece(Vector2D vector) {
+    public CustomPiece getPiece(Point vector) {
         if (vector == null) {
             return null;
         }
         return pieceMap.get(vector);
     }
 
-    public void setPiece(Vector2D vector, CustomPiece customPiece) {
+    public void setPiece(Point vector, CustomPiece customPiece) {
         if (vector == null) {
             throw new NullPointerException();
         }
@@ -190,7 +190,7 @@ public class Board {
             return this.getPieces();
         }
         List<CustomPiece> customPieceList = new LinkedList<>();
-        for (Vector2D vector : path) {
+        for (Point vector : path) {
             customPieceList.add(this.getPiece(vector));
         }
         return customPieceList;
@@ -204,7 +204,7 @@ public class Board {
         this.lastMoved = customPiece;
     }
 
-    public Vector2D getKingLocation(Colour colour) {
+    public Point getKingLocation(Colour colour) {
         if (colour == null) {
             throw new NullPointerException();
         }
@@ -222,7 +222,7 @@ public class Board {
         return pieceMap.get(this.getKingLocation(colour));
     }
 
-    public void movePiece(Vector2D start, Vector2D end) {
+    public void movePiece(Point start, Point end) {
         if (start == null || end == null) {
             throw new NullPointerException();
         }
@@ -252,17 +252,17 @@ public class Board {
         this.setLastMoved(pMoved);
     }
 
-    private void updatePieceThreats(CustomPiece moving, Vector2D start, Vector2D end) {
+    private void updatePieceThreats(CustomPiece moving, Point start, Point end) {
         if (moving == null) {
             throw new NullPointerException();
         }
-        Set<Vector2D> mStart = start != null ? moving.getMovementSet(start, this, false, true, true, true) :
+        Set<Point> mStart = start != null ? moving.getMovementSet(start, this, false, true, true, true) :
                 new HashSet<>();
-        Set<Vector2D> mEnd = end != null ? moving.getMovementSet(end, this, false, true, true, true) : new HashSet<>();
+        Set<Point> mEnd = end != null ? moving.getMovementSet(end, this, false, true, true, true) : new HashSet<>();
         this.updateThreats(moving, mStart, mEnd);
     }
 
-    private void updateLocationThreats(Vector2D vector) {
+    private void updateLocationThreats(Point vector) {
         if (vector == null) {
             throw new NullPointerException();
         }
@@ -274,45 +274,45 @@ public class Board {
             bCustomPieces = new HashSet<>();
         List<CustomPiece> list = Stream.concat(wCustomPieces.stream(), bCustomPieces.stream()).collect(Collectors.toList());
         for (CustomPiece p : list) {
-            Set<Vector2D> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null, false, true, false, false);
-            Set<Vector2D> movesWithBoard = p.getMovementSet(p.getPosition(), this, false, true, true, true);
+            Set<Point> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null, false, true, false, false);
+            Set<Point> movesWithBoard = p.getMovementSet(p.getPosition(), this, false, true, true, true);
             this.updateThreats(p, movesIgnoringBoard, movesWithBoard);
         }
     }
 
-    private void updateThreats(CustomPiece customPiece, Set<Vector2D> before, Set<Vector2D> after) {
+    private void updateThreats(CustomPiece customPiece, Set<Point> before, Set<Point> after) {
         if (customPiece == null || before == null || after == null) {
             throw new NullPointerException();
         }
         before.removeAll(after);
         if (customPiece.getColour().equals(Colour.WHITE)) {
             // Remove all old threats of this piece
-            for (Vector2D v : before) {
+            for (Point v : before) {
                 this.wThreats.computeIfAbsent(v, k -> new HashSet<>()).remove(customPiece);
             }
             // Add all new threats of this piece (including overlap)
-            for (Vector2D v : after) {
+            for (Point v : after) {
                 this.wThreats.computeIfAbsent(v, k -> new HashSet<>()).add(customPiece);
             }
         } else {
-            for (Vector2D v : before) {
+            for (Point v : before) {
                 this.bThreats.computeIfAbsent(v, k -> new HashSet<>()).remove(customPiece);
             }
-            for (Vector2D v : after) {
+            for (Point v : after) {
                 this.bThreats.computeIfAbsent(v, k -> new HashSet<>()).add(customPiece);
             }
         }
     }
 
-    public List<CustomPiece> getLocationThreats(Vector2D vector2D, Colour colour) {
-        if (vector2D == null) {
+    public List<CustomPiece> getLocationThreats(Point point, Colour colour) {
+        if (point == null) {
             throw new NullPointerException();
         }
-        Set<CustomPiece> wThreatCustomPieces = this.wThreats.get(vector2D);
+        Set<CustomPiece> wThreatCustomPieces = this.wThreats.get(point);
         if (wThreatCustomPieces == null) {
             wThreatCustomPieces = new HashSet<>();
         }
-        Set<CustomPiece> bThreatCustomPieces = this.bThreats.get(vector2D);
+        Set<CustomPiece> bThreatCustomPieces = this.bThreats.get(point);
         if (bThreatCustomPieces == null) {
             bThreatCustomPieces = new HashSet<>();
         }
@@ -352,7 +352,7 @@ public class Board {
         if (kingColour == null) {
             throw new NullPointerException();
         }
-        Vector2D kingLoc = this.getKingLocation(kingColour);
+        Point kingLoc = this.getKingLocation(kingColour);
         Set<CustomPiece> threats = Colour.WHITE.equals(kingColour) ? this.bThreats.get(kingLoc) : this.wThreats.get(kingLoc);
         if (threats == null) {
             return List.of();
@@ -392,12 +392,12 @@ public class Board {
         if (colour == null) {
             throw new NullPointerException();
         }
-        Map<Vector2D, Set<CustomPiece>> threats = Colour.WHITE.equals(colour) ? wThreats : bThreats;
+        Map<Point, Set<CustomPiece>> threats = Colour.WHITE.equals(colour) ? wThreats : bThreats;
         StringBuilder sb = new StringBuilder();
         for (int y = this.length - 1; y >= 0; y--) {
             for (int x = 0; x <= this.width - 1; x++) {
                 boolean hasThreat =
-                        threats.get(new Vector2D(x, y)) != null && !threats.get(new Vector2D(x, y)).isEmpty();
+                        threats.get(new Point(x, y)) != null && !threats.get(new Point(x, y)).isEmpty();
                 if (!hasThreat) {
                     sb.append("|   ");
                 } else {
@@ -413,7 +413,7 @@ public class Board {
         return this.pieceMap.isInBounds(x, y);
     }
 
-    public boolean isValidLocation(Vector2D point) {
+    public boolean isValidLocation(Point point) {
         return this.pieceMap.isInBounds(point.getX(), point.getY());
     }
 

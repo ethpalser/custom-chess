@@ -1,8 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Vector2D;
-import com.ethpalser.chess.board.Vector2DUtil;
+import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.board.PointUtil;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
@@ -13,10 +13,10 @@ import java.util.Set;
 public class Knight implements ChessPiece {
 
     private final Colour colour;
-    private Vector2D point;
+    private Point point;
     private boolean hasMoved;
 
-    public Knight(Colour colour, Vector2D point) {
+    public Knight(Colour colour, Point point) {
         this.colour = colour;
         this.point = point;
     }
@@ -33,26 +33,26 @@ public class Knight implements ChessPiece {
 
     @Override
     public MoveSet getMoves(ChessBoard board, ChessLog log) {
-        Set<Vector2D> set = new HashSet<>();
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 2, 1)); // right 2 up
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 2, -1)); // right 2 down
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 1, -2)); // down 2 right
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, -2)); // down 2 left
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
+        Set<Point> set = new HashSet<>();
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 2, 1)); // right 2 up
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 2, -1)); // right 2 down
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, -2)); // down 2 right
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, -2)); // down 2 left
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
         set.remove(null);
         return new MoveSet(set);
     }
 
     @Override
-    public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
+    public boolean canMove(ChessBoard board, ChessLog log, Point destination) {
         return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
     }
 
     @Override
-    public void move(Vector2D destination) {
+    public void move(Point destination) {
         if (destination == null) {
             throw new IllegalArgumentException("destination cannot be null");
         }

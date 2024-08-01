@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.Colour;
 
 /**
@@ -9,16 +9,16 @@ import com.ethpalser.chess.piece.Colour;
 public class Action {
 
     private final Colour colour;
-    private final Vector2D start;
-    private final Vector2D end;
+    private final Point start;
+    private final Point end;
 
     private Action() {
         colour = Colour.WHITE;
-        start = new Vector2D();
-        end = new Vector2D();
+        start = new Point();
+        end = new Point();
     }
 
-    public Action(Colour colour, Vector2D start, Vector2D end) {
+    public Action(Colour colour, Point start, Point end) {
         this.colour = colour;
         this.start = start;
         this.end = end;
@@ -28,11 +28,11 @@ public class Action {
         return colour;
     }
 
-    public Vector2D getStart() {
+    public Point getStart() {
         return start;
     }
 
-    public Vector2D getEnd() {
+    public Point getEnd() {
         return end;
     }
 

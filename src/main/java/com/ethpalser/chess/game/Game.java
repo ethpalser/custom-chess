@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -60,8 +60,8 @@ public class Game {
         }
 
         Colour player = action.getColour();
-        Vector2D start = action.getStart();
-        Vector2D end = action.getEnd();
+        Point start = action.getStart();
+        Point end = action.getEnd();
         if (!this.turn.equals(player)) {
             throw new IllegalActionException("Acting player is not the turn player!");
         }
@@ -85,7 +85,7 @@ public class Game {
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
 
-    private CustomPiece getPieceToMove(Colour player, Vector2D start) {
+    private CustomPiece getPieceToMove(Colour player, Point start) {
         if (player == null || start == null) {
             throw new NullPointerException();
         }
@@ -98,7 +98,7 @@ public class Game {
         return customPiece;
     }
 
-    private void verifyDestination(CustomPiece selected, Vector2D end) {
+    private void verifyDestination(CustomPiece selected, Point end) {
         if (selected == null || end == null) {
             throw new NullPointerException();
         }
@@ -110,7 +110,7 @@ public class Game {
         }
     }
 
-    private Movement getMovement(CustomPiece selected, Vector2D end) {
+    private Movement getMovement(CustomPiece selected, Point end) {
         if (selected == null || end == null) {
             throw new NullPointerException();
         }
@@ -121,7 +121,7 @@ public class Game {
         return movement;
     }
 
-    private void performMovement(Colour player, Movement movement, Vector2D start, Vector2D end) {
+    private void performMovement(Colour player, Movement movement, Point start, Point end) {
         if (player == null || movement == null || start == null || end == null) {
             throw new NullPointerException();
         }
@@ -146,9 +146,9 @@ public class Game {
             return false;
         }
         CustomPiece king = this.board.getKing(this.getTurnOppColour());
-        Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
+        Set<Point> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
-            for (Vector2D v : kingMoves) {
+            for (Point v : kingMoves) {
                 if (this.board.getLocationThreats(v, this.getTurnColour()).isEmpty()) {
                     // King can move to a location that is not threatened by an opponent's piece
                     return false;
@@ -156,7 +156,7 @@ public class Game {
             }
         }
 
-        Vector2D kingPosition = king.getPosition();
+        Point kingPosition = king.getPosition();
         for (CustomPiece p : this.board.getPiecesCausingCheck(this.getTurnOppColour())) {
             List<CustomPiece> attackers = this.board.getLocationThreats(p.getPosition(), this.getTurnOppColour());
             for (CustomPiece a : attackers) {
@@ -170,7 +170,7 @@ public class Game {
 
             Movement pMove = this.getMovement(p, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition, this.board);
-            for (Vector2D v : pPath) {
+            for (Point v : pPath) {
                 List<CustomPiece> blockers =
                         this.board.getLocationThreats(v, this.getTurnOppColour()).stream().filter(piece -> !piece.getType().equals(PieceType.KING))
                                 .collect(Collectors.toList());
@@ -192,9 +192,9 @@ public class Game {
         }
 
         CustomPiece king = this.board.getKing(this.getTurnOppColour());
-        Set<Vector2D> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
+        Set<Point> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
-            for (Vector2D v : kingMoves) {
+            for (Point v : kingMoves) {
                 if (this.board.getLocationThreats(v, this.getTurnColour()).isEmpty()) {
                     // King can move to a location that is not threatened by an opponent's piece
                     return false;
@@ -205,7 +205,7 @@ public class Game {
         List<CustomPiece> playerCustomPieces = allCustomPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
                 && !p.getType().equals(PieceType.KING)).collect(Collectors.toList());
         for (CustomPiece p : playerCustomPieces) {
-            Set<Vector2D> moves = p.getMovementSet(p.getPosition(), board);
+            Set<Point> moves = p.getMovementSet(p.getPosition(), board);
             if (!moves.isEmpty()) {
                 return false;
             }

@@ -1,9 +1,7 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.custom.CustomPiece;
-import com.ethpalser.chess.piece.custom.PieceType;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +9,7 @@ class CustomPieceTest {
 
     @Test
     void initialize_fromValidCoordinate_isNotNullAndHasCoordinateAndNotMoved() {
-        Vector2D start = new Vector2D(2, 0);
+        Point start = new Point(2, 0);
         CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
         assertNotEquals(null, bishop.getPosition());
         assertFalse(bishop.getHasMoved());
@@ -21,10 +19,10 @@ class CustomPieceTest {
     void performMove_toSameLocationAndHasNotMoved_isNotUpdatedAndHasMovedIsFalse() {
         int x = 2;
         int y = 0;
-        Vector2D start = new Vector2D(x, y);
+        Point start = new Point(x, y);
         CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
-        Vector2D next = new Vector2D(x, y);
+        Point next = new Point(x, y);
         bishop.setPosition(next);
         assertEquals(x, bishop.getPosition().getX());
         assertEquals(y, bishop.getPosition().getY());
@@ -35,15 +33,15 @@ class CustomPieceTest {
     void performMove_toSameLocationHasMoved_isNotUpdatedAndHasMovedIsTrue() {
         int x = 2;
         int y = 0;
-        Vector2D start = new Vector2D(x, y);
+        Point start = new Point(x, y);
         CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
         int nextX = 3;
         int nextY = 1;
-        Vector2D moved = new Vector2D(nextX, nextY);
+        Point moved = new Point(nextX, nextY);
         bishop.setPosition(moved);
 
-        Vector2D next = new Vector2D(nextX, nextY);
+        Point next = new Point(nextX, nextY);
         bishop.setPosition(next);
         assertEquals(nextX, bishop.getPosition().getX());
         assertEquals(nextY, bishop.getPosition().getY());
@@ -54,12 +52,12 @@ class CustomPieceTest {
     void performMove_toNewLocation_isUpdatedAndHasMovedIsTrue() {
         int x = 2;
         int y = 0;
-        Vector2D start = new Vector2D(x, y);
+        Point start = new Point(x, y);
         CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
         int nextX = 3;
         int nextY = 1;
-        Vector2D next = new Vector2D(nextX, nextY);
+        Point next = new Point(nextX, nextY);
         bishop.setPosition(next);
         assertEquals(nextX, bishop.getPosition().getX());
         assertEquals(nextY, bishop.getPosition().getY());

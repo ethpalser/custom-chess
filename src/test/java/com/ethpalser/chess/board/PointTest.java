@@ -3,17 +3,17 @@ package com.ethpalser.chess.board;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-class Vector2DTest {
+class PointTest {
 
     @Test
     void initialize_fromIntegersAndInBounds_isNotNull() {
-        Vector2D vector = new Vector2D(0, 0);
+        Point vector = new Point(0, 0);
         assertNotNull(vector);
     }
 
     @Test
     void initialize_fromCharsAndInBounds_isNotNull() {
-        Vector2D vector = new Vector2D('a', '1');
+        Point vector = new Point('a', '1');
         assertNotNull(vector);
         assertEquals(0, vector.getX());
         assertEquals(0, vector.getY());
@@ -21,15 +21,15 @@ class Vector2DTest {
 
     @Test
     void equals_null_isFalse() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = null;
+        Point coA = new Point(5, 7);
+        Point coB = null;
         boolean isEqual = coA.equals(coB);
         assertFalse(isEqual);
     }
 
     @Test
     void equals_differentClass_isFalse() {
-        Vector2D coA = new Vector2D(5, 7);
+        Point coA = new Point(5, 7);
         Integer b = 5;
         boolean isEqual = coA.equals(b);
         assertFalse(isEqual);
@@ -37,32 +37,32 @@ class Vector2DTest {
 
     @Test
     void equals_coordinateWithDifferentX_isFalse() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = new Vector2D(2, 7);
+        Point coA = new Point(5, 7);
+        Point coB = new Point(2, 7);
         boolean isEqual = coA.equals(coB);
         assertFalse(isEqual);
     }
 
     @Test
     void equals_coordinateWithDifferentY_isFalse() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = new Vector2D(5, 5);
+        Point coA = new Point(5, 7);
+        Point coB = new Point(5, 5);
         boolean isEqual = coA.equals(coB);
         assertFalse(isEqual);
     }
 
     @Test
     void equals_coordinateWithSameXAndY_isTrue() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = new Vector2D(5, 7);
+        Point coA = new Point(5, 7);
+        Point coB = new Point(5, 7);
         boolean isEqual = coA.equals(coB);
         assertTrue(isEqual);
     }
 
     @Test
     void hashCode_notEqualCoordinate_isNotEqual() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = new Vector2D(5, 5);
+        Point coA = new Point(5, 7);
+        Point coB = new Point(5, 5);
         int hashA = coA.hashCode();
         int hashB = coB.hashCode();
         boolean isEqual = hashA == hashB;
@@ -71,8 +71,8 @@ class Vector2DTest {
 
     @Test
     void hashCode_equalCoordinate_isEqual() {
-        Vector2D coA = new Vector2D(5, 7);
-        Vector2D coB = new Vector2D(5, 7);
+        Point coA = new Point(5, 7);
+        Point coB = new Point(5, 7);
         int hashA = coA.hashCode();
         int hashB = coB.hashCode();
         boolean isEqual = hashA == hashB;

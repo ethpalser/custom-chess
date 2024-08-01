@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -28,8 +28,8 @@ class ConditionTest {
         Board board = new Board();
 
         // When
-        Vector2D selected = new Vector2D(4, 4);
-        Vector2D destination = new Vector2D(5, 5);
+        Point selected = new Point(4, 4);
+        Point destination = new Point(5, 5);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -44,8 +44,8 @@ class ConditionTest {
         Board board = new Board();
 
         // When
-        Vector2D selected = new Vector2D(4, 4);
-        Vector2D destination = new Vector2D(5, 5);
+        Point selected = new Point(4, 4);
+        Point destination = new Point(5, 5);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -60,11 +60,11 @@ class ConditionTest {
 
         Board board = new Board();
         CustomPiece customPiece = board.getPiece(2, 1);
-        board.setPiece(new Vector2D(2, 2), customPiece);
+        board.setPiece(new Point(2, 2), customPiece);
 
         // When
-        Vector2D selected = new Vector2D(4, 1);
-        Vector2D destination = new Vector2D(5, 2);
+        Point selected = new Point(4, 1);
+        Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -78,11 +78,11 @@ class ConditionTest {
 
         Board board = new Board();
         CustomPiece customPiece = board.getPiece(2, 1);
-        board.setPiece(new Vector2D(2, 3), customPiece);
+        board.setPiece(new Point(2, 3), customPiece);
 
         // When
-        Vector2D selected = new Vector2D(4, 1);
-        Vector2D destination = new Vector2D(5, 2);
+        Point selected = new Point(4, 1);
+        Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -97,8 +97,8 @@ class ConditionTest {
         Board board = new Board();
 
         // When
-        Vector2D selected = new Vector2D(4, 1);
-        Vector2D destination = new Vector2D(5, 2);
+        Point selected = new Point(4, 1);
+        Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -116,14 +116,14 @@ class ConditionTest {
 
         Board board = new Board();
         CustomPiece white = board.getPiece(4, 1);
-        board.setPiece(new Vector2D(4, 4), white);
+        board.setPiece(new Point(4, 4), white);
         CustomPiece black = board.getPiece(5, 6);
-        board.setPiece(new Vector2D(5, 4), black);
+        board.setPiece(new Point(5, 4), black);
         board.setLastMoved(black);
 
         // When
-        Vector2D selected = new Vector2D(4, 4);
-        Vector2D destination = new Vector2D(5, 5);
+        Point selected = new Point(4, 4);
+        Point destination = new Point(5, 5);
         Action action = new Action(Colour.WHITE, selected, destination);
         boolean result = conditionA.isExpected(board, action)
                 && conditionB.isExpected(board, action)
@@ -140,8 +140,8 @@ class ConditionTest {
 
         // When
         Board board = new Board();
-        Vector2D selected = new Vector2D(4, 1);
-        Vector2D destination = new Vector2D(5, 2);
+        Point selected = new Point(4, 1);
+        Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -154,13 +154,13 @@ class ConditionTest {
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         Board board = new Board();
-        board.setPiece(new Vector2D(4, 1), null);
+        board.setPiece(new Point(4, 1), null);
         CustomPiece king = board.getPiece(4, 0);
-        board.setPiece(new Vector2D(4, 1), king);
+        board.setPiece(new Point(4, 1), king);
 
         // When
-        Vector2D selected = new Vector2D(4, 1);
-        Vector2D destination = new Vector2D(5, 2);
+        Point selected = new Point(4, 1);
+        Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -169,18 +169,18 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.VECTOR, new Vector2D(0, 0)),
+        Conditional condition = new PropertyCondition(new Reference(Location.VECTOR, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         Board board = new Board();
         CustomPiece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
-        board.setPiece(new Vector2D(0, 2), rook);
-        board.setPiece(new Vector2D(0, 0), rook);
+        board.setPiece(new Point(0, 2), rook);
+        board.setPiece(new Point(0, 0), rook);
 
         // When
-        Vector2D selected = new Vector2D(4, 0);
-        Vector2D destination = new Vector2D(2, 0);
+        Point selected = new Point(4, 0);
+        Point destination = new Point(2, 0);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -189,13 +189,13 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Conditional condition = new ReferenceCondition(new Reference(Location.VECTOR, new Vector2D(1, 0)),
+        Conditional condition = new ReferenceCondition(new Reference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
         Board board = new Board();
         // When
-        Vector2D selected = new Vector2D(4, 0);
-        Vector2D destination = new Vector2D(2, 0);
+        Point selected = new Point(4, 0);
+        Point destination = new Point(2, 0);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
         // Then
         assertFalse(result);
@@ -206,19 +206,19 @@ class ConditionTest {
         // Given
         Conditional conditionA = new PropertyCondition(new Reference(Location.START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionB = new PropertyCondition(new Reference(Location.VECTOR, new Vector2D(0, 0)),
+        Conditional conditionB = new PropertyCondition(new Reference(Location.VECTOR, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionC = new PropertyCondition(new Reference(Location.VECTOR, new Vector2D(1, 0)),
+        Conditional conditionC = new PropertyCondition(new Reference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST);
 
         Board board = new Board();
-        board.setPiece(new Vector2D(1, 0), null);
-        board.setPiece(new Vector2D(2, 0), null);
-        board.setPiece(new Vector2D(3, 0), null);
+        board.setPiece(new Point(1, 0), null);
+        board.setPiece(new Point(2, 0), null);
+        board.setPiece(new Point(3, 0), null);
 
         // When
-        Vector2D selected = new Vector2D(4, 0);
-        Vector2D destination = new Vector2D(2, 0);
+        Point selected = new Point(4, 0);
+        Point destination = new Point(2, 0);
         Action action = new Action(Colour.WHITE, selected, destination);
         boolean result = conditionA.isExpected(board, action)
                 && conditionB.isExpected(board, action)

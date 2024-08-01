@@ -1,8 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Vector2D;
-import com.ethpalser.chess.board.Vector2DUtil;
+import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.board.PointUtil;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.game.LogRecord;
 import com.ethpalser.chess.piece.ChessPiece;
@@ -14,10 +14,10 @@ import java.util.Set;
 public class Pawn implements ChessPiece {
 
     private final Colour colour;
-    private Vector2D point;
+    private Point point;
     private boolean hasMoved;
 
-    public Pawn(Colour colour, Vector2D point) {
+    public Pawn(Colour colour, Point point) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = false;
@@ -35,19 +35,19 @@ public class Pawn implements ChessPiece {
 
     @Override
     public MoveSet getMoves(ChessBoard board, ChessLog log) {
-        Set<Vector2D> set = new HashSet<>();
+        Set<Point> set = new HashSet<>();
         int y = this.colour == Colour.WHITE ? 1 : -1;
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
-        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, y));
-        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, y));
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
+        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, y));
+        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, y));
         if (!this.hasMoved) {
-            set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y * 2));
+            set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y * 2));
         }
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
             LogRecord lastMove = log.peek();
-            Vector2D start = lastMove.getStart();
-            Vector2D destination = lastMove.getEnd();
+            Point start = lastMove.getStart();
+            Point destination = lastMove.getEnd();
             // a pawn moved forward two
             if (lastMove.isFirstMove() && "P".equals(board.getPiece(destination).getCode())
                     && ((lastMove.getMovingPiece().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
@@ -55,10 +55,10 @@ public class Pawn implements ChessPiece {
             ) {
                 // that pawn is beside this pawn
                 if (destination.getX() == this.point.getX() - 1) {
-                    set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, y));
+                    set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, y));
                 }
                 if (destination.getX() == this.point.getX() + 1) {
-                    set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 1, y));
+                    set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, y));
                 }
             }
         }
@@ -67,12 +67,12 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
+    public boolean canMove(ChessBoard board, ChessLog log, Point destination) {
         return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
     }
 
     @Override
-    public void move(Vector2D destination) {
+    public void move(Point destination) {
         if (destination == null) {
             throw new IllegalArgumentException("destination cannot be null");
         }

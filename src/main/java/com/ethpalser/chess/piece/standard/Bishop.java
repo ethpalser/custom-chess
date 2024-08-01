@@ -1,8 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Vector2D;
-import com.ethpalser.chess.board.Vector2DUtil;
+import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.board.PointUtil;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
@@ -13,10 +13,10 @@ import java.util.Set;
 public class Bishop implements ChessPiece {
 
     private final Colour colour;
-    private Vector2D point;
+    private Point point;
     private boolean hasMoved;
 
-    public Bishop(Colour colour, Vector2D point) {
+    public Bishop(Colour colour, Point point) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = false;
@@ -37,21 +37,21 @@ public class Bishop implements ChessPiece {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
-        Set<Vector2D> set = new HashSet<>();
-        set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, false, false)); // bottom left
-        set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, false, true)); // top left
-        set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, true, false)); // bottom right
-        set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, true, true)); // top right
+        Set<Point> set = new HashSet<>();
+        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, false)); // bottom left
+        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, true)); // top left
+        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, false)); // bottom right
+        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, true)); // top right
         return new MoveSet(set);
     }
 
     @Override
-    public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
+    public boolean canMove(ChessBoard board, ChessLog log, Point destination) {
         return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
     }
 
     @Override
-    public void move(Vector2D destination) {
+    public void move(Point destination) {
         if (destination == null) {
             throw new IllegalArgumentException("destination cannot be null");
         }

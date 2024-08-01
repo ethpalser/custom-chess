@@ -4,11 +4,11 @@ import com.ethpalser.chess.piece.Colour;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Vector2DUtil {
+public class PointUtil {
 
-    public static Vector2D generateValidPointOrNull(ChessBoard board, Vector2D start, Colour colour,
+    public static Point generateValidPointOrNull(ChessBoard board, Point start, Colour colour,
             int xOffset, int yOffset) {
-        Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
+        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
         if (!board.isInBounds(point.getX(), point.getY()) || (board.getPiece(point) != null
                 && board.getPiece(point).getColour() == colour)) {
@@ -17,9 +17,9 @@ public class Vector2DUtil {
         return point;
     }
 
-    public static Vector2D generateCapturePointOrNull(ChessBoard board, Vector2D start, Colour colour,
+    public static Point generateCapturePointOrNull(ChessBoard board, Point start, Colour colour,
             int xOffset, int yOffset) {
-        Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
+        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
         if (!board.isInBounds(point.getX(), point.getY()) || board.getPiece(point) == null
                 || board.getPiece(point).getColour() == colour) {
@@ -29,13 +29,13 @@ public class Vector2DUtil {
         return point;
     }
 
-    public static Set<Vector2D> generateHorizontalMoves(ChessBoard board, Vector2D start, Colour colour,
+    public static Set<Point> generateHorizontalMoves(ChessBoard board, Point start, Colour colour,
             boolean right) {
-        Set<Vector2D> set = new HashSet<>();
+        Set<Point> set = new HashSet<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
-            Vector2D pos = new Vector2D(start.getX() + x, start.getY());
+            Point pos = new Point(start.getX() + x, start.getY());
             if (board.getPiece(pos) != null) {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
@@ -48,13 +48,13 @@ public class Vector2DUtil {
         return set;
     }
 
-    public static Set<Vector2D> generateVerticalMoves(ChessBoard board, Vector2D start, Colour colour,
+    public static Set<Point> generateVerticalMoves(ChessBoard board, Point start, Colour colour,
             boolean up) {
-        Set<Vector2D> set = new HashSet<>();
+        Set<Point> set = new HashSet<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
-            Vector2D pos = new Vector2D(start.getX(), start.getY() + y);
+            Point pos = new Point(start.getX(), start.getY() + y);
             if (board.getPiece(pos) != null) {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
@@ -67,14 +67,14 @@ public class Vector2DUtil {
         return set;
     }
 
-    public static Set<Vector2D> generateDiagonalMoves(ChessBoard board, Vector2D start, Colour colour,
+    public static Set<Point> generateDiagonalMoves(ChessBoard board, Point start, Colour colour,
             boolean right, boolean up) {
-        Set<Vector2D> set = new HashSet<>();
+        Set<Point> set = new HashSet<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
-            Vector2D pos = new Vector2D(start.getX() + x, start.getY() + y);
+            Point pos = new Point(start.getX() + x, start.getY() + y);
             if (board.getPiece(pos) != null) {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);

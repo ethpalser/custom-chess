@@ -25,7 +25,7 @@ class BoardTest {
                     continue;
                 }
 
-                Vector2D vector = customPiece.getPosition();
+                Point vector = customPiece.getPosition();
                 if (vector.getY() == 0 || vector.getY() == 1) {
                     assertEquals(Colour.WHITE, customPiece.getColour());
                 } else if (vector.getY() == 6 || vector.getY() == 7) {
@@ -59,12 +59,12 @@ class BoardTest {
         Board board = new Board();
         int y = 1;
         for (int x = 0; x < board.width(); x++) {
-            board.setPiece(new Vector2D(x, y), null);
+            board.setPiece(new Point(x, y), null);
         }
 
         y = 6;
         for (int x = 0; x < board.width(); x++) {
-            board.setPiece(new Vector2D(x, y), null);
+            board.setPiece(new Point(x, y), null);
         }
         assertEquals(16, board.count());
 

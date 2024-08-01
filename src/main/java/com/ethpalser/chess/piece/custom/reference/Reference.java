@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom.reference;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.movement.Path;
@@ -12,7 +12,7 @@ public class Reference {
 
     private final Location location;
     private final Direction direction;
-    private final Vector2D vector;
+    private final Point vector;
 
     public Reference() {
         this(Location.START);
@@ -22,7 +22,7 @@ public class Reference {
         this(location, Direction.AT, null);
     }
 
-    public Reference(Location location, Vector2D vector) {
+    public Reference(Location location, Point vector) {
         this(location, Direction.AT, vector);
     }
 
@@ -30,7 +30,7 @@ public class Reference {
         this(location, direction, null);
     }
 
-    public Reference(Location location, Direction direction, Vector2D vector) {
+    public Reference(Location location, Direction direction, Point vector) {
         this.location = location;
         this.direction = direction;
 
@@ -56,9 +56,9 @@ public class Reference {
         if (action.getStart() == null || action.getEnd() == null) {
             throw new IllegalArgumentException("Action has null start or end vector.");
         }
-        Vector2D shiftedStart = action.getStart().shift(action.getColour(), this.direction);
-        Vector2D shiftedEnd = action.getEnd().shift(action.getColour(), this.direction);
-        Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.getColour(), this.direction);
+        Point shiftedStart = action.getStart().shift(action.getColour(), this.direction);
+        Point shiftedEnd = action.getEnd().shift(action.getColour(), this.direction);
+        Point shiftedReference = this.vector == null ? null : this.vector.shift(action.getColour(), this.direction);
 
         List<CustomPiece> list = new ArrayList<>();
         CustomPiece toAdd = null;

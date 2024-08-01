@@ -1,25 +1,25 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import java.util.Objects;
 import java.util.Optional;
 
 public class Move {
 
-    private final Vector2D point;
+    private final Point point;
     private final MoveRecord followUpMove;
 
-    public Move(Vector2D point) {
+    public Move(Point point) {
         this.point = point;
         this.followUpMove = null;
     }
 
-    public Move(Vector2D point, MoveRecord followUpMove) {
+    public Move(Point point, MoveRecord followUpMove) {
         this.point = point;
         this.followUpMove = followUpMove;
     }
 
-    public Vector2D getPoint() {
+    public Point getPoint() {
         return this.point;
     }
 

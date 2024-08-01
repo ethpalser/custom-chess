@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
+public class Plane<T> implements Map<Point, T>, Iterable<T> {
 
     private final int minX;
     private final int minY;
     private final int maxX;
     private final int maxY;
 
-    private final Map<Vector2D, T> space;
+    private final Map<Point, T> space;
 
-    public Space2D() {
+    public Plane() {
         space = new HashMap<>();
         this.minX = 0;
         this.minY = 0;
@@ -23,7 +23,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         this.maxY = 31;
     }
 
-    public Space2D(int x1, int y1, int x2, int y2) {
+    public Plane(int x1, int y1, int x2, int y2) {
         space = new HashMap<>();
 
         this.minX = Math.min(x1, x2);
@@ -58,7 +58,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
     }
 
     @Override
-    public T put(Vector2D key, T value) {
+    public T put(Point key, T value) {
         return space.put(key, value);
     }
 
@@ -68,7 +68,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
     }
 
     @Override
-    public void putAll(Map<? extends Vector2D, ? extends T> m) {
+    public void putAll(Map<? extends Point, ? extends T> m) {
         space.putAll(m);
     }
 
@@ -78,7 +78,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
     }
 
     @Override
-    public Set<Vector2D> keySet() {
+    public Set<Point> keySet() {
         return space.keySet();
     }
 
@@ -88,7 +88,7 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
     }
 
     @Override
-    public Set<Entry<Vector2D, T>> entrySet() {
+    public Set<Entry<Point, T>> entrySet() {
         return space.entrySet();
     }
 
@@ -96,15 +96,15 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return space.values().iterator();
     }
 
-    public Vector2D at(int x, int y) throws IndexOutOfBoundsException {
+    public Point at(int x, int y) throws IndexOutOfBoundsException {
         if (x < minX || x > maxX || y < minY || y > maxY) {
             String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space. " + this.printBounds();
             throw new IndexOutOfBoundsException(errMsg);
         }
-        return new Vector2D(x, y, this.minX, this.minY, this.maxX, this.maxY);
+        return new Point(x, y, this.minX, this.minY, this.maxX, this.maxY);
     }
 
-    public Vector2D at(char x, char y) throws IndexOutOfBoundsException {
+    public Point at(char x, char y) throws IndexOutOfBoundsException {
         // This has greater bounds than Vector2D's char constructor. Ensures consistency in hash value
         return this.at(x - 'a', y - '1');
     }

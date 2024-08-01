@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardTestCases;
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,8 +17,8 @@ class GameTest {
         int pieceY = 2;
         int nextX = 4;
         int nextY = 3;
-        Vector2D pieceC = new Vector2D(pieceX, pieceY); // Nothing at location
-        Vector2D nextC = new Vector2D(nextX, nextY);
+        Point pieceC = new Point(pieceX, pieceY); // Nothing at location
+        Point nextC = new Point(nextX, nextY);
         Game game = new Game();
 
         // When
@@ -38,8 +38,8 @@ class GameTest {
         int pieceY = 0;
         int nextX = 1;
         int nextY = 0;
-        Vector2D pieceC = new Vector2D(pieceX, pieceY); // White Knight
-        Vector2D nextC = new Vector2D(nextX, nextY);
+        Point pieceC = new Point(pieceX, pieceY); // White Knight
+        Point nextC = new Point(nextX, nextY);
         Game game = new Game();
 
         // When
@@ -59,8 +59,8 @@ class GameTest {
         int pieceY = 0;
         int nextX = 0;
         int nextY = -2;
-        Vector2D pieceC = new Vector2D(pieceX, pieceY); // White Knight
-        Vector2D invalid = new Vector2D(nextX, nextY);
+        Point pieceC = new Point(pieceX, pieceY); // White Knight
+        Point invalid = new Point(nextX, nextY);
         Game game = new Game();
 
         // When
@@ -80,12 +80,12 @@ class GameTest {
         int pieceY = 0;
         int nextX = 2;
         int nextY = 2;
-        Vector2D source = new Vector2D(pieceX, pieceY); // White Knight
-        Vector2D target = new Vector2D(nextX, nextY); // White Pawn
+        Point source = new Point(pieceX, pieceY); // White Knight
+        Point target = new Point(nextX, nextY); // White Pawn
         Game game = new Game();
         Board board = game.getBoard();
-        board.movePiece(new Vector2D(nextX, 1), new Vector2D(nextX, nextY)); // Filler
-        board.movePiece(new Vector2D(0, 6), new Vector2D(0, 5)); // Filler
+        board.movePiece(new Point(nextX, 1), new Point(nextX, nextY)); // Filler
+        board.movePiece(new Point(0, 6), new Point(0, 5)); // Filler
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -106,8 +106,8 @@ class GameTest {
         int pieceY = 0;
         int nextX = 0;
         int nextY = 6;
-        Vector2D source = new Vector2D(pieceX, pieceY); // White Rook
-        Vector2D target = new Vector2D(nextX, nextY); // Black Pawn
+        Point source = new Point(pieceX, pieceY); // White Rook
+        Point target = new Point(nextX, nextY); // Black Pawn
         Game game = new Game();
 
         // When
@@ -130,11 +130,11 @@ class GameTest {
         int pieceY = 0;
         int nextX = 0;
         int nextY = 6;
-        Vector2D source = new Vector2D(pieceX, pieceY); // White Rook
-        Vector2D target = new Vector2D(nextX, nextY); // Black Pawn
+        Point source = new Point(pieceX, pieceY); // White Rook
+        Point target = new Point(nextX, nextY); // Black Pawn
         Game game = new Game();
         Board board = game.getBoard();
-        board.setPiece(new Vector2D(0, 1), null); // Can be sufficient for path checks
+        board.setPiece(new Point(0, 1), null); // Can be sufficient for path checks
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -154,8 +154,8 @@ class GameTest {
         int pieceY = 0;
         int nextX = 4;
         int nextY = 2;
-        Vector2D source = new Vector2D(pieceX, pieceY); // White Bishop
-        Vector2D target = new Vector2D(nextX, nextY); // Empty
+        Point source = new Point(pieceX, pieceY); // White Bishop
+        Point target = new Point(nextX, nextY); // Empty
         Game game = new Game();
 
         // When
@@ -177,11 +177,11 @@ class GameTest {
         int pieceY = 0;
         int nextX = 4;
         int nextY = 2;
-        Vector2D source = new Vector2D(pieceX, pieceY); // White Bishop
-        Vector2D target = new Vector2D(nextX, nextY); // Empty
+        Point source = new Point(pieceX, pieceY); // White Bishop
+        Point target = new Point(nextX, nextY); // Empty
         Game game = new Game();
         Board board = game.getBoard();
-        board.setPiece(new Vector2D(3, 1), null); // Clearing the path for a Bishop's move
+        board.setPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -197,12 +197,12 @@ class GameTest {
     @Test
     void executeAction_castleKingSideAndValid_kingAndRookMovedAndNoFewerPieces() {
         // Given
-        Vector2D source = new Vector2D(4, 0);
-        Vector2D target = new Vector2D(6, 0);
+        Point source = new Point(4, 0);
+        Point target = new Point(6, 0);
         Game game = new Game();
         Board board = game.getBoard();
-        board.setPiece(new Vector2D(5, 0), null);
-        board.setPiece(new Vector2D(6, 0), null);
+        board.setPiece(new Point(5, 0), null);
+        board.setPiece(new Point(6, 0), null);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -219,13 +219,13 @@ class GameTest {
     @Test
     void executeAction_castleQueenSideAndValid_kingAndRookMovedAndNoFewerPieces() {
         // Given
-        Vector2D source = new Vector2D(4, 0);
-        Vector2D target = new Vector2D(2, 0);
+        Point source = new Point(4, 0);
+        Point target = new Point(2, 0);
         Game game = new Game();
         Board board = game.getBoard();
-        board.setPiece(new Vector2D(1, 0), null);
-        board.setPiece(new Vector2D(2, 0), null);
-        board.setPiece(new Vector2D(3, 0), null);
+        board.setPiece(new Point(1, 0), null);
+        board.setPiece(new Point(2, 0), null);
+        board.setPiece(new Point(3, 0), null);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -241,21 +241,21 @@ class GameTest {
     @Test
     void executeAction_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
         // Given
-        Vector2D source = new Vector2D(4, 6);
-        Vector2D target = new Vector2D(4, 4);
+        Point source = new Point(4, 6);
+        Point target = new Point(4, 4);
         Game game = new Game();
         Board board = game.getBoard();
         // White move
-        board.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
+        board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
-        board.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
+        board.movePiece(new Point(1, 6), new Point(1, 5));
         // White move
-        board.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
+        board.movePiece(new Point(3, 3), new Point(3, 4));
         // Black move
         board.movePiece(source, target);
 
         // When (White move)
-        Action action = new Action(Colour.WHITE, new Vector2D(3, 4), new Vector2D(4, 5));
+        Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
         game.executeAction(action); // En Passant
 
         // Then
@@ -267,21 +267,21 @@ class GameTest {
     @Test
     void executeAction_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
         // Given
-        Vector2D source = new Vector2D(2, 6);
-        Vector2D target = new Vector2D(2, 4);
+        Point source = new Point(2, 6);
+        Point target = new Point(2, 4);
         Game game = new Game();
         Board board = game.getBoard();
         // White move
-        board.movePiece(new Vector2D(3, 1), new Vector2D(3, 3));
+        board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
-        board.movePiece(new Vector2D(1, 6), new Vector2D(1, 5));
+        board.movePiece(new Point(1, 6), new Point(1, 5));
         // White move
-        board.movePiece(new Vector2D(3, 3), new Vector2D(3, 4));
+        board.movePiece(new Point(3, 3), new Point(3, 4));
         // Black move
         board.movePiece(source, target);
 
         // When (White move)
-        Action action = new Action(Colour.WHITE, new Vector2D(3, 4), new Vector2D(2, 5));
+        Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));
         game.executeAction(action); // En Passant
 
         // Then
@@ -296,7 +296,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.inProgressPieceCanMove);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -308,7 +308,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.inProgressPieceCanCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -320,7 +320,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.inProgressNotOnlyKings);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '2'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '2'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -335,7 +335,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.stalematePieceCannotMove);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('g', '4'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -347,7 +347,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.stalematePieceCannotCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -359,7 +359,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.stalemateOnlyKings);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('e', '1'), new Vector2D('e', '2'));
+        Action action = new Action(Colour.WHITE, new Point('e', '1'), new Point('e', '2'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -373,7 +373,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkPieceCanCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -386,7 +386,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkPieceCanBlock);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -399,7 +399,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkKingCanMove);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertNull(game.getWinner());
@@ -414,7 +414,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkmatePieceCannotCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertEquals(Colour.WHITE, game.getWinner());
@@ -427,7 +427,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkmatePieceCannotBlock);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '8'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
         game.executeAction(action);
         // Then
         assertEquals(Colour.WHITE, game.getWinner());
@@ -440,7 +440,7 @@ class GameTest {
         Board board = new Board(BoardTestCases.checkmateKingCannotMove);
         Game game = new Game(board, Colour.WHITE);
         // When
-        Action action = new Action(Colour.WHITE, new Vector2D('d', '1'), new Vector2D('d', '7'));
+        Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         game.executeAction(action);
         // Then
         assertEquals(Colour.WHITE, game.getWinner());

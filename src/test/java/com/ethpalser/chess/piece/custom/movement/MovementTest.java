@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.Colour;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ class MovementTest {
     private static final int MAX_X = 7;
     private static final int MAX_Y = 7;
 
-    private List<Vector2D> bishopCoordinates() {
-        List<Vector2D> list = new ArrayList<>();
+    private List<Point> bishopCoordinates() {
+        List<Point> list = new ArrayList<>();
         for (int i = 1; i <= MAX_X; i++) {
-            list.add(new Vector2D(i, i));
+            list.add(new Point(i, i));
         }
         return list;
     }
@@ -26,7 +26,7 @@ class MovementTest {
         Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
-        Vector2D co = new Vector2D(3, 3);
+        Point co = new Point(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
@@ -62,7 +62,7 @@ class MovementTest {
         Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
-        Vector2D co = new Vector2D(3, 3);
+        Point co = new Point(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
@@ -98,7 +98,7 @@ class MovementTest {
         Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, true);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
-        Vector2D co = new Vector2D(3, 3);
+        Point co = new Point(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
@@ -134,7 +134,7 @@ class MovementTest {
         Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, true);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
-        Vector2D co = new Vector2D(3, 3);
+        Point co = new Point(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
@@ -170,7 +170,7 @@ class MovementTest {
         Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
         boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
 
-        Vector2D co = new Vector2D(3, 3);
+        Point co = new Point(3, 3);
         boolean[][] boardMove = movement.drawCoordinates(Colour.BLACK, co);
 
         final int coX = co.getX();
