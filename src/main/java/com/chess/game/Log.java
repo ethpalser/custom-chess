@@ -1,35 +1,34 @@
 package com.chess.game;
 
 import com.chess.game.movement.ActionRecord;
-import com.chess.game.piece.Piece;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-public class Log implements Collection<ActionRecord> {
+public class Log implements ChessLog {
 
-    private final Deque<ActionRecord> logStack;
-    private final Deque<ActionRecord> undoStack;
+    private final Deque<LogRecord> logStack;
+    private final Deque<LogRecord> undoStack;
 
     public Log() {
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
     }
 
-    public Log(Space2D<Piece> board, List<String> logStrings) {
+    public Log(ChessBoard board, List<String> logStrings) {
         this();
         for (String s : logStrings) {
             ActionRecord rec = new ActionRecord(board, s);
             this.logStack.push(rec);
             // Manually move the piece on the board, ignoring all checks
-            board.put(rec.getAction().getEnd(), board.remove(rec.getAction().getStart()));
+            board.move(rec.getStart(), rec.getEnd());
         }
     }
 
     @Override
-    public boolean addAll(Collection<? extends ActionRecord> c) {
+    public boolean addAll(Collection<? extends LogRecord> c) {
         return this.logStack.addAll(c);
     }
 
@@ -84,7 +83,7 @@ public class Log implements Collection<ActionRecord> {
     }
 
     @Override
-    public Iterator<ActionRecord> iterator() {
+    public Iterator<LogRecord> iterator() {
         return this.logStack.iterator();
     }
 
@@ -99,38 +98,36 @@ public class Log implements Collection<ActionRecord> {
     }
 
     @Override
-    public boolean add(ActionRecord actionRecord) {
+    public boolean add(LogRecord actionRecord) {
         return this.logStack.add(actionRecord);
     }
 
-    public ActionRecord peek() {
+    @Override
+    public LogRecord peek() {
         return this.logStack.peek();
     }
 
-    public void push(ActionRecord actionRecord) {
+    @Override
+    public void push(LogRecord actionRecord) {
         this.logStack.push(actionRecord);
     }
 
-    public ActionRecord pop() {
+    @Override
+    public LogRecord pop() {
         return this.logStack.pop();
     }
 
+    @Override
     public void undo() {
         if (!this.logStack.isEmpty()) {
             this.undoStack.push(this.logStack.pop());
         }
     }
 
+    @Override
     public void redo() {
         if (!this.undoStack.isEmpty()) {
             this.logStack.push(this.undoStack.pop());
         }
     }
-
-    public void restore() {
-        while (!this.undoStack.isEmpty()) {
-            this.redo();
-        }
-    }
-
 }
