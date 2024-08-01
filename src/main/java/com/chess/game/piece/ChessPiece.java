@@ -13,7 +13,7 @@ public interface ChessPiece {
 
     Colour getColour();
 
-    Set<Vector2D> getMoves(Space2D<Piece> board);
+    Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log);
 
     boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination);
 

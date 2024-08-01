@@ -32,7 +32,7 @@ public class Knight implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<Piece> board) {
+    public Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log) {
         Set<Vector2D> set = new HashSet<>();
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
@@ -48,7 +48,7 @@ public class Knight implements ChessPiece {
 
     @Override
     public boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination) {
-        return this.getMoves(board).contains(destination);
+        return this.getMoves(board, log).contains(destination);
     }
 
     @Override

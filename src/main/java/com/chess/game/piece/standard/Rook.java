@@ -32,7 +32,7 @@ public class Rook implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<Piece> board) {
+    public Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
@@ -46,7 +46,7 @@ public class Rook implements ChessPiece {
 
     @Override
     public boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination) {
-        return this.getMoves(board).contains(destination);
+        return this.getMoves(board, log).contains(destination);
     }
 
     @Override

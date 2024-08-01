@@ -34,7 +34,7 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<Piece> board) {
+    public Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log) {
         Set<Vector2D> set = new HashSet<>();
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, 1));
         set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, 1));
@@ -49,7 +49,7 @@ public class Pawn implements ChessPiece {
 
     @Override
     public boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination) {
-        return this.getMoves(board).contains(destination);
+        return this.getMoves(board, log).contains(destination);
     }
 
     @Override
