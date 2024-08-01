@@ -1,12 +1,22 @@
 package com.chess.game;
 
 import com.chess.game.piece.ChessPiece;
+import java.util.Set;
 
 public interface ChessBoard {
 
     ChessPiece getPiece(Vector2D point);
 
     void movePiece(Vector2D start, Vector2D end);
+
+    Set<ChessPiece> getThreats(Vector2D point, Colour colour);
+
+    default boolean hasThreats(Vector2D point, Colour colour) {
+        if (point == null) {
+            return false;
+        }
+        return !getThreats(point, colour).isEmpty();
+    }
 
     boolean isInBounds(int x, int y);
 
