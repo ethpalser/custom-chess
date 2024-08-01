@@ -49,8 +49,8 @@ public class Pawn implements ChessPiece {
             Vector2D destination = lastMove.getEnd();
             // a pawn moved forward two
             if (lastMove.isFirstMove() && "P".equals(board.getPiece(destination).getCode())
-                    && ((lastMove.getMoved().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
-                    || (lastMove.getMoved().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
+                    && ((lastMove.getMovingPiece().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
+                    || (lastMove.getMovingPiece().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
             ) {
                 // that pawn is beside this pawn
                 if (destination.getX() == this.point.getX() - 1) {

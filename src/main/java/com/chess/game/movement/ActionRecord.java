@@ -50,12 +50,12 @@ public class ActionRecord implements LogRecord {
     }
 
     @Override
-    public ChessPiece getMoved() {
+    public ChessPiece getMovingPiece() {
         return this.moved;
     }
 
     @Override
-    public ChessPiece getCaptured() {
+    public ChessPiece getCapturedPiece() {
         return this.captured;
     }
 

@@ -1,16 +1,17 @@
 package com.chess.game;
 
+import com.chess.game.movement.MoveRecord;
 import com.chess.game.piece.ChessPiece;
 
-public interface LogRecord {
+public interface LogRecord extends MoveRecord {
 
     Vector2D getStart();
 
     Vector2D getEnd();
 
-    ChessPiece getMoved();
+    ChessPiece getMovingPiece();
 
-    ChessPiece getCaptured();
+    ChessPiece getCapturedPiece();
 
     boolean isFirstMove();
 
