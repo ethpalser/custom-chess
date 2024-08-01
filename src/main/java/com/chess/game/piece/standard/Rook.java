@@ -6,8 +6,7 @@ import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
 import com.chess.game.movement.ActionRecord;
 import com.chess.game.piece.ChessPiece;
-import com.chess.game.piece.Piece;
-import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +31,7 @@ public class Rook implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log) {
+    public Set<Vector2D> getMoves(Space2D<ChessPiece> board, Deque<ActionRecord> log) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
@@ -45,7 +44,7 @@ public class Rook implements ChessPiece {
     }
 
     @Override
-    public boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination) {
+    public boolean canMove(Space2D<ChessPiece> board, Deque<ActionRecord> log, Vector2D destination) {
         return this.getMoves(board, log).contains(destination);
     }
 

@@ -6,8 +6,7 @@ import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
 import com.chess.game.movement.ActionRecord;
 import com.chess.game.piece.ChessPiece;
-import com.chess.game.piece.Piece;
-import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,21 +33,40 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(Space2D<Piece> board, Collection<ActionRecord> log) {
+    public Set<Vector2D> getMoves(Space2D<ChessPiece> board, Deque<ActionRecord> log) {
         Set<Vector2D> set = new HashSet<>();
-        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, 1));
-        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, 1));
-        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, 1));
+        int y = this.colour == Colour.WHITE ? 1 : -1;
+        set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
+        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, y));
+        set.add(Vector2DUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, y));
         if (!this.hasMoved) {
-            set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, 2));
+            set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y * 2));
         }
-        // todo: add en passant
+        // en passant (there must be at least one move)
+        if (log != null && log.size() > 1) {
+            ActionRecord lastMove = log.peek();
+            Vector2D start = lastMove.getAction().getStart();
+            Vector2D destination = lastMove.getAction().getEnd();
+            // a pawn moved forward two
+            if (lastMove.isFirstMove() && "P".equals(board.get(destination).getCode())
+                    && ((lastMove.getAction().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
+                    || (lastMove.getAction().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
+            ) {
+                // that pawn is beside this pawn
+                if (destination.getX() == this.point.getX() - 1) {
+                    set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, -1, y));
+                }
+                if (destination.getX() == this.point.getX() + 1) {
+                    set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 1, y));
+                }
+            }
+        }
         set.remove(null); // remove any case of null
         return set;
     }
 
     @Override
-    public boolean canMove(Space2D<Piece> board, Collection<ActionRecord> log, Vector2D destination) {
+    public boolean canMove(Space2D<ChessPiece> board, Deque<ActionRecord> log, Vector2D destination) {
         return this.getMoves(board, log).contains(destination);
     }
 
