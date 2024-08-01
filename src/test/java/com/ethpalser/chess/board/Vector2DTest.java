@@ -1,6 +1,5 @@
-package com.ethpalser.chess;
+package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.board.Vector2D;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

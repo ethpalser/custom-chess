@@ -2,14 +2,14 @@ package com.ethpalser.chess.piece.custom.condition;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.piece.custom.Piece;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
 
 public class PropertyCondition implements Conditional {
 
     private final Reference reference;
-    private final Property<Piece> property;
+    private final Property<CustomPiece> property;
     private final Comparator comparator;
     private final Object expected;
 
@@ -17,7 +17,7 @@ public class PropertyCondition implements Conditional {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(Reference reference, Comparator comparator, Property<Piece> property,
+    public PropertyCondition(Reference reference, Comparator comparator, Property<CustomPiece> property,
             Object expected) {
         if (reference == null || comparator == null) {
             throw new NullPointerException();
@@ -33,15 +33,15 @@ public class PropertyCondition implements Conditional {
 
     @Override
     public boolean isExpected(Board board, Action action) {
-        List<Piece> list = this.reference.getPieces(board, action);
+        List<CustomPiece> list = this.reference.getPieces(board, action);
 
         boolean hasPiece = false;
-        for (Piece piece : list) {
-            if (piece == null) {
+        for (CustomPiece customPiece : list) {
+            if (customPiece == null) {
                 continue;
             }
             hasPiece = true;
-            Object pieceProperty = this.property != null ? this.property.fetch(piece) : null;
+            Object pieceProperty = this.property != null ? this.property.fetch(customPiece) : null;
             if (!isExpectedState(pieceProperty)) {
                 return false;
             }

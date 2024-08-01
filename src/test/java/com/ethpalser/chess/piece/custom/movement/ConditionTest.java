@@ -1,16 +1,16 @@
-package com.ethpalser.chess.movement;
+package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.custom.CustomPiece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.custom.condition.Comparator;
 import com.ethpalser.chess.piece.custom.condition.Conditional;
 import com.ethpalser.chess.piece.custom.condition.Property;
 import com.ethpalser.chess.piece.custom.condition.PropertyCondition;
 import com.ethpalser.chess.piece.custom.condition.ReferenceCondition;
-import com.ethpalser.chess.piece.custom.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.reference.Location;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,8 +59,8 @@ class ConditionTest {
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
         Board board = new Board();
-        Piece piece = board.getPiece(2, 1);
-        board.setPiece(new Vector2D(2, 2), piece);
+        CustomPiece customPiece = board.getPiece(2, 1);
+        board.setPiece(new Vector2D(2, 2), customPiece);
 
         // When
         Vector2D selected = new Vector2D(4, 1);
@@ -77,8 +77,8 @@ class ConditionTest {
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
         Board board = new Board();
-        Piece piece = board.getPiece(2, 1);
-        board.setPiece(new Vector2D(2, 3), piece);
+        CustomPiece customPiece = board.getPiece(2, 1);
+        board.setPiece(new Vector2D(2, 3), customPiece);
 
         // When
         Vector2D selected = new Vector2D(4, 1);
@@ -115,9 +115,9 @@ class ConditionTest {
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         Board board = new Board();
-        Piece white = board.getPiece(4, 1);
+        CustomPiece white = board.getPiece(4, 1);
         board.setPiece(new Vector2D(4, 4), white);
-        Piece black = board.getPiece(5, 6);
+        CustomPiece black = board.getPiece(5, 6);
         board.setPiece(new Vector2D(5, 4), black);
         board.setLastMoved(black);
 
@@ -155,7 +155,7 @@ class ConditionTest {
 
         Board board = new Board();
         board.setPiece(new Vector2D(4, 1), null);
-        Piece king = board.getPiece(4, 0);
+        CustomPiece king = board.getPiece(4, 0);
         board.setPiece(new Vector2D(4, 1), king);
 
         // When
@@ -173,7 +173,7 @@ class ConditionTest {
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         Board board = new Board();
-        Piece rook = board.getPiece(0, 0);
+        CustomPiece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
         board.setPiece(new Vector2D(0, 2), rook);
         board.setPiece(new Vector2D(0, 0), rook);

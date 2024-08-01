@@ -1,10 +1,7 @@
-package com.ethpalser.chess.movement;
+package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.board.Vector2D;
-import com.ethpalser.chess.piece.custom.movement.Movement;
-import com.ethpalser.chess.piece.custom.movement.MovementType;
-import com.ethpalser.chess.piece.custom.movement.Path;
+import com.ethpalser.chess.piece.Colour;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;

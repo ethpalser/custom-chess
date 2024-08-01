@@ -2,7 +2,7 @@ package com.ethpalser.chess.piece.custom.condition;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.piece.custom.Piece;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
 
@@ -23,26 +23,26 @@ public class ReferenceCondition implements Conditional {
 
     @Override
     public boolean isExpected(Board board, Action action) {
-        List<Piece> pieces = this.target.getPieces(board, action);
+        List<CustomPiece> customPieces = this.target.getPieces(board, action);
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {
-                return pieces == null || pieces.isEmpty();
+                return customPieces == null || customPieces.isEmpty();
             }
             case TRUE, EXIST -> {
-                return pieces != null;
+                return customPieces != null;
             }
             case EQUAL -> {
-                List<Piece> expectedPieces = this.expected.getPieces(board, action);
-                for (Piece piece : pieces) {
-                    if (!expectedPieces.contains(piece))
+                List<CustomPiece> expectedCustomPieces = this.expected.getPieces(board, action);
+                for (CustomPiece customPiece : customPieces) {
+                    if (!expectedCustomPieces.contains(customPiece))
                         return false;
                 }
                 return true;
             }
             case NOT_EQUAL -> {
-                List<Piece> expectedPieces = this.expected.getPieces(board, action);
-                for (Piece piece : pieces) {
-                    if (!expectedPieces.contains(piece))
+                List<CustomPiece> expectedCustomPieces = this.expected.getPieces(board, action);
+                for (CustomPiece customPiece : customPieces) {
+                    if (!expectedCustomPieces.contains(customPiece))
                         return true;
                 }
                 return false;

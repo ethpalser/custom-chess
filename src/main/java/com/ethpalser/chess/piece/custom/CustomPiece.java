@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Piece {
+public class CustomPiece {
 
     private final PieceType type;
     private final Colour colour;
@@ -20,15 +20,15 @@ public class Piece {
     private int lastMoveDistance;
     private boolean hasMoved;
 
-    public Piece() {
+    public CustomPiece() {
         this(PieceType.PAWN, Colour.WHITE, new Vector2D());
     }
 
-    public Piece(PieceType pieceType, Colour colour, Vector2D vector) {
+    public CustomPiece(PieceType pieceType, Colour colour, Vector2D vector) {
         this(pieceType, colour, vector, (Movement) null);
     }
 
-    public Piece(PieceType pieceType, Colour colour, Vector2D vector, Movement... movements) {
+    public CustomPiece(PieceType pieceType, Colour colour, Vector2D vector, Movement... movements) {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;

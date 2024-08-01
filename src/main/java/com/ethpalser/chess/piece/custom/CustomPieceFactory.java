@@ -18,37 +18,37 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PieceFactory {
+public class CustomPieceFactory {
 
-    private static PieceFactory factory;
+    private static CustomPieceFactory factory;
 
-    private PieceFactory() {
+    private CustomPieceFactory() {
     }
 
-    public static PieceFactory getInstance() {
+    public static CustomPieceFactory getInstance() {
         if (factory == null) {
-            factory = new PieceFactory();
+            factory = new CustomPieceFactory();
         }
         return factory;
     }
 
-    public Piece build(String string) {
+    public CustomPiece build(String string) {
         Pattern pattern = Pattern.compile("^[A-Ha-h][1-8]\\*?#[wb][PRNBQK]");
         Matcher matcher = pattern.matcher(string);
         if (matcher.find()) {
             String[] parts = string.split("#");
             Vector2D vector2D = new Vector2D(parts[0].charAt(0), parts[0].charAt(1));
-            Piece piece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0,
+            CustomPiece customPiece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0,
                             1)),
                     vector2D);
-            piece.setHasMoved(!parts[0].contains("*"));
-            return piece;
+            customPiece.setHasMoved(!parts[0].contains("*"));
+            return customPiece;
         } else {
             throw new IllegalArgumentException("String (" + string + ") does not match the required format.");
         }
     }
 
-    public Piece build(PieceType type, Colour colour, Vector2D vector) {
+    public CustomPiece build(PieceType type, Colour colour, Vector2D vector) {
         Path vertical = new Path(new Vector2D(0, 1), new Vector2D(0, 7));
         Path horizontal = new Path(new Vector2D(1, 0), new Vector2D(7, 0));
         Path diagonal = new Path(new Vector2D(1, 1), new Vector2D(7, 7));
@@ -59,22 +59,22 @@ public class PieceFactory {
             case KNIGHT -> {
                 Movement knightMove1 = new Movement(new Path(new Vector2D(1, 2)), MovementType.JUMP, true, true);
                 Movement knightMove2 = new Movement(new Path(new Vector2D(2, 1)), MovementType.JUMP, true, true);
-                return new Piece(PieceType.KNIGHT, colour, vector, knightMove1, knightMove2);
+                return new CustomPiece(PieceType.KNIGHT, colour, vector, knightMove1, knightMove2);
             }
             case ROOK -> {
                 Movement rookMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
                 Movement rookMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
-                return new Piece(PieceType.ROOK, colour, vector, rookMoveV, rookMoveH);
+                return new CustomPiece(PieceType.ROOK, colour, vector, rookMoveV, rookMoveH);
             }
             case BISHOP -> {
                 Movement bishopBaseMove = new Movement(diagonal, MovementType.ADVANCE, true, true);
-                return new Piece(PieceType.BISHOP, colour, vector, bishopBaseMove);
+                return new CustomPiece(PieceType.BISHOP, colour, vector, bishopBaseMove);
             }
             case QUEEN -> {
                 Movement queenBaseMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
                 Movement queenBaseMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
                 Movement queenBaseMoveD = new Movement(diagonal, MovementType.ADVANCE, true, true);
-                return new Piece(PieceType.QUEEN, colour, vector, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
+                return new CustomPiece(PieceType.QUEEN, colour, vector, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
             }
             case KING -> {
                 Movement kingBaseMoveV = new Movement(new Path(new Vector2D(0, 1)), MovementType.ADVANCE, true, false);
@@ -112,7 +112,7 @@ public class PieceFactory {
                                 new Vector2D(3, 0)))
                         .build();
 
-                return new Piece(PieceType.KING, colour, vector, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
+                return new CustomPiece(PieceType.KING, colour, vector, kingBaseMoveV, kingBaseMoveH, kingBaseMoveD,
                         castleKingSide, castleQueenSide);
             }
             case PAWN -> {
@@ -150,10 +150,10 @@ public class PieceFactory {
                         .conditions(List.of(enPassantCond1, enPassantCond2, enPassantCond3))
                         .extraAction(extraAction)
                         .build();
-                return new Piece(PieceType.PAWN, colour, vector, pawnBaseMove, pawnCharge, pawnCapture, enPassant);
+                return new CustomPiece(PieceType.PAWN, colour, vector, pawnBaseMove, pawnCharge, pawnCapture, enPassant);
             }
         }
-        return new Piece();
+        return new CustomPiece();
     }
 
 }

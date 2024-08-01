@@ -1,10 +1,8 @@
-package com.ethpalser.chess;
+package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.custom.Piece;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.board.Vector2D;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -19,30 +17,30 @@ class BoardTest {
         assertEquals(8, board.width());
         assertEquals(32, board.count());
 
-        Piece piece;
+        CustomPiece customPiece;
         for (int x = 0; x < board.width(); x++) {
             for (int y = 0; y < board.length(); y++) {
-                piece = board.getPiece(x, y);
-                if (piece == null) {
+                customPiece = board.getPiece(x, y);
+                if (customPiece == null) {
                     continue;
                 }
 
-                Vector2D vector = piece.getPosition();
+                Vector2D vector = customPiece.getPosition();
                 if (vector.getY() == 0 || vector.getY() == 1) {
-                    assertEquals(Colour.WHITE, piece.getColour());
+                    assertEquals(Colour.WHITE, customPiece.getColour());
                 } else if (vector.getY() == 6 || vector.getY() == 7) {
-                    assertEquals(Colour.BLACK, piece.getColour());
+                    assertEquals(Colour.BLACK, customPiece.getColour());
                 }
 
                 if (vector.getY() == 1 || vector.getY() == 6) {
-                    assertEquals(PieceType.PAWN, piece.getType());
+                    assertEquals(PieceType.PAWN, customPiece.getType());
                 } else {
                     switch (vector.getX()) {
-                        case 0, 7 -> assertEquals(PieceType.ROOK, piece.getType());
-                        case 1, 6 -> assertEquals(PieceType.KNIGHT, piece.getType());
-                        case 2, 5 -> assertEquals(PieceType.BISHOP, piece.getType());
-                        case 3 -> assertEquals(PieceType.QUEEN, piece.getType());
-                        case 4 -> assertEquals(PieceType.KING, piece.getType());
+                        case 0, 7 -> assertEquals(PieceType.ROOK, customPiece.getType());
+                        case 1, 6 -> assertEquals(PieceType.KNIGHT, customPiece.getType());
+                        case 2, 5 -> assertEquals(PieceType.BISHOP, customPiece.getType());
+                        case 3 -> assertEquals(PieceType.QUEEN, customPiece.getType());
+                        case 4 -> assertEquals(PieceType.KING, customPiece.getType());
                         default -> fail("Board size is invalid, or test coordinate is outside board bounds");
                     }
                 }

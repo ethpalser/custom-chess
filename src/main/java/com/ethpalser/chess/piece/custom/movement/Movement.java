@@ -5,7 +5,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.board.Vector2D;
 import com.ethpalser.chess.piece.custom.condition.Conditional;
-import com.ethpalser.chess.piece.custom.Piece;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -281,7 +281,7 @@ public class Movement {
             return false;
         }
         if (board != null) {
-            Piece p = board.getPiece(vector);
+            CustomPiece p = board.getPiece(vector);
             if (p != null) {
                 return withDefend || !colour.equals(p.getColour()) || PieceType.KING.equals(p.getType()) && ignoreKing;
             } else {
@@ -298,8 +298,8 @@ public class Movement {
         if (!board.isValidLocation(vector) || board == null) {
             return false;
         }
-        Piece piece = board.getPiece(vector);
-        return piece != null && !(PieceType.KING.equals(piece.getType()) && ignoreKing);
+        CustomPiece customPiece = board.getPiece(vector);
+        return customPiece != null && !(PieceType.KING.equals(customPiece.getType()) && ignoreKing);
     }
 
     /**
@@ -313,8 +313,8 @@ public class Movement {
         if (board == null || action == null) {
             throw new NullPointerException();
         }
-        Piece pStart = board.getPiece(action.getStart());
-        Piece pEnd = board.getPiece(action.getEnd());
+        CustomPiece pStart = board.getPiece(action.getStart());
+        CustomPiece pEnd = board.getPiece(action.getEnd());
         if (!this.isAttack && this.isMove && pEnd != null) {
             return false;
         }

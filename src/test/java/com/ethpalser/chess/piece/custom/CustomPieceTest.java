@@ -1,17 +1,18 @@
-package com.ethpalser.chess.piece;
+package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Vector2D;
-import com.ethpalser.chess.piece.custom.Piece;
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-class PieceTest {
+class CustomPieceTest {
 
     @Test
     void initialize_fromValidCoordinate_isNotNullAndHasCoordinateAndNotMoved() {
         Vector2D start = new Vector2D(2, 0);
-        Piece bishop = new Piece(PieceType.BISHOP, Colour.WHITE, start);
+        CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
         assertNotEquals(null, bishop.getPosition());
         assertFalse(bishop.getHasMoved());
     }
@@ -21,7 +22,7 @@ class PieceTest {
         int x = 2;
         int y = 0;
         Vector2D start = new Vector2D(x, y);
-        Piece bishop = new Piece(PieceType.BISHOP, Colour.WHITE, start);
+        CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
         Vector2D next = new Vector2D(x, y);
         bishop.setPosition(next);
@@ -35,7 +36,7 @@ class PieceTest {
         int x = 2;
         int y = 0;
         Vector2D start = new Vector2D(x, y);
-        Piece bishop = new Piece(PieceType.BISHOP, Colour.WHITE, start);
+        CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
         int nextX = 3;
         int nextY = 1;
@@ -54,7 +55,7 @@ class PieceTest {
         int x = 2;
         int y = 0;
         Vector2D start = new Vector2D(x, y);
-        Piece bishop = new Piece(PieceType.BISHOP, Colour.WHITE, start);
+        CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
 
         int nextX = 3;
         int nextY = 1;

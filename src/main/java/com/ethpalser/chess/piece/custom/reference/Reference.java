@@ -3,8 +3,8 @@ package com.ethpalser.chess.piece.custom.reference;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.Vector2D;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.movement.Path;
-import com.ethpalser.chess.piece.custom.Piece;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +42,14 @@ public class Reference {
     }
 
     /**
-     * Get one or more {@link Piece}s that this reference is for using the current state of the board and action
+     * Get one or more {@link CustomPiece}s that this reference is for using the current state of the board and action
      * being attempted.
      *
      * @param board  {@link Board} used for reference
      * @param action {@link Action} used for reference containing a single piece's position and destination
      * @return List of Pieces of the location is a Path, otherwise a List of one Piece
      */
-    public List<Piece> getPieces(Board board, Action action) {
+    public List<CustomPiece> getPieces(Board board, Action action) {
         if (board == null || action == null) {
             throw new NullPointerException();
         }
@@ -60,8 +60,8 @@ public class Reference {
         Vector2D shiftedEnd = action.getEnd().shift(action.getColour(), this.direction);
         Vector2D shiftedReference = this.vector == null ? null : this.vector.shift(action.getColour(), this.direction);
 
-        List<Piece> list = new ArrayList<>();
-        Piece toAdd = null;
+        List<CustomPiece> list = new ArrayList<>();
+        CustomPiece toAdd = null;
         switch (this.location) {
             case LAST_MOVED -> toAdd = board.getLastMoved();
             case START -> toAdd = board.getPiece(shiftedStart);

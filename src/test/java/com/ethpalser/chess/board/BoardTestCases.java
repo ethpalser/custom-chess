@@ -1,4 +1,4 @@
-package com.ethpalser.chess;
+package com.ethpalser.chess.board;
 
 import java.util.List;
 

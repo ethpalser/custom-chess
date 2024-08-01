@@ -1,11 +1,10 @@
-package com.ethpalser.chess;
+package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.game.Game;
-import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.Vector2D;
+import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.piece.Colour;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
