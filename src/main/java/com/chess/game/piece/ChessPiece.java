@@ -4,7 +4,6 @@ import com.chess.game.ChessBoard;
 import com.chess.game.ChessLog;
 import com.chess.game.Colour;
 import com.chess.game.Vector2D;
-import java.util.Set;
 
 public interface ChessPiece {
 
@@ -12,7 +11,7 @@ public interface ChessPiece {
 
     Colour getColour();
 
-    Set<Vector2D> getMoves(ChessBoard board, ChessLog log);
+    MoveSet getMoves(ChessBoard board, ChessLog log);
 
     boolean canMove(ChessBoard board, ChessLog log, Vector2D destination);
 

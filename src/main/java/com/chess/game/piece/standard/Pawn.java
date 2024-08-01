@@ -7,6 +7,8 @@ import com.chess.game.LogRecord;
 import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
 import com.chess.game.piece.ChessPiece;
+import com.chess.game.piece.Move;
+import com.chess.game.piece.MoveSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +35,7 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(ChessBoard board, ChessLog log) {
+    public MoveSet getMoves(ChessBoard board, ChessLog log) {
         Set<Vector2D> set = new HashSet<>();
         int y = this.colour == Colour.WHITE ? 1 : -1;
         set.add(Vector2DUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
@@ -62,12 +64,12 @@ public class Pawn implements ChessPiece {
             }
         }
         set.remove(null); // remove any case of null
-        return set;
+        return new MoveSet(set);
     }
 
     @Override
     public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
-        return this.getMoves(board, log).contains(destination);
+        return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
     }
 
     @Override

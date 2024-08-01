@@ -6,6 +6,8 @@ import com.chess.game.Colour;
 import com.chess.game.Vector2D;
 import com.chess.game.Vector2DUtil;
 import com.chess.game.piece.ChessPiece;
+import com.chess.game.piece.Move;
+import com.chess.game.piece.MoveSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ public class Bishop implements ChessPiece {
     }
 
     @Override
-    public Set<Vector2D> getMoves(ChessBoard board, ChessLog log) {
+    public MoveSet getMoves(ChessBoard board, ChessLog log) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
@@ -41,12 +43,12 @@ public class Bishop implements ChessPiece {
         set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, false, true)); // top left
         set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, true, false)); // bottom right
         set.addAll(Vector2DUtil.generateDiagonalMoves(board, this.point, this.colour, true, true)); // top right
-        return set;
+        return new MoveSet(set);
     }
 
     @Override
     public boolean canMove(ChessBoard board, ChessLog log, Vector2D destination) {
-        return this.getMoves(board, log).contains(destination);
+        return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
     }
 
     @Override
