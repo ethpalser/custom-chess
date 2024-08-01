@@ -4,9 +4,9 @@ import com.chess.game.piece.ChessPiece;
 
 public interface ChessBoard {
 
-    ChessPiece get(Vector2D point);
+    ChessPiece getPiece(Vector2D point);
 
-    void move(Vector2D start, Vector2D end);
+    void movePiece(Vector2D start, Vector2D end);
 
     boolean isInBounds(int x, int y);
 

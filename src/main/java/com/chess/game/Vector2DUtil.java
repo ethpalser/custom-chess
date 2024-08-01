@@ -9,8 +9,8 @@ public class Vector2DUtil {
             int xOffset, int yOffset) {
         Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
-        if (!board.isInBounds(point.getX(), point.getY()) || (board.get(point) != null
-                && board.get(point).getColour() == colour)) {
+        if (!board.isInBounds(point.getX(), point.getY()) || (board.getPiece(point) != null
+                && board.getPiece(point).getColour() == colour)) {
             return null;
         }
         return point;
@@ -20,8 +20,8 @@ public class Vector2DUtil {
             int xOffset, int yOffset) {
         Vector2D point = new Vector2D(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
-        if (!board.isInBounds(point.getX(), point.getY()) || board.get(point) == null
-                || board.get(point).getColour() == colour) {
+        if (!board.isInBounds(point.getX(), point.getY()) || board.getPiece(point) == null
+                || board.getPiece(point).getColour() == colour) {
             return null;
         }
         // in bounds and opposite colour (i.e. can capture)
@@ -35,8 +35,8 @@ public class Vector2DUtil {
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
             Vector2D pos = new Vector2D(start.getX() + x, start.getY());
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+            if (board.getPiece(pos) != null) {
+                if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 break;
@@ -54,8 +54,8 @@ public class Vector2DUtil {
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
             Vector2D pos = new Vector2D(start.getX(), start.getY() + y);
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+            if (board.getPiece(pos) != null) {
+                if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 break;
@@ -74,8 +74,8 @@ public class Vector2DUtil {
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Vector2D pos = new Vector2D(start.getX() + x, start.getY() + y);
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+            if (board.getPiece(pos) != null) {
+                if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 break;

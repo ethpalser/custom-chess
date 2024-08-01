@@ -23,7 +23,7 @@ public class Log implements ChessLog {
             ActionRecord rec = new ActionRecord(board, s);
             this.logStack.push(rec);
             // Manually move the piece on the board, ignoring all checks
-            board.move(rec.getStart(), rec.getEnd());
+            board.movePiece(rec.getStart(), rec.getEnd());
         }
     }
 

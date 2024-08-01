@@ -33,8 +33,8 @@ public class ActionRecord implements LogRecord {
         Vector2D start = new Vector2D(split[0]);
         Vector2D end = new Vector2D(split[1]);
         // This only works by recreating the log by simulating the game forward. This fails recreating in reverse.
-        this.moved = board.get(start);
-        this.captured = board.get(end);
+        this.moved = board.getPiece(start);
+        this.captured = board.getPiece(end);
         this.action = new Action(moved.getColour(), start, end);
         this.isFirstMove = !this.moved.hasMoved();
     }
