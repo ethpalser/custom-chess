@@ -119,4 +119,20 @@ public class Space2D<T> implements Map<Vector2D, T>, Iterable<T> {
         return minX <= x && x <= maxX && minY <= y && y <= maxY;
     }
 
+    public int getMinX() {
+        return this.minX;
+    }
+
+    public int getMaxX() {
+        return this.maxX;
+    }
+
+    public int getMinY() {
+        return this.minY;
+    }
+
+    public int getMaxY() {
+        return this.maxY;
+    }
+
 }

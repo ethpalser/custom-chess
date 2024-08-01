@@ -12,6 +12,10 @@ public class ActionRecord implements LogRecord {
     private final ChessPiece captured;
     private final boolean isFirstMove;
 
+    public ActionRecord(Vector2D start, Vector2D end, ChessPiece moved) {
+        this(new Action(moved.getColour(), start, end), moved);
+    }
+
     public ActionRecord(Action action, ChessPiece moved) {
         this(action, moved, null);
     }
