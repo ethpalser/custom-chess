@@ -1,7 +1,6 @@
-package com.chess.game.movement;
+package com.chess.game.piece;
 
 import com.chess.game.Vector2D;
-import com.chess.game.piece.ChessPiece;
 
 public interface MoveRecord {
 
