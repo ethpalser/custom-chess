@@ -12,7 +12,12 @@ public interface ChessPiece {
 
     MoveSet getMoves(ChessBoard board, ChessLog log);
 
-    boolean canMove(ChessBoard board, ChessLog log, Point destination);
+    default boolean canMove(ChessBoard board, ChessLog log, Point destination) {
+        if (board == null || destination == null) {
+            return false;
+        }
+        return this.getMoves(board, log).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
+    }
 
     void move(Point destination);
 

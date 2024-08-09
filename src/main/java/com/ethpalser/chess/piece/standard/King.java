@@ -90,11 +90,6 @@ public class King implements ChessPiece {
     }
 
     @Override
-    public boolean canMove(ChessBoard board, ChessLog log, Point destination) {
-        return this.getMoves(board, log).getMoves().stream().anyMatch(m -> m.getPoint().equals(destination));
-    }
-
-    @Override
     public void move(Point destination) {
         if (destination == null) {
             throw new IllegalArgumentException("destination cannot be null");

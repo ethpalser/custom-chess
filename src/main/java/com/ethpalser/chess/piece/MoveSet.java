@@ -17,7 +17,7 @@ public class MoveSet {
         this.moves = moveSet;
     }
 
-    public Set<Move> getMoves() {
+    public Set<Move> toSet() {
         return this.moves;
     }
 
