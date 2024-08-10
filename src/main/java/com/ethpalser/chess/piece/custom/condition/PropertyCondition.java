@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.condition;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
@@ -32,7 +32,7 @@ public class PropertyCondition implements Conditional {
     }
 
     @Override
-    public boolean isExpected(Board board, Action action) {
+    public boolean isExpected(CustomBoard board, Action action) {
         List<CustomPiece> list = this.reference.getPieces(board, action);
 
         boolean hasPiece = false;

@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.reference;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -45,11 +45,11 @@ public class Reference {
      * Get one or more {@link CustomPiece}s that this reference is for using the current state of the board and action
      * being attempted.
      *
-     * @param board  {@link Board} used for reference
+     * @param board  {@link CustomBoard} used for reference
      * @param action {@link Action} used for reference containing a single piece's position and destination
      * @return List of Pieces of the location is a Path, otherwise a List of one Piece
      */
-    public List<CustomPiece> getPieces(Board board, Action action) {
+    public List<CustomPiece> getPieces(CustomBoard board, Action action) {
         if (board == null || action == null) {
             throw new NullPointerException();
         }

@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
@@ -26,7 +26,7 @@ class GameTest {
         assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         assertNull(board.getPiece(pieceX, pieceY));
         assertEquals(32, board.count());
     }
@@ -47,7 +47,7 @@ class GameTest {
         assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
         assertEquals(32, board.count());
     }
@@ -68,7 +68,7 @@ class GameTest {
         assertThrows(IndexOutOfBoundsException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
         assertEquals(32, board.count());
     }
@@ -83,7 +83,7 @@ class GameTest {
         Point source = new Point(pieceX, pieceY); // White Knight
         Point target = new Point(nextX, nextY); // White Pawn
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         board.movePiece(new Point(nextX, 1), new Point(nextX, nextY)); // Filler
         board.movePiece(new Point(0, 6), new Point(0, 5)); // Filler
 
@@ -115,7 +115,7 @@ class GameTest {
         assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
@@ -133,7 +133,7 @@ class GameTest {
         Point source = new Point(pieceX, pieceY); // White Rook
         Point target = new Point(nextX, nextY); // Black Pawn
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         board.setPiece(new Point(0, 1), null); // Can be sufficient for path checks
 
         // When
@@ -163,7 +163,7 @@ class GameTest {
         assertThrows(IllegalActionException.class, () -> game.executeAction(action));
 
         // Then
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         assertNotNull(board.getPiece(source));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
         assertNull(board.getPiece(target));
@@ -180,7 +180,7 @@ class GameTest {
         Point source = new Point(pieceX, pieceY); // White Bishop
         Point target = new Point(nextX, nextY); // Empty
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         board.setPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
 
         // When
@@ -200,7 +200,7 @@ class GameTest {
         Point source = new Point(4, 0);
         Point target = new Point(6, 0);
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         board.setPiece(new Point(5, 0), null);
         board.setPiece(new Point(6, 0), null);
 
@@ -222,7 +222,7 @@ class GameTest {
         Point source = new Point(4, 0);
         Point target = new Point(2, 0);
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         board.setPiece(new Point(1, 0), null);
         board.setPiece(new Point(2, 0), null);
         board.setPiece(new Point(3, 0), null);
@@ -244,7 +244,7 @@ class GameTest {
         Point source = new Point(4, 6);
         Point target = new Point(4, 4);
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         // White move
         board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
@@ -270,7 +270,7 @@ class GameTest {
         Point source = new Point(2, 6);
         Point target = new Point(2, 4);
         Game game = new Game();
-        Board board = game.getBoard();
+        CustomBoard board = game.getBoard();
         // White move
         board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
@@ -293,7 +293,7 @@ class GameTest {
     // region In Progress Game
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
-        Board board = new Board(BoardTestCases.inProgressPieceCanMove);
+        CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanMove);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
@@ -305,7 +305,7 @@ class GameTest {
 
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
-        Board board = new Board(BoardTestCases.inProgressPieceCanCapture);
+        CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -317,7 +317,7 @@ class GameTest {
 
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
-        Board board = new Board(BoardTestCases.inProgressNotOnlyKings);
+        CustomBoard board = new CustomBoard(BoardTestCases.inProgressNotOnlyKings);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '2'));
@@ -332,7 +332,7 @@ class GameTest {
     @Test
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
-        Board board = new Board(BoardTestCases.stalematePieceCannotMove);
+        CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotMove);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
@@ -344,7 +344,7 @@ class GameTest {
 
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
-        Board board = new Board(BoardTestCases.stalematePieceCannotCapture);
+        CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -356,7 +356,7 @@ class GameTest {
 
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
-        Board board = new Board(BoardTestCases.stalemateOnlyKings);
+        CustomBoard board = new CustomBoard(BoardTestCases.stalemateOnlyKings);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('e', '1'), new Point('e', '2'));
@@ -370,7 +370,7 @@ class GameTest {
     // region Check in Game
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
-        Board board = new Board(BoardTestCases.checkPieceCanCapture);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -383,7 +383,7 @@ class GameTest {
 
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
-        Board board = new Board(BoardTestCases.checkPieceCanBlock);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanBlock);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -396,7 +396,7 @@ class GameTest {
 
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
-        Board board = new Board(BoardTestCases.checkKingCanMove);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkKingCanMove);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -411,7 +411,7 @@ class GameTest {
     // region Checkmate in Game
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
-        Board board = new Board(BoardTestCases.checkmatePieceCannotCapture);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotCapture);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -424,7 +424,7 @@ class GameTest {
 
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
-        Board board = new Board(BoardTestCases.checkmatePieceCannotBlock);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotBlock);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -437,7 +437,7 @@ class GameTest {
 
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
-        Board board = new Board(BoardTestCases.checkmateKingCannotMove);
+        CustomBoard board = new CustomBoard(BoardTestCases.checkmateKingCannotMove);
         Game game = new Game(board, Colour.WHITE);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));

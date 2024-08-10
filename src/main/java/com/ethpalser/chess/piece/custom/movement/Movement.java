@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.board.Point;
@@ -135,7 +135,7 @@ public class Movement {
      * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
-    public Path getPath(Colour colour, Point start, Point end, Board board) {
+    public Path getPath(Colour colour, Point start, Point end, CustomBoard board) {
         if (colour == null || start == null || end == null) {
             throw new NullPointerException();
         }
@@ -187,7 +187,7 @@ public class Movement {
         return this.getCoordinates(colour, offset, null, false, false);
     }
 
-    public Set<Point> getCoordinates(Colour colour, Point offset, Board board,
+    public Set<Point> getCoordinates(Colour colour, Point offset, CustomBoard board,
             boolean withDefend, boolean ignoreKing) {
         if (colour == null || offset == null) {
             throw new NullPointerException();
@@ -199,7 +199,7 @@ public class Movement {
         }
     }
 
-    private Set<Point> getVectorsInSpecificQuadrant(Point offset, Colour colour, Board board,
+    private Set<Point> getVectorsInSpecificQuadrant(Point offset, Colour colour, CustomBoard board,
             boolean withDefend, boolean ignoreKing) {
         if (offset == null || colour == null) {
             throw new NullPointerException();
@@ -218,7 +218,7 @@ public class Movement {
         return set;
     }
 
-    private Set<Point> getVectorsInAllQuadrants(Point offset, Colour colour, Board board,
+    private Set<Point> getVectorsInAllQuadrants(Point offset, Colour colour, CustomBoard board,
             boolean withDefend, boolean ignoreKing) {
         if (offset == null || colour == null) {
             throw new NullPointerException();
@@ -272,7 +272,7 @@ public class Movement {
         return new Point(x, y);
     }
 
-    private boolean canMoveInQuadrant(Point vector, Colour colour, Board board,
+    private boolean canMoveInQuadrant(Point vector, Colour colour, CustomBoard board,
             boolean withDefend, boolean ignoreKing) {
         if (vector == null || colour == null) {
             throw new NullPointerException();
@@ -291,7 +291,7 @@ public class Movement {
         return true;
     }
 
-    private boolean isBlockedInQuadrant(Point vector, Board board, boolean ignoreKing) {
+    private boolean isBlockedInQuadrant(Point vector, CustomBoard board, boolean ignoreKing) {
         if (vector == null) {
             throw new NullPointerException();
         }
@@ -305,11 +305,11 @@ public class Movement {
     /**
      * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
      *
-     * @param board  {@link Board} for the Condition to verify with
+     * @param board  {@link CustomBoard} for the Condition to verify with
      * @param action {@link Action} representing the movement attempted for a Piece at a location to a destination
      * @return true if all Condition pass, otherwise false
      */
-    public boolean passesConditions(Board board, Action action) {
+    public boolean passesConditions(CustomBoard board, Action action) {
         if (board == null || action == null) {
             throw new NullPointerException();
         }

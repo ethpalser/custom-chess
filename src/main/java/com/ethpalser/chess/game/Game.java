@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
@@ -14,24 +14,24 @@ import java.util.stream.Collectors;
 
 public class Game {
 
-    private final Board board;
+    private final CustomBoard board;
     private Colour turn;
     private Colour winner;
     private boolean isComplete;
 
     public Game() {
-        this.board = new Board();
+        this.board = new CustomBoard();
         this.turn = Colour.WHITE;
         this.winner = null;
         this.isComplete = false;
     }
 
-    public Game(Board board, Colour turn) {
+    public Game(CustomBoard board, Colour turn) {
         this.board = board;
         this.turn = turn;
     }
 
-    public Board getBoard() {
+    public CustomBoard getBoard() {
         return this.board;
     }
 

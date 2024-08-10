@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
-class BoardTest {
+class CustomBoardTest {
 
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
 
         assertEquals(8, board.length());
         assertEquals(8, board.width());
@@ -50,13 +50,13 @@ class BoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         assertEquals(32, board.count());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         int y = 1;
         for (int x = 0; x < board.width(); x++) {
             board.setPiece(new Point(x, y), null);

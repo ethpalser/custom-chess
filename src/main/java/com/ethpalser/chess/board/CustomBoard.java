@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Board {
+public class CustomBoard {
 
     private final int length;
     private final int width;
@@ -31,7 +31,7 @@ public class Board {
     private boolean bCheck;
     private CustomPiece lastMoved;
 
-    public Board() {
+    public CustomBoard() {
         this.length = 8;
         this.width = 8;
         Plane<CustomPiece> map = new Plane<>();
@@ -62,7 +62,7 @@ public class Board {
         this.lastMoved = null;
     }
 
-    public Board(List<String> pieces) {
+    public CustomBoard(List<String> pieces) {
         this.length = 8;
         this.width = 8;
         Plane<CustomPiece> map = new Plane<>();

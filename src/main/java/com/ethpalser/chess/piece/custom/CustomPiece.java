@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
@@ -108,11 +108,11 @@ public class CustomPiece implements ChessPiece {
      * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
      * be traversed and has all its conditions met.
      *
-     * @param board       {@link Board} used for reference
+     * @param board       {@link CustomBoard} used for reference
      * @param destination {@link Point} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
-    public Movement getMovement(Board board, Point destination) {
+    public Movement getMovement(CustomBoard board, Point destination) {
         if (board == null || destination == null) {
             throw new NullPointerException();
         }
@@ -126,14 +126,14 @@ public class CustomPiece implements ChessPiece {
         return null;
     }
 
-    public Set<Point> getMovementSet(Point location, Board board) {
+    public Set<Point> getMovementSet(Point location, CustomBoard board) {
         if (location == null) {
             throw new NullPointerException();
         }
         return this.getMovementSet(location, board, true, true, false, false);
     }
 
-    public Set<Point> getMovementSet(Point location, Board board, boolean includeMove,
+    public Set<Point> getMovementSet(Point location, CustomBoard board, boolean includeMove,
             boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
         if (location == null) {
             throw new NullPointerException();

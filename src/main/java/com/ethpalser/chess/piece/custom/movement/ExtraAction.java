@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -28,11 +28,11 @@ public class ExtraAction {
     /**
      * Creates an Action using a previous action and this reference for the board to consume for another movement.
      *
-     * @param board          {@link Board} needed for {@link Reference} to refer to
+     * @param board          {@link CustomBoard} needed for {@link Reference} to refer to
      * @param previousAction {@link Action} that this ExtraAction is following-up on
      * @return {@link Action}
      */
-    public Action getAction(Board board, Action previousAction) {
+    public Action getAction(CustomBoard board, Action previousAction) {
         if (board == null || previousAction == null) {
             throw new NullPointerException();
         }

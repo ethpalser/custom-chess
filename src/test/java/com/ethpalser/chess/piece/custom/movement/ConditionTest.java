@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Colour;
@@ -25,7 +25,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.START), Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
 
         // When
         Point selected = new Point(4, 4);
@@ -41,7 +41,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
 
         // When
         Point selected = new Point(4, 4);
@@ -58,7 +58,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         CustomPiece customPiece = board.getPiece(2, 1);
         board.setPiece(new Point(2, 2), customPiece);
 
@@ -76,7 +76,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         CustomPiece customPiece = board.getPiece(2, 1);
         board.setPiece(new Point(2, 3), customPiece);
 
@@ -94,7 +94,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
 
         // When
         Point selected = new Point(4, 1);
@@ -114,7 +114,7 @@ class ConditionTest {
         Conditional conditionC = new PropertyCondition(new Reference(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         CustomPiece white = board.getPiece(4, 1);
         board.setPiece(new Point(4, 4), white);
         CustomPiece black = board.getPiece(5, 6);
@@ -138,7 +138,7 @@ class ConditionTest {
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
         // When
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         Point selected = new Point(4, 1);
         Point destination = new Point(5, 2);
         boolean result = condition.isExpected(board, new Action(Colour.WHITE, selected, destination));
@@ -152,7 +152,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         board.setPiece(new Point(4, 1), null);
         CustomPiece king = board.getPiece(4, 0);
         board.setPiece(new Point(4, 1), king);
@@ -171,7 +171,7 @@ class ConditionTest {
         Conditional condition = new PropertyCondition(new Reference(Location.VECTOR, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         CustomPiece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
         board.setPiece(new Point(0, 2), rook);
@@ -191,7 +191,7 @@ class ConditionTest {
         Conditional condition = new ReferenceCondition(new Reference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         // When
         Point selected = new Point(4, 0);
         Point destination = new Point(2, 0);
@@ -210,7 +210,7 @@ class ConditionTest {
         Conditional conditionC = new PropertyCondition(new Reference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST);
 
-        Board board = new Board();
+        CustomBoard board = new CustomBoard();
         board.setPiece(new Point(1, 0), null);
         board.setPiece(new Point(2, 0), null);
         board.setPiece(new Point(3, 0), null);

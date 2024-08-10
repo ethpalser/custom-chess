@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.condition;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 
 /**
@@ -9,6 +9,6 @@ import com.ethpalser.chess.game.Action;
  */
 public interface Conditional {
 
-    boolean isExpected(Board board, Action action);
+    boolean isExpected(CustomBoard board, Action action);
 
 }
