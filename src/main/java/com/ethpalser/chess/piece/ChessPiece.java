@@ -12,6 +12,8 @@ public interface ChessPiece {
 
     MoveSet getMoves(ChessBoard board, ChessLog log);
 
+    Point getPoint();
+
     default boolean canMove(ChessBoard board, ChessLog log, Point destination) {
         if (board == null || destination == null) {
             return false;

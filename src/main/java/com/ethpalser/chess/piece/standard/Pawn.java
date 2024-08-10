@@ -67,6 +67,11 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
+    @Override
     public void move(Point destination) {
         if (destination == null) {
             throw new IllegalArgumentException("destination cannot be null");

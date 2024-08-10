@@ -84,6 +84,11 @@ public class King implements ChessPiece {
         return moveSet;
     }
 
+    @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
     private boolean isEmptyAndSafe(ChessBoard board, int x, int y, Colour colour) {
         Point p = new Point(x, y);
         return board.getPiece(p) == null && !board.hasThreats(p, colour);
