@@ -39,6 +39,9 @@ public class ChessGame {
             throw new IllegalActionException("not the acting player's turn (actor: " + action.getColour()
                     + ", turn: " + this.turn + ")");
         }
+        if (isNotInBoardBounds(action)) {
+            throw new IllegalActionException("cannot perform move as one of the start or end are not on the board");
+        }
 
         ChessPiece movingPiece = this.board.getPiece(action.getStart());
         if (movingPiece == null) {
@@ -46,10 +49,15 @@ public class ChessGame {
         }
         if (isNotAllowedToMove(movingPiece)) {
             throw new IllegalActionException("not the acting player's piece (actor: " + action.getColour()
-                    + ", piece: " + movingPiece.getColour());
+                    + ", piece: " + movingPiece.getColour() + ")");
         }
 
         this.board.movePiece(action.getStart(), action.getEnd());
+        // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
+        if (this.isKingInCheck(this.turn)) {
+            this.undoAction(1, false);
+            throw new IllegalActionException("cannot perform move as player's king will be in check");
+        }
 
         ChessPiece expectingEmpty = this.board.getPiece(action.getStart());
         if (expectingEmpty != null) {
@@ -66,18 +74,78 @@ public class ChessGame {
         return status;
     }
 
+    public GameStatus undoAction() {
+        return this.undoAction(1, true);
+    }
+
+    public GameStatus undoAction(int beforeCurrent, boolean saveUndone) {
+        for (int i = 0; i < beforeCurrent; i++) {
+            LogRecord logRecord;
+            if (saveUndone) {
+                logRecord = this.log.undo();
+            } else {
+                logRecord = this.log.pop();
+            }
+            if (logRecord == null) {
+                break;
+            }
+            this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
+            this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
+            this.board.refresh();
+        }
+        return this.checkGameStatus();
+    }
+
+    public GameStatus redoAction() {
+        return this.redoAction(1);
+    }
+
+    public GameStatus redoAction(int afterCurrent) {
+        for (int i = 0; i < afterCurrent; i++) {
+            LogRecord logRecord = this.log.redo();
+            if (logRecord == null) {
+                break;
+            }
+            this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
+            this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
+            this.board.refresh();
+        }
+        return this.checkGameStatus();
+    }
+
     // PRIVATE METHODS
 
     private boolean isNotPlayerAction(Action action) {
+        if (action == null) {
+            throw new NullPointerException();
+        }
         return !this.turn.equals(action.getColour());
     }
 
+    private boolean isNotInBoardBounds(Action action) {
+        return action.getStart() == null || action.getEnd() == null
+                || !this.board.isInBounds(action.getStart()) || !this.board.isInBounds(action.getEnd());
+    }
+
     private boolean isNotAllowedToMove(ChessPiece piece) {
+        if (piece == null) {
+            throw new NullPointerException();
+        }
         return !this.turn.equals(piece.getColour());
     }
 
     private boolean isKingPiece(ChessPiece piece) {
+        if (piece == null) {
+            throw new NullPointerException();
+        }
         return "K".equals(piece.getCode());
+    }
+
+    private boolean isKingInCheck(Colour playerColour) {
+        if (playerColour == null) {
+            throw new NullPointerException();
+        }
+        return this.board.hasThreats(this.getOpponentKingPosition(this.turn), playerColour);
     }
 
     private void updateKingPosition(ChessPiece piece, Point update) {
@@ -100,11 +168,9 @@ public class ChessGame {
 
     private GameStatus checkGameStatus() {
         Colour opponent = Colour.opposite(this.turn);
-        Point toCheck = this.getOpponentKingPosition(this.turn);
-        Set<ChessPiece> threats = this.board.getThreats(toCheck, opponent);
         // Is there a check, checkmate or stalemate?
         GameStatus nextStatus;
-        if (!threats.isEmpty()) {
+        if (isKingInCheck(opponent)) {
             if (this.isCheckmate()) {
                 nextStatus = GameStatus.colourWinStatus(this.turn);
             } else {
@@ -157,22 +223,22 @@ public class ChessGame {
     }
 
     private boolean isStalemate() {
+        // Only kings remain, which is a stalemate
         if (this.board.getPieces().size() <= 2) {
             return true;
         }
         Colour oppColour = Colour.opposite(this.turn);
         Point oppKingPoint = this.getOpponentKingPosition(this.turn);
         ChessPiece oppKing = this.board.getPiece(oppKingPoint);
-        // Assume not in check or checkmate
+        // Can the opponent's king move, including captures that are not defended?
         Set<Point> oppKingMoves = oppKing.getMoves(this.board, this.log).getPoints();
         if (!oppKingMoves.isEmpty()) {
             return false;
         }
-
+        // Are there any non-king opponent pieces that can move?
         List<ChessPiece> opponentPieces = this.board.getPieces().values().stream()
                 .filter(p -> oppColour.equals(p.getColour()) && !isKingPiece(p)).collect(Collectors.toList());
         for (ChessPiece p : opponentPieces) {
-            // Any non-king opponent piece can move
             if (!p.getMoves(this.board, this.log).toSet().isEmpty()) {
                 return false;
             }
