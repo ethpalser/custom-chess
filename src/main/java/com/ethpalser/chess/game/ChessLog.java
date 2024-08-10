@@ -10,8 +10,8 @@ public interface ChessLog extends Collection<LogRecord> {
 
     LogRecord pop();
 
-    void undo();
+    LogRecord undo();
 
-    void redo();
+    LogRecord redo();
 
 }

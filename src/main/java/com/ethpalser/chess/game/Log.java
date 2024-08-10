@@ -118,16 +118,22 @@ public class Log implements ChessLog {
     }
 
     @Override
-    public void undo() {
+    public LogRecord undo() {
         if (!this.logStack.isEmpty()) {
-            this.undoStack.push(this.logStack.pop());
+            LogRecord logRecord = this.logStack.pop();
+            this.undoStack.push(logRecord);
+            return logRecord;
         }
+        return null;
     }
 
     @Override
-    public void redo() {
+    public LogRecord redo() {
         if (!this.undoStack.isEmpty()) {
-            this.logStack.push(this.undoStack.pop());
+            LogRecord logRecord = this.undoStack.pop();
+            this.logStack.push(logRecord);
+            return logRecord;
         }
+        return null;
     }
 }
