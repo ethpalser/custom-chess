@@ -1,9 +1,13 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.ChessLog;
+import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.MoveSet;
 import com.ethpalser.chess.piece.custom.movement.Movement;
 import com.ethpalser.chess.piece.custom.movement.Path;
 import java.util.Arrays;
@@ -11,18 +15,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CustomPiece {
+public class CustomPiece implements ChessPiece {
 
     private final PieceType type;
+    private final String code;
     private final Colour colour;
     private final List<Movement> movements;
     private Point position;
-    private int lastMoveDistance;
     private boolean hasMoved;
-
-    public CustomPiece() {
-        this(PieceType.PAWN, Colour.WHITE, new Point());
-    }
 
     public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
         this(pieceType, colour, vector, (Movement) null);
@@ -34,23 +34,37 @@ public class CustomPiece {
         this.position = vector;
         this.movements = Arrays.asList(movements);
         this.hasMoved = false;
-        this.lastMoveDistance = 0;
+        this.code = pieceType.getCode();
+    }
+
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, boolean hasMoved, Movement... movements) {
+        this(pieceType, colour, vector, movements);
+        this.hasMoved = hasMoved;
     }
 
     public PieceType getType() {
         return this.type;
     }
 
+    @Override
+    public String getCode() {
+        if (this.type != PieceType.CUSTOM) {
+            return type.getCode();
+        } else {
+            return code;
+        }
+    }
+
+    @Override
     public Colour getColour() {
         return this.colour;
     }
 
-    public List<Movement> getMovements() {
-        return this.movements;
-    }
-
-    public Point getPosition() {
-        return this.position;
+    @Override
+    public MoveSet getMoves(ChessBoard board, ChessLog log) {
+        Set<Point> set = new HashSet<>();
+        // todo: update to use Movements, which requires refactoring all custom logic to use ChessPiece and ChessBoard
+        return new MoveSet(set);
     }
 
     /**
@@ -59,22 +73,16 @@ public class CustomPiece {
      *
      * @param destination representing the new location of this piece.
      */
-    public void setPosition(Point destination) {
+    @Override
+    public void move(Point destination) {
         if (destination == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("illegal argument, destination is null");
         }
         if (destination.equals(this.position)) {
             return;
         }
-
-        this.lastMoveDistance = Math.max(Math.abs(destination.getX() - position.getX()),
-                Math.abs(destination.getY() - position.getY()));
         this.position = destination;
         this.hasMoved = true;
-    }
-
-    public int getLastMoveDistance() {
-        return this.lastMoveDistance;
     }
 
     /**
@@ -82,12 +90,18 @@ public class CustomPiece {
      *
      * @return true or false
      */
-    public boolean getHasMoved() {
+    @Override
+    public boolean hasMoved() {
         return hasMoved;
     }
 
-    public void setHasMoved(boolean bool) {
-        this.hasMoved = bool;
+    // Temporary
+    public boolean getHasMoved() {
+        return this.hasMoved;
+    }
+
+    public Point getPosition() {
+        return this.position;
     }
 
     /**

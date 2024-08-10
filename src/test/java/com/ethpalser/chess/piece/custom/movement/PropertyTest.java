@@ -1,7 +1,9 @@
 package com.ethpalser.chess.piece.custom.movement;
 
+import com.ethpalser.chess.board.Point;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.custom.condition.Property;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,7 @@ class PropertyTest {
         // Given
         String fieldName = "a";
         Property<CustomPiece> property = new Property<>(fieldName);
-        CustomPiece customPiece = new CustomPiece();
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
         // When
         Object result = property.fetch(customPiece);
         // Then
@@ -25,7 +27,7 @@ class PropertyTest {
         // Given
         String fieldName = "HaSmOvEd";
         Property<CustomPiece> property = new Property<>(fieldName);
-        CustomPiece customPiece = new CustomPiece();
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
         // When
         Object result = property.fetch(customPiece);
         // Then
@@ -37,7 +39,7 @@ class PropertyTest {
         // Given
         String fieldName = "hasMoved";
         Property<CustomPiece> property = new Property<>(fieldName);
-        CustomPiece customPiece = new CustomPiece();
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
         // When
         Object result = property.fetch(customPiece);
         // Then
@@ -49,7 +51,7 @@ class PropertyTest {
         // Given
         String fieldName = "hasMoved";
         Property<CustomPiece> property = new Property<>(fieldName);
-        CustomPiece customPiece = new CustomPiece();
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
         // When
         Object result = property.fetch(customPiece);
         // Then
@@ -61,7 +63,7 @@ class PropertyTest {
         // Given
         String fieldName = "colour";
         Property<CustomPiece> property = new Property<>(fieldName);
-        CustomPiece customPiece = new CustomPiece();
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
         // When
         Object result = property.fetch(customPiece);
         // Then

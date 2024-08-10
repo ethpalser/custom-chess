@@ -74,7 +74,10 @@ public class Game {
 
         CustomPiece toMove = this.getPieceToMove(player, start);
         this.verifyDestination(toMove, end);
-        Movement movement = this.getMovement(toMove, end);
+        Movement movement = toMove.getMovement(this.board, end);
+        if (movement == null) {
+            throw new IllegalActionException("The selected piece does not have a movement to " + end);
+        }
         this.performMovement(player, movement, start, end);
         if (this.isCheckmate()) {
             this.winner = this.turn;
@@ -108,17 +111,6 @@ public class Game {
         } else if (destination != null && selected.getColour().equals(destination.getColour())) {
             throw new IllegalActionException("The destination " + end + " is occupied by a piece of the same colour.");
         }
-    }
-
-    private Movement getMovement(CustomPiece selected, Point end) {
-        if (selected == null || end == null) {
-            throw new NullPointerException();
-        }
-        Movement movement = selected.getMovement(this.board, end);
-        if (movement == null) {
-            throw new IllegalActionException("The selected piece does not have a movement to " + end);
-        }
-        return movement;
     }
 
     private void performMovement(Colour player, Movement movement, Point start, Point end) {
@@ -168,7 +160,7 @@ public class Game {
                 }
             }
 
-            Movement pMove = this.getMovement(p, kingPosition);
+            Movement pMove = p.getMovement(this.board, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition, this.board);
             for (Point v : pPath) {
                 List<CustomPiece> blockers =
@@ -202,7 +194,8 @@ public class Game {
             }
         }
 
-        List<CustomPiece> playerCustomPieces = allCustomPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
+        List<CustomPiece> playerCustomPieces =
+                allCustomPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
                 && !p.getType().equals(PieceType.KING)).collect(Collectors.toList());
         for (CustomPiece p : playerCustomPieces) {
             Set<Point> moves = p.getMovementSet(p.getPosition(), board);

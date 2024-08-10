@@ -125,11 +125,10 @@ class ConditionTest {
         Point selected = new Point(4, 4);
         Point destination = new Point(5, 5);
         Action action = new Action(Colour.WHITE, selected, destination);
-        boolean result = conditionA.isExpected(board, action)
-                && conditionB.isExpected(board, action)
-                && conditionC.isExpected(board, action);
         // Then
-        assertTrue(result);
+        assertTrue(conditionA.isExpected(board, action));
+        assertTrue(conditionB.isExpected(board, action));
+        assertTrue(conditionC.isExpected(board, action));
     }
 
     @Test

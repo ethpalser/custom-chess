@@ -79,10 +79,6 @@ public class Point implements Comparable<Point> {
         this.minY = Math.min(yBounds1, yBounds2);
         this.maxX = Math.max(xBounds1, xBounds2);
         this.maxY = Math.max(yBounds1, yBounds2);
-
-        if (this.x < this.minX || this.x > this.maxX || this.y < this.minY || this.y > this.maxY) {
-            throw new IndexOutOfBoundsException("Either x and/or y are out of bounds.");
-        }
     }
 
     public Point(Point copy) {
@@ -168,6 +164,12 @@ public class Point implements Comparable<Point> {
             case RIGHT -> new Point(this.x + dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
             case LEFT -> new Point(this.x - dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
         };
+    }
+
+    // Temporary
+    public boolean isValidLocation(Point point) {
+        return this.minX <= point.getX() && point.getX() <= this.maxX
+                && this.minY <= point.getY() && point.getY() <= this.minY;
     }
 
 }

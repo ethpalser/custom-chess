@@ -277,7 +277,7 @@ public class Movement {
         if (vector == null || colour == null) {
             throw new NullPointerException();
         }
-        if (!board.isValidLocation(vector)) {
+        if (!vector.isValidLocation(vector)) {
             return false;
         }
         if (board != null) {
@@ -295,7 +295,7 @@ public class Movement {
         if (vector == null) {
             throw new NullPointerException();
         }
-        if (!board.isValidLocation(vector) || board == null) {
+        if (!vector.isValidLocation(vector) || board == null) {
             return false;
         }
         CustomPiece customPiece = board.getPiece(vector);

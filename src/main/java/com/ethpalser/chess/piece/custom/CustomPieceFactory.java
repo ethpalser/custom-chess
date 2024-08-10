@@ -41,7 +41,8 @@ public class CustomPieceFactory {
             CustomPiece customPiece = this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0,
                             1)),
                     point);
-            customPiece.setHasMoved(!parts[0].contains("*"));
+            // todo: add this to constructor
+            // customPiece.setHasMoved(!parts[0].contains("*"));
             return customPiece;
         } else {
             throw new IllegalArgumentException("String (" + string + ") does not match the required format.");
@@ -153,7 +154,7 @@ public class CustomPieceFactory {
                 return new CustomPiece(PieceType.PAWN, colour, vector, pawnBaseMove, pawnCharge, pawnCapture, enPassant);
             }
         }
-        return new CustomPiece();
+        return null;
     }
 
 }

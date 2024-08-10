@@ -167,7 +167,7 @@ public class Board {
         } else {
             this.pieceMap.remove(customPiece.getPosition());
             this.pieceMap.put(vector, customPiece);
-            customPiece.setPosition(vector);
+            customPiece.move(vector);
             // Update the king position if it moved
             if (customPiece.getType().equals(PieceType.KING)) {
                 if (customPiece.getColour().equals(Colour.WHITE)) {
@@ -274,7 +274,7 @@ public class Board {
             bCustomPieces = new HashSet<>();
         List<CustomPiece> list = Stream.concat(wCustomPieces.stream(), bCustomPieces.stream()).collect(Collectors.toList());
         for (CustomPiece p : list) {
-            Set<Point> movesIgnoringBoard = p.getMovementSet(p.getPosition(), null, false, true, false, false);
+            Set<Point> movesIgnoringBoard = p.getMovementSet(p.getPosition(), this, false, true, false, false);
             Set<Point> movesWithBoard = p.getMovementSet(p.getPosition(), this, false, true, true, true);
             this.updateThreats(p, movesIgnoringBoard, movesWithBoard);
         }
