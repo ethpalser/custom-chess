@@ -1,12 +1,11 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
-import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +31,7 @@ public class Knight implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board, ChessLog log) {
+    public MoveSet getMoves(ChessBoard board) {
         Set<Point> set = new HashSet<>();
         set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
         set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left

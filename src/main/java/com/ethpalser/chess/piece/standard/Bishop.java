@@ -1,12 +1,11 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
-import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +32,7 @@ public class Bishop implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board, ChessLog log) {
+    public MoveSet getMoves(ChessBoard board) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }

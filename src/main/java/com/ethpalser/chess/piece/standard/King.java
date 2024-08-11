@@ -1,6 +1,7 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.ActionRecord;
@@ -36,29 +37,33 @@ public class King implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board, ChessLog log) {
+    public MoveSet getMoves(ChessBoard board) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MoveSet getMoves(ChessBoard board, ChessLog log, ThreatMap opponentThreats) {
         Set<Point> set = new HashSet<>();
-        set.add(this.generateSafeOrNull(board, -1, 0)); // left
-        set.add(this.generateSafeOrNull(board, -1, 1)); // top left
-        set.add(this.generateSafeOrNull(board, 0, 1)); // top
-        set.add(this.generateSafeOrNull(board, 1, 1)); // top right
-        set.add(this.generateSafeOrNull(board, 1, 0)); // right
-        set.add(this.generateSafeOrNull(board, 1, -1)); // bottom right
-        set.add(this.generateSafeOrNull(board, 0, -1)); // bottom
-        set.add(this.generateSafeOrNull(board, -1, -1)); // bottom left
+        set.add(this.generateSafeOrNull(board, opponentThreats, -1, 0)); // left
+        set.add(this.generateSafeOrNull(board, opponentThreats, -1, 1)); // top left
+        set.add(this.generateSafeOrNull(board, opponentThreats, 0, 1)); // top
+        set.add(this.generateSafeOrNull(board, opponentThreats, 1, 1)); // top right
+        set.add(this.generateSafeOrNull(board, opponentThreats, 1, 0)); // right
+        set.add(this.generateSafeOrNull(board, opponentThreats, 1, -1)); // bottom right
+        set.add(this.generateSafeOrNull(board, opponentThreats, 0, -1)); // bottom
+        set.add(this.generateSafeOrNull(board, opponentThreats, -1, -1)); // bottom left
         set.remove(null); // remove any case of null
         MoveSet moveSet = new MoveSet(set);
 
         // castling
-        Colour opposite = this.colour == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
-        // not moved and not threatened
-        if (!this.hasMoved && !board.hasThreats(this.point, opposite)) {
+        // not moved and not threatened (need to use the correct threat map)
+        if (!this.hasMoved && opponentThreats.getPieces(this.point).isEmpty()) {
             int startRank = this.colour == Colour.WHITE ? board.getPieces().getMinY() : board.getPieces().getMaxY();
             // king side
             ChessPiece kingSideRook = board.getPiece(new Point(board.getPieces().getMinX(), startRank));
             if (kingSideRook != null && !kingSideRook.hasMoved()
-                    && isEmptyAndSafe(board, this.point.getX() - 1, this.point.getY())
-                    && isEmptyAndSafe(board, this.point.getX() - 2, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
                 MoveRecord kingSideRookMove = new ActionRecord(
                         new Point(0, startRank),
@@ -70,8 +75,8 @@ public class King implements ChessPiece {
             // queen side
             ChessPiece queenSideRook = board.getPiece(new Point(board.getPieces().getMaxX(), startRank));
             if (queenSideRook != null && !queenSideRook.hasMoved()
-                    && isEmptyAndSafe(board, this.point.getX() + 1, this.point.getY())
-                    && isEmptyAndSafe(board, this.point.getX() + 2, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
                 MoveRecord queenSideRookMove = new ActionRecord(
                         new Point(0, startRank),
@@ -89,19 +94,6 @@ public class King implements ChessPiece {
         return this.point;
     }
 
-    private boolean isEmptyAndSafe(ChessBoard board, int x, int y) {
-        Point p = new Point(x, y);
-        return board.getPiece(p) == null && !board.hasThreats(p, this.colour);
-    }
-
-    private Point generateSafeOrNull(ChessBoard board, int xOffset, int yOffset) {
-        Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
-        if (!board.hasThreats(p, this.colour)) {
-            return PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
-        }
-        return null;
-    }
-
     @Override
     public void move(Point destination) {
         if (destination == null) {
@@ -114,5 +106,24 @@ public class King implements ChessPiece {
     @Override
     public boolean hasMoved() {
         return this.hasMoved;
+    }
+
+    // PRIVATE METHODS
+
+    private boolean isSafe(ThreatMap threatMap, Point point) {
+        return threatMap.getPieces(point).isEmpty();
+    }
+
+    private boolean isEmptyAndSafe(ChessBoard board, ThreatMap threatMap, int x, int y) {
+        Point p = new Point(x, y);
+        return board.getPiece(p) == null && isSafe(threatMap, p);
+    }
+
+    private Point generateSafeOrNull(ChessBoard board, ThreatMap threatMap, int xOffset, int yOffset) {
+        Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
+        if (isSafe(threatMap, p)) {
+            return PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
+        }
+        return null;
     }
 }

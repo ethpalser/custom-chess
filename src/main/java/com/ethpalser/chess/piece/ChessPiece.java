@@ -1,6 +1,7 @@
 package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.ChessLog;
 
@@ -10,7 +11,17 @@ public interface ChessPiece {
 
     Colour getColour();
 
-    MoveSet getMoves(ChessBoard board, ChessLog log);
+    MoveSet getMoves(ChessBoard board);
+
+    default MoveSet getMoves(ChessBoard board, ChessLog log) {
+        // log ignored
+        return this.getMoves(board);
+    }
+
+    default MoveSet getMoves(ChessBoard board, ChessLog log, ThreatMap threats) {
+        // threats ignored, and likely log as well
+        return this.getMoves(board, log);
+    }
 
     Point getPoint();
 

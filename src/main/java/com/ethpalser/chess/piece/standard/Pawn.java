@@ -1,6 +1,7 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.piece.Move;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.ChessLog;
@@ -31,6 +32,11 @@ public class Pawn implements ChessPiece {
     @Override
     public Colour getColour() {
         return this.colour;
+    }
+
+    @Override
+    public MoveSet getMoves(ChessBoard board) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
