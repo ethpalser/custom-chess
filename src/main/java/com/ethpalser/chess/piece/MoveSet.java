@@ -21,6 +21,10 @@ public class MoveSet {
         return this.moves;
     }
 
+    public Move getMove(Point point) {
+        return this.moves.stream().filter(m -> point.equals(m.getPoint())).findFirst().orElse(null);
+    }
+
     public void addMove(Move move) {
         this.moves.add(move);
     }
