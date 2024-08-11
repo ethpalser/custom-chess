@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.board;
 
 public interface Quantifiable<N extends Number> {
 
