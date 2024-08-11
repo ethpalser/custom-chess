@@ -16,16 +16,6 @@ public class ThreatMap implements MoveMap {
     private final Colour colour;
     private final Map<Point, Set<ChessPiece>> map;
 
-    public ThreatMap(Colour colour) {
-        this.colour = colour;
-        this.map = new HashMap<>();
-    }
-
-    public ThreatMap(Colour colour, ChessBoard board) {
-        this.colour = colour;
-        this.map = this.setup(colour, board, null);
-    }
-
     public ThreatMap(Colour colour, ChessBoard board, ChessLog log) {
         this.colour = colour;
         this.map = this.setup(colour, board, log);

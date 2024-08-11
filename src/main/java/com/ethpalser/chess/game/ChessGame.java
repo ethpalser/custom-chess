@@ -33,8 +33,8 @@ public class ChessGame {
         // Assuming standard starting positions, and if this assumption changes it should be provided by the board
         this.whiteKing = new Point('e', '1');
         this.blackKing = new Point('e', '8');
-        this.whiteThreats = new ThreatMap(Colour.WHITE, board);
-        this.blackThreats = new ThreatMap(Colour.BLACK, board);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board, this.log);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log);
     }
 
     public GameStatus updateGame(Action action) throws IllegalActionException {
