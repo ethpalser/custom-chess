@@ -1,6 +1,7 @@
 package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Quantifiable;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
