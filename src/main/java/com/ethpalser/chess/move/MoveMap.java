@@ -13,6 +13,10 @@ public interface MoveMap extends Quantifiable<Integer> {
 
     Set<ChessPiece> getPieces(Point point);
 
+    default boolean isEmpty(Point point) {
+        return this.getPieces(point).isEmpty();
+    }
+
     /**
      * Remove the given piece from all sets it exists in, so it cannot be retrieved from any point.
      *
@@ -36,9 +40,8 @@ public interface MoveMap extends Quantifiable<Integer> {
      *
      * @param board
      * @param log
-     * @param start
-     * @param end
+     * @param point
      */
-    void updateMoves(ChessBoard board, ChessLog log, Point start, Point end);
+    void updateMoves(ChessBoard board, ChessLog log, Point point);
 
 }
