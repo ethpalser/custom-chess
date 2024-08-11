@@ -1,6 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.ChessPiece;
@@ -13,6 +14,9 @@ public class ChessGame {
 
     private final ChessBoard board;
     private final ChessLog log;
+    private final ThreatMap whiteThreats;
+    private final ThreatMap blackThreats;
+
     private GameStatus status;
     private Colour turn;
     private Point whiteKing;
@@ -29,6 +33,8 @@ public class ChessGame {
         // Assuming standard starting positions, and if this assumption changes it should be provided by the board
         this.whiteKing = new Point('e', '1');
         this.blackKing = new Point('e', '8');
+        this.whiteThreats = new ThreatMap(Colour.WHITE, board);
+        this.blackThreats = new ThreatMap(Colour.BLACK, board);
     }
 
     public GameStatus updateGame(Action action) throws IllegalActionException {
@@ -90,9 +96,16 @@ public class ChessGame {
             if (logRecord == null) {
                 break;
             }
+
             this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
             this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
-            this.board.updateThreats(logRecord.getStart(), logRecord.getEnd());
+
+            this.whiteThreats.clearMoves(logRecord.getMovingPiece());
+            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getEnd());
+            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getStart());
+            this.blackThreats.clearMoves(logRecord.getMovingPiece());
+            this.blackThreats.updateMoves(this.board, this.log, logRecord.getEnd());
+            this.blackThreats.updateMoves(this.board, this.log, logRecord.getStart());
         }
         return this.checkGameStatus();
     }
@@ -109,7 +122,13 @@ public class ChessGame {
             }
             this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
             this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
-            this.board.updateThreats(logRecord.getStart(), logRecord.getEnd());
+
+            this.whiteThreats.clearMoves(logRecord.getMovingPiece());
+            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getEnd());
+            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getStart());
+            this.blackThreats.clearMoves(logRecord.getMovingPiece());
+            this.blackThreats.updateMoves(this.board, this.log, logRecord.getEnd());
+            this.blackThreats.updateMoves(this.board, this.log, logRecord.getStart());
         }
         return this.checkGameStatus();
     }
@@ -146,7 +165,7 @@ public class ChessGame {
         if (playerColour == null) {
             throw new NullPointerException();
         }
-        return this.board.hasThreats(this.getOpponentKingPosition(this.turn), playerColour);
+        return this.hasThreats(playerColour, this.getOpponentKingPosition(this.turn));
     }
 
     private void updateKingPosition(ChessPiece piece, Point update) {
@@ -166,6 +185,19 @@ public class ChessGame {
             return this.whiteKing;
         }
     }
+
+    private ThreatMap getThreatMap(Colour colour) {
+        if (Colour.WHITE.equals(colour)) {
+            return whiteThreats;
+        } else {
+            return blackThreats;
+        }
+    }
+
+    private boolean hasThreats(Colour colour, Point point) {
+        return !this.getThreatMap(colour).getPieces(point).isEmpty();
+    }
+
 
     private GameStatus checkGameStatus() {
         Colour opponent = Colour.opposite(this.turn);
@@ -196,7 +228,7 @@ public class ChessGame {
         if (!oppKingMoveSet.isEmpty()) {
             for (Point p : oppKingMoveSet) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.board.getThreats(p, this.turn).isEmpty()) {
+                if (!hasThreats(this.turn, p)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -204,7 +236,7 @@ public class ChessGame {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<ChessPiece> sourcesOfCheck = this.board.getThreats(oppKingPoint, this.turn);
+        Set<ChessPiece> sourcesOfCheck = this.getThreatMap(this.turn).getPieces(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
@@ -212,7 +244,7 @@ public class ChessGame {
         // There is only one threatening check
         for (ChessPiece p : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<ChessPiece> defenders = this.board.getThreats(p.getPoint(), oppColour);
+            Set<ChessPiece> defenders = this.getThreatMap(oppColour).getPieces(p.getPoint());
             if (!defenders.isEmpty()) {
                 // Yes, as this piece can be captured by a non-king, the opponent has a legal move to prevent check
                 return false;
