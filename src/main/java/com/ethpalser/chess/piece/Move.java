@@ -32,7 +32,7 @@ public class Move {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Move move = (Move) o;
-        return Objects.equals(point, move.point) && Objects.equals(followUpMove, move.followUpMove);
+        return Objects.equals(point, move.point);
     }
 
     @Override
