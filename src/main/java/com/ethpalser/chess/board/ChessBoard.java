@@ -1,10 +1,8 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.piece.ChessPiece;
-import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import java.util.Set;
 
 public interface ChessBoard {
 
@@ -16,26 +14,10 @@ public interface ChessBoard {
 
     void movePiece(Point start, Point end);
 
-    Set<ChessPiece> getThreats(Point point, Colour colour);
-
-    default boolean hasThreats(Point point, Colour colour) {
-        if (point == null) {
-            return false;
-        }
-        return !getThreats(point, colour).isEmpty();
-    }
-
     boolean isInBounds(int x, int y);
 
     default boolean isInBounds(Point point) {
         return this.isInBounds(point.getX(), point.getY());
     }
-
-    /**
-     * Updates the boards internal state for legal moves, threats and any other state-dependent information.
-     * This method is only needed if the state is modified directly. This may already be used implicitly whenever
-     * a piece is moved, or a more optimized version of this.
-     */
-    void updateThreats(Point start, Point end);
 
 }
