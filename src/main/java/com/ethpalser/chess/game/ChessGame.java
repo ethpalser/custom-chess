@@ -64,6 +64,7 @@ public class ChessGame {
             throw new IllegalActionException("cannot perform move as it cannot move to " + action.getEnd());
         }
 
+        this.log.push(new ActionRecord(action, movingPiece));
         this.updateKingPosition(movingPiece, action.getEnd());
         this.status = this.checkGameStatus();
         this.turn = Colour.opposite(this.turn);
