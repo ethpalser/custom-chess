@@ -91,7 +91,7 @@ public class ChessGame {
             }
             this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
             this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
-            this.board.refresh();
+            this.board.updateThreats(logRecord.getStart(), logRecord.getEnd());
         }
         return this.checkGameStatus();
     }
@@ -108,7 +108,7 @@ public class ChessGame {
             }
             this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
             this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
-            this.board.refresh();
+            this.board.updateThreats(logRecord.getStart(), logRecord.getEnd());
         }
         return this.checkGameStatus();
     }

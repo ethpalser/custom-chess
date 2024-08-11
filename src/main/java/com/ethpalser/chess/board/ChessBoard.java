@@ -34,6 +34,6 @@ public interface ChessBoard {
      * This method is only needed if the state is modified directly. This may already be used implicitly whenever
      * a piece is moved, or a more optimized version of this.
      */
-    void refresh();
+    void updateThreats(Point start, Point end);
 
 }
