@@ -2,7 +2,7 @@ package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;

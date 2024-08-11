@@ -1,5 +1,6 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.piece.Colour;
 import java.util.HashSet;
 import java.util.Set;

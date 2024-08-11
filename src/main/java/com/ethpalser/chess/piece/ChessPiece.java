@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.ChessLog;
 
 public interface ChessPiece {

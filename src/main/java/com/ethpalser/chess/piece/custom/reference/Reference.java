@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom.reference;
 
 import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.movement.Path;

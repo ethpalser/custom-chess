@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;
 
 /**

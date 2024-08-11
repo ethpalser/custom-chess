@@ -1,4 +1,4 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.reference.Direction;

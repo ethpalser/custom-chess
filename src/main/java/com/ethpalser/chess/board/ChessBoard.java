@@ -2,6 +2,8 @@ package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Point;
 import java.util.Set;
 
 public interface ChessBoard {

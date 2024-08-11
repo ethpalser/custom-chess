@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 
 public interface MoveRecord {
 

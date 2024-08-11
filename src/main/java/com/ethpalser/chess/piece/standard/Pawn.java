@@ -1,8 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Point;
-import com.ethpalser.chess.board.PointUtil;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.game.LogRecord;
 import com.ethpalser.chess.piece.ChessPiece;

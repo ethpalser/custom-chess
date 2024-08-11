@@ -1,4 +1,4 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.space;
 
 import java.util.Collection;
 import java.util.HashMap;

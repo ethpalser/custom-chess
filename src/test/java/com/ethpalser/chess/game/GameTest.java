@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
 import static org.junit.jupiter.api.Assertions.*;

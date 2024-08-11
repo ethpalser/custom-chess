@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.Point;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
