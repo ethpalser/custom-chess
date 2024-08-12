@@ -1,6 +1,7 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.MoveRecord;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
@@ -9,7 +10,6 @@ import com.ethpalser.chess.game.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Move;
-import com.ethpalser.chess.piece.MoveRecord;
 import com.ethpalser.chess.piece.MoveSet;
 import java.util.HashSet;
 import java.util.Set;

@@ -9,8 +9,8 @@ import java.util.List;
 
 public class StandardLog implements Log {
 
-    private final Deque<LogRecord> logStack;
-    private final Deque<LogRecord> undoStack;
+    private final Deque<MoveRecord> logStack;
+    private final Deque<MoveRecord> undoStack;
 
     public StandardLog() {
         this.logStack = new ArrayDeque<>();
@@ -28,7 +28,7 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public boolean addAll(Collection<? extends LogRecord> c) {
+    public boolean addAll(Collection<? extends MoveRecord> c) {
         return this.logStack.addAll(c);
     }
 
@@ -83,7 +83,7 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public Iterator<LogRecord> iterator() {
+    public Iterator<MoveRecord> iterator() {
         return this.logStack.iterator();
     }
 
@@ -98,41 +98,41 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public boolean add(LogRecord actionRecord) {
+    public boolean add(MoveRecord actionRecord) {
         return this.logStack.add(actionRecord);
     }
 
     @Override
-    public LogRecord peek() {
+    public MoveRecord peek() {
         return this.logStack.peek();
     }
 
     @Override
-    public void push(LogRecord actionRecord) {
+    public void push(MoveRecord actionRecord) {
         this.logStack.push(actionRecord);
     }
 
     @Override
-    public LogRecord pop() {
+    public MoveRecord pop() {
         return this.logStack.pop();
     }
 
     @Override
-    public LogRecord undo() {
+    public MoveRecord undo() {
         if (!this.logStack.isEmpty()) {
-            LogRecord logRecord = this.logStack.pop();
-            this.undoStack.push(logRecord);
-            return logRecord;
+            MoveRecord moveRecord = this.logStack.pop();
+            this.undoStack.push(moveRecord);
+            return moveRecord;
         }
         return null;
     }
 
     @Override
-    public LogRecord redo() {
+    public MoveRecord redo() {
         if (!this.undoStack.isEmpty()) {
-            LogRecord logRecord = this.undoStack.pop();
-            this.logStack.push(logRecord);
-            return logRecord;
+            MoveRecord moveRecord = this.undoStack.pop();
+            this.logStack.push(moveRecord);
+            return moveRecord;
         }
         return null;
     }

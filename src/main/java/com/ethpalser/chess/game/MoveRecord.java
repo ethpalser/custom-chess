@@ -1,10 +1,9 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.MoveRecord;
+import com.ethpalser.chess.space.Point;
 
-public interface LogRecord extends MoveRecord {
+public interface MoveRecord {
 
     Point getStart();
 

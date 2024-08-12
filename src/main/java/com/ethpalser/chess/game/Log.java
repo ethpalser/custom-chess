@@ -2,16 +2,16 @@ package com.ethpalser.chess.game;
 
 import java.util.Collection;
 
-public interface Log extends Collection<LogRecord> {
+public interface Log extends Collection<MoveRecord> {
 
-    void push(LogRecord item);
+    void push(MoveRecord item);
 
-    LogRecord peek();
+    MoveRecord peek();
 
-    LogRecord pop();
+    MoveRecord pop();
 
-    LogRecord undo();
+    MoveRecord undo();
 
-    LogRecord redo();
+    MoveRecord redo();
 
 }

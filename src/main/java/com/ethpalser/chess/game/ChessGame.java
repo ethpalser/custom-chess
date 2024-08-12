@@ -94,25 +94,25 @@ public class ChessGame {
 
     public GameStatus undoAction(int beforeCurrent, boolean saveUndone) {
         for (int i = 0; i < beforeCurrent; i++) {
-            LogRecord logRecord;
+            MoveRecord moveRecord;
             if (saveUndone) {
-                logRecord = this.log.undo();
+                moveRecord = this.log.undo();
             } else {
-                logRecord = this.log.pop();
+                moveRecord = this.log.pop();
             }
-            if (logRecord == null) {
+            if (moveRecord == null) {
                 break;
             }
 
-            this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
-            this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
+            this.board.addPiece(moveRecord.getEnd(), moveRecord.getCapturedPiece());
+            this.board.addPiece(moveRecord.getStart(), moveRecord.getMovingPiece());
 
-            this.whiteThreats.clearMoves(logRecord.getMovingPiece());
-            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getEnd());
-            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getStart());
-            this.blackThreats.clearMoves(logRecord.getMovingPiece());
-            this.blackThreats.updateMoves(this.board, this.log, logRecord.getEnd());
-            this.blackThreats.updateMoves(this.board, this.log, logRecord.getStart());
+            this.whiteThreats.clearMoves(moveRecord.getMovingPiece());
+            this.whiteThreats.updateMoves(this.board, this.log, moveRecord.getEnd());
+            this.whiteThreats.updateMoves(this.board, this.log, moveRecord.getStart());
+            this.blackThreats.clearMoves(moveRecord.getMovingPiece());
+            this.blackThreats.updateMoves(this.board, this.log, moveRecord.getEnd());
+            this.blackThreats.updateMoves(this.board, this.log, moveRecord.getStart());
         }
         return this.checkGameStatus();
     }
@@ -123,19 +123,19 @@ public class ChessGame {
 
     public GameStatus redoAction(int afterCurrent) {
         for (int i = 0; i < afterCurrent; i++) {
-            LogRecord logRecord = this.log.redo();
-            if (logRecord == null) {
+            MoveRecord moveRecord = this.log.redo();
+            if (moveRecord == null) {
                 break;
             }
-            this.board.addPiece(logRecord.getEnd(), logRecord.getCapturedPiece());
-            this.board.addPiece(logRecord.getStart(), logRecord.getMovingPiece());
+            this.board.addPiece(moveRecord.getEnd(), moveRecord.getCapturedPiece());
+            this.board.addPiece(moveRecord.getStart(), moveRecord.getMovingPiece());
 
-            this.whiteThreats.clearMoves(logRecord.getMovingPiece());
-            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getEnd());
-            this.whiteThreats.updateMoves(this.board, this.log, logRecord.getStart());
-            this.blackThreats.clearMoves(logRecord.getMovingPiece());
-            this.blackThreats.updateMoves(this.board, this.log, logRecord.getEnd());
-            this.blackThreats.updateMoves(this.board, this.log, logRecord.getStart());
+            this.whiteThreats.clearMoves(moveRecord.getMovingPiece());
+            this.whiteThreats.updateMoves(this.board, this.log, moveRecord.getEnd());
+            this.whiteThreats.updateMoves(this.board, this.log, moveRecord.getStart());
+            this.blackThreats.clearMoves(moveRecord.getMovingPiece());
+            this.blackThreats.updateMoves(this.board, this.log, moveRecord.getEnd());
+            this.blackThreats.updateMoves(this.board, this.log, moveRecord.getStart());
         }
         return this.checkGameStatus();
     }

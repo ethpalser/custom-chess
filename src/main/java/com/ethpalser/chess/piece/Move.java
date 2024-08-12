@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.game.MoveRecord;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
 import java.util.Optional;
