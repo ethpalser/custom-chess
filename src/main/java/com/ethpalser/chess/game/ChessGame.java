@@ -69,6 +69,8 @@ public class ChessGame {
         }
 
         this.board.movePiece(start, end);
+        // Todo: update movePiece to return a LogEntry
+        this.log.push(new ChessLogEntry(start, end, movingPiece));
         // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
         if (this.isKingInCheck(this.turn)) {
             this.undoUpdate(1, false);
@@ -80,7 +82,6 @@ public class ChessGame {
             throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
 
-        this.log.push(new ChessLogEntry(start, end, movingPiece));
         this.updateKingPosition(movingPiece, end);
         this.status = this.checkGameStatus();
         this.turn = Colour.opposite(this.turn);
@@ -106,16 +107,11 @@ public class ChessGame {
             if (logEntry == null) {
                 break;
             }
-
-            this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
-            this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
-
-            this.whiteThreats.clearMoves(logEntry.getStartObject());
-            this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-            this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
-            this.blackThreats.clearMoves(logEntry.getStartObject());
-            this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-            this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
+            // FollowUp moves are applied first while undoing, as they are the most recent board change
+            if (logEntry.getSubLogEntry() != null) {
+                this.applyLog(logEntry.getSubLogEntry());
+            }
+            this.applyLog(logEntry);
         }
         return this.checkGameStatus();
     }
@@ -130,15 +126,11 @@ public class ChessGame {
             if (logEntry == null) {
                 break;
             }
-            this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
-            this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
-
-            this.whiteThreats.clearMoves(logEntry.getStartObject());
-            this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-            this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
-            this.blackThreats.clearMoves(logEntry.getStartObject());
-            this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-            this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
+            this.applyLog(logEntry);
+            // FollowUp moves are applied last while redoing, as they are the most recent board change
+            if (logEntry.getSubLogEntry() != null) {
+                this.applyLog(logEntry.getSubLogEntry());
+            }
         }
         return this.checkGameStatus();
     }
@@ -203,7 +195,6 @@ public class ChessGame {
     private boolean hasThreats(Colour colour, Point point) {
         return !this.getThreatMap(colour).getPieces(point).isEmpty();
     }
-
 
     private GameStatus checkGameStatus() {
         Colour opponent = Colour.opposite(this.turn);
@@ -285,5 +276,21 @@ public class ChessGame {
         return true;
     }
 
+    private void applyLog(LogEntry<Point, Piece> logEntry) {
+        if (logEntry == null) {
+            throw new NullPointerException();
+        }
 
+        if (logEntry.getEndObject() != null) {
+            this.board.addPiece(logEntry.getEndObject().getPoint(), logEntry.getEndObject());
+        }
+        this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
+
+        this.whiteThreats.clearMoves(logEntry.getStartObject());
+        this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
+        this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
+        this.blackThreats.clearMoves(logEntry.getStartObject());
+        this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
+        this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
+    }
 }
