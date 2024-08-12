@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.game.LogEntry;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
 import java.util.Optional;

@@ -1,8 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.Log;
-import com.ethpalser.chess.game.LogEntry;
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
 import com.ethpalser.chess.piece.Piece;

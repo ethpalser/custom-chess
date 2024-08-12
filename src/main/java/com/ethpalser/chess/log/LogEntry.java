@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.log;
 
 public interface LogEntry<T extends Comparable<T>, U> {
 
