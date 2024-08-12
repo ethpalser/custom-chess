@@ -1,9 +1,9 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
 
 public class ChessLogEntry implements LogEntry<Point, Piece> {
 

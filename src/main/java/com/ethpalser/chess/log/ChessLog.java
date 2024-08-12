@@ -1,7 +1,6 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.ChessLogEntry;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;

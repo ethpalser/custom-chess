@@ -5,7 +5,7 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
-import com.ethpalser.chess.game.ChessLogEntry;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
