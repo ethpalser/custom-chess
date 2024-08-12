@@ -42,16 +42,16 @@ public class King implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board board, Log log, ThreatMap opponentThreats) {
+    public MoveSet getMoves(Board board, Log<Point, Piece> log, ThreatMap opponentThreats) {
         Set<Point> set = new HashSet<>();
-        set.add(this.generateSafeOrNull(board, opponentThreats, -1, 0)); // left
-        set.add(this.generateSafeOrNull(board, opponentThreats, -1, 1)); // top left
-        set.add(this.generateSafeOrNull(board, opponentThreats, 0, 1)); // top
-        set.add(this.generateSafeOrNull(board, opponentThreats, 1, 1)); // top right
-        set.add(this.generateSafeOrNull(board, opponentThreats, 1, 0)); // right
-        set.add(this.generateSafeOrNull(board, opponentThreats, 1, -1)); // bottom right
-        set.add(this.generateSafeOrNull(board, opponentThreats, 0, -1)); // bottom
-        set.add(this.generateSafeOrNull(board, opponentThreats, -1, -1)); // bottom left
+        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, 0)); // left
+        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, 1)); // top left
+        set.add(this.generateSafePointOrNull(board, opponentThreats, 0, 1)); // top
+        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, 1)); // top right
+        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, 0)); // right
+        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, -1)); // bottom right
+        set.add(this.generateSafePointOrNull(board, opponentThreats, 0, -1)); // bottom
+        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, -1)); // bottom left
         set.remove(null); // remove any case of null
         MoveSet moveSet = new MoveSet(set);
 
@@ -119,7 +119,7 @@ public class King implements Piece {
         return board.getPiece(p) == null && isSafe(threatMap, p);
     }
 
-    private Point generateSafeOrNull(Board board, ThreatMap threatMap, int xOffset, int yOffset) {
+    private Point generateSafePointOrNull(Board board, ThreatMap threatMap, int xOffset, int yOffset) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
             return PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
