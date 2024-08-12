@@ -1,7 +1,7 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.ActionRecord;
+import com.ethpalser.chess.game.ChessLogEntry;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
@@ -23,7 +23,7 @@ public class ChessLog implements Log<Point, Piece> {
     public ChessLog(Board board, List<String> logStrings) {
         this();
         for (String s : logStrings) {
-            ActionRecord rec = new ActionRecord(board, s);
+            ChessLogEntry rec = new ChessLogEntry(board, s);
             this.logStack.push(rec);
             // Manually move the piece on the board, ignoring all checks
             board.movePiece(rec.getStart(), rec.getEnd());

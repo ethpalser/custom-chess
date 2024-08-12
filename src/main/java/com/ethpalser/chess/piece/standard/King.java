@@ -5,7 +5,7 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
-import com.ethpalser.chess.game.ActionRecord;
+import com.ethpalser.chess.game.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
@@ -65,7 +65,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
-                LogEntry<Point, Piece> kingSideRookMove = new ActionRecord(
+                LogEntry<Point, Piece> kingSideRookMove = new ChessLogEntry(
                         new Point(0, startRank),
                         new Point(this.point.getX() - 1, this.point.getY()),
                         kingSideRook
@@ -78,7 +78,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
-                LogEntry<Point, Piece> queenSideRookMove = new ActionRecord(
+                LogEntry<Point, Piece> queenSideRookMove = new ChessLogEntry(
                         new Point(0, startRank),
                         new Point(this.point.getX() + 1, this.point.getY()),
                         queenSideRook
