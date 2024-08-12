@@ -12,21 +12,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Game {
+public class CustomGame {
 
     private final CustomBoard board;
     private Colour turn;
     private Colour winner;
     private boolean isComplete;
 
-    public Game() {
+    public CustomGame() {
         this.board = new CustomBoard();
         this.turn = Colour.WHITE;
         this.winner = null;
         this.isComplete = false;
     }
 
-    public Game(CustomBoard board, Colour turn) {
+    public CustomGame(CustomBoard board, Colour turn) {
         this.board = board;
         this.turn = turn;
     }
