@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -17,7 +17,7 @@ public class StandardLog implements ChessLog {
         this.undoStack = new ArrayDeque<>();
     }
 
-    public StandardLog(ChessBoard board, List<String> logStrings) {
+    public StandardLog(Board board, List<String> logStrings) {
         this();
         for (String s : logStrings) {
             ActionRecord rec = new ActionRecord(board, s);

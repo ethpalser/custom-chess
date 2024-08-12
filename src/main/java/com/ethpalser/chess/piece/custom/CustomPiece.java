@@ -1,10 +1,9 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
@@ -61,7 +60,7 @@ public class CustomPiece implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board) {
+    public MoveSet getMoves(Board board) {
         Set<Point> set = new HashSet<>();
         // todo: update to use Movements, which requires refactoring all custom logic to use ChessPiece and ChessBoard
         return new MoveSet(set);

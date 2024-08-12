@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class ChessGame {
 
-    private final ChessBoard board;
+    private final Board board;
     private final ChessLog log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
@@ -22,7 +22,7 @@ public class ChessGame {
     private Point whiteKing;
     private Point blackKing;
 
-    public ChessGame(ChessBoard board) {
+    public ChessGame(Board board) {
         if (board == null) {
             throw new NullPointerException("board cannot be null");
         }

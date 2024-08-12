@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
@@ -37,12 +37,12 @@ public class King implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board) {
+    public MoveSet getMoves(Board board) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board, ChessLog log, ThreatMap opponentThreats) {
+    public MoveSet getMoves(Board board, ChessLog log, ThreatMap opponentThreats) {
         Set<Point> set = new HashSet<>();
         set.add(this.generateSafeOrNull(board, opponentThreats, -1, 0)); // left
         set.add(this.generateSafeOrNull(board, opponentThreats, -1, 1)); // top left
@@ -114,12 +114,12 @@ public class King implements ChessPiece {
         return threatMap.getPieces(point).isEmpty();
     }
 
-    private boolean isEmptyAndSafe(ChessBoard board, ThreatMap threatMap, int x, int y) {
+    private boolean isEmptyAndSafe(Board board, ThreatMap threatMap, int x, int y) {
         Point p = new Point(x, y);
         return board.getPiece(p) == null && isSafe(threatMap, p);
     }
 
-    private Point generateSafeOrNull(ChessBoard board, ThreatMap threatMap, int xOffset, int yOffset) {
+    private Point generateSafeOrNull(Board board, ThreatMap threatMap, int xOffset, int yOffset) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
             return PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);

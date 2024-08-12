@@ -4,7 +4,7 @@ import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 
-public interface ChessBoard {
+public interface Board {
 
     Plane<ChessPiece> getPieces();
 

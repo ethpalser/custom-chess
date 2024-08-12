@@ -1,6 +1,6 @@
 package com.ethpalser.chess.move;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
@@ -42,6 +42,6 @@ public interface MoveMap extends Quantifiable<Integer> {
      * @param log
      * @param point
      */
-    void updateMoves(ChessBoard board, ChessLog log, Point point);
+    void updateMoves(Board board, ChessLog log, Point point);
 
 }

@@ -1,6 +1,6 @@
 package com.ethpalser.chess.move;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.ChessLog;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
@@ -16,7 +16,7 @@ public class ThreatMap implements MoveMap {
     private final Colour colour;
     private final Map<Point, Set<ChessPiece>> map;
 
-    public ThreatMap(Colour colour, ChessBoard board, ChessLog log) {
+    public ThreatMap(Colour colour, Board board, ChessLog log) {
         this.colour = colour;
         this.map = this.setup(colour, board, log);
     }
@@ -47,7 +47,7 @@ public class ThreatMap implements MoveMap {
     }
 
     @Override
-    public void updateMoves(ChessBoard board, ChessLog log, Point point) {
+    public void updateMoves(Board board, ChessLog log, Point point) {
         ChessPiece piece = board.getPiece(point);
         if (piece != null) {
             Set<ChessPiece> threateningPieces = this.getPieces(point);
@@ -70,7 +70,7 @@ public class ThreatMap implements MoveMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<ChessPiece>> setup(Colour colour, ChessBoard board, ChessLog log) {
+    private Map<Point, Set<ChessPiece>> setup(Colour colour, Board board, ChessLog log) {
         Map<Point, Set<ChessPiece>> piecesThreateningPoint = new HashMap<>();
         for (ChessPiece piece : board.getPieces()) {
             if (colour.equals(piece.getColour())) {

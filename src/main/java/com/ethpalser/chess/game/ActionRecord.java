@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.ChessPiece;
 
@@ -27,7 +27,7 @@ public class ActionRecord implements LogRecord {
         this.isFirstMove = !this.moved.hasMoved();
     }
 
-    public ActionRecord(ChessBoard board, String log) {
+    public ActionRecord(Board board, String log) {
         String[] split = log.split("-"); // When a log entry has a '-' it was not a capture
         if (split.length <= 1) {
             split = log.split("x"); // Assumes the piece is not using an x in its code, which shouldn't happen

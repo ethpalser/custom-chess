@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
@@ -32,7 +32,7 @@ public class Bishop implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(ChessBoard board) {
+    public MoveSet getMoves(Board board) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }

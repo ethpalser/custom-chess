@@ -14,7 +14,7 @@ import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StandardBoard implements ChessBoard {
+public class StandardBoard implements Board {
 
     private final Plane<ChessPiece> piecesOnBoard;
 

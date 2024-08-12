@@ -1,13 +1,13 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import java.util.HashSet;
 import java.util.Set;
 
 public class PointUtil {
 
-    public static Point generateValidPointOrNull(ChessBoard board, Point start, Colour colour,
+    public static Point generateValidPointOrNull(Board board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
@@ -18,7 +18,7 @@ public class PointUtil {
         return point;
     }
 
-    public static Point generateCapturePointOrNull(ChessBoard board, Point start, Colour colour,
+    public static Point generateCapturePointOrNull(Board board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
@@ -30,7 +30,7 @@ public class PointUtil {
         return point;
     }
 
-    public static Set<Point> generateHorizontalMoves(ChessBoard board, Point start, Colour colour,
+    public static Set<Point> generateHorizontalMoves(Board board, Point start, Colour colour,
             boolean right) {
         Set<Point> set = new HashSet<>();
         int x = right ? 1 : -1;
@@ -49,7 +49,7 @@ public class PointUtil {
         return set;
     }
 
-    public static Set<Point> generateVerticalMoves(ChessBoard board, Point start, Colour colour,
+    public static Set<Point> generateVerticalMoves(Board board, Point start, Colour colour,
             boolean up) {
         Set<Point> set = new HashSet<>();
         int y = up ? 1 : -1;
@@ -68,7 +68,7 @@ public class PointUtil {
         return set;
     }
 
-    public static Set<Point> generateDiagonalMoves(ChessBoard board, Point start, Colour colour,
+    public static Set<Point> generateDiagonalMoves(Board board, Point start, Colour colour,
             boolean right, boolean up) {
         Set<Point> set = new HashSet<>();
         int x = right ? 1 : -1;
