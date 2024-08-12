@@ -37,6 +37,13 @@ public class ChessGame {
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log);
     }
 
+    public GameStatus updateGame(Action action) throws IllegalActionException {
+        if (action == null) {
+            throw new IllegalActionException("action cannot be null");
+        }
+        return this.updateGame(action.getStart(), action.getEnd(), action.getColour());
+    }
+
     public GameStatus updateGame(Point start, Point end, Colour player) throws IllegalActionException {
         if (GameStatus.isCompletedGameStatus(this.status)) {
             throw new IllegalActionException("cannot update completed game");
