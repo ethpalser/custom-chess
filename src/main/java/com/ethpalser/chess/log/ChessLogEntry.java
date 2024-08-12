@@ -12,6 +12,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
     private final Piece moved;
     private final Piece captured;
     private final boolean isFirstMove;
+    private final LogEntry<Point, Piece> followUp;
 
     public ChessLogEntry(Point start, Point end, Piece moved) {
         this(start, end, moved, null);
@@ -24,6 +25,17 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.captured = captured;
         // For this to work this object must be created after verifying but before executing the move from start to end
         this.isFirstMove = !this.moved.hasMoved();
+        this.followUp = null;
+    }
+
+    public ChessLogEntry(Point start, Point end, Piece moved, Piece captured, LogEntry<Point, Piece> followUpMove) {
+        this.start = start;
+        this.end = end;
+        this.moved = moved;
+        this.captured = captured;
+        // For this to work this object must be created after verifying but before executing the move from start to end
+        this.isFirstMove = !this.moved.hasMoved();
+        this.followUp = followUpMove;
     }
 
     public ChessLogEntry(Action action, Piece moved) {
@@ -32,6 +44,10 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
 
     public ChessLogEntry(Action action, Piece moved, Piece captured) {
         this(action.getStart(), action.getEnd(), moved, captured);
+    }
+
+    public ChessLogEntry(Action action, Piece moved, Piece captured, LogEntry<Point, Piece> followUpMove) {
+        this(action.getStart(), action.getEnd(), moved, captured, followUpMove);
     }
 
     public ChessLogEntry(Board board, String log) {
@@ -46,6 +62,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.moved = board.getPiece(start);
         this.captured = board.getPiece(end);
         this.isFirstMove = !this.moved.hasMoved();
+        this.followUp = null; // Todo: check for specific log strings involving enPassant and castle
     }
 
     @Override
@@ -71,6 +88,10 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
     @Override
     public boolean isFirstOccurrence() {
         return this.isFirstMove;
+    }
+
+    public LogEntry<Point, Piece> getSubLogEntry() {
+        return this.followUp;
     }
 
     @Override
