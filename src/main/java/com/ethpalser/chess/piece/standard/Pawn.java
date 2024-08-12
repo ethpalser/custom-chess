@@ -1,9 +1,11 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Move;
 import com.ethpalser.chess.piece.MoveSet;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
@@ -25,7 +27,7 @@ public class Pawn implements Piece {
 
     @Override
     public String getCode() {
-        return ""; // Often it is nothing or a 'P'
+        return "P"; // Often it is nothing or a 'P'
     }
 
     @Override
@@ -41,34 +43,42 @@ public class Pawn implements Piece {
     @Override
     public MoveSet getMoves(Board board, Log<Point, Piece> log) {
         Set<Point> set = new HashSet<>();
-        int y = this.colour == Colour.WHITE ? 1 : -1;
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
-        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, y));
-        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, y));
+        int nextY = this.colour == Colour.WHITE ? 1 : -1;
+        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, nextY));
+        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY));
+        set.add(PointUtil.generateCapturePointOrNull(board, this.point, this.colour, 1, nextY));
         if (!this.hasMoved) {
-            set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y * 2));
+            set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, nextY * 2));
         }
+        set.remove(null); // remove any case of null
+        MoveSet moveSet = new MoveSet(set);
+
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
             LogEntry<Point, Piece> lastMove = log.peek();
-            Point start = lastMove.getStart();
-            Point destination = lastMove.getEnd();
+            Point peekStart = lastMove.getStart();
+            Point peekEnd = lastMove.getEnd();
+
             // a pawn moved forward two
-            if (lastMove.isFirstOccurrence() && "P".equals(board.getPiece(destination).getCode())
-                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
-                    || (lastMove.getStartObject().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
+            if (lastMove.isFirstOccurrence() && "P".equals(board.getPiece(peekEnd).getCode())
+                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getX() + 2 == peekStart.getY())
+                    || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getX() - 2 == peekStart.getY()))
             ) {
-                // that pawn is beside this pawn
-                if (destination.getX() == this.point.getX() - 1) {
-                    set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, y));
+                // that pawn is to the left of this pawn
+                Point left = PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
+                if (left != null && left.equals(peekEnd)) {
+                    Point enPassPoint = PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, nextY);
+                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.getPiece(left))));
                 }
-                if (destination.getX() == this.point.getX() + 1) {
-                    set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, y));
+                // that pawn is to the right of this pawn
+                Point right = PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, 0);
+                if (right != null && right.equals(peekEnd)) {
+                    Point enPassPoint = PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, nextY);
+                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.getPiece(right))));
                 }
             }
         }
-        set.remove(null); // remove any case of null
-        return new MoveSet(set);
+        return moveSet;
     }
 
     @Override
