@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.Log;
-import com.ethpalser.chess.game.MoveRecord;
+import com.ethpalser.chess.game.LogEntry;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
@@ -50,7 +50,7 @@ public class Pawn implements Piece {
         }
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
-            MoveRecord lastMove = log.peek();
+            LogEntry lastMove = log.peek();
             Point start = lastMove.getStart();
             Point destination = lastMove.getEnd();
             // a pawn moved forward two

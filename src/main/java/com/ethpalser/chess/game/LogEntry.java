@@ -3,7 +3,7 @@ package com.ethpalser.chess.game;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 
-public interface MoveRecord {
+public interface LogEntry {
 
     Point getStart();
 

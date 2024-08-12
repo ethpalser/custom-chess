@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.game.MoveRecord;
+import com.ethpalser.chess.game.LogEntry;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,14 +8,14 @@ import java.util.Optional;
 public class Move {
 
     private final Point point;
-    private final MoveRecord followUpMove;
+    private final LogEntry followUpMove;
 
     public Move(Point point) {
         this.point = point;
         this.followUpMove = null;
     }
 
-    public Move(Point point, MoveRecord followUpMove) {
+    public Move(Point point, LogEntry followUpMove) {
         this.point = point;
         this.followUpMove = followUpMove;
     }
@@ -24,7 +24,7 @@ public class Move {
         return this.point;
     }
 
-    public Optional<MoveRecord> getFollowUpMove() {
+    public Optional<LogEntry> getFollowUpMove() {
         return Optional.ofNullable(this.followUpMove);
     }
 

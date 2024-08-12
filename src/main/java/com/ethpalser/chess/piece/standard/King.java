@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.MoveRecord;
+import com.ethpalser.chess.game.LogEntry;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
@@ -65,7 +65,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
-                MoveRecord kingSideRookMove = new ActionRecord(
+                LogEntry kingSideRookMove = new ActionRecord(
                         new Point(0, startRank),
                         new Point(this.point.getX() - 1, this.point.getY()),
                         kingSideRook
@@ -78,7 +78,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
-                MoveRecord queenSideRookMove = new ActionRecord(
+                LogEntry queenSideRookMove = new ActionRecord(
                         new Point(0, startRank),
                         new Point(this.point.getX() + 1, this.point.getY()),
                         queenSideRook

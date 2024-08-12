@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Piece;
 
-public class ActionRecord implements MoveRecord {
+public class ActionRecord implements LogEntry {
 
     private final Action action;
     private final Piece moved;
