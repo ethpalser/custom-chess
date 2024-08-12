@@ -27,7 +27,7 @@ public class ChessGame {
             throw new NullPointerException("board cannot be null");
         }
         this.board = board;
-        this.log = new Log();
+        this.log = new StandardLog();
         this.status = GameStatus.PENDING;
         this.turn = Colour.WHITE;
         // Assuming standard starting positions, and if this assumption changes it should be provided by the board
