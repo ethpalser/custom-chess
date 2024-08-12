@@ -37,41 +37,41 @@ public class ChessGame {
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log);
     }
 
-    public GameStatus updateGame(Action action) throws IllegalActionException {
+    public GameStatus updateGame(Point start, Point end, Colour player) throws IllegalActionException {
         if (GameStatus.isCompletedGameStatus(this.status)) {
             throw new IllegalActionException("cannot update completed game");
         }
-        if (isNotPlayerAction(action)) {
-            throw new IllegalActionException("not the acting player's turn (actor: " + action.getColour()
+        if (isNotPlayerAction(player)) {
+            throw new IllegalActionException("not the acting player's turn (actor: " + player
                     + ", turn: " + this.turn + ")");
         }
-        if (isNotInBoardBounds(action)) {
+        if (isNotInBoardBounds(start, end)) {
             throw new IllegalActionException("cannot perform move as one of the start or end are not on the board");
         }
 
-        ChessPiece movingPiece = this.board.getPiece(action.getStart());
+        ChessPiece movingPiece = this.board.getPiece(start);
         if (movingPiece == null) {
-            throw new IllegalActionException("cannot perform move as there is no piece at " + action.getStart());
+            throw new IllegalActionException("cannot perform move as there is no piece at " + start);
         }
         if (isNotAllowedToMove(movingPiece)) {
-            throw new IllegalActionException("not the acting player's piece (actor: " + action.getColour()
+            throw new IllegalActionException("not the acting player's piece (actor: " + player
                     + ", piece: " + movingPiece.getColour() + ")");
         }
 
-        this.board.movePiece(action.getStart(), action.getEnd());
+        this.board.movePiece(start, end);
         // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
         if (this.isKingInCheck(this.turn)) {
             this.undoAction(1, false);
             throw new IllegalActionException("cannot perform move as player's king will be in check");
         }
 
-        ChessPiece expectingEmpty = this.board.getPiece(action.getStart());
+        ChessPiece expectingEmpty = this.board.getPiece(start);
         if (expectingEmpty != null) {
-            throw new IllegalActionException("cannot perform move as it cannot move to " + action.getEnd());
+            throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
 
-        this.log.push(new ActionRecord(action, movingPiece));
-        this.updateKingPosition(movingPiece, action.getEnd());
+        this.log.push(new ActionRecord(start, end, movingPiece));
+        this.updateKingPosition(movingPiece, end);
         this.status = this.checkGameStatus();
         this.turn = Colour.opposite(this.turn);
         return this.status;
@@ -135,16 +135,12 @@ public class ChessGame {
 
     // PRIVATE METHODS
 
-    private boolean isNotPlayerAction(Action action) {
-        if (action == null) {
-            throw new NullPointerException();
-        }
-        return !this.turn.equals(action.getColour());
+    private boolean isNotPlayerAction(Colour colour) {
+        return !this.turn.equals(colour);
     }
 
-    private boolean isNotInBoardBounds(Action action) {
-        return action.getStart() == null || action.getEnd() == null
-                || !this.board.isInBounds(action.getStart()) || !this.board.isInBounds(action.getEnd());
+    private boolean isNotInBoardBounds(Point start, Point end) {
+        return start == null || end == null || !this.board.isInBounds(start) || !this.board.isInBounds(end);
     }
 
     private boolean isNotAllowedToMove(ChessPiece piece) {
