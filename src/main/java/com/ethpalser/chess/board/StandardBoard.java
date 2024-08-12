@@ -54,6 +54,7 @@ public class StandardBoard implements Board {
             Piece followUp = m.getStartObject();
             this.piecesOnBoard.remove(m.getStart());
             this.piecesOnBoard.put(m.getEnd(), followUp);
+            this.piecesOnBoard.remove(null); // If the piece is meant to be removed it was put here
         });
     }
 
