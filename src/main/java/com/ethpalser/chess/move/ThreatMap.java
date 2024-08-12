@@ -2,9 +2,8 @@ package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.MoveSet;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
 import java.util.HashSet;

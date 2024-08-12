@@ -1,14 +1,14 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.MoveSet;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.movement.Movement;
 import com.ethpalser.chess.piece.custom.movement.Path;
+import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

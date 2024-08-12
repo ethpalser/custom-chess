@@ -1,9 +1,10 @@
 package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.log.Log;
 
 public interface Piece {
 

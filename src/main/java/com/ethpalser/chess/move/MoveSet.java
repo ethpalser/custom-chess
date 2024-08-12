@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece;
+package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.space.Point;
 import java.util.HashSet;
