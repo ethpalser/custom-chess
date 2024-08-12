@@ -54,9 +54,9 @@ public class Pawn implements Piece {
             Point start = lastMove.getStart();
             Point destination = lastMove.getEnd();
             // a pawn moved forward two
-            if (lastMove.isFirstMove() && "P".equals(board.getPiece(destination).getCode())
-                    && ((lastMove.getMovingPiece().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
-                    || (lastMove.getMovingPiece().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
+            if (lastMove.isFirstOccurrence() && "P".equals(board.getPiece(destination).getCode())
+                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && start.getX() + 2 == start.getY())
+                    || (lastMove.getStartObject().getColour() == Colour.BLACK && start.getX() - 2 == start.getY()))
             ) {
                 // that pawn is beside this pawn
                 if (destination.getX() == this.point.getX() - 1) {

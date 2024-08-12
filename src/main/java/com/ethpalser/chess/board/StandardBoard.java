@@ -51,7 +51,7 @@ public class StandardBoard implements Board {
 
         Move move = piece.getMoves(this, null).getMove(end);
         move.getFollowUpMove().ifPresent(m -> {
-            Piece followUp = m.getMovingPiece();
+            Piece followUp = m.getStartObject();
             this.piecesOnBoard.remove(m.getStart());
             this.piecesOnBoard.put(m.getEnd(), followUp);
         });

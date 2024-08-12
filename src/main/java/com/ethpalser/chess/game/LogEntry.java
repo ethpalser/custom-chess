@@ -9,10 +9,10 @@ public interface LogEntry {
 
     Point getEnd();
 
-    Piece getMovingPiece();
+    Piece getStartObject();
 
-    Piece getCapturedPiece();
+    Piece getEndObject();
 
-    boolean isFirstMove();
+    boolean isFirstOccurrence();
 
 }

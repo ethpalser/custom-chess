@@ -53,17 +53,17 @@ public class ActionRecord implements LogEntry {
     }
 
     @Override
-    public Piece getMovingPiece() {
+    public Piece getStartObject() {
         return this.moved;
     }
 
     @Override
-    public Piece getCapturedPiece() {
+    public Piece getEndObject() {
         return this.captured;
     }
 
     @Override
-    public boolean isFirstMove() {
+    public boolean isFirstOccurrence() {
         return this.isFirstMove;
     }
 

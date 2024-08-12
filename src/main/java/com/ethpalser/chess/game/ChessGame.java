@@ -104,13 +104,13 @@ public class ChessGame {
                 break;
             }
 
-            this.board.addPiece(logEntry.getEnd(), logEntry.getCapturedPiece());
-            this.board.addPiece(logEntry.getStart(), logEntry.getMovingPiece());
+            this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
+            this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
 
-            this.whiteThreats.clearMoves(logEntry.getMovingPiece());
+            this.whiteThreats.clearMoves(logEntry.getStartObject());
             this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
             this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
-            this.blackThreats.clearMoves(logEntry.getMovingPiece());
+            this.blackThreats.clearMoves(logEntry.getStartObject());
             this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
             this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
         }
@@ -127,13 +127,13 @@ public class ChessGame {
             if (logEntry == null) {
                 break;
             }
-            this.board.addPiece(logEntry.getEnd(), logEntry.getCapturedPiece());
-            this.board.addPiece(logEntry.getStart(), logEntry.getMovingPiece());
+            this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
+            this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
 
-            this.whiteThreats.clearMoves(logEntry.getMovingPiece());
+            this.whiteThreats.clearMoves(logEntry.getStartObject());
             this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
             this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
-            this.blackThreats.clearMoves(logEntry.getMovingPiece());
+            this.blackThreats.clearMoves(logEntry.getStartObject());
             this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
             this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
         }
