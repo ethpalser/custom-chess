@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class ChessGame {
 
     private final Board board;
-    private final StandardLog log;
+    private final ChessLog log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
 
@@ -27,7 +27,7 @@ public class ChessGame {
             throw new NullPointerException("board cannot be null");
         }
         this.board = board;
-        this.log = new StandardLog();
+        this.log = new ChessLog();
         this.status = GameStatus.PENDING;
         this.turn = Colour.WHITE;
         // Assuming standard starting positions, and if this assumption changes it should be provided by the board

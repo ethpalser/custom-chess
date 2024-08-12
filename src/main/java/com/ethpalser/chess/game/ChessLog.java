@@ -9,17 +9,17 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-public class StandardLog implements Log<Point, Piece> {
+public class ChessLog implements Log<Point, Piece> {
 
     private final Deque<LogEntry<Point, Piece>> logStack;
     private final Deque<LogEntry<Point, Piece>> undoStack;
 
-    public StandardLog() {
+    public ChessLog() {
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
     }
 
-    public StandardLog(Board board, List<String> logStrings) {
+    public ChessLog(Board board, List<String> logStrings) {
         this();
         for (String s : logStrings) {
             ActionRecord rec = new ActionRecord(board, s);
