@@ -1,11 +1,11 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.move.ThreatMap;
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class ChessGame {
 
     private final Board board;
-    private final Log log;
+    private final StandardLog log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
 
@@ -94,7 +94,7 @@ public class ChessGame {
 
     public GameStatus undoAction(int beforeCurrent, boolean saveUndone) {
         for (int i = 0; i < beforeCurrent; i++) {
-            LogEntry logEntry;
+            LogEntry<Point, Piece> logEntry;
             if (saveUndone) {
                 logEntry = this.log.undo();
             } else {
@@ -123,7 +123,7 @@ public class ChessGame {
 
     public GameStatus redoAction(int afterCurrent) {
         for (int i = 0; i < afterCurrent; i++) {
-            LogEntry logEntry = this.log.redo();
+            LogEntry<Point, Piece> logEntry = this.log.redo();
             if (logEntry == null) {
                 break;
             }

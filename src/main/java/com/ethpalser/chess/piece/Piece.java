@@ -13,12 +13,12 @@ public interface Piece {
 
     MoveSet getMoves(Board board);
 
-    default MoveSet getMoves(Board board, Log log) {
+    default MoveSet getMoves(Board board, Log<Point, Piece> log) {
         // log ignored
         return this.getMoves(board);
     }
 
-    default MoveSet getMoves(Board board, Log log, ThreatMap threats) {
+    default MoveSet getMoves(Board board, Log<Point, Piece> log, ThreatMap threats) {
         // threats ignored, and likely log as well
         return this.getMoves(board, log);
     }
@@ -32,14 +32,14 @@ public interface Piece {
         return this.getMoves(board).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
     }
 
-    default boolean canMove(Board board, Log log, Point destination) {
+    default boolean canMove(Board board, Log<Point, Piece> log, Point destination) {
         if (board == null || destination == null) {
             return false;
         }
         return this.getMoves(board, log).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
     }
 
-    default boolean canMove(Board board, Log log, ThreatMap threats, Point destination) {
+    default boolean canMove(Board board, Log<Point, Piece> log, ThreatMap threats, Point destination) {
         if (board == null || destination == null) {
             return false;
         }

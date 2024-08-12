@@ -65,7 +65,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
-                LogEntry kingSideRookMove = new ActionRecord(
+                LogEntry<Point, Piece> kingSideRookMove = new ActionRecord(
                         new Point(0, startRank),
                         new Point(this.point.getX() - 1, this.point.getY()),
                         kingSideRook
@@ -78,7 +78,7 @@ public class King implements Piece {
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
-                LogEntry queenSideRookMove = new ActionRecord(
+                LogEntry<Point, Piece> queenSideRookMove = new ActionRecord(
                         new Point(0, startRank),
                         new Point(this.point.getX() + 1, this.point.getY()),
                         queenSideRook

@@ -1,13 +1,13 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.Log;
 import com.ethpalser.chess.game.LogEntry;
-import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board board, Log log) {
+    public MoveSet getMoves(Board board, Log<Point, Piece> log) {
         Set<Point> set = new HashSet<>();
         int y = this.colour == Colour.WHITE ? 1 : -1;
         set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));
@@ -50,7 +50,7 @@ public class Pawn implements Piece {
         }
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
-            LogEntry lastMove = log.peek();
+            LogEntry<Point, Piece> lastMove = log.peek();
             Point start = lastMove.getStart();
             Point destination = lastMove.getEnd();
             // a pawn moved forward two

@@ -8,14 +8,14 @@ import java.util.Optional;
 public class Move {
 
     private final Point point;
-    private final LogEntry followUpMove;
+    private final LogEntry<Point, Piece> followUpMove;
 
     public Move(Point point) {
         this.point = point;
         this.followUpMove = null;
     }
 
-    public Move(Point point, LogEntry followUpMove) {
+    public Move(Point point, LogEntry<Point, Piece> followUpMove) {
         this.point = point;
         this.followUpMove = followUpMove;
     }
@@ -24,7 +24,7 @@ public class Move {
         return this.point;
     }
 
-    public Optional<LogEntry> getFollowUpMove() {
+    public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
         return Optional.ofNullable(this.followUpMove);
     }
 

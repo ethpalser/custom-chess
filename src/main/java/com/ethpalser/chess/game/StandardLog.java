@@ -1,16 +1,18 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-public class StandardLog implements Log {
+public class StandardLog implements Log<Point, Piece> {
 
-    private final Deque<LogEntry> logStack;
-    private final Deque<LogEntry> undoStack;
+    private final Deque<LogEntry<Point, Piece>> logStack;
+    private final Deque<LogEntry<Point, Piece>> undoStack;
 
     public StandardLog() {
         this.logStack = new ArrayDeque<>();
@@ -28,7 +30,7 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public boolean addAll(Collection<? extends LogEntry> c) {
+    public boolean addAll(Collection<? extends LogEntry<Point, Piece>> c) {
         return this.logStack.addAll(c);
     }
 
@@ -83,7 +85,7 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public Iterator<LogEntry> iterator() {
+    public Iterator<LogEntry<Point, Piece>> iterator() {
         return this.logStack.iterator();
     }
 
@@ -98,29 +100,29 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public boolean add(LogEntry actionRecord) {
+    public boolean add(LogEntry<Point, Piece> actionRecord) {
         return this.logStack.add(actionRecord);
     }
 
     @Override
-    public LogEntry peek() {
+    public LogEntry<Point, Piece> peek() {
         return this.logStack.peek();
     }
 
     @Override
-    public void push(LogEntry actionRecord) {
+    public void push(LogEntry<Point, Piece> actionRecord) {
         this.logStack.push(actionRecord);
     }
 
     @Override
-    public LogEntry pop() {
+    public LogEntry<Point, Piece> pop() {
         return this.logStack.pop();
     }
 
     @Override
-    public LogEntry undo() {
+    public LogEntry<Point, Piece> undo() {
         if (!this.logStack.isEmpty()) {
-            LogEntry logEntry = this.logStack.pop();
+            LogEntry<Point, Piece> logEntry = this.logStack.pop();
             this.undoStack.push(logEntry);
             return logEntry;
         }
@@ -128,9 +130,9 @@ public class StandardLog implements Log {
     }
 
     @Override
-    public LogEntry redo() {
+    public LogEntry<Point, Piece> redo() {
         if (!this.undoStack.isEmpty()) {
-            LogEntry logEntry = this.undoStack.pop();
+            LogEntry<Point, Piece> logEntry = this.undoStack.pop();
             this.logStack.push(logEntry);
             return logEntry;
         }

@@ -1,17 +1,14 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Point;
+public interface LogEntry<T extends Comparable<T>, U> {
 
-public interface LogEntry {
+    T getStart();
 
-    Point getStart();
+    T getEnd();
 
-    Point getEnd();
+    U getStartObject();
 
-    Piece getStartObject();
-
-    Piece getEndObject();
+    U getEndObject();
 
     boolean isFirstOccurrence();
 
