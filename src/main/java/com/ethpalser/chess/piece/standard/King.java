@@ -5,7 +5,7 @@ import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.ActionRecord;
-import com.ethpalser.chess.game.ChessLog;
+import com.ethpalser.chess.game.Log;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Move;
@@ -42,7 +42,7 @@ public class King implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(Board board, ChessLog log, ThreatMap opponentThreats) {
+    public MoveSet getMoves(Board board, Log log, ThreatMap opponentThreats) {
         Set<Point> set = new HashSet<>();
         set.add(this.generateSafeOrNull(board, opponentThreats, -1, 0)); // left
         set.add(this.generateSafeOrNull(board, opponentThreats, -1, 1)); // top left

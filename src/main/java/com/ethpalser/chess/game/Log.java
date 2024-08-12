@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 import java.util.Collection;
 
-public interface ChessLog extends Collection<LogRecord> {
+public interface Log extends Collection<LogRecord> {
 
     void push(LogRecord item);
 

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class ChessGame {
 
     private final Board board;
-    private final ChessLog log;
+    private final Log log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
 

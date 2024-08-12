@@ -3,7 +3,7 @@ package com.ethpalser.chess.piece.standard;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
-import com.ethpalser.chess.game.ChessLog;
+import com.ethpalser.chess.game.Log;
 import com.ethpalser.chess.game.LogRecord;
 import com.ethpalser.chess.piece.ChessPiece;
 import com.ethpalser.chess.piece.Colour;
@@ -39,7 +39,7 @@ public class Pawn implements ChessPiece {
     }
 
     @Override
-    public MoveSet getMoves(Board board, ChessLog log) {
+    public MoveSet getMoves(Board board, Log log) {
         Set<Point> set = new HashSet<>();
         int y = this.colour == Colour.WHITE ? 1 : -1;
         set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 0, y));

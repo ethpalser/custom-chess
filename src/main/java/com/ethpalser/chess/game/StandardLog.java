@@ -7,7 +7,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-public class StandardLog implements ChessLog {
+public class StandardLog implements Log {
 
     private final Deque<LogRecord> logStack;
     private final Deque<LogRecord> undoStack;
