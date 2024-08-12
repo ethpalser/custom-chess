@@ -2,7 +2,7 @@ package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.Log;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Point;
 import java.util.Set;
@@ -11,7 +11,7 @@ public interface MoveMap extends Quantifiable<Integer> {
 
     Colour getColour();
 
-    Set<ChessPiece> getPieces(Point point);
+    Set<Piece> getPieces(Point point);
 
     default boolean isEmpty(Point point) {
         return this.getPieces(point).isEmpty();
@@ -22,7 +22,7 @@ public interface MoveMap extends Quantifiable<Integer> {
      *
      * @param piece
      */
-    void clearMoves(ChessPiece piece);
+    void clearMoves(Piece piece);
 
     /**
      * Remove the given piece for only the set at this point, so it cannot be retrieved from this point.
@@ -30,7 +30,7 @@ public interface MoveMap extends Quantifiable<Integer> {
      * @param piece
      * @param point
      */
-    void clearMoves(ChessPiece piece, Point point);
+    void clearMoves(Piece piece, Point point);
 
     /**
      * Update all possible moves pieces can make given the start and end points, which were performed by a piece.

@@ -5,7 +5,7 @@ import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.Log;
 
-public interface ChessPiece {
+public interface Piece {
 
     String getCode();
 

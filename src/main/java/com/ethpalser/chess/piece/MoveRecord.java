@@ -4,7 +4,7 @@ import com.ethpalser.chess.space.Point;
 
 public interface MoveRecord {
 
-    ChessPiece getMovingPiece();
+    Piece getMovingPiece();
 
     Point getStart();
 

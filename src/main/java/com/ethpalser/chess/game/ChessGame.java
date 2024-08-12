@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +56,7 @@ public class ChessGame {
             throw new IllegalActionException("cannot perform move as one of the start or end are not on the board");
         }
 
-        ChessPiece movingPiece = this.board.getPiece(start);
+        Piece movingPiece = this.board.getPiece(start);
         if (movingPiece == null) {
             throw new IllegalActionException("cannot perform move as there is no piece at " + start);
         }
@@ -72,7 +72,7 @@ public class ChessGame {
             throw new IllegalActionException("cannot perform move as player's king will be in check");
         }
 
-        ChessPiece expectingEmpty = this.board.getPiece(start);
+        Piece expectingEmpty = this.board.getPiece(start);
         if (expectingEmpty != null) {
             throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
@@ -150,14 +150,14 @@ public class ChessGame {
         return start == null || end == null || !this.board.isInBounds(start) || !this.board.isInBounds(end);
     }
 
-    private boolean isNotAllowedToMove(ChessPiece piece) {
+    private boolean isNotAllowedToMove(Piece piece) {
         if (piece == null) {
             throw new NullPointerException();
         }
         return !this.turn.equals(piece.getColour());
     }
 
-    private boolean isKingPiece(ChessPiece piece) {
+    private boolean isKingPiece(Piece piece) {
         if (piece == null) {
             throw new NullPointerException();
         }
@@ -171,7 +171,7 @@ public class ChessGame {
         return this.hasThreats(playerColour, this.getOpponentKingPosition(this.turn));
     }
 
-    private void updateKingPosition(ChessPiece piece, Point update) {
+    private void updateKingPosition(Piece piece, Point update) {
         if (isKingPiece(piece)) {
             if (Colour.WHITE.equals(piece.getColour())) {
                 this.whiteKing = update;
@@ -225,7 +225,7 @@ public class ChessGame {
     private boolean isCheckmate() {
         Colour oppColour = Colour.opposite(this.turn);
         Point oppKingPoint = this.getOpponentKingPosition(this.turn);
-        ChessPiece oppKing = this.board.getPiece(oppKingPoint);
+        Piece oppKing = this.board.getPiece(oppKingPoint);
         // Assuming King is in check
         Set<Point> oppKingMoveSet = oppKing.getMoves(this.board, this.log).getPoints();
         if (!oppKingMoveSet.isEmpty()) {
@@ -239,15 +239,15 @@ public class ChessGame {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<ChessPiece> sourcesOfCheck = this.getThreatMap(this.turn).getPieces(oppKingPoint);
+        Set<Piece> sourcesOfCheck = this.getThreatMap(this.turn).getPieces(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
         }
         // There is only one threatening check
-        for (ChessPiece p : sourcesOfCheck) {
+        for (Piece p : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<ChessPiece> defenders = this.getThreatMap(oppColour).getPieces(p.getPoint());
+            Set<Piece> defenders = this.getThreatMap(oppColour).getPieces(p.getPoint());
             if (!defenders.isEmpty()) {
                 // Yes, as this piece can be captured by a non-king, the opponent has a legal move to prevent check
                 return false;
@@ -265,16 +265,16 @@ public class ChessGame {
         }
         Colour oppColour = Colour.opposite(this.turn);
         Point oppKingPoint = this.getOpponentKingPosition(this.turn);
-        ChessPiece oppKing = this.board.getPiece(oppKingPoint);
+        Piece oppKing = this.board.getPiece(oppKingPoint);
         // Can the opponent's king move, including captures that are not defended?
         Set<Point> oppKingMoves = oppKing.getMoves(this.board, this.log).getPoints();
         if (!oppKingMoves.isEmpty()) {
             return false;
         }
         // Are there any non-king opponent pieces that can move?
-        List<ChessPiece> opponentPieces = this.board.getPieces().values().stream()
+        List<Piece> opponentPieces = this.board.getPieces().values().stream()
                 .filter(p -> oppColour.equals(p.getColour()) && !isKingPiece(p)).collect(Collectors.toList());
-        for (ChessPiece p : opponentPieces) {
+        for (Piece p : opponentPieces) {
             if (!p.getMoves(this.board, this.log).toSet().isEmpty()) {
                 return false;
             }

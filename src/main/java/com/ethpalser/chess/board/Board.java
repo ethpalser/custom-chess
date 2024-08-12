@@ -1,16 +1,16 @@
 package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 
 public interface Board {
 
-    Plane<ChessPiece> getPieces();
+    Plane<Piece> getPieces();
 
-    ChessPiece getPiece(Point point);
+    Piece getPiece(Point point);
 
-    void addPiece(Point point, ChessPiece piece);
+    void addPiece(Point point, Piece piece);
 
     void movePiece(Point start, Point end);
 

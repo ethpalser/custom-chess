@@ -1,6 +1,6 @@
 package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Move;
 import com.ethpalser.chess.piece.standard.Bishop;
@@ -16,10 +16,10 @@ import java.util.Map;
 
 public class StandardBoard implements Board {
 
-    private final Plane<ChessPiece> piecesOnBoard;
+    private final Plane<Piece> piecesOnBoard;
 
     public StandardBoard() {
-        Plane<ChessPiece> map = new Plane<>();
+        Plane<Piece> map = new Plane<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length() - 2));
@@ -28,30 +28,30 @@ public class StandardBoard implements Board {
     }
 
     @Override
-    public Plane<ChessPiece> getPieces() {
+    public Plane<Piece> getPieces() {
         return this.piecesOnBoard;
     }
 
     @Override
-    public ChessPiece getPiece(Point point) {
+    public Piece getPiece(Point point) {
         return this.piecesOnBoard.get(point);
     }
 
     @Override
-    public void addPiece(Point point, ChessPiece piece) {
+    public void addPiece(Point point, Piece piece) {
         this.piecesOnBoard.put(point, piece);
     }
 
     @Override
     public void movePiece(Point start, Point end) {
-        ChessPiece piece = this.piecesOnBoard.get(start);
+        Piece piece = this.piecesOnBoard.get(start);
         this.piecesOnBoard.remove(start);
         this.piecesOnBoard.put(end, piece);
         piece.move(end);
 
         Move move = piece.getMoves(this, null).getMove(end);
         move.getFollowUpMove().ifPresent(m -> {
-            ChessPiece followUp = m.getMovingPiece();
+            Piece followUp = m.getMovingPiece();
             this.piecesOnBoard.remove(m.getStart());
             this.piecesOnBoard.put(m.getEnd(), followUp);
         });
@@ -69,14 +69,14 @@ public class StandardBoard implements Board {
         return this.piecesOnBoard.getMaxY() - this.piecesOnBoard.getMinY();
     }
 
-    private Map<Point, ChessPiece> generatePiecesInRank(int rank) {
-        Map<Point, ChessPiece> map = new HashMap<>();
+    private Map<Point, Piece> generatePiecesInRank(int rank) {
+        Map<Point, Piece> map = new HashMap<>();
         Colour colour = rank < (this.length() - 1) / 2 ? Colour.WHITE : Colour.BLACK;
 
         if (rank == 0 || rank == this.length() - 1) {
             for (int file = 0; file < 8; file++) {
                 Point point = new Point(file, rank);
-                ChessPiece piece = switch (file) {
+                Piece piece = switch (file) {
                     case 0, 7 -> new Rook(colour, point);
                     case 1, 6 -> new Knight(colour, point);
                     case 2, 5 -> new Bishop(colour, point);

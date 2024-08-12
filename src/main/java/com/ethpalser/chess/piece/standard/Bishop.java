@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
 import com.ethpalser.chess.space.Point;
@@ -9,7 +9,7 @@ import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Bishop implements ChessPiece {
+public class Bishop implements Piece {
 
     private final Colour colour;
     private Point point;

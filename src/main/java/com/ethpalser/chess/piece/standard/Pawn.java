@@ -5,13 +5,13 @@ import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.Log;
 import com.ethpalser.chess.game.LogRecord;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Pawn implements ChessPiece {
+public class Pawn implements Piece {
 
     private final Colour colour;
     private Point point;

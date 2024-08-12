@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.MoveRecord;
 
 public interface LogRecord extends MoveRecord {
@@ -10,9 +10,9 @@ public interface LogRecord extends MoveRecord {
 
     Point getEnd();
 
-    ChessPiece getMovingPiece();
+    Piece getMovingPiece();
 
-    ChessPiece getCapturedPiece();
+    Piece getCapturedPiece();
 
     boolean isFirstMove();
 

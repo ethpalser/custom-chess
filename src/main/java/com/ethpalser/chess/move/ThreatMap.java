@@ -2,7 +2,7 @@ package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.Log;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.MoveSet;
 import com.ethpalser.chess.space.Point;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class ThreatMap implements MoveMap {
 
     private final Colour colour;
-    private final Map<Point, Set<ChessPiece>> map;
+    private final Map<Point, Set<Piece>> map;
 
     public ThreatMap(Colour colour, Board board, Log log) {
         this.colour = colour;
@@ -27,7 +27,7 @@ public class ThreatMap implements MoveMap {
     }
 
     @Override
-    public Set<ChessPiece> getPieces(Point point) {
+    public Set<Piece> getPieces(Point point) {
         if (point == null) {
             return null;
         }
@@ -35,26 +35,26 @@ public class ThreatMap implements MoveMap {
     }
 
     @Override
-    public void clearMoves(ChessPiece piece) {
+    public void clearMoves(Piece piece) {
         for (Point p : this.map.keySet()) {
             this.clearMoves(piece, p);
         }
     }
 
     @Override
-    public void clearMoves(ChessPiece piece, Point point) {
+    public void clearMoves(Piece piece, Point point) {
         this.map.get(point).remove(piece);
     }
 
     @Override
     public void updateMoves(Board board, Log log, Point point) {
-        ChessPiece piece = board.getPiece(point);
+        Piece piece = board.getPiece(point);
         if (piece != null) {
-            Set<ChessPiece> threateningPieces = this.getPieces(point);
+            Set<Piece> threateningPieces = this.getPieces(point);
 
             // Expensive operation. This can be improved by knowing the paths to replace.
             this.map.get(point).clear();
-            for (ChessPiece c : threateningPieces) {
+            for (Piece c : threateningPieces) {
                 this.clearMoves(c);
                 for (Point p : piece.getMoves(board, log).getPoints()) {
                     this.map.computeIfAbsent(p, k -> new HashSet<>()).add(c);
@@ -70,9 +70,9 @@ public class ThreatMap implements MoveMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<ChessPiece>> setup(Colour colour, Board board, Log log) {
-        Map<Point, Set<ChessPiece>> piecesThreateningPoint = new HashMap<>();
-        for (ChessPiece piece : board.getPieces()) {
+    private Map<Point, Set<Piece>> setup(Colour colour, Board board, Log log) {
+        Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
+        for (Piece piece : board.getPieces()) {
             if (colour.equals(piece.getColour())) {
                 MoveSet moveSet = piece.getMoves(board, log);
                 for (Point point : moveSet.getPoints()) {

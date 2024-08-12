@@ -2,24 +2,24 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 
 public class ActionRecord implements LogRecord {
 
     private final Action action;
-    private final ChessPiece moved;
-    private final ChessPiece captured;
+    private final Piece moved;
+    private final Piece captured;
     private final boolean isFirstMove;
 
-    public ActionRecord(Point start, Point end, ChessPiece moved) {
+    public ActionRecord(Point start, Point end, Piece moved) {
         this(new Action(moved.getColour(), start, end), moved);
     }
 
-    public ActionRecord(Action action, ChessPiece moved) {
+    public ActionRecord(Action action, Piece moved) {
         this(action, moved, null);
     }
 
-    public ActionRecord(Action action, ChessPiece moved, ChessPiece captured) {
+    public ActionRecord(Action action, Piece moved, Piece captured) {
         this.action = action;
         this.moved = moved;
         this.captured = captured;
@@ -53,12 +53,12 @@ public class ActionRecord implements LogRecord {
     }
 
     @Override
-    public ChessPiece getMovingPiece() {
+    public Piece getMovingPiece() {
         return this.moved;
     }
 
     @Override
-    public ChessPiece getCapturedPiece() {
+    public Piece getCapturedPiece() {
         return this.captured;
     }
 

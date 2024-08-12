@@ -6,7 +6,7 @@ import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.PointUtil;
 import com.ethpalser.chess.game.ActionRecord;
 import com.ethpalser.chess.game.Log;
-import com.ethpalser.chess.piece.ChessPiece;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Move;
 import com.ethpalser.chess.piece.MoveRecord;
@@ -14,7 +14,7 @@ import com.ethpalser.chess.piece.MoveSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class King implements ChessPiece {
+public class King implements Piece {
 
     private final Colour colour;
     private Point point;
@@ -60,7 +60,7 @@ public class King implements ChessPiece {
         if (!this.hasMoved && opponentThreats.getPieces(this.point).isEmpty()) {
             int startRank = this.colour == Colour.WHITE ? board.getPieces().getMinY() : board.getPieces().getMaxY();
             // king side
-            ChessPiece kingSideRook = board.getPiece(new Point(board.getPieces().getMinX(), startRank));
+            Piece kingSideRook = board.getPiece(new Point(board.getPieces().getMinX(), startRank));
             if (kingSideRook != null && !kingSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
@@ -73,7 +73,7 @@ public class King implements ChessPiece {
                 moveSet.addMove(new Move(new Point(this.point.getX() - 2, this.point.getY()), kingSideRookMove));
             }
             // queen side
-            ChessPiece queenSideRook = board.getPiece(new Point(board.getPieces().getMaxX(), startRank));
+            Piece queenSideRook = board.getPiece(new Point(board.getPieces().getMaxX(), startRank));
             if (queenSideRook != null && !queenSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
