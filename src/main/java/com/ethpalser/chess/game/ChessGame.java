@@ -71,7 +71,7 @@ public class ChessGame {
         this.board.movePiece(start, end);
         // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
         if (this.isKingInCheck(this.turn)) {
-            this.undoAction(1, false);
+            this.undoUpdate(1, false);
             throw new IllegalActionException("cannot perform move as player's king will be in check");
         }
 
@@ -91,11 +91,11 @@ public class ChessGame {
         return status;
     }
 
-    public GameStatus undoAction() {
-        return this.undoAction(1, true);
+    public GameStatus undoUpdate() {
+        return this.undoUpdate(1, true);
     }
 
-    public GameStatus undoAction(int beforeCurrent, boolean saveUndone) {
+    public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
         for (int i = 0; i < beforeCurrent; i++) {
             LogEntry<Point, Piece> logEntry;
             if (saveUndone) {
@@ -120,11 +120,11 @@ public class ChessGame {
         return this.checkGameStatus();
     }
 
-    public GameStatus redoAction() {
-        return this.redoAction(1);
+    public GameStatus redoUpdate() {
+        return this.redoUpdate(1);
     }
 
-    public GameStatus redoAction(int afterCurrent) {
+    public GameStatus redoUpdate(int afterCurrent) {
         for (int i = 0; i < afterCurrent; i++) {
             LogEntry<Point, Piece> logEntry = this.log.redo();
             if (logEntry == null) {
