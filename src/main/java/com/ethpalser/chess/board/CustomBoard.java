@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class CustomBoard implements Board {
 
-    private final Plane<Piece> pieceMap;
+    private final Plane<Piece> pieces;
 
     public CustomBoard() {
         Plane<Piece> map = new Plane<>(0, 0, 8, 8);
@@ -25,7 +25,7 @@ public class CustomBoard implements Board {
         map.putAll(this.generatePiecesInRank(length, 1));
         map.putAll(this.generatePiecesInRank(length, map.length() - 2));
         map.putAll(this.generatePiecesInRank(length, map.length() - 1));
-        this.pieceMap = map;
+        this.pieces = map;
     }
 
     public CustomBoard(List<String> pieces) {
@@ -35,18 +35,18 @@ public class CustomBoard implements Board {
             CustomPiece customPiece = pf.build(s);
             map.put(customPiece.getPoint(), customPiece);
         }
-        this.pieceMap = map;
+        this.pieces = map;
     }
 
     @Override
     public Plane<Piece> getPieces() {
-        return pieceMap;
+        return pieces;
     }
 
     public List<Piece> getPieces(Path path) {
         if (path == null) {
             List<Piece> list = new LinkedList<>();
-            for (Piece piece : this.pieceMap) {
+            for (Piece piece : this.pieces) {
                 list.add(piece);
             }
             return list;
@@ -60,7 +60,7 @@ public class CustomBoard implements Board {
         if (vector == null) {
             return null;
         }
-        return pieceMap.get(vector);
+        return pieces.get(vector);
     }
 
     @Override
@@ -69,10 +69,10 @@ public class CustomBoard implements Board {
             throw new NullPointerException();
         }
         if (piece == null) {
-            this.pieceMap.remove(point);
+            this.pieces.remove(point);
         } else {
-            this.pieceMap.remove(piece.getPoint());
-            this.pieceMap.put(point, piece);
+            this.pieces.remove(piece.getPoint());
+            this.pieces.put(point, piece);
             piece.move(point);
         }
     }
@@ -87,7 +87,7 @@ public class CustomBoard implements Board {
 
     @Override
     public boolean isInBounds(int x, int y) {
-        return this.pieceMap.isInBounds(x, y);
+        return this.pieces.isInBounds(x, y);
     }
 
     // PRIVATE METHODS
