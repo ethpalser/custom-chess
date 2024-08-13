@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
@@ -64,6 +65,10 @@ public class Path implements Iterable<Point> {
             default -> set = new LinkedHashSet<>();
         }
         this.linkedHashSet = set;
+    }
+
+    public Set<Point> toSet() {
+        return this.linkedHashSet;
     }
 
     @Override
