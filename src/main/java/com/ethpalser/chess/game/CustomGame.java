@@ -6,7 +6,7 @@ import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.custom.movement.Movement;
+import com.ethpalser.chess.piece.custom.movement.CustomMove;
 import com.ethpalser.chess.space.Path;
 import java.util.List;
 import java.util.Set;
@@ -74,11 +74,11 @@ public class CustomGame {
 
         CustomPiece toMove = this.getPieceToMove(player, start);
         this.verifyDestination(toMove, end);
-        Movement movement = toMove.getMovement(this.board, end);
-        if (movement == null) {
+        CustomMove customMove = toMove.getMovement(this.board, end);
+        if (customMove == null) {
             throw new IllegalActionException("The selected piece does not have a movement to " + end);
         }
-        this.performMovement(player, movement, start, end);
+        this.performMovement(player, customMove, start, end);
         if (this.isCheckmate()) {
             this.winner = this.turn;
             this.isComplete = true;
@@ -113,15 +113,15 @@ public class CustomGame {
         }
     }
 
-    private void performMovement(Colour player, Movement movement, Point start, Point end) {
-        if (player == null || movement == null || start == null || end == null) {
+    private void performMovement(Colour player, CustomMove customMove, Point start, Point end) {
+        if (player == null || customMove == null || start == null || end == null) {
             throw new NullPointerException();
         }
         this.board.movePiece(start, end);
 
         // If the movement has an extra action, perform it
-        if (movement.getExtraAction() != null) {
-            Action action = movement.getExtraAction().getAction(this.board, new Action(player, start, end));
+        if (customMove.getExtraAction() != null) {
+            Action action = customMove.getExtraAction().getAction(this.board, new Action(player, start, end));
             CustomPiece toForceMove = this.board.getPiece(action.getStart());
             if (toForceMove != null) {
                 if (action.getEnd() != null) {
@@ -160,7 +160,7 @@ public class CustomGame {
                 }
             }
 
-            Movement pMove = p.getMovement(this.board, kingPosition);
+            CustomMove pMove = p.getMovement(this.board, kingPosition);
             Path pPath = pMove.getPath(this.getTurnColour(), p.getPosition(), kingPosition, this.board);
             for (Point v : pPath) {
                 List<CustomPiece> blockers =

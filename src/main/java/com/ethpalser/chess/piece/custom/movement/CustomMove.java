@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Movement {
+public class CustomMove {
 
     private final Path pathBase;
     private final MovementType moveType;
@@ -86,12 +86,12 @@ public class Movement {
             return this;
         }
 
-        public Movement build() {
-            return new Movement(this);
+        public CustomMove build() {
+            return new CustomMove(this);
         }
     }
 
-    public Movement(Builder builder) {
+    public CustomMove(Builder builder) {
         this.pathBase = builder.path;
         this.moveType = builder.moveType;
         this.mirrorXAxis = builder.mirrorXAxis;
@@ -103,7 +103,7 @@ public class Movement {
         this.extraAction = builder.extraAction;
     }
 
-    public Movement(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
+    public CustomMove(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
         this.pathBase = path;
         this.moveType = moveType;
         this.mirrorXAxis = mirrorXAxis;

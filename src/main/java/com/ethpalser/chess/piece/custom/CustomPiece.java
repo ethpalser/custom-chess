@@ -6,7 +6,7 @@ import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.movement.Movement;
+import com.ethpalser.chess.piece.custom.movement.CustomMove;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
@@ -20,25 +20,25 @@ public class CustomPiece implements Piece {
     private final PieceType type;
     private final String code;
     private final Colour colour;
-    private final List<Movement> movements;
+    private final List<CustomMove> customMoves;
     private Point position;
     private boolean hasMoved;
 
     public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
-        this(pieceType, colour, vector, (Movement) null);
+        this(pieceType, colour, vector, (CustomMove) null);
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, Movement... movements) {
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, CustomMove... customMoves) {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;
-        this.movements = Arrays.asList(movements);
+        this.customMoves = Arrays.asList(customMoves);
         this.hasMoved = false;
         this.code = pieceType.getCode();
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, boolean hasMoved, Movement... movements) {
-        this(pieceType, colour, vector, movements);
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, boolean hasMoved, CustomMove... customMoves) {
+        this(pieceType, colour, vector, customMoves);
         this.hasMoved = hasMoved;
     }
 
@@ -117,11 +117,11 @@ public class CustomPiece implements Piece {
      * @param destination {@link Point} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
-    public Movement getMovement(CustomBoard board, Point destination) {
+    public CustomMove getMovement(CustomBoard board, Point destination) {
         if (board == null || destination == null) {
             throw new NullPointerException();
         }
-        for (Movement move : this.movements) {
+        for (CustomMove move : this.customMoves) {
             Path path = move.getPath(this.colour, this.position, destination, board);
             if (path != null && this.isTraversable(path, board)
                     && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
@@ -144,7 +144,7 @@ public class CustomPiece implements Piece {
             throw new NullPointerException();
         }
         Set<Point> set = new HashSet<>();
-        for (Movement move : this.movements) {
+        for (CustomMove move : this.customMoves) {
             if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
                 Set<Point> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
                 if (board != null) {

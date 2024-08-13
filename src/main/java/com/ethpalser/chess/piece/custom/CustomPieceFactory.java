@@ -8,7 +8,7 @@ import com.ethpalser.chess.piece.custom.condition.Property;
 import com.ethpalser.chess.piece.custom.condition.PropertyCondition;
 import com.ethpalser.chess.piece.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.piece.custom.movement.ExtraAction;
-import com.ethpalser.chess.piece.custom.movement.Movement;
+import com.ethpalser.chess.piece.custom.movement.CustomMove;
 import com.ethpalser.chess.piece.custom.movement.MovementType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Direction;
@@ -58,29 +58,29 @@ public class CustomPieceFactory {
 
         switch (type) {
             case KNIGHT -> {
-                Movement knightMove1 = new Movement(new Path(new Point(1, 2)), MovementType.JUMP, true, true);
-                Movement knightMove2 = new Movement(new Path(new Point(2, 1)), MovementType.JUMP, true, true);
+                CustomMove knightMove1 = new CustomMove(new Path(new Point(1, 2)), MovementType.JUMP, true, true);
+                CustomMove knightMove2 = new CustomMove(new Path(new Point(2, 1)), MovementType.JUMP, true, true);
                 return new CustomPiece(PieceType.KNIGHT, colour, vector, knightMove1, knightMove2);
             }
             case ROOK -> {
-                Movement rookMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
-                Movement rookMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
+                CustomMove rookMoveV = new CustomMove(vertical, MovementType.ADVANCE, true, false);
+                CustomMove rookMoveH = new CustomMove(horizontal, MovementType.ADVANCE, false, true);
                 return new CustomPiece(PieceType.ROOK, colour, vector, rookMoveV, rookMoveH);
             }
             case BISHOP -> {
-                Movement bishopBaseMove = new Movement(diagonal, MovementType.ADVANCE, true, true);
+                CustomMove bishopBaseMove = new CustomMove(diagonal, MovementType.ADVANCE, true, true);
                 return new CustomPiece(PieceType.BISHOP, colour, vector, bishopBaseMove);
             }
             case QUEEN -> {
-                Movement queenBaseMoveV = new Movement(vertical, MovementType.ADVANCE, true, false);
-                Movement queenBaseMoveH = new Movement(horizontal, MovementType.ADVANCE, false, true);
-                Movement queenBaseMoveD = new Movement(diagonal, MovementType.ADVANCE, true, true);
+                CustomMove queenBaseMoveV = new CustomMove(vertical, MovementType.ADVANCE, true, false);
+                CustomMove queenBaseMoveH = new CustomMove(horizontal, MovementType.ADVANCE, false, true);
+                CustomMove queenBaseMoveD = new CustomMove(diagonal, MovementType.ADVANCE, true, true);
                 return new CustomPiece(PieceType.QUEEN, colour, vector, queenBaseMoveV, queenBaseMoveH, queenBaseMoveD);
             }
             case KING -> {
-                Movement kingBaseMoveV = new Movement(new Path(new Point(0, 1)), MovementType.ADVANCE, true, false);
-                Movement kingBaseMoveH = new Movement(new Path(new Point(1, 0)), MovementType.ADVANCE, false, true);
-                Movement kingBaseMoveD = new Movement(new Path(new Point(1, 1)), MovementType.ADVANCE, true, true);
+                CustomMove kingBaseMoveV = new CustomMove(new Path(new Point(0, 1)), MovementType.ADVANCE, true, false);
+                CustomMove kingBaseMoveH = new CustomMove(new Path(new Point(1, 0)), MovementType.ADVANCE, false, true);
+                CustomMove kingBaseMoveD = new CustomMove(new Path(new Point(1, 1)), MovementType.ADVANCE, true, true);
                 // Castle - King side Todo: Implement moving to a fixed location so this and queen-side can be intuitive
                 Point kingSideRook = new Point(7, 0);
                 Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
@@ -88,7 +88,7 @@ public class CustomPieceFactory {
                 Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                Movement castleKingSide = new Movement.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
+                CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
@@ -103,7 +103,7 @@ public class CustomPieceFactory {
                 Conditional castleQueenSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
                         queenSideRook),
                         Comparator.DOES_NOT_EXIST, null);
-                Movement castleQueenSide = new Movement.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
+                CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(true)
                         .isSpecificQuadrant(false)
@@ -117,13 +117,13 @@ public class CustomPieceFactory {
                         castleKingSide, castleQueenSide);
             }
             case PAWN -> {
-                Movement pawnBaseMove = new Movement.Builder(new Path(new Point(0, 1)), MovementType.ADVANCE)
+                CustomMove pawnBaseMove = new CustomMove.Builder(new Path(new Point(0, 1)), MovementType.ADVANCE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
                         .isSpecificQuadrant(true)
                         .isAttack(false)
                         .build();
-                Movement pawnCharge = new Movement.Builder(new Path(new Point(0, 1), new Point(0, 2)),
+                CustomMove pawnCharge = new CustomMove.Builder(new Path(new Point(0, 1), new Point(0, 2)),
                         MovementType.CHARGE)
                         .isMirrorXAxis(false)
                         .isMirrorYAxis(false)
@@ -131,7 +131,7 @@ public class CustomPieceFactory {
                         .isAttack(false)
                         .conditions(List.of(notMoved))
                         .build();
-                Movement pawnCapture = new Movement.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
+                CustomMove pawnCapture = new CustomMove.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
                         .isMirrorXAxis(false)
                         .isMove(false)
                         .build();
@@ -145,7 +145,7 @@ public class CustomPieceFactory {
 
                 ExtraAction extraAction = new ExtraAction(new Reference(Location.DESTINATION, Direction.BACK, null),
                         null);
-                Movement enPassant = new Movement.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
+                CustomMove enPassant = new CustomMove.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
                         .isMirrorXAxis(false)
                         .isAttack(false)
                         .conditions(List.of(enPassantCond1, enPassantCond2, enPassantCond3))

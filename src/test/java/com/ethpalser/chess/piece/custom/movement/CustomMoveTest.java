@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
-class MovementTest {
+class CustomMoveTest {
 
     private static final int MAX_X = 7;
     private static final int MAX_Y = 7;
@@ -24,11 +24,11 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceNoMirror_isOffsetByCoordinateAndOnlyForward() {
-        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
-        boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
+        boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
-        boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
+        boolean[][] boardMove = customMove.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
         final int coY = co.getY();
@@ -60,11 +60,11 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorX_isOffsetByCoordinateAndOnlyForwardAndBehind() {
-        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, false);
-        boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, true, false);
+        boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
-        boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
+        boolean[][] boardMove = customMove.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
         final int coY = co.getY();
@@ -96,11 +96,11 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorY_isOffsetByCoordinateAndOnlyForwardRightAndForwardLeft() {
-        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, true);
-        boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, true);
+        boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
-        boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
+        boolean[][] boardMove = customMove.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
         final int coY = co.getY();
@@ -132,11 +132,11 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorXAndY_isOffsetByCoordinateAndMovesInAllDirections() {
-        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, true, true);
-        boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, true, true);
+        boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
-        boolean[][] boardMove = movement.drawCoordinates(Colour.WHITE, co);
+        boolean[][] boardMove = customMove.drawCoordinates(Colour.WHITE, co);
 
         final int coX = co.getX();
         final int coY = co.getY();
@@ -168,11 +168,11 @@ class MovementTest {
 
     @Test
     void getCoordinates_relativeToPieceReverseForBlack_isOffsetByCoordinateAndMovesBackwards() {
-        Movement movement = new Movement(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
-        boolean[][] baseMove = movement.drawCoordinates(Colour.WHITE);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
+        boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
-        boolean[][] boardMove = movement.drawCoordinates(Colour.BLACK, co);
+        boolean[][] boardMove = customMove.drawCoordinates(Colour.BLACK, co);
 
         final int coX = co.getX();
         final int coY = co.getY();
