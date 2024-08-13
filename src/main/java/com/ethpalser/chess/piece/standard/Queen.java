@@ -1,12 +1,12 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Queen implements Piece {
 
@@ -35,11 +35,16 @@ public class Queen implements Piece {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
-        Set<Point> set = new HashSet<>();
-        set.addAll(Point.generateHorizontalMoves(board, this.point, this.colour));
-        set.addAll(Point.generateVerticalMoves(board, this.point, this.colour));
-        set.addAll(Point.generateDiagonalMoves(board, this.point, this.colour));
-        return new MoveSet(set);
+        return new MoveSet(
+                new Move(new Path(Point.generateHorizontalMoves(board, this.point, this.colour, false))),
+                new Move(new Path(Point.generateHorizontalMoves(board, this.point, this.colour, true))),
+                new Move(new Path(Point.generateVerticalMoves(board, this.point, this.colour, false))),
+                new Move(new Path(Point.generateVerticalMoves(board, this.point, this.colour, true))),
+                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, false, false))),
+                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, false, true))),
+                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, false))),
+                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, true)))
+        );
     }
 
     @Override
