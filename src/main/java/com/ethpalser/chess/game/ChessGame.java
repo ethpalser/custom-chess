@@ -5,6 +5,7 @@ import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -247,7 +248,16 @@ public class ChessGame {
                 return false;
             }
             // Can a piece block its path?
-            // Todo: how do I get the path? Note: CustomPiece Movement uses Paths, but I don't want to use all of it
+            Move causingCheck = p.getMoves(this.board, this.log).getMove(oppKingPoint);
+            if (causingCheck == null) {
+                throw new NullPointerException("exception in game state, move causing check should not be null");
+            }
+            for (Point c : causingCheck.getPath()) {
+                // Yes, there is at least one piece that can move to a point along the path causing check
+                if (!this.getThreatMap(oppColour).getPieces(c).isEmpty()) {
+                    return false;
+                }
+            }
         }
         return true;
     }
