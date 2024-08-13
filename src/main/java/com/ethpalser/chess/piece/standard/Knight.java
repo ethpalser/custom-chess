@@ -5,7 +5,6 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,14 +32,14 @@ public class Knight implements Piece {
     @Override
     public MoveSet getMoves(Board board) {
         Set<Point> set = new HashSet<>();
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 2, 1)); // right 2 up
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 2, -1)); // right 2 down
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, 1, -2)); // down 2 right
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, -2)); // down 2 left
-        set.add(PointUtil.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 2, 1)); // right 2 up
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 2, -1)); // right 2 down
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 1, -2)); // down 2 right
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -1, -2)); // down 2 left
+        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
         set.remove(null);
         return new MoveSet(set);
     }

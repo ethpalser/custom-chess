@@ -10,7 +10,6 @@ import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -122,7 +121,7 @@ public class King implements Piece {
     private Point generateSafePointOrNull(Board board, ThreatMap threatMap, int xOffset, int yOffset) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
-            return PointUtil.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
+            return Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
         }
         return null;
     }

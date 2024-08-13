@@ -5,7 +5,6 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,14 +36,9 @@ public class Queen implements Piece {
             throw new IllegalArgumentException("board cannot be null");
         }
         Set<Point> set = new HashSet<>();
-        set.addAll(PointUtil.generateHorizontalMoves(board, this.point, this.colour, false)); // left
-        set.addAll(PointUtil.generateHorizontalMoves(board, this.point, this.colour, true)); // right
-        set.addAll(PointUtil.generateVerticalMoves(board, this.point, this.colour, true)); // up
-        set.addAll(PointUtil.generateVerticalMoves(board, this.point, this.colour, false)); // down
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, false)); // bottom left
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, true)); // top left
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, false)); // bottom right
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, true)); // top right
+        set.addAll(Point.generateHorizontalMoves(board, this.point, this.colour));
+        set.addAll(Point.generateVerticalMoves(board, this.point, this.colour));
+        set.addAll(Point.generateDiagonalMoves(board, this.point, this.colour));
         return new MoveSet(set);
     }
 

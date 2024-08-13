@@ -5,7 +5,6 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,10 +36,8 @@ public class Rook implements Piece {
             throw new IllegalArgumentException("board cannot be null");
         }
         Set<Point> set = new HashSet<>();
-        set.addAll(PointUtil.generateHorizontalMoves(board, this.point, this.colour, false)); // left
-        set.addAll(PointUtil.generateHorizontalMoves(board, this.point, this.colour, true)); // right
-        set.addAll(PointUtil.generateVerticalMoves(board, this.point, this.colour, true)); // up
-        set.addAll(PointUtil.generateVerticalMoves(board, this.point, this.colour, false)); // down
+        set.addAll(Point.generateHorizontalMoves(board, this.point, this.colour));
+        set.addAll(Point.generateVerticalMoves(board, this.point, this.colour));
         return new MoveSet(set);
     }
 

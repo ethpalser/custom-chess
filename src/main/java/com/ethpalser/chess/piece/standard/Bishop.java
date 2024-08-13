@@ -5,7 +5,6 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.PointUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,12 +35,7 @@ public class Bishop implements Piece {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
-        Set<Point> set = new HashSet<>();
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, false)); // bottom left
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, false, true)); // top left
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, false)); // bottom right
-        set.addAll(PointUtil.generateDiagonalMoves(board, this.point, this.colour, true, true)); // top right
-        return new MoveSet(set);
+        return new MoveSet(Point.generateDiagonalMoves(board, this.point, this.colour));
     }
 
     @Override
