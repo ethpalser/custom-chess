@@ -9,6 +9,7 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,7 +70,10 @@ public class King implements Piece {
                         new Point(this.point.getX() - 1, this.point.getY()),
                         kingSideRook
                 );
-                moveSet.addMove(new Move(new Point(this.point.getX() - 2, this.point.getY()), kingSideRookMove));
+                moveSet.addMove(new Move(new Path(
+                        new Point(this.point.getX() - 1, this.point.getY()),
+                        new Point(this.point.getX() - 2, this.point.getY())
+                ), kingSideRookMove));
             }
             // queen side
             Piece queenSideRook = board.getPiece(new Point(board.getPieces().getMaxX(), startRank));
@@ -82,7 +86,10 @@ public class King implements Piece {
                         new Point(this.point.getX() + 1, this.point.getY()),
                         queenSideRook
                 );
-                moveSet.addMove(new Move(new Point(this.point.getX() - 2, this.point.getY()), queenSideRookMove));
+                moveSet.addMove(new Move(new Path(
+                        new Point(this.point.getX() + 1, this.point.getY()),
+                        new Point(this.point.getX() + 2, this.point.getY())
+                ), queenSideRookMove));
             }
         }
         return moveSet;
