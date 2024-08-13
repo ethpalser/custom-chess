@@ -28,6 +28,10 @@ public class Path implements Iterable<Point> {
         ));
     }
 
+    public Path(LinkedHashSet<Point> set) {
+        this.linkedHashSet = set;
+    }
+
     /**
      * Creates a Path moving in a linear direction (vertical, horizontal or diagonal) from start to end
      * {@link Point}.
