@@ -5,7 +5,7 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Knight implements Piece {
@@ -31,7 +31,7 @@ public class Knight implements Piece {
 
     @Override
     public MoveSet getMoves(Board board) {
-        Set<Point> set = new HashSet<>();
+        Set<Point> set = new LinkedHashSet<>();
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
