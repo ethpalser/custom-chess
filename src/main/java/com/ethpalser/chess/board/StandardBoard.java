@@ -3,6 +3,7 @@ package com.ethpalser.chess.board;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Bishop;
 import com.ethpalser.chess.piece.standard.King;
 import com.ethpalser.chess.piece.standard.Knight;
@@ -19,11 +20,12 @@ public class StandardBoard implements Board {
     private final Plane<Piece> piecesOnBoard;
 
     public StandardBoard() {
-        Plane<Piece> map = new Plane<>();
-        map.putAll(this.generatePiecesInRank(0));
-        map.putAll(this.generatePiecesInRank(1));
-        map.putAll(this.generatePiecesInRank(this.length() - 2));
-        map.putAll(this.generatePiecesInRank(this.length() - 1));
+        Plane<Piece> map = new Plane<>(0, 0, 7, 7);
+        int length = map.length();
+        map.putAll(this.generatePiecesInRank(length, 0));
+        map.putAll(this.generatePiecesInRank(length, 1));
+        map.putAll(this.generatePiecesInRank(length, map.length() - 2));
+        map.putAll(this.generatePiecesInRank(length, map.length() - 1));
         this.piecesOnBoard = map;
     }
 
@@ -64,18 +66,36 @@ public class StandardBoard implements Board {
                 || y > this.piecesOnBoard.getMaxY() || this.piecesOnBoard.getMinY() > y;
     }
 
-    // PRIVATE METHODS
-
-    private int length() {
-        return this.piecesOnBoard.getMaxY() - this.piecesOnBoard.getMinY();
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = this.piecesOnBoard.length() - 1; y >= 0; y--) {
+            for (int x = 0; x <= this.piecesOnBoard.width() - 1; x++) {
+                Piece customPiece = getPiece(x, y);
+                if (customPiece == null) {
+                    sb.append("|   ");
+                } else {
+                    sb.append("| ");
+                    if (PieceType.PAWN.getCode().equals(customPiece.getCode())) {
+                        sb.append("P ");
+                    } else {
+                        sb.append(customPiece.getCode()).append(" ");
+                    }
+                }
+            }
+            sb.append("|\n");
+        }
+        return sb.toString();
     }
 
-    private Map<Point, Piece> generatePiecesInRank(int rank) {
-        Map<Point, Piece> map = new HashMap<>();
-        Colour colour = rank < (this.length() - 1) / 2 ? Colour.WHITE : Colour.BLACK;
+    // PRIVATE METHODS
 
-        if (rank == 0 || rank == this.length() - 1) {
-            for (int file = 0; file < 8; file++) {
+    private Map<Point, Piece> generatePiecesInRank(int length, int rank) {
+        Map<Point, Piece> map = new HashMap<>();
+        Colour colour = rank < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
+
+        if (rank == 0 || rank == length - 1) {
+            for (int file = 0; file < length; file++) {
                 Point point = new Point(file, rank);
                 Piece piece = switch (file) {
                     case 0, 7 -> new Rook(colour, point);
@@ -87,7 +107,7 @@ public class StandardBoard implements Board {
                 };
                 map.put(point, piece);
             }
-        } else if (rank == 1 || rank == this.length() - 2) {
+        } else if (rank == 1 || rank == length - 2) {
             for (int file = 0; file < 8; file++) {
                 Point point = new Point(file, rank);
                 map.put(point, new Pawn(colour, point));
