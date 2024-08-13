@@ -14,10 +14,14 @@ public class ThreatMap implements MoveMap {
 
     private final Colour colour;
     private final Map<Point, Set<Piece>> map;
+    private final int length;
+    private final int width;
 
-    public ThreatMap(Colour colour, Board board, Log log) {
+    public ThreatMap(Colour colour, Board board, Log<Point, Piece> log) {
         this.colour = colour;
         this.map = this.setup(colour, board, log);
+        this.length = board.getPieces().length();
+        this.width = board.getPieces().width();
     }
 
     @Override
@@ -28,7 +32,7 @@ public class ThreatMap implements MoveMap {
     @Override
     public Set<Piece> getPieces(Point point) {
         if (point == null) {
-            return null;
+            return Set.of();
         }
         return this.map.get(point);
     }
@@ -46,7 +50,7 @@ public class ThreatMap implements MoveMap {
     }
 
     @Override
-    public void updateMoves(Board board, Log log, Point point) {
+    public void updateMoves(Board board, Log<Point, Piece> log, Point point) {
         Piece piece = board.getPiece(point);
         if (piece != null) {
             Set<Piece> threateningPieces = this.getPieces(point);
@@ -69,7 +73,7 @@ public class ThreatMap implements MoveMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<Piece>> setup(Colour colour, Board board, Log log) {
+    private Map<Point, Set<Piece>> setup(Colour colour, Board board, Log<Point, Piece> log) {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
         for (Piece piece : board.getPieces()) {
             if (colour.equals(piece.getColour())) {

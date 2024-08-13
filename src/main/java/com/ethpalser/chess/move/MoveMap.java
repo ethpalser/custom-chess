@@ -42,6 +42,6 @@ public interface MoveMap extends Quantifiable<Integer> {
      * @param log
      * @param point
      */
-    void updateMoves(Board board, Log log, Point point);
+    void updateMoves(Board board, Log<Point, Piece> log, Point point);
 
 }
