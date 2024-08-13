@@ -10,7 +10,7 @@ import com.ethpalser.chess.piece.Colour;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-class CustomGameTest {
+class GameTest {
 
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
