@@ -24,7 +24,7 @@ class CustomMoveTest {
 
     @Test
     void getCoordinates_relativeToPieceNoMirror_isOffsetByCoordinateAndOnlyForward() {
-        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), CustomMoveType.ADVANCE, false, false);
         boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
@@ -60,7 +60,7 @@ class CustomMoveTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorX_isOffsetByCoordinateAndOnlyForwardAndBehind() {
-        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, true, false);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), CustomMoveType.ADVANCE, true, false);
         boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
@@ -96,7 +96,7 @@ class CustomMoveTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorY_isOffsetByCoordinateAndOnlyForwardRightAndForwardLeft() {
-        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, true);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), CustomMoveType.ADVANCE, false, true);
         boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
@@ -132,7 +132,7 @@ class CustomMoveTest {
 
     @Test
     void getCoordinates_relativeToPieceMirrorXAndY_isOffsetByCoordinateAndMovesInAllDirections() {
-        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, true, true);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), CustomMoveType.ADVANCE, true, true);
         boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);
@@ -168,7 +168,7 @@ class CustomMoveTest {
 
     @Test
     void getCoordinates_relativeToPieceReverseForBlack_isOffsetByCoordinateAndMovesBackwards() {
-        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), MovementType.ADVANCE, false, false);
+        CustomMove customMove = new CustomMove(new Path(bishopCoordinates()), CustomMoveType.ADVANCE, false, false);
         boolean[][] baseMove = customMove.drawCoordinates(Colour.WHITE);
 
         Point co = new Point(3, 3);

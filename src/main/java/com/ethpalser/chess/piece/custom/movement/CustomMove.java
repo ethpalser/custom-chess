@@ -16,7 +16,7 @@ import java.util.Set;
 public class CustomMove {
 
     private final Path pathBase;
-    private final MovementType moveType;
+    private final CustomMoveType moveType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
@@ -36,7 +36,7 @@ public class CustomMove {
     public static class Builder {
         // required
         private final Path path;
-        private final MovementType moveType;
+        private final CustomMoveType moveType;
         // optional
         private boolean mirrorXAxis = true;
         private boolean mirrorYAxis = true;
@@ -46,7 +46,7 @@ public class CustomMove {
         private List<Conditional> conditions = List.of();
         private ExtraAction extraAction = null;
 
-        public Builder(Path path, MovementType moveType) {
+        public Builder(Path path, CustomMoveType moveType) {
             this.path = path;
             this.moveType = moveType;
         }
@@ -103,7 +103,7 @@ public class CustomMove {
         this.extraAction = builder.extraAction;
     }
 
-    public CustomMove(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
+    public CustomMove(Path path, CustomMoveType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
         this.pathBase = path;
         this.moveType = moveType;
         this.mirrorXAxis = mirrorXAxis;
@@ -119,7 +119,7 @@ public class CustomMove {
         return this.pathBase;
     }
 
-    public MovementType getMoveType() {
+    public CustomMoveType getMoveType() {
         return this.moveType;
     }
 

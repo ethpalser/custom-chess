@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-public enum MovementType {
+public enum CustomMoveType {
     JUMP,
     ADVANCE,
     CHARGE
