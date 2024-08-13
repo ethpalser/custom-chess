@@ -30,21 +30,21 @@ public interface Piece {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
+        return this.getMoves(board).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
     }
 
     default boolean canMove(Board board, Log<Point, Piece> log, Point destination) {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board, log).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
+        return this.getMoves(board, log).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
     }
 
     default boolean canMove(Board board, Log<Point, Piece> log, ThreatMap threats, Point destination) {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> destination.equals(m.getPoint()));
+        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
     }
 
     void move(Point destination);
