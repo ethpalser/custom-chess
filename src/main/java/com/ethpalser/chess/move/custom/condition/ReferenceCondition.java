@@ -8,11 +8,11 @@ import java.util.List;
 
 public class ReferenceCondition implements Conditional {
 
-    private final RelativeReference target;
+    private final RelativeReference<Piece> target;
     private final Comparator comparator;
-    private final RelativeReference expected;
+    private final RelativeReference<Piece> expected;
 
-    public ReferenceCondition(RelativeReference target, Comparator comparator, RelativeReference expected) {
+    public ReferenceCondition(RelativeReference<Piece> target, Comparator comparator, RelativeReference<Piece> expected) {
         if (expected == null && !Comparator.canReferenceSelf(comparator)) {
             throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
         }
@@ -23,7 +23,7 @@ public class ReferenceCondition implements Conditional {
 
     @Override
     public boolean isExpected(CustomBoard board, Action action) {
-        List<Piece> customPieces = this.target.getPieces(board, action);
+        List<Piece> customPieces = this.target.getReferences(board.getPieces());
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {
                 return customPieces == null || customPieces.isEmpty();
@@ -32,7 +32,7 @@ public class ReferenceCondition implements Conditional {
                 return customPieces != null;
             }
             case EQUAL -> {
-                List<Piece> expectedCustomPieces = this.expected.getPieces(board, action);
+                List<Piece> expectedCustomPieces = this.expected.getReferences(board.getPieces());
                 for (Piece customPiece : customPieces) {
                     if (!expectedCustomPieces.contains(customPiece))
                         return false;
@@ -40,7 +40,7 @@ public class ReferenceCondition implements Conditional {
                 return true;
             }
             case NOT_EQUAL -> {
-                List<Piece> expectedCustomPieces = this.expected.getPieces(board, action);
+                List<Piece> expectedCustomPieces = this.expected.getReferences(board.getPieces());
                 for (Piece customPiece : customPieces) {
                     if (!expectedCustomPieces.contains(customPiece))
                         return true;
