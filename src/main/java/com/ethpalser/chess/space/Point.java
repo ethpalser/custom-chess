@@ -2,7 +2,7 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Point implements Comparable<Point> {
@@ -199,16 +199,16 @@ public class Point implements Comparable<Point> {
         return point;
     }
 
-    public static Set<Point> generateHorizontalMoves(Board board, Point start, Colour colour) {
-        Set<Point> set = new HashSet<>();
+    public static LinkedHashSet<Point> generateHorizontalMoves(Board board, Point start, Colour colour) {
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateHorizontalMoves(board, start, colour, false));
         set.addAll(generateHorizontalMoves(board, start, colour, true));
         return set;
     }
 
-    private static Set<Point> generateHorizontalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateHorizontalMoves(Board board, Point start, Colour colour,
             boolean right) {
-        Set<Point> set = new HashSet<>();
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
@@ -225,16 +225,16 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static Set<Point> generateVerticalMoves(Board board, Point start, Colour colour) {
-        Set<Point> set = new HashSet<>();
+    public static LinkedHashSet<Point> generateVerticalMoves(Board board, Point start, Colour colour) {
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateVerticalMoves(board, start, colour, false));
         set.addAll(generateVerticalMoves(board, start, colour, true));
         return set;
     }
 
-    private static Set<Point> generateVerticalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateVerticalMoves(Board board, Point start, Colour colour,
             boolean up) {
-        Set<Point> set = new HashSet<>();
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
@@ -251,8 +251,8 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static Set<Point> generateDiagonalMoves(Board board, Point start, Colour colour) {
-        Set<Point> set = new HashSet<>();
+    public static LinkedHashSet<Point> generateDiagonalMoves(Board board, Point start, Colour colour) {
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateDiagonalMoves(board, start, colour, false, false));
         set.addAll(generateDiagonalMoves(board, start, colour, false, true));
         set.addAll(generateDiagonalMoves(board, start, colour, true, false));
@@ -260,9 +260,9 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    private static Set<Point> generateDiagonalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateDiagonalMoves(Board board, Point start, Colour colour,
             boolean right, boolean up) {
-        Set<Point> set = new HashSet<>();
+        LinkedHashSet<Point> set = new LinkedHashSet<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
         // while within the board's boundaries
