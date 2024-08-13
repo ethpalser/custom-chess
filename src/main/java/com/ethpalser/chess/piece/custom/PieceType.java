@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom;
 
 public enum PieceType {
-    PAWN(""),
+    PAWN("P"),
     ROOK("R"),
     KNIGHT("N"),
     BISHOP("B"),
@@ -21,7 +21,7 @@ public enum PieceType {
 
     public static PieceType fromCode(String code) {
         return switch (code) {
-            case "P" -> PAWN;
+            case "P", "" -> PAWN;
             case "R" -> ROOK;
             case "N" -> KNIGHT;
             case "B" -> BISHOP;
