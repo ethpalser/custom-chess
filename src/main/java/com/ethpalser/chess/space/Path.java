@@ -1,26 +1,27 @@
 package com.ethpalser.chess.space;
 
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 public class Path implements Iterable<Point> {
 
-    private final LinkedHashMap<Integer, Point> linkedHashMap;
+    private final LinkedHashSet<Point> linkedHashSet;
 
     public Path(Point end) {
-        this.linkedHashMap = new LinkedHashMap<>();
-        this.linkedHashMap.put(end.hashCode(), end);
+        this.linkedHashSet = new LinkedHashSet<>();
+        this.linkedHashSet.add(end);
     }
 
     public Path(List<Point> points) {
-        this.linkedHashMap = points.stream().collect(Collector.of(
-                (Supplier<LinkedHashMap<Integer, Point>>) LinkedHashMap::new,
-                (map, point) -> map.put(point.hashCode(), point),
+        this.linkedHashSet = points.stream().collect(Collector.of(
+                (Supplier<LinkedHashSet<Point>>) LinkedHashSet::new,
+                HashSet::add,
                 (map, map2) -> {
-                    map.putAll(map2);
+                    map.addAll(map2);
                     return map;
                 }
         ));
@@ -34,14 +35,14 @@ public class Path implements Iterable<Point> {
      * @param end   {@link Point} representing the last vector of the path
      */
     public Path(Point start, Point end) {
-        LinkedHashMap<Integer, Point> map;
+        LinkedHashSet<Point> set;
         switch (PathType.fromPoints(start, end)) {
             case POINT, CUSTOM -> {
-                map = new LinkedHashMap<>();
+                set = new LinkedHashSet<>();
                 if (start != null)
-                    map.put(start.hashCode(), start);
+                    set.add(start);
                 if (end != null)
-                    map.put(end.hashCode(), end);
+                    set.add(end);
             }
             case VERTICAL, HORIZONTAL, DIAGONAL -> {
                 int x = start.getX();
@@ -51,23 +52,23 @@ public class Path implements Iterable<Point> {
                 int dirX = diffX / Math.abs(diffX); // 0 for Vertical
                 int dirY = diffY / Math.abs(diffY); // 0 for Horizontal
 
-                map = new LinkedHashMap<>();
+                set = new LinkedHashSet<>();
                 // Build the path along the line until an edge is exceeded
                 while (x != end.getX() + dirX && y != end.getY() + dirY) {
-                    Point vector = new Point(x, y);
-                    map.put(vector.hashCode(), vector);
+                    Point point = new Point(x, y);
+                    set.add(point);
                     x = x + dirX;
                     y = y + dirY;
                 }
             }
-            default -> map = new LinkedHashMap<>();
+            default -> set = new LinkedHashSet<>();
         }
-        this.linkedHashMap = map;
+        this.linkedHashSet = set;
     }
 
     @Override
     public Iterator<Point> iterator() {
-        return this.linkedHashMap.values().iterator();
+        return this.linkedHashSet.iterator();
     }
 
     @Override
