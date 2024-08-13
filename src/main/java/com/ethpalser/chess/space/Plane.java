@@ -135,4 +135,12 @@ public class Plane<T> implements Map<Point, T>, Iterable<T> {
         return this.maxY;
     }
 
+    public int length() {
+        return this.maxY - this.minY + 1;
+    }
+
+    public int width() {
+        return this.maxX - this.minX + 1;
+    }
+
 }
