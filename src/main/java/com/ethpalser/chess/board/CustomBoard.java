@@ -38,6 +38,60 @@ public class CustomBoard implements Board {
         this.pieceMap = map;
     }
 
+    @Override
+    public Plane<Piece> getPieces() {
+        return pieceMap;
+    }
+
+    public List<Piece> getPieces(Path path) {
+        if (path == null) {
+            List<Piece> list = new LinkedList<>();
+            for (Piece piece : this.pieceMap) {
+                list.add(piece);
+            }
+            return list;
+        } else {
+            return path.toSet().stream().map(this::getPiece).collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    public Piece getPiece(Point vector) {
+        if (vector == null) {
+            return null;
+        }
+        return pieceMap.get(vector);
+    }
+
+    @Override
+    public void addPiece(Point point, Piece piece) {
+        if (point == null) {
+            throw new NullPointerException();
+        }
+        if (piece == null) {
+            this.pieceMap.remove(point);
+        } else {
+            this.pieceMap.remove(piece.getPoint());
+            this.pieceMap.put(point, piece);
+            piece.move(point);
+        }
+    }
+
+    @Override
+    public void movePiece(Point start, Point end) {
+        if (start == null || end == null) {
+            throw new NullPointerException();
+        }
+        this.addPiece(end, this.getPiece(start));
+    }
+
+    @Override
+    public boolean isInBounds(int x, int y) {
+        return this.pieceMap.isInBounds(x, y);
+    }
+
+    // PRIVATE METHODS
+
     private Map<Point, CustomPiece> generatePiecesInRank(int length, int y) {
         Map<Point, CustomPiece> map = new HashMap<>();
         Colour colour = y < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
@@ -65,57 +119,4 @@ public class CustomBoard implements Board {
         }
         return map;
     }
-
-    @Override
-    public Piece getPiece(Point vector) {
-        if (vector == null) {
-            return null;
-        }
-        return pieceMap.get(vector);
-    }
-
-    @Override
-    public void addPiece(Point point, Piece piece) {
-        if (point == null) {
-            throw new NullPointerException();
-        }
-        if (piece == null) {
-            this.pieceMap.remove(point);
-        } else {
-            this.pieceMap.remove(piece.getPoint());
-            this.pieceMap.put(point, piece);
-            piece.move(point);
-        }
-    }
-
-    public List<Piece> getPieces(Path path) {
-        if (path == null) {
-            List<Piece> list = new LinkedList<>();
-            for (Piece piece : this.pieceMap) {
-                list.add(piece);
-            }
-            return list;
-        } else {
-            return path.toSet().stream().map(this::getPiece).collect(Collectors.toList());
-        }
-    }
-
-    @Override
-    public Plane<Piece> getPieces() {
-        return pieceMap;
-    }
-
-    @Override
-    public void movePiece(Point start, Point end) {
-        if (start == null || end == null) {
-            throw new NullPointerException();
-        }
-        this.addPiece(end, this.getPiece(start));
-    }
-
-    @Override
-    public boolean isInBounds(int x, int y) {
-        return false;
-    }
-
 }
