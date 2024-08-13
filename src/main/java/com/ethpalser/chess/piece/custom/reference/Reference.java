@@ -65,7 +65,7 @@ public class Reference {
         List<Piece> list = new ArrayList<>();
         Piece toAdd = null;
         switch (this.location) {
-            case LAST_MOVED -> toAdd = board.getLastMoved();
+            case LAST_MOVED -> toAdd = null; // Todo: Use ChessLog
             case START -> toAdd = board.getPiece(shiftedStart);
             case DESTINATION -> toAdd = board.getPiece(shiftedEnd);
             case VECTOR -> toAdd = board.getPiece(shiftedReference);
