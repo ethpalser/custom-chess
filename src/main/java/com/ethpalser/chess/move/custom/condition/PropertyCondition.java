@@ -8,16 +8,16 @@ import java.util.List;
 
 public class PropertyCondition implements Conditional {
 
-    private final RelativeReference reference;
+    private final RelativeReference<Piece> reference;
     private final Property<Piece> property;
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition(RelativeReference reference, Comparator comparator) {
+    public PropertyCondition(RelativeReference<Piece> reference, Comparator comparator) {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(RelativeReference reference, Comparator comparator, Property<Piece> property,
+    public PropertyCondition(RelativeReference<Piece> reference, Comparator comparator, Property<Piece> property,
             Object expected) {
         if (reference == null || comparator == null) {
             throw new NullPointerException();
@@ -33,7 +33,7 @@ public class PropertyCondition implements Conditional {
 
     @Override
     public boolean isExpected(CustomBoard board, Action action) {
-        List<Piece> list = this.reference.getPieces(board, action);
+        List<Piece> list = this.reference.getReferences(board.getPieces());
 
         boolean hasPiece = false;
         for (Piece customPiece : list) {

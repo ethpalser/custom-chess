@@ -12,7 +12,7 @@ import com.ethpalser.chess.space.Point;
  */
 public class ExtraAction {
 
-    private final RelativeReference reference;
+    private final RelativeReference<Piece> reference;
     private final Point destination;
 
     public ExtraAction() {
@@ -20,7 +20,7 @@ public class ExtraAction {
         this.reference = null;
     }
 
-    public ExtraAction(RelativeReference reference, Point destination) {
+    public ExtraAction(RelativeReference<Piece> reference, Point destination) {
         this.reference = reference;
         this.destination = destination;
     }
@@ -39,7 +39,7 @@ public class ExtraAction {
         if (this.reference == null) {
             return null;
         }
-        Piece customPiece = this.reference.getPieces(board, previousAction).get(0);
+        Piece customPiece = this.reference.getReferences(board.getPieces()).get(0);
         return new Action(customPiece.getColour(), customPiece.getPoint(), this.destination);
     }
 

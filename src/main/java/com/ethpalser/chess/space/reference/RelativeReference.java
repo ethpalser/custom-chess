@@ -45,40 +45,6 @@ public class RelativeReference<T> implements Reference<T> {
         this.end = end;
     }
 
-    /**
-     * Get one or more {@link CustomPiece}s that this reference is for using the current state of the board and action
-     * being attempted.
-     *
-     * @param board  {@link CustomBoard} used for reference
-     * @param action {@link Action} used for reference containing a single piece's position and destination
-     * @return List of Pieces of the location is a Path, otherwise a List of one Piece
-     */
-    public List<Piece> getPieces(CustomBoard board, Action action) {
-        if (board == null || action == null) {
-            throw new NullPointerException();
-        }
-        if (action.getStart() == null || action.getEnd() == null) {
-            throw new IllegalArgumentException("Action has null start or end vector.");
-        }
-        Point shiftedStart = action.getStart().shift(action.getColour(), this.direction);
-        Point shiftedEnd = action.getEnd().shift(action.getColour(), this.direction);
-        Point shiftedReference = this.start == null ? null : this.start.shift(action.getColour(), this.direction);
-
-        List<Piece> list = new ArrayList<>();
-        Piece toAdd = null;
-        switch (this.location) {
-            case LAST_MOVED -> toAdd = null; // Todo: Use ChessLog
-            case START -> toAdd = board.getPiece(shiftedStart);
-            case DESTINATION -> toAdd = board.getPiece(shiftedEnd);
-            case VECTOR -> toAdd = board.getPiece(shiftedReference);
-            case PATH_TO_DESTINATION -> list = board.getPieces(new Path(shiftedStart, shiftedEnd));
-            case PATH_TO_VECTOR -> list = board.getPieces(new Path(shiftedStart, shiftedReference));
-        }
-        if (toAdd != null)
-            list.add(toAdd);
-        return list;
-    }
-
     @Override
     public Location getLocation() {
         return this.location;
