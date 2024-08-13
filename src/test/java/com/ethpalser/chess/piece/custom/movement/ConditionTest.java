@@ -12,7 +12,7 @@ import com.ethpalser.chess.move.custom.condition.Property;
 import com.ethpalser.chess.move.custom.condition.PropertyCondition;
 import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.space.reference.Location;
-import com.ethpalser.chess.space.reference.Reference;
+import com.ethpalser.chess.space.reference.RelativeReference;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.START), Comparator.EQUAL,
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.START), Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
         CustomBoard board = new CustomBoard();
@@ -38,7 +38,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsNotPawn_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
 
         CustomBoard board = new CustomBoard();
@@ -55,7 +55,7 @@ class ConditionTest {
     void evaluate_enPassantLastMovedAdvancedOneSpace_isFalse() {
         // Given
         // En Passant condition requires moving 2
-        Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
         CustomBoard board = new CustomBoard();
@@ -73,7 +73,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedAdvancedTwoSpaces_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
         CustomBoard board = new CustomBoard();
@@ -91,7 +91,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedAndAdjacentIsSameColour_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         CustomBoard board = new CustomBoard();
@@ -107,11 +107,11 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsPawnAndMovedTwoAndIsAdjacentAndIsOppositeColour_isTrue() {
         // Given
-        Conditional conditionA = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional conditionA = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.TRUE, new Property<>("hasMoved"), null);
-        Conditional conditionB = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional conditionB = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
-        Conditional conditionC = new PropertyCondition(new Reference(Location.LAST_MOVED),
+        Conditional conditionC = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         CustomBoard board = new CustomBoard();
@@ -133,7 +133,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.START),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.START),
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
         // When
@@ -148,7 +148,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.START),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         CustomBoard board = new CustomBoard();
@@ -167,7 +167,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new Reference(Location.VECTOR, new Point(0, 0)),
+        Conditional condition = new PropertyCondition(new RelativeReference(Location.VECTOR, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         CustomBoard board = new CustomBoard();
@@ -187,7 +187,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Conditional condition = new ReferenceCondition(new Reference(Location.VECTOR, new Point(1, 0)),
+        Conditional condition = new ReferenceCondition(new RelativeReference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
         CustomBoard board = new CustomBoard();
@@ -202,11 +202,11 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Conditional conditionA = new PropertyCondition(new Reference(Location.START),
+        Conditional conditionA = new PropertyCondition(new RelativeReference(Location.START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionB = new PropertyCondition(new Reference(Location.VECTOR, new Point(0, 0)),
+        Conditional conditionB = new PropertyCondition(new RelativeReference(Location.VECTOR, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionC = new PropertyCondition(new Reference(Location.VECTOR, new Point(1, 0)),
+        Conditional conditionC = new PropertyCondition(new RelativeReference(Location.VECTOR, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST);
 
         CustomBoard board = new CustomBoard();

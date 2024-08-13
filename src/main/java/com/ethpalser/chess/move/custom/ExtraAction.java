@@ -3,7 +3,7 @@ package com.ethpalser.chess.move.custom;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.reference.Reference;
+import com.ethpalser.chess.space.reference.RelativeReference;
 import com.ethpalser.chess.space.Point;
 
 /**
@@ -12,7 +12,7 @@ import com.ethpalser.chess.space.Point;
  */
 public class ExtraAction {
 
-    private final Reference reference;
+    private final RelativeReference reference;
     private final Point destination;
 
     public ExtraAction() {
@@ -20,7 +20,7 @@ public class ExtraAction {
         this.reference = null;
     }
 
-    public ExtraAction(Reference reference, Point destination) {
+    public ExtraAction(RelativeReference reference, Point destination) {
         this.reference = reference;
         this.destination = destination;
     }
@@ -28,7 +28,7 @@ public class ExtraAction {
     /**
      * Creates an Action using a previous action and this reference for the board to consume for another movement.
      *
-     * @param board          {@link CustomBoard} needed for {@link Reference} to refer to
+     * @param board          {@link CustomBoard} needed for {@link RelativeReference} to refer to
      * @param previousAction {@link Action} that this ExtraAction is following-up on
      * @return {@link Action}
      */

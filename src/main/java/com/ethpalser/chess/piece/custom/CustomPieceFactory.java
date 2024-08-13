@@ -13,7 +13,7 @@ import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.reference.Location;
-import com.ethpalser.chess.space.reference.Reference;
+import com.ethpalser.chess.space.reference.RelativeReference;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +53,7 @@ public class CustomPieceFactory {
         Path vertical = new Path(new Point(0, 1), new Point(0, 7));
         Path horizontal = new Path(new Point(1, 0), new Point(7, 0));
         Path diagonal = new Path(new Point(1, 1), new Point(7, 7));
-        PropertyCondition notMoved = new PropertyCondition(new Reference(Location.START), Comparator.FALSE,
+        PropertyCondition notMoved = new PropertyCondition(new RelativeReference(Location.START), Comparator.FALSE,
                 new Property<>("hasMoved"), false);
 
         switch (type) {
@@ -83,9 +83,9 @@ public class CustomPieceFactory {
                 CustomMove kingBaseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
                 // Castle - King side Todo: Implement moving to a fixed location so this and queen-side can be intuitive
                 Point kingSideRook = new Point(7, 0);
-                Conditional castleKingSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, kingSideRook),
+                Conditional castleKingSideCond2 = new PropertyCondition(new RelativeReference(Location.VECTOR, kingSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional castleKingSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
+                Conditional castleKingSideCond3 = new ReferenceCondition(new RelativeReference(Location.PATH_TO_VECTOR,
                         kingSideRook),
                         Comparator.DOES_NOT_EXIST, null);
                 CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
@@ -94,13 +94,13 @@ public class CustomPieceFactory {
                         .isSpecificQuadrant(true)
                         .isAttack(false)
                         .conditions(List.of(notMoved, castleKingSideCond2, castleKingSideCond3))
-                        .extraAction(new ExtraAction(new Reference(Location.VECTOR, kingSideRook), new Point(5, 0)))
+                        .extraAction(new ExtraAction(new RelativeReference(Location.VECTOR, kingSideRook), new Point(5, 0)))
                         .build();
                 // Castle - Queen side
                 Point queenSideRook = new Point(0, 0);
-                Conditional castleQueenSideCond2 = new PropertyCondition(new Reference(Location.VECTOR, queenSideRook),
+                Conditional castleQueenSideCond2 = new PropertyCondition(new RelativeReference(Location.VECTOR, queenSideRook),
                         Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional castleQueenSideCond3 = new ReferenceCondition(new Reference(Location.PATH_TO_VECTOR,
+                Conditional castleQueenSideCond3 = new ReferenceCondition(new RelativeReference(Location.PATH_TO_VECTOR,
                         queenSideRook),
                         Comparator.DOES_NOT_EXIST, null);
                 CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
@@ -109,7 +109,7 @@ public class CustomPieceFactory {
                         .isSpecificQuadrant(false)
                         .isAttack(false)
                         .conditions(List.of(notMoved, castleQueenSideCond2, castleQueenSideCond3))
-                        .extraAction(new ExtraAction(new Reference(Location.VECTOR, new Point(0, 0)),
+                        .extraAction(new ExtraAction(new RelativeReference(Location.VECTOR, new Point(0, 0)),
                                 new Point(3, 0)))
                         .build();
 
@@ -136,14 +136,14 @@ public class CustomPieceFactory {
                         .isMove(false)
                         .build();
 
-                Conditional enPassantCond1 = new PropertyCondition(new Reference(Location.LAST_MOVED),
+                Conditional enPassantCond1 = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                         Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
-                Conditional enPassantCond2 = new ReferenceCondition(new Reference(Location.LAST_MOVED),
-                        Comparator.EQUAL, new Reference(Location.DESTINATION, Direction.BACK, null));
-                Conditional enPassantCond3 = new PropertyCondition(new Reference(Location.LAST_MOVED),
+                Conditional enPassantCond2 = new ReferenceCondition(new RelativeReference(Location.LAST_MOVED),
+                        Comparator.EQUAL, new RelativeReference(Location.DESTINATION, Direction.BACK, null));
+                Conditional enPassantCond3 = new PropertyCondition(new RelativeReference(Location.LAST_MOVED),
                         Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
-                ExtraAction extraAction = new ExtraAction(new Reference(Location.DESTINATION, Direction.BACK, null),
+                ExtraAction extraAction = new ExtraAction(new RelativeReference(Location.DESTINATION, Direction.BACK, null),
                         null);
                 CustomMove enPassant = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                         .isMirrorXAxis(false)

@@ -10,29 +10,29 @@ import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Reference {
+public class RelativeReference {
 
     private final Location location;
     private final Direction direction;
     private final Point vector;
 
-    public Reference() {
+    public RelativeReference() {
         this(Location.START);
     }
 
-    public Reference(Location location) {
+    public RelativeReference(Location location) {
         this(location, Direction.AT, null);
     }
 
-    public Reference(Location location, Point vector) {
+    public RelativeReference(Location location, Point vector) {
         this(location, Direction.AT, vector);
     }
 
-    public Reference(Location location, Direction direction) {
+    public RelativeReference(Location location, Direction direction) {
         this(location, direction, null);
     }
 
-    public Reference(Location location, Direction direction, Point vector) {
+    public RelativeReference(Location location, Direction direction, Point vector) {
         this.location = location;
         this.direction = direction;
 
