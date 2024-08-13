@@ -10,6 +10,10 @@ public interface Board {
 
     Piece getPiece(Point point);
 
+    default Piece getPiece(int x, int y) {
+        return getPiece(new Point(x, y));
+    }
+
     void addPiece(Point point, Piece piece);
 
     void movePiece(Point start, Point end);
