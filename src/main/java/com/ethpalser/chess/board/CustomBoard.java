@@ -71,8 +71,11 @@ public class CustomBoard implements Board {
         if (piece == null) {
             this.pieces.remove(point);
         } else {
+            // Removes the piece from its original location
             this.pieces.remove(piece.getPoint());
+            // Replaces the piece at the new point
             this.pieces.put(point, piece);
+            // Updates the piece to be at its new location
             piece.move(point);
         }
     }
