@@ -71,6 +71,23 @@ public class ThreatMap implements MoveMap {
         return null;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = this.length - 1; y >= 0; y--) {
+            for (int x = 0; x <= this.width - 1; x++) {
+                boolean hasThreat = map.get(new Point(x, y)) != null && !map.get(new Point(x, y)).isEmpty();
+                if (!hasThreat) {
+                    sb.append("|   ");
+                } else {
+                    sb.append("| x ");
+                }
+            }
+            sb.append("|\n");
+        }
+        return sb.toString();
+    }
+
     // PRIVATE METHODS
 
     private Map<Point, Set<Piece>> setup(Colour colour, Board board, Log<Point, Piece> log) {
