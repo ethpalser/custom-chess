@@ -2,8 +2,6 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.reference.Direction;
 import java.util.HashSet;
 import java.util.Set;
 

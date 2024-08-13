@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom.reference;
+package com.ethpalser.chess.space;
 
 public enum Direction {
     AT,

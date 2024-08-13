@@ -11,7 +11,7 @@ import com.ethpalser.chess.piece.custom.movement.ExtraAction;
 import com.ethpalser.chess.piece.custom.movement.Movement;
 import com.ethpalser.chess.piece.custom.movement.MovementType;
 import com.ethpalser.chess.piece.custom.movement.Path;
-import com.ethpalser.chess.piece.custom.reference.Direction;
+import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.piece.custom.reference.Location;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
