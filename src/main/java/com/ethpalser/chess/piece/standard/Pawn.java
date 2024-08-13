@@ -8,6 +8,7 @@ import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,11 +47,16 @@ public class Pawn implements Piece {
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY));
         set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY));
         set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, 1, nextY));
-        if (!this.hasMoved) {
-            set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY * 2));
-        }
         set.remove(null); // remove any case of null
         MoveSet moveSet = new MoveSet(set);
+
+        // pawns can move forward two if it is their first move
+        if (!this.hasMoved) {
+            moveSet.addMove(new Move(new Path(
+                    Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY),
+                    Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY * 2)
+            )));
+        }
 
         // en passant (there must be at least one move)
         if (log != null && log.size() > 1) {
