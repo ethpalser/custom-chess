@@ -160,7 +160,7 @@ public class CustomMove {
         for (Point vector : this.pathBase) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
-            if (!board.isValidLocation(nextX, nextY)) {
+            if (!board.isInBounds(nextX, nextY)) {
                 break;
             }
             vectors.add(new Point(nextX, nextY));

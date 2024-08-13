@@ -15,13 +15,13 @@ class CustomBoardTest {
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
         CustomBoard board = new CustomBoard();
 
-        assertEquals(8, board.length());
-        assertEquals(8, board.width());
-        assertEquals(32, board.count());
+        assertEquals(8, board.getPieces().length());
+        assertEquals(8, board.getPieces().width());
+        assertEquals(32, board.getPieces().size());
 
         Piece customPiece;
-        for (int x = 0; x < board.width(); x++) {
-            for (int y = 0; y < board.length(); y++) {
+        for (int x = 0; x < board.getPieces().width(); x++) {
+            for (int y = 0; y < board.getPieces().length(); y++) {
                 customPiece = board.getPiece(x, y);
                 if (customPiece == null) {
                     continue;
@@ -53,22 +53,22 @@ class CustomBoardTest {
     @Test
     void count_newBoard_has32Pieces() {
         CustomBoard board = new CustomBoard();
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
         CustomBoard board = new CustomBoard();
         int y = 1;
-        for (int x = 0; x < board.width(); x++) {
+        for (int x = 0; x < board.getPieces().width(); x++) {
             board.addPiece(new Point(x, y), null);
         }
 
         y = 6;
-        for (int x = 0; x < board.width(); x++) {
+        for (int x = 0; x < board.getPieces().width(); x++) {
             board.addPiece(new Point(x, y), null);
         }
-        assertEquals(16, board.count());
+        assertEquals(16, board.getPieces().size());
 
     }
 

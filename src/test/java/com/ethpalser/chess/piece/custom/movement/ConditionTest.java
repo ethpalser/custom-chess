@@ -120,7 +120,6 @@ class ConditionTest {
         board.addPiece(new Point(4, 4), white);
         Piece black = board.getPiece(5, 6);
         board.addPiece(new Point(5, 4), black);
-        board.setLastMoved(black);
 
         // When
         Point selected = new Point(4, 4);
