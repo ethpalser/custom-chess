@@ -1,6 +1,4 @@
-package com.ethpalser.chess.piece.custom.movement;
-
-import com.ethpalser.chess.space.Point;
+package com.ethpalser.chess.space;
 
 public enum PathType {
     VERTICAL,

@@ -5,7 +5,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.custom.movement.Path;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;

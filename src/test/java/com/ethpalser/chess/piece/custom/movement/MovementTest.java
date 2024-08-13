@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;
 import java.util.ArrayList;

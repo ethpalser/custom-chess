@@ -1,7 +1,6 @@
-package com.ethpalser.chess.piece.custom.movement;
+package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.space.Point;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;

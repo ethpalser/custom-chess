@@ -3,6 +3,7 @@ package com.ethpalser.chess.piece.custom.movement;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.custom.condition.Conditional;
 import com.ethpalser.chess.piece.custom.CustomPiece;
