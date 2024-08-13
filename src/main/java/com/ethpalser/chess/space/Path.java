@@ -3,33 +3,27 @@ package com.ethpalser.chess.space;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 public class Path implements Iterable<Point> {
 
-    private final LinkedHashMap<Integer, Point> map;
-
-    public LinkedHashMap<Integer, Point> getMap() {
-        return this.map;
-    }
-
-    public Path() {
-        this.map = new LinkedHashMap<>();
-    }
+    private final LinkedHashMap<Integer, Point> linkedHashMap;
 
     public Path(Point end) {
-        this(List.of(end));
+        this.linkedHashMap = new LinkedHashMap<>();
+        this.linkedHashMap.put(end.hashCode(), end);
     }
 
-    public Path(List<Point> vectors) {
-        LinkedHashMap<Integer, Point> linkedHashMap = new LinkedHashMap<>();
-        if (vectors != null) {
-            for (Point vector : vectors) {
-                if (vector != null) {
-                    linkedHashMap.put(vector.hashCode(), vector);
+    public Path(List<Point> points) {
+        this.linkedHashMap = points.stream().collect(Collector.of(
+                (Supplier<LinkedHashMap<Integer, Point>>) LinkedHashMap::new,
+                (map, point) -> map.put(point.hashCode(), point),
+                (map, map2) -> {
+                    map.putAll(map2);
+                    return map;
                 }
-            }
-        }
-        this.map = linkedHashMap;
+        ));
     }
 
     /**
@@ -40,85 +34,40 @@ public class Path implements Iterable<Point> {
      * @param end   {@link Point} representing the last vector of the path
      */
     public Path(Point start, Point end) {
-        LinkedHashMap<Integer, Point> linkedHashMap = new LinkedHashMap<>();
-        if (start == null || end == null) {
-            this.map = linkedHashMap;
-            return;
-        }
-
-        PathType pathType;
-        if (start.equals(end)) {
-            pathType = PathType.CUSTOM;
-        } else {
-            pathType = PathType.fromPoints(start, end);
-        }
-
-        int x = start.getX();
-        int y = start.getY();
-        switch (pathType) {
-            case VERTICAL -> {
-                int diff = end.getY() - start.getY();
-                int dir = diff / Math.abs(diff);
-
-                while (y != end.getY() + dir) {
-                    Point vector = new Point(x, y);
-                    linkedHashMap.put(vector.hashCode(), vector);
-                    y = y + dir;
-                }
+        LinkedHashMap<Integer, Point> map;
+        switch (PathType.fromPoints(start, end)) {
+            case POINT, CUSTOM -> {
+                map = new LinkedHashMap<>();
+                if (start != null)
+                    map.put(start.hashCode(), start);
+                if (end != null)
+                    map.put(end.hashCode(), end);
             }
-            case HORIZONTAL -> {
-                int diff = end.getX() - start.getX();
-                int dir = diff / Math.abs(diff);
+            case VERTICAL, HORIZONTAL, DIAGONAL -> {
+                int x = start.getX();
+                int y = start.getY();
+                int diffX = end.getX() - x;
+                int diffY = end.getY() - y;
+                int dirX = diffX / Math.abs(diffX); // 0 for Vertical
+                int dirY = diffY / Math.abs(diffY); // 0 for Horizontal
 
-                while (x != end.getX() + dir) {
-                    Point vector = new Point(x, y);
-                    linkedHashMap.put(vector.hashCode(), vector);
-                    x = x + dir;
-                }
-            }
-            case DIAGONAL -> {
-                int diffX = end.getX() - start.getX();
-                int diffY = end.getY() - start.getY();
-                int dirX = diffX / Math.abs(diffX);
-                int dirY = diffY / Math.abs(diffY);
-
+                map = new LinkedHashMap<>();
+                // Build the path along the line until an edge is exceeded
                 while (x != end.getX() + dirX && y != end.getY() + dirY) {
                     Point vector = new Point(x, y);
-                    linkedHashMap.put(vector.hashCode(), vector);
+                    map.put(vector.hashCode(), vector);
                     x = x + dirX;
                     y = y + dirY;
                 }
             }
-            case CUSTOM -> {
-                linkedHashMap.put(start.hashCode(), start);
-                linkedHashMap.put(end.hashCode(), end);
-            }
+            default -> map = new LinkedHashMap<>();
         }
-        this.map = linkedHashMap;
-    }
-
-    /**
-     * Iterates through all vectors of this path to count all non-null elements.
-     *
-     * @return int of non-null elements in path
-     */
-    public int size() {
-        if (!this.map.containsValue(null)) {
-            return this.map.size();
-        }
-        // Ignore all incorrectly added null values
-        int size = 0;
-        for (Point vector : this) {
-            if (vector != null) {
-                size++;
-            }
-        }
-        return size;
+        this.linkedHashMap = map;
     }
 
     @Override
     public Iterator<Point> iterator() {
-        return this.map.values().iterator();
+        return this.linkedHashMap.values().iterator();
     }
 
     @Override
@@ -132,7 +81,7 @@ public class Path implements Iterable<Point> {
 
     @Override
     public int hashCode() {
-        int prime = 31;
+        int prime = 63;
         int result = 1;
         for (Point vector : this) {
             result = result * prime + vector.hashCode();
@@ -154,16 +103,26 @@ public class Path implements Iterable<Point> {
     }
 
     private enum PathType {
+        EMPTY,
+        POINT,
         VERTICAL,
         HORIZONTAL,
         DIAGONAL,
         CUSTOM;
 
         public static Path.PathType fromPoints(Point start, Point end) {
+            if (start == null && end == null) {
+                return EMPTY;
+            }
+            if (start == null || end == null) {
+                return POINT;
+            }
+
             int diffX = Math.abs(end.getX() - start.getX());
             int diffY = Math.abs(end.getY() - start.getY());
-
-            if (diffX == 0) {
+            if (diffX == 0 && diffY == 0) {
+                return POINT;
+            } else if (diffX == 0) {
                 return VERTICAL;
             } else if (diffY == 0) {
                 return HORIZONTAL;
