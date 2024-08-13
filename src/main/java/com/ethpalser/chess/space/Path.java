@@ -1,6 +1,5 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.board.CustomBoard;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,27 +114,6 @@ public class Path implements Iterable<Point> {
             }
         }
         return size;
-    }
-
-    /**
-     * Iterates through the path to determine if there is a piece in the path between the start and end.
-     *
-     * @param board {@link CustomBoard} referred to for checking pieces
-     * @return true if no piece is in the middle of the path, false otherwise
-     */
-    public boolean isTraversable(CustomBoard board) {
-        if (board == null) {
-            throw new NullPointerException();
-        }
-        Iterator<Point> iterator = this.iterator();
-        while (iterator.hasNext()) {
-            Point vector = iterator.next();
-            if (board.getPiece(vector) != null && iterator.hasNext()) {
-                // Piece is in the middle of the path
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

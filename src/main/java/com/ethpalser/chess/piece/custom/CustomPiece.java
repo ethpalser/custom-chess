@@ -11,6 +11,7 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -122,7 +123,7 @@ public class CustomPiece implements Piece {
         }
         for (Movement move : this.movements) {
             Path path = move.getPath(this.colour, this.position, destination, board);
-            if (path != null && path.isTraversable(board)
+            if (path != null && this.isTraversable(path, board)
                     && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
                 return move;
             }
@@ -164,6 +165,29 @@ public class CustomPiece implements Piece {
     @Override
     public String toString() {
         return this.type.getCode() + position.toString();
+    }
+
+
+
+    /**
+     * Iterates through the path to determine if there is a piece in the path between the start and end.
+     *
+     * @param board {@link CustomBoard} referred to for checking pieces
+     * @return true if no piece is in the middle of the path, false otherwise
+     */
+    private boolean isTraversable(Path path, CustomBoard board) {
+        if (board == null) {
+            throw new NullPointerException();
+        }
+        Iterator<Point> iterator = path.iterator();
+        while (iterator.hasNext()) {
+            Point vector = iterator.next();
+            if (board.getPiece(vector) != null && iterator.hasNext()) {
+                // Piece is in the middle of the path
+                return false;
+            }
+        }
+        return true;
     }
 
 }
