@@ -2,6 +2,7 @@ package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
@@ -39,8 +40,8 @@ public class ExtraAction {
         if (this.reference == null) {
             return null;
         }
-        CustomPiece customPiece = this.reference.getPieces(board, previousAction).get(0);
-        return new Action(customPiece.getColour(), customPiece.getPosition(), this.destination);
+        Piece customPiece = this.reference.getPieces(board, previousAction).get(0);
+        return new Action(customPiece.getColour(), customPiece.getPoint(), this.destination);
     }
 
 }

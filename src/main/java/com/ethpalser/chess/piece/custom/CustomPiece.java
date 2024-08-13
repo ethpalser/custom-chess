@@ -42,6 +42,7 @@ public class CustomPiece implements Piece {
         this.hasMoved = hasMoved;
     }
 
+    @Deprecated
     public PieceType getType() {
         return this.type;
     }
@@ -101,10 +102,12 @@ public class CustomPiece implements Piece {
     }
 
     // Temporary
+    @Deprecated
     public boolean getHasMoved() {
         return this.hasMoved;
     }
 
+    @Deprecated
     public Point getPosition() {
         return this.position;
     }
@@ -117,6 +120,7 @@ public class CustomPiece implements Piece {
      * @param destination {@link Point} the piece is requested to move to
      * @return Movement if any are valid, otherwise null
      */
+    @Deprecated
     public CustomMove getMovement(CustomBoard board, Point destination) {
         if (board == null || destination == null) {
             throw new NullPointerException();
@@ -131,6 +135,7 @@ public class CustomPiece implements Piece {
         return null;
     }
 
+    @Deprecated
     public Set<Point> getMovementSet(Point location, CustomBoard board) {
         if (location == null) {
             throw new NullPointerException();
@@ -138,6 +143,7 @@ public class CustomPiece implements Piece {
         return this.getMovementSet(location, board, true, true, false, false);
     }
 
+    @Deprecated
     public Set<Point> getMovementSet(Point location, CustomBoard board, boolean includeMove,
             boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
         if (location == null) {

@@ -2,6 +2,7 @@ package com.ethpalser.chess.piece.custom.condition;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ReferenceCondition implements Conditional {
 
     @Override
     public boolean isExpected(CustomBoard board, Action action) {
-        List<CustomPiece> customPieces = this.target.getPieces(board, action);
+        List<Piece> customPieces = this.target.getPieces(board, action);
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {
                 return customPieces == null || customPieces.isEmpty();
@@ -32,16 +33,16 @@ public class ReferenceCondition implements Conditional {
                 return customPieces != null;
             }
             case EQUAL -> {
-                List<CustomPiece> expectedCustomPieces = this.expected.getPieces(board, action);
-                for (CustomPiece customPiece : customPieces) {
+                List<Piece> expectedCustomPieces = this.expected.getPieces(board, action);
+                for (Piece customPiece : customPieces) {
                     if (!expectedCustomPieces.contains(customPiece))
                         return false;
                 }
                 return true;
             }
             case NOT_EQUAL -> {
-                List<CustomPiece> expectedCustomPieces = this.expected.getPieces(board, action);
-                for (CustomPiece customPiece : customPieces) {
+                List<Piece> expectedCustomPieces = this.expected.getPieces(board, action);
+                for (Piece customPiece : customPieces) {
                     if (!expectedCustomPieces.contains(customPiece))
                         return true;
                 }

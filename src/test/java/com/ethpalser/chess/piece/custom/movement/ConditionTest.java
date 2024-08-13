@@ -1,6 +1,7 @@
 package com.ethpalser.chess.piece.custom.movement;
 
 import com.ethpalser.chess.board.CustomBoard;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Colour;
@@ -59,8 +60,8 @@ class ConditionTest {
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
         CustomBoard board = new CustomBoard();
-        CustomPiece customPiece = board.getPiece(2, 1);
-        board.setPiece(new Point(2, 2), customPiece);
+        Piece customPiece = board.getPiece(2, 1);
+        board.addPiece(new Point(2, 2), customPiece);
 
         // When
         Point selected = new Point(4, 1);
@@ -77,8 +78,8 @@ class ConditionTest {
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
         CustomBoard board = new CustomBoard();
-        CustomPiece customPiece = board.getPiece(2, 1);
-        board.setPiece(new Point(2, 3), customPiece);
+        Piece customPiece = board.getPiece(2, 1);
+        board.addPiece(new Point(2, 3), customPiece);
 
         // When
         Point selected = new Point(4, 1);
@@ -115,10 +116,10 @@ class ConditionTest {
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         CustomBoard board = new CustomBoard();
-        CustomPiece white = board.getPiece(4, 1);
-        board.setPiece(new Point(4, 4), white);
-        CustomPiece black = board.getPiece(5, 6);
-        board.setPiece(new Point(5, 4), black);
+        Piece white = board.getPiece(4, 1);
+        board.addPiece(new Point(4, 4), white);
+        Piece black = board.getPiece(5, 6);
+        board.addPiece(new Point(5, 4), black);
         board.setLastMoved(black);
 
         // When
@@ -153,9 +154,9 @@ class ConditionTest {
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         CustomBoard board = new CustomBoard();
-        board.setPiece(new Point(4, 1), null);
-        CustomPiece king = board.getPiece(4, 0);
-        board.setPiece(new Point(4, 1), king);
+        board.addPiece(new Point(4, 1), null);
+        Piece king = board.getPiece(4, 0);
+        board.addPiece(new Point(4, 1), king);
 
         // When
         Point selected = new Point(4, 1);
@@ -172,10 +173,10 @@ class ConditionTest {
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         CustomBoard board = new CustomBoard();
-        CustomPiece rook = board.getPiece(0, 0);
+        Piece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
-        board.setPiece(new Point(0, 2), rook);
-        board.setPiece(new Point(0, 0), rook);
+        board.addPiece(new Point(0, 2), rook);
+        board.addPiece(new Point(0, 0), rook);
 
         // When
         Point selected = new Point(4, 0);
@@ -211,9 +212,9 @@ class ConditionTest {
                 Comparator.DOES_NOT_EXIST);
 
         CustomBoard board = new CustomBoard();
-        board.setPiece(new Point(1, 0), null);
-        board.setPiece(new Point(2, 0), null);
-        board.setPiece(new Point(3, 0), null);
+        board.addPiece(new Point(1, 0), null);
+        board.addPiece(new Point(2, 0), null);
+        board.addPiece(new Point(3, 0), null);
 
         // When
         Point selected = new Point(4, 0);

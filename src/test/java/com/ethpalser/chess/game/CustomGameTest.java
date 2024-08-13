@@ -134,7 +134,7 @@ class CustomGameTest {
         Point target = new Point(nextX, nextY); // Black Pawn
         CustomGame customGame = new CustomGame();
         CustomBoard board = customGame.getBoard();
-        board.setPiece(new Point(0, 1), null); // Can be sufficient for path checks
+        board.addPiece(new Point(0, 1), null); // Can be sufficient for path checks
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -181,7 +181,7 @@ class CustomGameTest {
         Point target = new Point(nextX, nextY); // Empty
         CustomGame customGame = new CustomGame();
         CustomBoard board = customGame.getBoard();
-        board.setPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
+        board.addPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -201,8 +201,8 @@ class CustomGameTest {
         Point target = new Point(6, 0);
         CustomGame customGame = new CustomGame();
         CustomBoard board = customGame.getBoard();
-        board.setPiece(new Point(5, 0), null);
-        board.setPiece(new Point(6, 0), null);
+        board.addPiece(new Point(5, 0), null);
+        board.addPiece(new Point(6, 0), null);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -223,9 +223,9 @@ class CustomGameTest {
         Point target = new Point(2, 0);
         CustomGame customGame = new CustomGame();
         CustomBoard board = customGame.getBoard();
-        board.setPiece(new Point(1, 0), null);
-        board.setPiece(new Point(2, 0), null);
-        board.setPiece(new Point(3, 0), null);
+        board.addPiece(new Point(1, 0), null);
+        board.addPiece(new Point(2, 0), null);
+        board.addPiece(new Point(3, 0), null);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);

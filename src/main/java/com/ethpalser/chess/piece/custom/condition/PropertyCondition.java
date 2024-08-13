@@ -2,6 +2,7 @@ package com.ethpalser.chess.piece.custom.condition;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 public class PropertyCondition implements Conditional {
 
     private final Reference reference;
-    private final Property<CustomPiece> property;
+    private final Property<Piece> property;
     private final Comparator comparator;
     private final Object expected;
 
@@ -17,7 +18,7 @@ public class PropertyCondition implements Conditional {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(Reference reference, Comparator comparator, Property<CustomPiece> property,
+    public PropertyCondition(Reference reference, Comparator comparator, Property<Piece> property,
             Object expected) {
         if (reference == null || comparator == null) {
             throw new NullPointerException();
@@ -33,10 +34,10 @@ public class PropertyCondition implements Conditional {
 
     @Override
     public boolean isExpected(CustomBoard board, Action action) {
-        List<CustomPiece> list = this.reference.getPieces(board, action);
+        List<Piece> list = this.reference.getPieces(board, action);
 
         boolean hasPiece = false;
-        for (CustomPiece customPiece : list) {
+        for (Piece customPiece : list) {
             if (customPiece == null) {
                 continue;
             }

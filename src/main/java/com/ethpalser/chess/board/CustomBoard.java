@@ -2,6 +2,7 @@ package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,23 +22,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CustomBoard {
+public class CustomBoard implements Board {
 
     private final int length;
     private final int width;
-    private final Plane<CustomPiece> pieceMap;
+    private final Plane<Piece> pieceMap;
     private final Map<Point, Set<CustomPiece>> wThreats;
     private final Map<Point, Set<CustomPiece>> bThreats;
     private Point wKing;
     private Point bKing;
     private boolean wCheck;
     private boolean bCheck;
-    private CustomPiece lastMoved;
+    private Piece lastMoved;
 
     public CustomBoard() {
         this.length = 8;
         this.width = 8;
-        Plane<CustomPiece> map = new Plane<>();
+        Plane<Piece> map = new Plane<>();
         map.putAll(this.generatePiecesInRank(0));
         map.putAll(this.generatePiecesInRank(1));
         map.putAll(this.generatePiecesInRank(this.length - 2));
@@ -47,7 +49,7 @@ public class CustomBoard {
         Map<Point, Set<CustomPiece>> wThreatMap = new HashMap<>();
         Map<Point, Set<CustomPiece>> bThreatMap = new HashMap<>();
         for (Point v : map.keySet()) {
-            CustomPiece p = this.getPiece(v);
+            CustomPiece p = (CustomPiece) this.getPiece(v);
             Set<Point> pMoves = p.getMovementSet(v, this, false, true, true, false);
             for (Point m : pMoves) {
                 if (Colour.WHITE.equals(p.getColour())) {
@@ -67,7 +69,7 @@ public class CustomBoard {
     public CustomBoard(List<String> pieces) {
         this.length = 8;
         this.width = 8;
-        Plane<CustomPiece> map = new Plane<>();
+        Plane<Piece> map = new Plane<>();
         CustomPieceFactory pf = CustomPieceFactory.getInstance();
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);
@@ -83,7 +85,7 @@ public class CustomBoard {
         Map<Point, Set<CustomPiece>> wThreatMap = new HashMap<>();
         Map<Point, Set<CustomPiece>> bThreatMap = new HashMap<>();
         for (Point v : map.keySet()) {
-            CustomPiece p = this.getPiece(v);
+            CustomPiece p = (CustomPiece) this.getPiece(v);
             Set<Point> pMoves = p.getMovementSet(v, this, false, true, true, false);
             for (Point m : pMoves) {
                 if (Colour.WHITE.equals(p.getColour())) {
@@ -129,10 +131,10 @@ public class CustomBoard {
     }
 
     public int count() {
-        Collection<CustomPiece> customPieces = this.pieceMap.values();
+        Collection<Piece> pieces = this.pieceMap.values();
         int count = 0;
-        for (CustomPiece customPiece : customPieces) {
-            if (customPiece != null)
+        for (Piece p : pieces) {
+            if (p != null)
                 count++;
         }
         return count;
@@ -146,63 +148,64 @@ public class CustomBoard {
         return this.width;
     }
 
-    public CustomPiece getPiece(int x, int y) {
+    public Piece getPiece(int x, int y) {
         if (x < 0 || x > this.width - 1 || y < 0 || y > this.length - 1) {
             return null;
         }
         return pieceMap.get(new Point(x, y));
     }
 
-    public CustomPiece getPiece(Point vector) {
+    public Piece getPiece(Point vector) {
         if (vector == null) {
             return null;
         }
         return pieceMap.get(vector);
     }
 
-    public void setPiece(Point vector, CustomPiece customPiece) {
-        if (vector == null) {
+    public void addPiece(Point point, Piece piece) {
+        if (point == null) {
             throw new NullPointerException();
         }
-        if (customPiece == null) {
-            this.pieceMap.remove(vector);
+        if (piece == null) {
+            this.pieceMap.remove(point);
         } else {
-            this.pieceMap.remove(customPiece.getPosition());
-            this.pieceMap.put(vector, customPiece);
-            customPiece.move(vector);
+            this.pieceMap.remove(piece.getPoint());
+            this.pieceMap.put(point, piece);
+            piece.move(point);
             // Update the king position if it moved
-            if (customPiece.getType().equals(PieceType.KING)) {
-                if (customPiece.getColour().equals(Colour.WHITE)) {
-                    this.wKing = vector;
+            if (PieceType.KING.getCode().equals(piece.getCode())) {
+                if (piece.getColour().equals(Colour.WHITE)) {
+                    this.wKing = point;
                 } else {
-                    this.bKing = vector;
+                    this.bKing = point;
                 }
             }
         }
     }
 
-    public List<CustomPiece> getPieces() {
-        List<CustomPiece> list = new ArrayList<>(32);
-        this.pieceMap.values().stream().filter(Objects::nonNull).forEach(list::add);
-        return list;
+    public Plane<Piece> getPieces() {
+        return pieceMap;
     }
 
-    public List<CustomPiece> getPieces(Path path) {
+    public List<Piece> getPieces(Path path) {
+        List<Piece> customPieceList = new LinkedList<>();
         if (path == null) {
-            return this.getPieces();
+            for (Piece piece : pieceMap) {
+                customPieceList.add(piece);
+            }
+            return customPieceList;
         }
-        List<CustomPiece> customPieceList = new LinkedList<>();
         for (Point vector : path) {
             customPieceList.add(this.getPiece(vector));
         }
         return customPieceList;
     }
 
-    public CustomPiece getLastMoved() {
+    public Piece getLastMoved() {
         return lastMoved;
     }
 
-    public void setLastMoved(CustomPiece customPiece) {
+    public void setLastMoved(Piece customPiece) {
         this.lastMoved = customPiece;
     }
 
@@ -217,7 +220,7 @@ public class CustomBoard {
         }
     }
 
-    public CustomPiece getKing(Colour colour) {
+    public Piece getKing(Colour colour) {
         if (colour == null) {
             throw new NullPointerException();
         }
@@ -228,30 +231,35 @@ public class CustomBoard {
         if (start == null || end == null) {
             throw new NullPointerException();
         }
-        CustomPiece pMoved = this.getPiece(start);
-        CustomPiece pCaptured = this.getPiece(end);
-        this.setPiece(end, pMoved);
+        Piece pMoved = this.getPiece(start);
+        Piece pCaptured = this.getPiece(end);
+        this.addPiece(end, pMoved);
 
         if (pCaptured != null) {
-            this.updatePieceThreats(pCaptured, end, null);
+            this.updatePieceThreats((CustomPiece) pCaptured, end, null);
         }
         this.updateLocationThreats(start);
         // Check if piece is pinned
         if ((pMoved.getColour().equals(Colour.WHITE) && this.isKingInCheck(Colour.WHITE))
                 || (!pMoved.getColour().equals(Colour.WHITE) && this.isKingInCheck(Colour.BLACK))) {
             // Undo move and threats
-            this.setPiece(start, pMoved);
-            this.setPiece(end, pCaptured);
+            this.addPiece(start, pMoved);
+            this.addPiece(end, pCaptured);
             if (pCaptured != null)
-                this.updatePieceThreats(pCaptured, null, end);
+                this.updatePieceThreats((CustomPiece) pCaptured, null, end);
             this.updateLocationThreats(start);
             throw new IllegalActionException("Cannot move piece at " + start + " as player's king will be in check.");
         }
-        this.updatePieceThreats(pMoved, start, end);
+        this.updatePieceThreats((CustomPiece) pMoved, start, end);
         this.updateLocationThreats(end);
         this.bCheck = pMoved.getColour().equals(Colour.WHITE) && isKingInCheck(Colour.BLACK);
         this.wCheck = pMoved.getColour().equals(Colour.BLACK) && isKingInCheck(Colour.WHITE);
-        this.setLastMoved(pMoved);
+        this.setLastMoved((CustomPiece) pMoved);
+    }
+
+    @Override
+    public boolean isInBounds(int x, int y) {
+        return false;
     }
 
     private void updatePieceThreats(CustomPiece moving, Point start, Point end) {
@@ -373,15 +381,15 @@ public class CustomBoard {
         StringBuilder sb = new StringBuilder();
         for (int y = this.length - 1; y >= 0; y--) {
             for (int x = 0; x <= this.width - 1; x++) {
-                CustomPiece customPiece = getPiece(x, y);
+                Piece customPiece = getPiece(x, y);
                 if (customPiece == null) {
                     sb.append("|   ");
                 } else {
                     sb.append("| ");
-                    if (PieceType.PAWN.equals(customPiece.getType())) {
+                    if (PieceType.PAWN.getCode().equals(customPiece.getCode())) {
                         sb.append("P ");
                     } else {
-                        sb.append(customPiece.getType().getCode()).append(" ");
+                        sb.append(customPiece.getCode()).append(" ");
                     }
                 }
             }

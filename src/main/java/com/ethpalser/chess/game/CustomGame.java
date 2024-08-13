@@ -1,6 +1,8 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.CustomBoard;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
@@ -8,6 +10,7 @@ import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.custom.movement.CustomMove;
 import com.ethpalser.chess.space.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -72,7 +75,7 @@ public class CustomGame {
             throw new IndexOutOfBoundsException("Vector arguments out of board bounds.");
         }
 
-        CustomPiece toMove = this.getPieceToMove(player, start);
+        CustomPiece toMove = (CustomPiece) this.getPieceToMove(player, start);
         this.verifyDestination(toMove, end);
         CustomMove customMove = toMove.getMovement(this.board, end);
         if (customMove == null) {
@@ -88,11 +91,11 @@ public class CustomGame {
         this.turn = turn.equals(Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
     }
 
-    private CustomPiece getPieceToMove(Colour player, Point start) {
+    private Piece getPieceToMove(Colour player, Point start) {
         if (player == null || start == null) {
             throw new NullPointerException();
         }
-        CustomPiece customPiece = this.board.getPiece(start);
+        Piece customPiece = this.board.getPiece(start);
         if (customPiece == null) {
             throw new IllegalActionException("The piece at " + start + " does not exist.");
         } else if (!player.equals(customPiece.getColour())) {
@@ -105,7 +108,7 @@ public class CustomGame {
         if (selected == null || end == null) {
             throw new NullPointerException();
         }
-        CustomPiece destination = this.board.getPiece(end);
+        Piece destination = this.board.getPiece(end);
         if (selected.getPosition().equals(end)) {
             throw new IllegalActionException("The destination " + end + " is the selected piece's current location.");
         } else if (destination != null && selected.getColour().equals(destination.getColour())) {
@@ -122,13 +125,13 @@ public class CustomGame {
         // If the movement has an extra action, perform it
         if (customMove.getExtraAction() != null) {
             Action action = customMove.getExtraAction().getAction(this.board, new Action(player, start, end));
-            CustomPiece toForceMove = this.board.getPiece(action.getStart());
+            Piece toForceMove = this.board.getPiece(action.getStart());
             if (toForceMove != null) {
                 if (action.getEnd() != null) {
-                    this.board.setPiece(action.getEnd(), toForceMove);
+                    this.board.addPiece(action.getEnd(), toForceMove);
                 }
                 // Remove this piece from its original location. If it did not move the intent is to capture it.
-                this.board.setPiece(action.getStart(), null);
+                this.board.addPiece(action.getStart(), null);
             }
         }
     }
@@ -137,7 +140,7 @@ public class CustomGame {
         if (!this.board.getKingCheck(this.getTurnOppColour())) {
             return false;
         }
-        CustomPiece king = this.board.getKing(this.getTurnOppColour());
+        CustomPiece king = (CustomPiece) this.board.getKing(this.getTurnOppColour());
         Set<Point> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
             for (Point v : kingMoves) {
@@ -178,12 +181,12 @@ public class CustomGame {
     }
 
     private boolean isStalemate() {
-        List<CustomPiece> allCustomPieces = this.board.getPieces();
+        Plane<Piece> allCustomPieces = this.board.getPieces();
         if (allCustomPieces.size() <= 2) {
             return true;
         }
 
-        CustomPiece king = this.board.getKing(this.getTurnOppColour());
+        CustomPiece king = (CustomPiece) this.board.getKing(this.getTurnOppColour());
         Set<Point> kingMoves = king.getMovementSet(king.getPosition(), this.getBoard());
         if (!kingMoves.isEmpty()) {
             for (Point v : kingMoves) {
@@ -194,9 +197,12 @@ public class CustomGame {
             }
         }
 
-        List<CustomPiece> playerCustomPieces =
-                allCustomPieces.stream().filter(p -> this.getTurnOppColour().equals(p.getColour())
-                && !p.getType().equals(PieceType.KING)).collect(Collectors.toList());
+        List<CustomPiece> playerCustomPieces = new ArrayList<>();
+        for (Piece p : allCustomPieces) {
+            if (this.getTurnOppColour().equals(p.getColour()) && !PieceType.KING.getCode().equals(p.getCode())) {
+                playerCustomPieces.add((CustomPiece) p);
+            }
+        }
         for (CustomPiece p : playerCustomPieces) {
             Set<Point> moves = p.getMovementSet(p.getPosition(), board);
             if (!moves.isEmpty()) {

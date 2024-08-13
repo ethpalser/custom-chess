@@ -3,6 +3,7 @@ package com.ethpalser.chess.piece.custom.movement;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.custom.condition.Conditional;
@@ -282,9 +283,9 @@ public class CustomMove {
             return false;
         }
         if (board != null) {
-            CustomPiece p = board.getPiece(vector);
+            Piece p = board.getPiece(vector);
             if (p != null) {
-                return withDefend || !colour.equals(p.getColour()) || PieceType.KING.equals(p.getType()) && ignoreKing;
+                return withDefend || !colour.equals(p.getColour()) || PieceType.KING.getCode().equals(p.getCode()) && ignoreKing;
             } else {
                 return true;
             }
@@ -299,8 +300,8 @@ public class CustomMove {
         if (!vector.isValidLocation(vector) || board == null) {
             return false;
         }
-        CustomPiece customPiece = board.getPiece(vector);
-        return customPiece != null && !(PieceType.KING.equals(customPiece.getType()) && ignoreKing);
+        Piece customPiece = board.getPiece(vector);
+        return customPiece != null && !(PieceType.KING.getCode().equals(customPiece.getCode()) && ignoreKing);
     }
 
     /**
@@ -314,8 +315,8 @@ public class CustomMove {
         if (board == null || action == null) {
             throw new NullPointerException();
         }
-        CustomPiece pStart = board.getPiece(action.getStart());
-        CustomPiece pEnd = board.getPiece(action.getEnd());
+        Piece pStart = board.getPiece(action.getStart());
+        Piece pEnd = board.getPiece(action.getEnd());
         if (!this.isAttack && this.isMove && pEnd != null) {
             return false;
         }
