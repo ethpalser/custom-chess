@@ -1,7 +1,9 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
+import com.ethpalser.chess.board.StandardBoard;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
@@ -19,16 +21,18 @@ class CustomGameTest {
         int nextY = 3;
         Point pieceC = new Point(pieceX, pieceY); // Nothing at location
         Point nextC = new Point(nextX, nextY);
-        CustomGame customGame = new CustomGame();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
+
+        Action action = new Action(Colour.WHITE, pieceC, nextC);
 
         // When
-        Action action = new Action(Colour.WHITE, pieceC, nextC);
-        assertThrows(IllegalActionException.class, () -> customGame.executeAction(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
-        CustomBoard board = customGame.getBoard();
         assertNull(board.getPiece(pieceX, pieceY));
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -40,16 +44,17 @@ class CustomGameTest {
         int nextY = 0;
         Point pieceC = new Point(pieceX, pieceY); // White Knight
         Point nextC = new Point(nextX, nextY);
-        CustomGame customGame = new CustomGame();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, nextC);
-        assertThrows(IllegalActionException.class, () -> customGame.executeAction(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
-        CustomBoard board = customGame.getBoard();
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -61,16 +66,17 @@ class CustomGameTest {
         int nextY = -2;
         Point pieceC = new Point(pieceX, pieceY); // White Knight
         Point invalid = new Point(nextX, nextY);
-        CustomGame customGame = new CustomGame();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, invalid);
-        assertThrows(IndexOutOfBoundsException.class, () -> customGame.executeAction(action));
+        assertThrows(IndexOutOfBoundsException.class, () -> game.updateGame(action));
 
         // Then
-        CustomBoard board = customGame.getBoard();
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -82,21 +88,22 @@ class CustomGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Knight
         Point target = new Point(nextX, nextY); // White Pawn
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         board.movePiece(new Point(nextX, 1), new Point(nextX, nextY)); // Filler
         board.movePiece(new Point(0, 6), new Point(0, 5)); // Filler
 
+        ChessGame game = new ChessGame(board);
+
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> customGame.executeAction(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
         assertEquals(Colour.WHITE, board.getPiece(target).getColour());
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -108,19 +115,20 @@ class CustomGameTest {
         int nextY = 6;
         Point source = new Point(pieceX, pieceY); // White Rook
         Point target = new Point(nextX, nextY); // Black Pawn
-        CustomGame customGame = new CustomGame();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> customGame.executeAction(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
-        CustomBoard board = customGame.getBoard();
         assertNotNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
         assertEquals(Colour.BLACK, board.getPiece(target).getColour());
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -132,19 +140,20 @@ class CustomGameTest {
         int nextY = 6;
         Point source = new Point(pieceX, pieceY); // White Rook
         Point target = new Point(nextX, nextY); // Black Pawn
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
         board.addPiece(new Point(0, 1), null); // Can be sufficient for path checks
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        customGame.executeAction(action);
+        game.updateGame(action);
 
         // Then
         assertNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(target).getColour());
-        assertEquals(30, board.count()); // Two fewer pieces due to forced removal and capture
+        assertEquals(30, board.getPieces().size()); // Two fewer pieces due to forced removal and capture
     }
 
     @Test
@@ -156,18 +165,19 @@ class CustomGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Bishop
         Point target = new Point(nextX, nextY); // Empty
-        CustomGame customGame = new CustomGame();
+        Board board = new StandardBoard();
+
+        ChessGame game = new ChessGame(board);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> customGame.executeAction(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
-        CustomBoard board = customGame.getBoard();
         assertNotNull(board.getPiece(source));
         assertEquals(Colour.WHITE, board.getPiece(source).getColour());
         assertNull(board.getPiece(target));
-        assertEquals(32, board.count());
+        assertEquals(32, board.getPieces().size());
     }
 
     @Test
@@ -179,19 +189,20 @@ class CustomGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Bishop
         Point target = new Point(nextX, nextY); // Empty
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         board.addPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
+
+        ChessGame game = new ChessGame(board);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        customGame.executeAction(action);
+        game.updateGame(action);
 
         // Then
-        assertNull(customGame.getBoard().getPiece(source));
+        assertNull(board.getPiece(source));
         assertNotNull(board.getPiece(target));
         assertEquals(Colour.WHITE, board.getPiece(target).getColour());
-        assertEquals(31, board.count()); // One fewer piece from forced removal
+        assertEquals(31, board.getPieces().size()); // One fewer piece from forced removal
     }
 
     @Test
@@ -199,14 +210,15 @@ class CustomGameTest {
         // Given
         Point source = new Point(4, 0);
         Point target = new Point(6, 0);
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         board.addPiece(new Point(5, 0), null);
         board.addPiece(new Point(6, 0), null);
 
+        ChessGame game = new ChessGame(board);
+
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        customGame.executeAction(action);
+        game.updateGame(action);
 
         // Then
         assertNull(board.getPiece(4, 0));
@@ -221,15 +233,17 @@ class CustomGameTest {
         // Given
         Point source = new Point(4, 0);
         Point target = new Point(2, 0);
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         board.addPiece(new Point(1, 0), null);
         board.addPiece(new Point(2, 0), null);
         board.addPiece(new Point(3, 0), null);
 
+
+        ChessGame game = new ChessGame(board);
+
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        customGame.executeAction(action);
+        game.updateGame(action);
 
         // Then
         assertNull(board.getPiece(4, 0));
@@ -243,8 +257,7 @@ class CustomGameTest {
         // Given
         Point source = new Point(4, 6);
         Point target = new Point(4, 4);
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         // White move
         board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
@@ -254,9 +267,11 @@ class CustomGameTest {
         // Black move
         board.movePiece(source, target);
 
+        ChessGame game = new ChessGame(board);
+
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
-        customGame.executeAction(action); // En Passant
+        game.updateGame(action); // En Passant
 
         // Then
         assertNull(board.getPiece(3, 4));
@@ -269,8 +284,7 @@ class CustomGameTest {
         // Given
         Point source = new Point(2, 6);
         Point target = new Point(2, 4);
-        CustomGame customGame = new CustomGame();
-        CustomBoard board = customGame.getBoard();
+        Board board = new StandardBoard();
         // White move
         board.movePiece(new Point(3, 1), new Point(3, 3));
         // Black move (filler)
@@ -280,9 +294,11 @@ class CustomGameTest {
         // Black move
         board.movePiece(source, target);
 
+        ChessGame game = new ChessGame(board);
+
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));
-        customGame.executeAction(action); // En Passant
+        game.updateGame(action); // En Passant
 
         // Then
         assertNull(board.getPiece(3, 4));
@@ -294,37 +310,37 @@ class CustomGameTest {
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
         CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanMove);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
+        assertEquals(GameStatus.ONGOING, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
         CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanCapture);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
+        assertEquals(GameStatus.ONGOING, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
         CustomBoard board = new CustomBoard(BoardTestCases.inProgressNotOnlyKings);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '2'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
+        assertEquals(GameStatus.ONGOING, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     // endregion
@@ -333,37 +349,37 @@ class CustomGameTest {
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
         CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotMove);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertTrue(customGame.isComplete());
+        assertEquals(GameStatus.STALEMATE, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
         CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotCapture);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertTrue(customGame.isComplete());
+        assertEquals(GameStatus.STALEMATE, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
         CustomBoard board = new CustomBoard(BoardTestCases.stalemateOnlyKings);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('e', '1'), new Point('e', '2'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertTrue(customGame.isComplete());
+        assertEquals(GameStatus.STALEMATE, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
 
     // endregion
@@ -371,40 +387,37 @@ class CustomGameTest {
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanCapture);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
-        assertTrue(customGame.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.BLACK_IN_CHECK, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanBlock);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
-        assertTrue(customGame.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.BLACK_IN_CHECK, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkKingCanMove);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertNull(customGame.getWinner());
-        assertFalse(customGame.isComplete());
-        assertTrue(customGame.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.BLACK_IN_CHECK, status);
+        assertFalse(GameStatus.isCompletedGameStatus(status));
     }
 
     // endregion
@@ -412,40 +425,37 @@ class CustomGameTest {
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotCapture);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertEquals(Colour.WHITE, customGame.getWinner());
-        assertTrue(customGame.isComplete());
-        assertTrue(customGame.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.WHITE_WIN, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotBlock);
-        CustomGame customGame = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
-        customGame.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertEquals(Colour.WHITE, customGame.getWinner());
-        assertTrue(customGame.isComplete());
-        assertTrue(customGame.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.WHITE_WIN, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
 
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkmateKingCannotMove);
-        CustomGame game = new CustomGame(board, Colour.WHITE);
+        ChessGame game = new ChessGame(new StandardBoard());
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
-        game.executeAction(action);
+        GameStatus status = game.updateGame(action);
         // Then
-        assertEquals(Colour.WHITE, game.getWinner());
-        assertTrue(game.isComplete());
-        assertTrue(game.getBoard().getKingCheck(Colour.BLACK));
+        assertEquals(GameStatus.WHITE_WIN, status);
+        assertTrue(GameStatus.isCompletedGameStatus(status));
     }
     // endregion
 
