@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom.reference;
+package com.ethpalser.chess.space.reference;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;

@@ -3,7 +3,7 @@ package com.ethpalser.chess.move.custom;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.reference.Reference;
+import com.ethpalser.chess.space.reference.Reference;
 import com.ethpalser.chess.space.Point;
 
 /**
