@@ -29,11 +29,6 @@ public class Move {
         this.followUpMove = followUpMove;
     }
 
-    @Deprecated(since = "2024-08-12")
-    public Point getPoint() {
-        return null;
-    }
-
     public Path getPath() {
         return this.path;
     }
