@@ -1,5 +1,7 @@
 package com.ethpalser.chess.piece.custom.movement;
 
+import com.ethpalser.chess.move.custom.CustomMove;
+import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;

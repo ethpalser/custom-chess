@@ -1,9 +1,8 @@
-package com.ethpalser.chess.piece.custom.condition;
+package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.reference.Reference;
 import java.util.List;
 

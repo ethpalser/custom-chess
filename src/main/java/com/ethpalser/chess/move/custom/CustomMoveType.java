@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom.movement;
+package com.ethpalser.chess.move.custom;
 
 public enum CustomMoveType {
     JUMP,

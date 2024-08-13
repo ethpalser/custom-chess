@@ -6,7 +6,7 @@ import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.movement.CustomMove;
+import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
