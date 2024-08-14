@@ -49,6 +49,10 @@ public class StandardBoard implements Board {
     public void movePiece(Point start, Point end) {
         Piece piece = this.piecesOnBoard.get(start);
         Move move = piece.getMoves(this, null, null).getMove(end);
+        if (move == null) {
+            throw new IllegalActionException("this piece cannot move to " + end);
+        }
+
         this.piecesOnBoard.remove(start);
         this.piecesOnBoard.put(end, piece);
         piece.move(end);
