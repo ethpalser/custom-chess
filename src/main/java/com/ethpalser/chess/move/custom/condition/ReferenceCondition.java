@@ -3,16 +3,16 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.reference.RelativeReference;
+import com.ethpalser.chess.space.reference.PathReference;
 import java.util.List;
 
 public class ReferenceCondition implements Conditional {
 
-    private final RelativeReference<Piece> target;
+    private final PathReference<Piece> target;
     private final Comparator comparator;
-    private final RelativeReference<Piece> expected;
+    private final PathReference<Piece> expected;
 
-    public ReferenceCondition(RelativeReference<Piece> target, Comparator comparator, RelativeReference<Piece> expected) {
+    public ReferenceCondition(PathReference<Piece> target, Comparator comparator, PathReference<Piece> expected) {
         if (expected == null && !Comparator.canReferenceSelf(comparator)) {
             throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
         }
@@ -23,6 +23,7 @@ public class ReferenceCondition implements Conditional {
 
     @Override
     public boolean isExpected(CustomBoard board, Action action) {
+        // todo: update to use action
         List<Piece> customPieces = this.target.getReferences(board.getPieces());
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {

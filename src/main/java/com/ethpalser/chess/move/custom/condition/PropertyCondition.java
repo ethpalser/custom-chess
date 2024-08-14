@@ -3,21 +3,21 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.reference.RelativeReference;
+import com.ethpalser.chess.space.reference.PathReference;
 import java.util.List;
 
 public class PropertyCondition implements Conditional {
 
-    private final RelativeReference<Piece> reference;
+    private final PathReference<Piece> reference;
     private final Property<Piece> property;
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition(RelativeReference<Piece> reference, Comparator comparator) {
+    public PropertyCondition(PathReference<Piece> reference, Comparator comparator) {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(RelativeReference<Piece> reference, Comparator comparator, Property<Piece> property,
+    public PropertyCondition(PathReference<Piece> reference, Comparator comparator, Property<Piece> property,
             Object expected) {
         if (reference == null || comparator == null) {
             throw new NullPointerException();
