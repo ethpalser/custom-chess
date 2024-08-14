@@ -2,6 +2,8 @@ package com.ethpalser.chess.space.reference;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.StandardBoard;
+import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
@@ -38,6 +40,29 @@ class ReferenceTest {
         // Then
         assertFalse(reference.getReferences(board.getPieces()).isEmpty());
         assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(4, 3)));
+    }
+
+    @Test
+    void logRef_getReferences_givenNoMoves_thenIsEmpty() {
+        Board board = new StandardBoard();
+        ChessLog log = new ChessLog();
+
+        Reference<Piece> ref = new LogReference<>(log);
+
+        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+    }
+
+    @Test
+    void logRef_getReferences_givenAtLeastOneMove_thenIsNotEmpty() {
+        Board board = new StandardBoard();
+        ChessLog log = new ChessLog();
+        log.add(new ChessLogEntry(new Point(4, 1), new Point(4, 3),
+                board.getPiece(4, 1), board.getPiece(4, 3)));
+
+        Piece lastMoved = log.peek().getStartObject();
+        Reference<Piece> ref = new LogReference<>(log);
+
+        assertTrue(ref.getReferences(board.getPieces()).contains(lastMoved));
     }
 
     @Test
