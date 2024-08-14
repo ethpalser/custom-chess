@@ -43,7 +43,7 @@ public class Pawn implements Piece {
     @Override
     public MoveSet getMoves(Board board, Log<Point, Piece> log) {
         Set<Point> set = new HashSet<>();
-        int nextY = this.colour == Colour.WHITE ? 1 : -1;
+        int nextY = this.colour == Colour.WHITE ? this.point.getY() + 1 : this.point.getY() -1;
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY));
         set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY));
         set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, 1, nextY));
@@ -52,6 +52,7 @@ public class Pawn implements Piece {
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
+            System.out.println("adding advance two");
             moveSet.addMove(new Move(new Path(
                     Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY),
                     Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY * 2)
