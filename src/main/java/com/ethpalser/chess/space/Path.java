@@ -54,8 +54,8 @@ public class Path implements Iterable<Point> {
                 int y = start.getY();
                 int diffX = end.getX() - x;
                 int diffY = end.getY() - y;
-                int dirX = diffX / Math.abs(diffX); // 0 for Vertical
-                int dirY = diffY / Math.abs(diffY); // 0 for Horizontal
+                int dirX = diffX == 0 ? 0 : diffX / Math.abs(diffX); // 0 for Vertical
+                int dirY = diffY == 0 ? 0 : diffY / Math.abs(diffY); // 0 for Horizontal
 
                 set = new LinkedHashSet<>();
                 // Build the path along the line until an edge is exceeded
