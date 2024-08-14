@@ -1,5 +1,6 @@
 package com.ethpalser.chess.board;
 
+import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -47,6 +48,7 @@ public class StandardBoard implements Board {
     @Override
     public void movePiece(Point start, Point end) {
         Piece piece = this.piecesOnBoard.get(start);
+        Move move = piece.getMoves(this, null, null).getMove(end);
         this.piecesOnBoard.remove(start);
         this.piecesOnBoard.put(end, piece);
         piece.move(end);
@@ -62,8 +64,8 @@ public class StandardBoard implements Board {
 
     @Override
     public boolean isInBounds(int x, int y) {
-        return x > this.piecesOnBoard.getMaxX() || this.piecesOnBoard.getMinX() > x
-                || y > this.piecesOnBoard.getMaxY() || this.piecesOnBoard.getMinY() > y;
+        return this.piecesOnBoard.getMinX() <= x && x <= this.piecesOnBoard.getMaxX()
+                && this.piecesOnBoard.getMinY() <= y && y <= this.piecesOnBoard.getMaxY();
     }
 
     @Override
