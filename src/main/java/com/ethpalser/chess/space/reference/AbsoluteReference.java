@@ -1,6 +1,7 @@
 package com.ethpalser.chess.space.reference;
 
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -29,6 +30,10 @@ public class AbsoluteReference<T> implements Reference<T> {
 
     @Override
     public List<T> getReferences(Plane<T> plane) {
-        return List.of(plane.get(this.point.shift(this.colour, this.direction)));
+        T ref = plane.get(this.point.shift(this.colour, this.direction));
+        if (ref == null) {
+            return List.of();
+        }
+        return List.of(ref);
     }
 }
