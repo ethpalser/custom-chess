@@ -50,4 +50,12 @@ public class Move {
         // FollowUp is irrelevant when used in a HashSet, as there cannot be overlap with paths
         return Objects.hash(this.path, this.followUpMove);
     }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "path=" + path +
+                ", followUpMove=" + followUpMove +
+                '}';
+    }
 }

@@ -4,6 +4,7 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class MoveSet {
@@ -51,4 +52,18 @@ public class MoveSet {
         return points;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MoveSet: [");
+        Iterator<Move> iterator = this.set.iterator();
+        while (iterator.hasNext()) {
+            sb.append(iterator.next().toString());
+            if (iterator.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

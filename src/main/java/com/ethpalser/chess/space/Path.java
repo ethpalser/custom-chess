@@ -102,6 +102,7 @@ public class Path implements Iterable<Point> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("[");
         Iterator<Point> iterator = this.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
@@ -109,6 +110,7 @@ public class Path implements Iterable<Point> {
                 sb.append(", ");
             }
         }
+        sb.append("]");
         return sb.toString();
     }
 
