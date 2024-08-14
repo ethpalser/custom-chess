@@ -52,7 +52,6 @@ public class Pawn implements Piece {
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
-            System.out.println("adding advance two");
             moveSet.addMove(new Move(new Path(
                     Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY),
                     Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY * 2)
