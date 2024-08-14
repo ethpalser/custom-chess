@@ -33,6 +33,7 @@ public class PieceReference implements Reference<Piece> {
     }
 
     public PieceReference(Piece piece, Direction direction, int distance) {
+        distance = Math.abs(distance);
         this.piece = piece;
         this.direction = direction;
         switch (direction) {
@@ -73,22 +74,20 @@ public class PieceReference implements Reference<Piece> {
 
     @Override
     public List<Piece> getReferences(Plane<Piece> plane) {
-        return switch (this.direction) {
-            case AT -> List.of(plane.get(
+        Piece ref = switch (this.direction) {
+            case AT -> plane.get(
                     new Point(this.piece.getPoint().getX() + shiftX, this.piece.getPoint().getY() + shiftY)
-            ));
-            case LEFT -> List.of(plane.get(
-                    new Point(this.piece.getPoint().getX() - shiftX, this.piece.getPoint().getY())
-            ));
-            case RIGHT -> List.of(plane.get(
+            );
+            case LEFT, RIGHT -> plane.get(
                     new Point(this.piece.getPoint().getX() + shiftX, this.piece.getPoint().getY())
-            ));
-            case BACK -> List.of(plane.get(
-                    new Point(this.piece.getPoint().getX(), this.piece.getPoint().getY() - shiftY)
-            ));
-            case FRONT -> List.of(plane.get(
+            );
+            case BACK, FRONT -> plane.get(
                     new Point(this.piece.getPoint().getX(), this.piece.getPoint().getY() + shiftY)
-            ));
+            );
         };
+        if (ref == null) {
+            return List.of();
+        }
+        return List.of(ref);
     }
 }
