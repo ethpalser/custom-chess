@@ -4,6 +4,7 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PathReference<T> implements Reference<T> {
@@ -17,7 +18,7 @@ public class PathReference<T> implements Reference<T> {
     }
 
     public PathReference(Location location, Point point) {
-        this(location, point, null);
+        this(location, point, point);
     }
 
     public PathReference(Location location, Point start, Point end) {
@@ -36,12 +37,29 @@ public class PathReference<T> implements Reference<T> {
         if (plane == null) {
             return List.of();
         }
-        return switch (this.location) {
-            case START, VECTOR -> List.of(plane.get(this.start));
-            case DESTINATION -> List.of(plane.get(this.end));
-            case PATH_TO_DESTINATION, PATH_TO_VECTOR -> new Path(this.start, this.end).toSet().stream().map(plane::get)
-                    .collect(Collectors.toList());
-            default -> List.of();
-        };
+        switch (this.location) {
+            case START, VECTOR -> {
+                T ref = plane.get(this.start);
+                if (ref != null) {
+                    return List.of(ref);
+                }
+            }
+            case DESTINATION -> {
+                T ref = plane.get(this.end);
+                if (ref != null) {
+                    return List.of(ref);
+                }
+            }
+            case PATH_TO_DESTINATION, PATH_TO_VECTOR -> {
+                return new Path(this.start, this.end).toSet().stream()
+                        .map(plane::get)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+            }
+            default -> {
+                return List.of();
+            }
+        }
+        return List.of();
     }
 }
