@@ -8,6 +8,7 @@ import java.util.List;
 
 public class PieceReference implements Reference<Piece> {
 
+    // Concern: Potential for Piece to not get garbage collected as it is referenced here despite not being on board
     private final Piece piece;
     private final Direction direction;
     private final int shiftX;

@@ -3,7 +3,6 @@ package com.ethpalser.chess.space;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class Point implements Comparable<Point> {
 
