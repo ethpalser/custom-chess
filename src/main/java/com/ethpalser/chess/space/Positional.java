@@ -4,4 +4,6 @@ public interface Positional {
 
     Point getPoint();
 
+    boolean hasMoved();
+
 }
