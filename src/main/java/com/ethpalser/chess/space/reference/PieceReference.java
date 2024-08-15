@@ -69,7 +69,7 @@ public class PieceReference implements Reference<Piece> {
 
     @Override
     public Location getLocation() {
-        return Location.VECTOR;
+        return Location.PIECE;
     }
 
     @Override

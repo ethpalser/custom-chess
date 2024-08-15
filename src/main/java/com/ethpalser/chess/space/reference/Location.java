@@ -2,9 +2,9 @@ package com.ethpalser.chess.space.reference;
 
 public enum Location {
     LAST_MOVED,
-    START,
-    DESTINATION,
-    VECTOR,
-    PATH_TO_DESTINATION,
-    PATH_TO_VECTOR,
+    PATH_START,
+    PATH_END,
+    PATH,
+    PIECE,
+    POINT;
 }

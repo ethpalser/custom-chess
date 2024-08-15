@@ -24,7 +24,7 @@ public class AbsoluteReference<T> implements Reference<T> {
 
     @Override
     public Location getLocation() {
-        return Location.VECTOR;
+        return Location.POINT;
     }
 
     @Override

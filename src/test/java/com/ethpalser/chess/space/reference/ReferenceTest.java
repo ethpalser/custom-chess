@@ -68,7 +68,7 @@ class ReferenceTest {
     @Test
     void pathRef_getReferences_givenVectorLocationAndEmpty_thenIsEmpty() {
         Board board = new StandardBoard();
-        Reference<Piece> ref = new PathReference<>(Location.VECTOR, new Point(4, 4));
+        Reference<Piece> ref = new PathReference<>(Location.POINT, new Point(4, 4));
 
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }
@@ -79,7 +79,7 @@ class ReferenceTest {
         Point point = new Point(4, 1);
         Piece piece = board.getPiece(point);
 
-        Reference<Piece> ref = new PathReference<>(Location.VECTOR, point);
+        Reference<Piece> ref = new PathReference<>(Location.POINT, point);
 
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -91,7 +91,7 @@ class ReferenceTest {
         Point end = new Point(4, 3);
         Piece piece = board.getPiece(start);
 
-        Reference<Piece> ref = new PathReference<>(Location.START, start, end);
+        Reference<Piece> ref = new PathReference<>(Location.PATH_START, start, end);
 
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -103,7 +103,7 @@ class ReferenceTest {
         Point end = new Point(4, 3);
         Piece piece = board.getPiece(start);
 
-        Reference<Piece> ref = new PathReference<>(Location.DESTINATION, end);
+        Reference<Piece> ref = new PathReference<>(Location.PATH_END, end);
         board.movePiece(start, end);
 
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
@@ -115,7 +115,7 @@ class ReferenceTest {
         Point start = new Point(3, 0);
         Point end = new Point(1, 0);
 
-        Reference<Piece> ref = new PathReference<>(Location.PATH_TO_DESTINATION, start, end);
+        Reference<Piece> ref = new PathReference<>(Location.PATH, start, end);
 
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }
@@ -126,7 +126,7 @@ class ReferenceTest {
         // Given
         Piece piece = board.getPiece(4, 1); // e1 pawn
         // When
-        Reference<Piece> ref = new PieceReference(piece);
+        Reference<Piece> ref = new ObjectReference(piece);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -137,7 +137,7 @@ class ReferenceTest {
         // Given
         Piece piece = board.getPiece(4, 1); // e1 pawn
         // When
-        Reference<Piece> ref = new PieceReference(piece, Direction.AT);
+        Reference<Piece> ref = new ObjectReference(piece, Direction.AT);
         board.movePiece(new Point(4, 1), new Point(4, 2));
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
@@ -149,7 +149,7 @@ class ReferenceTest {
         // Given
         Piece piece = board.getPiece(4, 1); // e1 pawn
         // When
-        Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
+        Reference<Piece> ref = new ObjectReference(piece, Direction.BACK);
         board.movePiece(new Point(4, 1), new Point(4, 2));
         // Then
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
@@ -162,7 +162,7 @@ class ReferenceTest {
         Piece refPiece = board.getPiece(4, 1); // e1 pawn
         Piece rightPiece = board.getPiece(5, 1); // f1 pawn
         // When
-        Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
+        Reference<Piece> ref = new ObjectReference(refPiece, Direction.RIGHT);
         board.movePiece(new Point(4, 1), new Point(4, 2));
         board.movePiece(new Point(5, 1), new Point(5, 2));
         // Then
@@ -176,7 +176,7 @@ class ReferenceTest {
         Piece refPiece = board.getPiece(4, 0); // d0 king
         Piece expected = board.getPiece(0, 0); // a0 rook
         // When
-        Reference<Piece> ref = new PieceReference(refPiece, Direction.LEFT, 4);
+        Reference<Piece> ref = new ObjectReference(refPiece, Direction.LEFT, 4);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(expected));
     }
@@ -187,7 +187,7 @@ class ReferenceTest {
         // Given
         Piece refPiece = board.getPiece(4, 0); // d0 king
         // When
-        Reference<Piece> ref = new PieceReference(refPiece, Direction.BACK, 2);
+        Reference<Piece> ref = new ObjectReference(refPiece, Direction.BACK, 2);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }

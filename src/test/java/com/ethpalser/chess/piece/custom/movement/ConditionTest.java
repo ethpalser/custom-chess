@@ -22,7 +22,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new PathReference(Location.START), Comparator.EQUAL,
+        Conditional condition = new PropertyCondition(new PathReference(Location.PATH_START), Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
         CustomBoard board = new CustomBoard();
@@ -133,7 +133,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new PathReference(Location.START),
+        Conditional condition = new PropertyCondition(new PathReference(Location.PATH_START),
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
         // When
@@ -148,7 +148,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new PathReference(Location.START),
+        Conditional condition = new PropertyCondition(new PathReference(Location.PATH_START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         CustomBoard board = new CustomBoard();
@@ -167,7 +167,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
-        Conditional condition = new PropertyCondition(new PathReference(Location.VECTOR, new Point(0, 0)),
+        Conditional condition = new PropertyCondition(new PathReference(Location.POINT, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         CustomBoard board = new CustomBoard();
@@ -187,7 +187,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Conditional condition = new ReferenceCondition(new PathReference(Location.VECTOR, new Point(1, 0)),
+        Conditional condition = new ReferenceCondition(new PathReference(Location.POINT, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
         CustomBoard board = new CustomBoard();
@@ -202,11 +202,11 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Conditional conditionA = new PropertyCondition(new PathReference(Location.START),
+        Conditional conditionA = new PropertyCondition(new PathReference(Location.PATH_START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionB = new PropertyCondition(new PathReference(Location.VECTOR, new Point(0, 0)),
+        Conditional conditionB = new PropertyCondition(new PathReference(Location.POINT, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional conditionC = new PropertyCondition(new PathReference(Location.VECTOR, new Point(1, 0)),
+        Conditional conditionC = new PropertyCondition(new PathReference(Location.POINT, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST);
 
         CustomBoard board = new CustomBoard();

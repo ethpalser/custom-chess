@@ -38,25 +38,26 @@ public class PathReference<T> implements Reference<T> {
             return List.of();
         }
         switch (this.location) {
-            case START, VECTOR -> {
+            case PATH_START, POINT -> {
                 T ref = plane.get(this.start);
                 if (ref != null) {
                     return List.of(ref);
                 }
             }
-            case DESTINATION -> {
+            case PATH_END -> {
                 T ref = plane.get(this.end);
                 if (ref != null) {
                     return List.of(ref);
                 }
             }
-            case PATH_TO_DESTINATION, PATH_TO_VECTOR -> {
+            case PATH -> {
                 return new Path(this.start, this.end).toSet().stream()
                         .map(plane::get)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
             }
             default -> {
+                System.err.println("Unsupported Location{" + location + "} for reference");
                 return List.of();
             }
         }
