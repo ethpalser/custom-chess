@@ -4,12 +4,15 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.log.ReferenceLogEntry;
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.Conditional;
+import com.ethpalser.chess.move.custom.condition.LogCondition;
 import com.ethpalser.chess.move.custom.condition.Property;
 import com.ethpalser.chess.move.custom.condition.PropertyCondition;
+import com.ethpalser.chess.move.custom.condition.PropertyType;
 import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -96,9 +99,7 @@ public class CustomPieceFactory {
     }
 
     private Conditional<Piece> lastMovedTravelledDistanceCondition(int distance) {
-        // Todo: create LogCondition to handle lastMovedDistance
-        return new PropertyCondition<>(new LogReference<>(this.log), Comparator.EQUAL,
-                new Property<>("lastMoveDistance"), distance);
+        return new LogCondition<>(this.log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, distance);
     }
 
     // PATHS
@@ -225,10 +226,9 @@ public class CustomPieceFactory {
         }
 
         // En Passant is split into two due to limitations with References, as they don't have CustomPiece's mirroring
-        // Todo: Create LogEntry that uses references, so a relative location can be used for the followUp
         {
-            LogEntry<Point, Piece> followUpRight = new ChessLogEntry(point, null,
-                    this.board.getPiece(point.shift(colour, Direction.BACK)));
+            LogEntry<Point, Piece> followUpRight = new ReferenceLogEntry<>(this.board.getPieces(),
+                    new PieceReference(pawn, Direction.AT, 1, 0), null);
             CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
@@ -244,8 +244,8 @@ public class CustomPieceFactory {
             pawn.addMove(enPassantRight);
         }
         {
-            LogEntry<Point, Piece> followUpLeft = new ChessLogEntry(point, null,
-                    this.board.getPiece(point.shift(colour, Direction.BACK)));
+            LogEntry<Point, Piece> followUpLeft = new ReferenceLogEntry<>(this.board.getPieces(),
+                    new PieceReference(pawn, Direction.AT, -1, 0), null);
             CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(true)
