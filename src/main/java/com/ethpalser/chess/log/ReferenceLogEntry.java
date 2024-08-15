@@ -11,19 +11,16 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
     private final Reference<T> startRef;
     private final Reference<T> endRef;
     private final LogEntry<Point, T> subLogEntry;
-    private final boolean isFirstOccurrence;
 
-    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end, boolean isFirstOccurrence) {
-        this(plane, start, end, isFirstOccurrence, null);
+    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end) {
+        this(plane, start, end, null);
     }
 
-    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end, boolean isFirstOccurrence,
-            LogEntry<Point, T> subLogEntry) {
+    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end, LogEntry<Point, T> subLogEntry) {
         this.space = plane;
         this.startRef = start;
         this.endRef = end;
         this.subLogEntry = subLogEntry;
-        this.isFirstOccurrence = isFirstOccurrence;
     }
 
     @Override
@@ -67,6 +64,10 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
 
     @Override
     public boolean isFirstOccurrence() {
-        return this.isFirstOccurrence;
+        T ref = this.getStartObject();
+        if (ref == null) {
+            return false;
+        }
+        return ref.hasMoved();
     }
 }
