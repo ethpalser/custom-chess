@@ -36,17 +36,16 @@ public class Knight implements Piece {
 
     @Override
     public MoveSet getMoves(Board board) {
-        Set<Point> set = new LinkedHashSet<>();
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -1, 2)); // up 2 left
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 1, 2)); // up 2 right
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 2, 1)); // right 2 up
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 2, -1)); // right 2 down
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 1, -2)); // down 2 right
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -1, -2)); // down 2 left
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
-        set.remove(null);
-        return new MoveSet(set);
+        return new MoveSet(
+                Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1), // left 2 up
+                Point.generateValidPointOrNull(board, this.point, this.colour, -1, 2), // up 2 left
+                Point.generateValidPointOrNull(board, this.point, this.colour, 1, 2), // up 2 right
+                Point.generateValidPointOrNull(board, this.point, this.colour, 2, 1), // right 2 up
+                Point.generateValidPointOrNull(board, this.point, this.colour, 2, -1), // right 2 down
+                Point.generateValidPointOrNull(board, this.point, this.colour, 1, -2), // down 2 right
+                Point.generateValidPointOrNull(board, this.point, this.colour, -1, -2), // down 2 left
+                Point.generateValidPointOrNull(board, this.point, this.colour, -2, -1) // left 2 down
+        );
     }
 
     @Override

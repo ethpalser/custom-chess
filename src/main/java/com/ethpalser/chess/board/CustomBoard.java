@@ -2,6 +2,7 @@ package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -73,7 +74,7 @@ public class CustomBoard implements Board {
             throw new NullPointerException();
         }
         CustomPiece piece = (CustomPiece) this.getPiece(start);
-        Move move = piece.getMoves(this, null, null).getMove(end);
+        Movement move = piece.getMoves(this, null, null).getMove(end);
         if (move == null) {
             throw new IllegalActionException("this piece cannot move to " + end);
         }

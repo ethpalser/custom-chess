@@ -4,6 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -14,13 +15,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CustomPiece implements Piece {
 
     private final PieceType type;
     private final String code;
     private final Colour colour;
-    private final List<CustomMove> customMoves;
+    private final List<Movement> customMoves;
     private Point position;
     private boolean hasMoved;
 
@@ -63,7 +65,7 @@ public class CustomPiece implements Piece {
 
     @Override
     public MoveSet getMoves(Board board) {
-        return new MoveSet(this.getMovementSet(this.position, (CustomBoard) board));
+        return new MoveSet(new HashSet<>(this.customMoves));
     }
 
     public void addMove(CustomMove move) {
@@ -111,8 +113,9 @@ public class CustomPiece implements Piece {
         if (board == null || destination == null) {
             throw new NullPointerException();
         }
-        for (CustomMove move : this.customMoves) {
-            Path path = move.getPath(this.colour, this.position, destination, board);
+        for (Movement m : this.customMoves) {
+            CustomMove move = (CustomMove) m; // Todo: Test that this works
+            Path path = move.getPath(board.getPieces(), this.colour, this.position, destination);
             if (path != null && this.isTraversable(path, board)
                     && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
                 return move;
@@ -136,7 +139,8 @@ public class CustomPiece implements Piece {
             throw new NullPointerException();
         }
         Set<Point> set = new HashSet<>();
-        for (CustomMove move : this.customMoves) {
+        for (Movement m : this.customMoves) {
+            CustomMove move = (CustomMove) m;
             if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
                 Set<Point> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
                 if (board != null) {

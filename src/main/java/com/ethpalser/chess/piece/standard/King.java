@@ -48,17 +48,16 @@ public class King implements Piece {
 
     @Override
     public MoveSet getMoves(Board board, Log<Point, Piece> log, ThreatMap opponentThreats) {
-        Set<Point> set = new HashSet<>();
-        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, 0)); // left
-        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, 1)); // top left
-        set.add(this.generateSafePointOrNull(board, opponentThreats, 0, 1)); // top
-        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, 1)); // top right
-        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, 0)); // right
-        set.add(this.generateSafePointOrNull(board, opponentThreats, 1, -1)); // bottom right
-        set.add(this.generateSafePointOrNull(board, opponentThreats, 0, -1)); // bottom
-        set.add(this.generateSafePointOrNull(board, opponentThreats, -1, -1)); // bottom left
-        set.remove(null); // remove any case of null
-        MoveSet moveSet = new MoveSet(set);
+        MoveSet moveSet = new MoveSet(
+                this.generateSafePointOrNull(board, opponentThreats, -1, 0), // left
+                this.generateSafePointOrNull(board, opponentThreats, -1, 1), // top left
+                this.generateSafePointOrNull(board, opponentThreats, 0, 1), // top
+                this.generateSafePointOrNull(board, opponentThreats, 1, 1), // top right
+                this.generateSafePointOrNull(board, opponentThreats, 1, 0), // right
+                this.generateSafePointOrNull(board, opponentThreats, 1, -1), // bottom right
+                this.generateSafePointOrNull(board, opponentThreats, 0, -1), // bottom
+                this.generateSafePointOrNull(board, opponentThreats, -1, -1) // bottom left
+        );
 
         // castling
         // not moved and not threatened (need to use the correct threat map)

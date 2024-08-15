@@ -6,6 +6,7 @@ import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -248,7 +249,7 @@ public class ChessGame {
                 return false;
             }
             // Can a piece block its path?
-            Move causingCheck = p.getMoves(this.board, this.log).getMove(oppKingPoint);
+            Movement causingCheck = p.getMoves(this.board, this.log).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }

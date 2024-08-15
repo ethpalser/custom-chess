@@ -9,44 +9,49 @@ import java.util.Set;
 
 public class MoveSet {
 
-    private final Set<Move> set;
+    private final Set<Movement> set;
 
-    @Deprecated(since = "2024-08-13")
-    public MoveSet(Set<Point> points) {
-        Set<Move> moves = new HashSet<>();
+    public MoveSet(Set<Movement> moves) {
+        this.set = moves;
+    }
+
+    public MoveSet(Point... points) {
+        Set<Movement> moves = new HashSet<>();
         for (Point p : points) {
             moves.add(new Move(p));
         }
+        moves.remove(null);
         this.set = moves;
     }
 
     public MoveSet(Path... paths) {
-        Set<Move> moves = new HashSet<>();
+        Set<Movement> moves = new HashSet<>();
         for (Path path : paths) {
             moves.add(new Move(path));
         }
+        moves.remove(null);
         this.set = moves;
     }
 
-    public MoveSet(Move... moves) {
+    public MoveSet(Movement... moves) {
         this.set = new HashSet<>(Arrays.asList(moves));
     }
 
-    public Set<Move> toSet() {
+    public Set<Movement> toSet() {
         return this.set;
     }
 
-    public Move getMove(Point point) {
+    public Movement getMove(Point point) {
         return this.set.stream().filter(m -> m.getPath().toSet().contains(point)).findFirst().orElse(null);
     }
 
-    public void addMove(Move move) {
+    public void addMove(Movement move) {
         this.set.add(move);
     }
 
     public Set<Point> getPoints() {
         Set<Point> points = new HashSet<>();
-        for (Move m : this.set) {
+        for (Movement m : this.set) {
             points.addAll(m.getPath().toSet());
         }
         return points;
@@ -56,7 +61,7 @@ public class MoveSet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("MoveSet: [");
-        Iterator<Move> iterator = this.set.iterator();
+        Iterator<Movement> iterator = this.set.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
             if (iterator.hasNext()) {

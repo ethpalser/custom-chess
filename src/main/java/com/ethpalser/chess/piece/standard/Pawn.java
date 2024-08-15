@@ -47,13 +47,12 @@ public class Pawn implements Piece {
 
     @Override
     public MoveSet getMoves(Board board, Log<Point, Piece> log) {
-        Set<Point> set = new HashSet<>();
         int nextY = this.colour == Colour.WHITE ? this.point.getY() + 1 : this.point.getY() -1;
-        set.add(Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY));
-        set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY));
-        set.add(Point.generateCapturePointOrNull(board, this.point, this.colour, 1, nextY));
-        set.remove(null); // remove any case of null
-        MoveSet moveSet = new MoveSet(set);
+        MoveSet moveSet = new MoveSet(
+                Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY),
+                Point.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY),
+                Point.generateCapturePointOrNull(board, this.point, this.colour, 1, nextY)
+        );
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
