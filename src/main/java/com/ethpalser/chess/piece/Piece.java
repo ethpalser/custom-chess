@@ -5,8 +5,9 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Positional;
 
-public interface Piece {
+public interface Piece extends Positional {
 
     String getCode();
 
