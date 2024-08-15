@@ -1,10 +1,11 @@
 package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.reference.Reference;
 import java.util.List;
 
-public class PropertyCondition<T> implements Conditional<T> {
+public class PropertyCondition<T extends Positional> implements Conditional<T> {
 
     private final Reference<T> reference;
     private final Property<T> property;

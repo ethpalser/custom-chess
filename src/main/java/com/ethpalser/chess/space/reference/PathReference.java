@@ -3,11 +3,12 @@ package com.ethpalser.chess.space.reference;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Positional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class PathReference<T> implements Reference<T> {
+public class PathReference<T extends Positional> implements Reference<T> {
 
     private final Location location;
     private final Point start;

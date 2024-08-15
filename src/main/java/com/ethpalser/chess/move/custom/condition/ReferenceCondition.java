@@ -1,10 +1,11 @@
 package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.reference.Reference;
 import java.util.List;
 
-public class ReferenceCondition<T> implements Conditional<T> {
+public class ReferenceCondition<T extends Positional> implements Conditional<T> {
 
     private final Reference<T> target;
     private final Comparator comparator;

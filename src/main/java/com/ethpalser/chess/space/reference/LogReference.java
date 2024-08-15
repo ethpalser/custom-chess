@@ -3,9 +3,10 @@ package com.ethpalser.chess.space.reference;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Positional;
 import java.util.List;
 
-public class LogReference<T extends Comparable<T>, U> implements Reference<U> {
+public class LogReference<T extends Comparable<T>, U extends Positional> implements Reference<U> {
 
     private final Log<T, U> log;
 

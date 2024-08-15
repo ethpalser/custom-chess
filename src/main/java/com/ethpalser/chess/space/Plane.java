@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class Plane<T> implements Map<Point, T>, Iterable<T> {
+public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
 
     private final int minX;
     private final int minY;

@@ -4,9 +4,10 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Positional;
 import java.util.List;
 
-public class AbsoluteReference<T> implements Reference<T> {
+public class AbsoluteReference<T extends Positional> implements Reference<T> {
 
     private final Point point;
     private final Direction direction;
