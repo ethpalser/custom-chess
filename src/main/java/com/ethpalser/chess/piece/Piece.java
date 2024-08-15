@@ -12,6 +12,8 @@ public interface Piece {
 
     Colour getColour();
 
+    Point getPoint();
+
     MoveSet getMoves(Board board);
 
     default MoveSet getMoves(Board board, Log<Point, Piece> log) {
@@ -23,8 +25,6 @@ public interface Piece {
         // threats ignored, and likely log as well
         return this.getMoves(board, log);
     }
-
-    Point getPoint();
 
     default boolean canMove(Board board, Point destination) {
         if (board == null || destination == null) {

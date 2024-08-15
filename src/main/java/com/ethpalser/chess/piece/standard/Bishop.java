@@ -31,6 +31,11 @@ public class Bishop implements Piece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
+    @Override
     public MoveSet getMoves(Board board) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
@@ -41,11 +46,6 @@ public class Bishop implements Piece {
                 new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, false))),
                 new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, true)))
         );
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
     }
 
     @Override

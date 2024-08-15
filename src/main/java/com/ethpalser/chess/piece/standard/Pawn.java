@@ -36,6 +36,11 @@ public class Pawn implements Piece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
+    @Override
     public MoveSet getMoves(Board board) {
         throw new UnsupportedOperationException();
     }
@@ -84,11 +89,6 @@ public class Pawn implements Piece {
             }
         }
         return moveSet;
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
     }
 
     @Override

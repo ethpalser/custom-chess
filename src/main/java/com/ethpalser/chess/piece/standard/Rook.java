@@ -31,6 +31,11 @@ public class Rook implements Piece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
+    @Override
     public MoveSet getMoves(Board board) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
@@ -41,11 +46,6 @@ public class Rook implements Piece {
                 new Move(new Path(Point.generateVerticalMoves(board, this.point, this.colour, false))),
                 new Move(new Path(Point.generateVerticalMoves(board, this.point, this.colour, true)))
         );
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
     }
 
     @Override

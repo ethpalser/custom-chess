@@ -30,6 +30,11 @@ public class Knight implements Piece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.point;
+    }
+
+    @Override
     public MoveSet getMoves(Board board) {
         Set<Point> set = new LinkedHashSet<>();
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1)); // left 2 up
@@ -42,11 +47,6 @@ public class Knight implements Piece {
         set.add(Point.generateValidPointOrNull(board, this.point, this.colour, -2, -1)); // left 2 down
         set.remove(null);
         return new MoveSet(set);
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
     }
 
     @Override
