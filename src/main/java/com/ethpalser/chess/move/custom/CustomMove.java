@@ -3,18 +3,22 @@ package com.ethpalser.chess.move.custom;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-public class CustomMove {
+public class CustomMove implements Movement {
 
     private final Path pathBase;
     private final CustomMoveType moveType;
@@ -116,6 +120,11 @@ public class CustomMove {
         this.followUp = null;
     }
 
+    @Override
+    public Path getPath() {
+        return this.pathBase;
+    }
+
     /**
      * Determines the direction that the end vector is relative to the start and builds a path in that direction
      * based off of this movement's path blueprint.
@@ -125,7 +134,8 @@ public class CustomMove {
      * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
-    public Path getPath(Colour colour, Point start, Point end, CustomBoard board) {
+    @Override
+    public Path getPath(Plane<Piece> board, Colour colour, Point start, Point end) {
         if (colour == null || start == null || end == null) {
             throw new NullPointerException();
         }
@@ -145,7 +155,7 @@ public class CustomMove {
         }
 
         List<Point> vectors = new LinkedList<>();
-        for (Point vector : this.pathBase) {
+        for (Point vector : this.getPath()) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
             if (!board.isInBounds(nextX, nextY)) {
@@ -161,6 +171,11 @@ public class CustomMove {
             return null; // No path that reaches this end from this start
         }
         return new Path(vectors);
+    }
+
+    @Override
+    public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
+        return Optional.ofNullable(this.followUp);
     }
 
     /**
@@ -198,7 +213,7 @@ public class CustomMove {
         boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
         Set<Point> set = new HashSet<>();
-        for (Point vector : this.pathBase) {
+        for (Point vector : this.getPath()) {
             Point v = getVectorInQuadrant(vector, offset, isRight, isUp);
             if (canMoveInQuadrant(v, colour, board, withDefend, ignoreKing))
                 set.add(v);
@@ -219,7 +234,7 @@ public class CustomMove {
         boolean blockBotLeft = false;
 
         Set<Point> set = new HashSet<>();
-        for (Point vector : this.pathBase) {
+        for (Point vector : this.getPath()) {
             if (mirrorXAxis || Colour.WHITE.equals(colour)) {
                 if (!blockTopRight) {
                     Point topRight = getVectorInQuadrant(vector, offset, true, true);
