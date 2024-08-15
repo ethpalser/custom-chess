@@ -42,11 +42,6 @@ public class CustomPiece implements Piece {
         this.hasMoved = hasMoved;
     }
 
-    @Deprecated
-    public PieceType getType() {
-        return this.type;
-    }
-
     @Override
     public String getCode() {
         if (this.type != PieceType.CUSTOM) {
@@ -101,17 +96,6 @@ public class CustomPiece implements Piece {
         return hasMoved;
     }
 
-    // Temporary
-    @Deprecated
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Deprecated
-    public Point getPosition() {
-        return this.position;
-    }
-
     /**
      * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
      * be traversed and has all its conditions met.
@@ -155,7 +139,7 @@ public class CustomPiece implements Piece {
                 Set<Point> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
                 if (board != null) {
                     for (Point v : vectorSet) {
-                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPosition(),
+                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPoint(),
                                 v))) {
                             set.add(v);
                         }
@@ -172,8 +156,6 @@ public class CustomPiece implements Piece {
     public String toString() {
         return this.type.getCode() + position.toString();
     }
-
-
 
     /**
      * Iterates through the path to determine if there is a piece in the path between the start and end.

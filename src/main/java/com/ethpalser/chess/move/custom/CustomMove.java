@@ -2,6 +2,7 @@ package com.ethpalser.chess.move.custom;
 
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -23,7 +24,7 @@ public class CustomMove {
     private final boolean isMove;
     private final boolean isAttack;
     private final List<Conditional<Piece>> conditions;
-    private final ExtraAction extraAction;
+    private final LogEntry<Point, Piece> followUp;
 
     public boolean isMove() {
         return this.isMove;
@@ -44,7 +45,7 @@ public class CustomMove {
         private boolean isAttack = true;
         private boolean isMove = true;
         private List<Conditional<Piece>> conditions = List.of();
-        private ExtraAction extraAction = null;
+        private LogEntry<Point, Piece> followUp = null;
 
         public Builder(Path path, CustomMoveType moveType) {
             this.path = path;
@@ -81,8 +82,8 @@ public class CustomMove {
             return this;
         }
 
-        public Builder extraAction(ExtraAction extraAction) {
-            this.extraAction = extraAction;
+        public Builder followUp(LogEntry<Point, Piece> followUp) {
+            this.followUp = followUp;
             return this;
         }
 
@@ -100,7 +101,7 @@ public class CustomMove {
         this.isMove = builder.isMove;
         this.isAttack = builder.isAttack;
         this.conditions = builder.conditions;
-        this.extraAction = builder.extraAction;
+        this.followUp = builder.followUp;
     }
 
     public CustomMove(Path path, CustomMoveType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
@@ -112,19 +113,7 @@ public class CustomMove {
         this.isMove = true;
         this.isAttack = true;
         this.conditions = List.of();
-        this.extraAction = null;
-    }
-
-    public Path getBasePath() {
-        return this.pathBase;
-    }
-
-    public CustomMoveType getMoveType() {
-        return this.moveType;
-    }
-
-    public ExtraAction getExtraAction() {
-        return this.extraAction;
+        this.followUp = null;
     }
 
     /**

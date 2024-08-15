@@ -30,7 +30,7 @@ public class CustomBoard implements Board {
 
     public CustomBoard(List<String> pieces) {
         Plane<Piece> map = new Plane<>();
-        CustomPieceFactory pf = CustomPieceFactory.getInstance();
+        CustomPieceFactory pf = new CustomPieceFactory(this, null);
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);
             map.put(customPiece.getPoint(), customPiece);
@@ -99,16 +99,16 @@ public class CustomBoard implements Board {
         Map<Point, CustomPiece> map = new HashMap<>();
         Colour colour = y < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
 
-        CustomPieceFactory customPieceFactory = CustomPieceFactory.getInstance();
+        CustomPieceFactory customPieceFactory = new CustomPieceFactory(this, null);
         if (y == 0 || y == length - 1) {
             for (int x = 0; x < 8; x++) {
                 Point vector = new Point(x, y);
                 CustomPiece customPiece = switch (x) {
-                    case 0, 7 -> customPieceFactory.build(PieceType.ROOK, colour, vector);
-                    case 1, 6 -> customPieceFactory.build(PieceType.KNIGHT, colour, vector);
-                    case 2, 5 -> customPieceFactory.build(PieceType.BISHOP, colour, vector);
-                    case 3 -> customPieceFactory.build(PieceType.QUEEN, colour, vector);
-                    case 4 -> customPieceFactory.build(PieceType.KING, colour, vector);
+                    case 0, 7 -> customPieceFactory.build(PieceType.ROOK, colour, vector, false);
+                    case 1, 6 -> customPieceFactory.build(PieceType.KNIGHT, colour, vector, false);
+                    case 2, 5 -> customPieceFactory.build(PieceType.BISHOP, colour, vector, false);
+                    case 3 -> customPieceFactory.build(PieceType.QUEEN, colour, vector, false);
+                    case 4 -> customPieceFactory.build(PieceType.KING, colour, vector, false);
                     default -> null;
                 };
                 map.put(vector, customPiece);
@@ -116,7 +116,7 @@ public class CustomBoard implements Board {
         } else if (y == 1 || y == length - 2) {
             for (int x = 0; x < 8; x++) {
                 Point vector = new Point(x, y);
-                CustomPiece customPiece = customPieceFactory.build(PieceType.PAWN, colour, vector);
+                CustomPiece customPiece = customPieceFactory.build(PieceType.PAWN, colour, vector, false);
                 map.put(vector, customPiece);
             }
         }
