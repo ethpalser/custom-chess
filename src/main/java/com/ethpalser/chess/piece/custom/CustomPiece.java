@@ -63,9 +63,7 @@ public class CustomPiece implements Piece {
 
     @Override
     public MoveSet getMoves(Board board) {
-        Set<Point> set = new HashSet<>();
-        // todo: update to use Movements, which requires refactoring all custom logic to use ChessPiece and ChessBoard
-        return new MoveSet(set);
+        return new MoveSet(this.getMovementSet(this.position, (CustomBoard) board));
     }
 
     public void addMove(CustomMove move) {
