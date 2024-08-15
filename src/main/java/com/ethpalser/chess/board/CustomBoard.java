@@ -1,5 +1,7 @@
 package com.ethpalser.chess.board;
 
+import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
@@ -14,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CustomBoard implements Board {
+public class CustomBoard implements Board<CustomPiece> {
 
-    private final Plane<Piece> pieces;
+    private final Plane<CustomPiece> pieces;
 
     public CustomBoard() {
-        Plane<Piece> map = new Plane<>(0, 0, 8, 8);
+        Plane<CustomPiece> map = new Plane<>(0, 0, 8, 8);
         int length = map.length();
         map.putAll(this.generatePiecesInRank(length, 0));
         map.putAll(this.generatePiecesInRank(length, 1));
@@ -29,7 +31,7 @@ public class CustomBoard implements Board {
     }
 
     public CustomBoard(List<String> pieces) {
-        Plane<Piece> map = new Plane<>();
+        Plane<CustomPiece> map = new Plane<>();
         CustomPieceFactory pf = new CustomPieceFactory(this, null);
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);
@@ -39,14 +41,14 @@ public class CustomBoard implements Board {
     }
 
     @Override
-    public Plane<Piece> getPieces() {
+    public Plane<CustomPiece> getPieces() {
         return pieces;
     }
 
-    public List<Piece> getPieces(Path path) {
+    public List<CustomPiece> getPieces(Path path) {
         if (path == null) {
-            List<Piece> list = new LinkedList<>();
-            for (Piece piece : this.pieces) {
+            List<CustomPiece> list = new LinkedList<>();
+            for (CustomPiece piece : this.pieces) {
                 list.add(piece);
             }
             return list;
@@ -56,7 +58,7 @@ public class CustomBoard implements Board {
     }
 
     @Override
-    public Piece getPiece(Point vector) {
+    public CustomPiece getPiece(Point vector) {
         if (vector == null) {
             return null;
         }
@@ -64,7 +66,7 @@ public class CustomBoard implements Board {
     }
 
     @Override
-    public void addPiece(Point point, Piece piece) {
+    public void addPiece(Point point, CustomPiece piece) {
         if (point == null) {
             throw new NullPointerException();
         }
@@ -85,7 +87,25 @@ public class CustomBoard implements Board {
         if (start == null || end == null) {
             throw new NullPointerException();
         }
-        this.addPiece(end, this.getPiece(start));
+        CustomPiece piece = this.pieces.get(start);
+        if (piece == null) {
+            throw new IllegalActionException("the moving piece does not exists at " + start);
+        }
+        Move move = piece.getMoves(this, null, null).getMove(end);
+        if (move == null) {
+            throw new IllegalActionException("this piece cannot move to " + end);
+        }
+
+        this.pieces.remove(start);
+        this.pieces.put(end, piece);
+        piece.move(end);
+
+        move.getFollowUpMove().ifPresent(m -> {
+            Piece followUp = m.getStartObject();
+            this.pieces.remove(m.getStart());
+            this.pieces.put(m.getEnd(), (CustomPiece) followUp);
+            this.pieces.remove(null); // If the piece is meant to be removed it was put here
+        });
     }
 
     @Override

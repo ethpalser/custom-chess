@@ -9,6 +9,7 @@ import com.ethpalser.chess.move.custom.condition.PropertyCondition;
 import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.reference.Location;
@@ -22,7 +23,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
@@ -39,7 +40,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsNotPawn_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
 
         CustomBoard board = new CustomBoard();
@@ -56,11 +57,11 @@ class ConditionTest {
     void evaluate_enPassantLastMovedAdvancedOneSpace_isFalse() {
         // Given
         // En Passant condition requires moving 2
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
         CustomBoard board = new CustomBoard();
-        Piece customPiece = board.getPiece(2, 1);
+        CustomPiece customPiece = board.getPiece(2, 1);
         board.addPiece(new Point(2, 2), customPiece);
 
         // When
@@ -74,11 +75,11 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedAdvancedTwoSpaces_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
         CustomBoard board = new CustomBoard();
-        Piece customPiece = board.getPiece(2, 1);
+        CustomPiece customPiece = board.getPiece(2, 1);
         board.addPiece(new Point(2, 3), customPiece);
 
         // When
@@ -92,7 +93,7 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedAndAdjacentIsSameColour_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         CustomBoard board = new CustomBoard();
@@ -108,17 +109,17 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsPawnAndMovedTwoAndIsAdjacentAndIsOppositeColour_isTrue() {
         // Given
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> conditionA = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.TRUE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionB = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> conditionB = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
-        Conditional<Piece> conditionC = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
+        Conditional<CustomPiece> conditionC = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.NOT_EQUAL, new Property<>("colour"), null);
 
         CustomBoard board = new CustomBoard();
-        Piece white = board.getPiece(4, 1);
+        CustomPiece white = board.getPiece(4, 1);
         board.addPiece(new Point(4, 4), white);
-        Piece black = board.getPiece(5, 6);
+        CustomPiece black = board.getPiece(5, 6);
         board.addPiece(new Point(5, 4), black);
 
         // When
@@ -134,7 +135,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
         // When
@@ -149,12 +150,12 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         CustomBoard board = new CustomBoard();
         board.addPiece(new Point(4, 1), null);
-        Piece king = board.getPiece(4, 0);
+        CustomPiece king = board.getPiece(4, 0);
         board.addPiece(new Point(4, 1), king);
 
         // When
@@ -168,11 +169,11 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
+        Conditional<CustomPiece> condition = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
         CustomBoard board = new CustomBoard();
-        Piece rook = board.getPiece(0, 0);
+        CustomPiece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
         board.addPiece(new Point(0, 2), rook);
         board.addPiece(new Point(0, 0), rook);
@@ -188,7 +189,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Conditional<Piece> condition = new ReferenceCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
+        Conditional<CustomPiece> condition = new ReferenceCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
         CustomBoard board = new CustomBoard();
@@ -203,11 +204,11 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<CustomPiece> conditionA = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionB = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
+        Conditional<CustomPiece> conditionB = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionC = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
+        Conditional<CustomPiece> conditionC = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST);
 
         CustomBoard board = new CustomBoard();
