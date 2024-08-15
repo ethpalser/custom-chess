@@ -4,17 +4,17 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 
-public interface Board<T extends Piece> {
+public interface Board {
 
-    Plane<T> getPieces();
+    Plane<Piece> getPieces();
 
-    T getPiece(Point point);
+    Piece getPiece(Point point);
 
-    default T getPiece(int x, int y) {
+    default Piece getPiece(int x, int y) {
         return getPiece(new Point(x, y));
     }
 
-    void addPiece(Point point, T piece);
+    void addPiece(Point point, Piece piece);
 
     void movePiece(Point start, Point end);
 
