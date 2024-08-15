@@ -1,13 +1,16 @@
 package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
-public class Move {
+public class Move implements Movement {
 
     private final Path path;
     private final LogEntry<Point, Piece> followUpMove;
@@ -29,10 +32,22 @@ public class Move {
         this.followUpMove = followUpMove;
     }
 
+    @Override
     public Path getPath() {
         return this.path;
     }
 
+    @Override
+    public Path getPath(Plane<Piece> plane, Colour colour, Point start, Point end) {
+        // Note: ignoring plane and colour (this method exists because of CustomMove)
+        Set<Point> pointSet = this.path.toSet();
+        if (pointSet.contains(start) && pointSet.contains(end)) {
+            return this.path;
+        }
+        return null;
+    }
+
+    @Override
     public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
         return Optional.ofNullable(this.followUpMove);
     }
