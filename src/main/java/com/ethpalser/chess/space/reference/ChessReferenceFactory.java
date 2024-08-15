@@ -6,7 +6,6 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import java.sql.Ref;
 
 public class ChessReferenceFactory {
 
