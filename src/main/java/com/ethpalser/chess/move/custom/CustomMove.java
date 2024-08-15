@@ -22,7 +22,7 @@ public class CustomMove {
     private final boolean isSpecificQuadrant;
     private final boolean isMove;
     private final boolean isAttack;
-    private final List<Conditional> conditions;
+    private final List<Conditional<Piece>> conditions;
     private final ExtraAction extraAction;
 
     public boolean isMove() {
@@ -43,7 +43,7 @@ public class CustomMove {
         private boolean isSpecificQuadrant = false;
         private boolean isAttack = true;
         private boolean isMove = true;
-        private List<Conditional> conditions = List.of();
+        private List<Conditional<Piece>> conditions = List.of();
         private ExtraAction extraAction = null;
 
         public Builder(Path path, CustomMoveType moveType) {
@@ -76,7 +76,7 @@ public class CustomMove {
             return this;
         }
 
-        public Builder conditions(List<Conditional> conditions) {
+        public Builder conditions(List<Conditional<Piece>> conditions) {
             this.conditions = conditions;
             return this;
         }
@@ -322,8 +322,8 @@ public class CustomMove {
         if (this.isAttack && !this.isMove && (pEnd == null || pStart.getColour().equals(pEnd.getColour()))) {
             return false;
         }
-        for (Conditional condition : this.conditions) {
-            if (!condition.isExpected(board, action)) {
+        for (Conditional<Piece> condition : this.conditions) {
+            if (!condition.isExpected(board.getPieces())) {
                 return false;
             }
         }

@@ -1,49 +1,44 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.reference.PathReference;
+import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.reference.Reference;
 import java.util.List;
 
-public class ReferenceCondition implements Conditional {
+public class ReferenceCondition<T> implements Conditional<T> {
 
-    private final PathReference<Piece> target;
+    private final Reference<T> target;
     private final Comparator comparator;
-    private final PathReference<Piece> expected;
+    private final Reference<T> expected;
 
-    public ReferenceCondition(PathReference<Piece> target, Comparator comparator, PathReference<Piece> expected) {
-        if (expected == null && !Comparator.canReferenceSelf(comparator)) {
-            throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
-        }
+    public ReferenceCondition(Reference<T> target, Comparator comparator, Reference<T> expected) {
         this.target = target;
         this.comparator = comparator;
         this.expected = expected;
     }
 
     @Override
-    public boolean isExpected(CustomBoard board, Action action) {
-        // todo: update to use action
-        List<Piece> customPieces = this.target.getReferences(board.getPieces());
+    public boolean isExpected(Plane<T> plane) {
+        List<T> tRefs = this.target.getReferences(plane);
+
         switch (this.comparator) {
             case FALSE, DOES_NOT_EXIST -> {
-                return customPieces == null || customPieces.isEmpty();
+                return tRefs == null || tRefs.isEmpty();
             }
             case TRUE, EXIST -> {
-                return customPieces != null;
+                return tRefs != null && !tRefs.isEmpty();
             }
             case EQUAL -> {
-                List<Piece> expectedCustomPieces = this.expected.getReferences(board.getPieces());
-                for (Piece customPiece : customPieces) {
-                    if (!expectedCustomPieces.contains(customPiece))
+                List<T> xRefs = this.expected.getReferences(plane);
+                for (T ref : tRefs) {
+                    if (!xRefs.contains(ref))
                         return false;
                 }
                 return true;
             }
             case NOT_EQUAL -> {
-                List<Piece> expectedCustomPieces = this.expected.getReferences(board.getPieces());
-                for (Piece customPiece : customPieces) {
-                    if (!expectedCustomPieces.contains(customPiece))
+                List<T> xPieces = this.expected.getReferences(plane);
+                for (T ref : tRefs) {
+                    if (!xPieces.contains(ref))
                         return true;
                 }
                 return false;

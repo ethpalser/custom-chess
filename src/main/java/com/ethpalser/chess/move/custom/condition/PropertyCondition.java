@@ -1,24 +1,21 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.game.Action;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.reference.PathReference;
+import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.reference.Reference;
 import java.util.List;
 
-public class PropertyCondition implements Conditional {
+public class PropertyCondition<T> implements Conditional<T> {
 
-    private final PathReference<Piece> reference;
-    private final Property<Piece> property;
+    private final Reference<T> reference;
+    private final Property<T> property;
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition(PathReference<Piece> reference, Comparator comparator) {
+    public PropertyCondition(Reference<T> reference, Comparator comparator) {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(PathReference<Piece> reference, Comparator comparator, Property<Piece> property,
-            Object expected) {
+    public PropertyCondition(Reference<T> reference, Comparator comparator, Property<T> property, Object expected) {
         if (reference == null || comparator == null) {
             throw new NullPointerException();
         }
@@ -32,21 +29,20 @@ public class PropertyCondition implements Conditional {
     }
 
     @Override
-    public boolean isExpected(CustomBoard board, Action action) {
-        List<Piece> list = this.reference.getReferences(board.getPieces());
+    public boolean isExpected(Plane<T> plane) {
+        List<T> refList = this.reference.getReferences(plane);
 
-        boolean hasPiece = false;
-        for (Piece customPiece : list) {
-            if (customPiece == null) {
-                continue;
-            }
-            hasPiece = true;
-            Object pieceProperty = this.property != null ? this.property.fetch(customPiece) : null;
-            if (!isExpectedState(pieceProperty)) {
-                return false;
+        boolean refExists = false;
+        for (T ref : refList) {
+            if (ref != null) {
+                Object refProp = this.property != null ? this.property.fetch(ref) : null;
+                if (!isExpectedState(refProp)) {
+                    return false;
+                }
+                refExists = true;
             }
         }
-        return hasPiece || Comparator.DOES_NOT_EXIST.equals(comparator);
+        return refExists || Comparator.DOES_NOT_EXIST.equals(comparator);
     }
 
     private boolean isExpectedState(Object objProperty) {
