@@ -15,9 +15,13 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.reference.AbsoluteReference;
 import com.ethpalser.chess.space.reference.Location;
+import com.ethpalser.chess.space.reference.LogReference;
 import com.ethpalser.chess.space.reference.PathReference;
+import com.ethpalser.chess.space.reference.PieceReference;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,118 +50,217 @@ public class CustomPieceFactory {
     }
 
     public CustomPiece build(PieceType type, Colour colour, Point vector, boolean hasMoved) {
-        Path vertical = new Path(new Point(0, 1), new Point(0, 7));
-        Path horizontal = new Path(new Point(1, 0), new Point(7, 0));
-        Path diagonal = new Path(new Point(1, 1), new Point(7, 7));
-        PropertyCondition<Piece> notMoved = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
-                Comparator.FALSE,
+        return switch (type) {
+            case KNIGHT -> this.knight(colour, vector, hasMoved);
+            case ROOK -> this.rook(colour, vector, hasMoved);
+            case BISHOP -> this.bishop(colour, vector, hasMoved);
+            case QUEEN -> this.queen(colour, vector, hasMoved);
+            case KING -> this.king(colour, vector, hasMoved);
+            case PAWN -> this.pawn(colour, vector, hasMoved);
+            default -> new CustomPiece(type, colour, vector, hasMoved); // Todo: Allow adding moves
+        };
+    }
+
+    // PRIVATE METHODS
+
+    // CONDITIONS
+
+    private Conditional<Piece> selfNotMovedCondition(Piece piece) {
+        return new PropertyCondition<>(new PieceReference(piece), Comparator.FALSE,
                 new Property<>("hasMoved"), false);
+    }
 
-        switch (type) {
-            case KNIGHT -> {
-                CustomMove knightMove1 = new CustomMove(new Path(new Point(1, 2)), CustomMoveType.JUMP, true, true);
-                CustomMove knightMove2 = new CustomMove(new Path(new Point(2, 1)), CustomMoveType.JUMP, true, true);
-                return new CustomPiece(PieceType.KNIGHT, colour, vector, hasMoved, knightMove1, knightMove2);
-            }
-            case ROOK -> {
-                CustomMove rookMoveV = new CustomMove(vertical, CustomMoveType.ADVANCE, true, false);
-                CustomMove rookMoveH = new CustomMove(horizontal, CustomMoveType.ADVANCE, false, true);
-                return new CustomPiece(PieceType.ROOK, colour, vector, hasMoved, rookMoveV, rookMoveH);
-            }
-            case BISHOP -> {
-                CustomMove bishopBaseMove = new CustomMove(diagonal, CustomMoveType.ADVANCE, true, true);
-                return new CustomPiece(PieceType.BISHOP, colour, vector, hasMoved, bishopBaseMove);
-            }
-            case QUEEN -> {
-                CustomMove queenBaseMoveV = new CustomMove(vertical, CustomMoveType.ADVANCE, true, false);
-                CustomMove queenBaseMoveH = new CustomMove(horizontal, CustomMoveType.ADVANCE, false, true);
-                CustomMove queenBaseMoveD = new CustomMove(diagonal, CustomMoveType.ADVANCE, true, true);
-                return new CustomPiece(PieceType.QUEEN, colour, vector, hasMoved, queenBaseMoveV, queenBaseMoveH,
-                        queenBaseMoveD);
-            }
-            case KING -> {
-                CustomMove kingBaseMoveV = new CustomMove(new Path(new Point(0, 1)), CustomMoveType.ADVANCE, true,
-                        false);
-                CustomMove kingBaseMoveH = new CustomMove(new Path(new Point(1, 0)), CustomMoveType.ADVANCE, false,
-                        true);
-                CustomMove kingBaseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true,
-                        true);
-                Point kingSideRook = new Point(7, 0);
-                Conditional<Piece> castleKingSideCond2 = new PropertyCondition<>(new PathReference<>(Location.POINT,
-                        kingSideRook),
-                        Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional<Piece> castleKingSideCond3 = new ReferenceCondition<>(new PathReference<>(Location.PATH,
-                        kingSideRook),
-                        Comparator.DOES_NOT_EXIST, null);
-                CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
-                        .isMirrorXAxis(false)
-                        .isMirrorYAxis(false)
-                        .isSpecificQuadrant(true)
-                        .isAttack(false)
-                        .conditions(List.of(notMoved, castleKingSideCond2, castleKingSideCond3))
-                        .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.board.getPiece(kingSideRook)))
-                        .build();
-                // Castle - Queen side
-                Point queenSideRook = new Point(0, 0);
-                Conditional<Piece> castleQueenSideCond2 = new PropertyCondition<>(new PathReference<>(Location.POINT,
-                        queenSideRook),
-                        Comparator.FALSE, new Property<>("hasMoved"), false);
-                Conditional<Piece> castleQueenSideCond3 = new ReferenceCondition<>(new PathReference<>(Location.PATH,
-                        queenSideRook),
-                        Comparator.DOES_NOT_EXIST, null);
-                CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
-                        .isMirrorXAxis(false)
-                        .isMirrorYAxis(true)
-                        .isSpecificQuadrant(false)
-                        .isAttack(false)
-                        .conditions(List.of(notMoved, castleQueenSideCond2, castleQueenSideCond3))
-                        .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.board.getPiece(queenSideRook)))
-                        .build();
+    private Conditional<Piece> targetNotMovedCondition(Point point) {
+        return new PropertyCondition<>(new AbsoluteReference<>(point), Comparator.FALSE,
+                new Property<>("hasMoved"), false);
+    }
 
-                return new CustomPiece(PieceType.KING, colour, vector, hasMoved, kingBaseMoveV, kingBaseMoveH,
-                        kingBaseMoveD,
-                        castleKingSide, castleQueenSide);
-            }
-            case PAWN -> {
-                CustomMove pawnBaseMove = new CustomMove.Builder(new Path(new Point(0, 1)), CustomMoveType.ADVANCE)
-                        .isMirrorXAxis(false)
-                        .isMirrorYAxis(false)
-                        .isSpecificQuadrant(true)
-                        .isAttack(false)
-                        .build();
-                CustomMove pawnCharge = new CustomMove.Builder(new Path(new Point(0, 1), new Point(0, 2)),
-                        CustomMoveType.CHARGE)
-                        .isMirrorXAxis(false)
-                        .isMirrorYAxis(false)
-                        .isSpecificQuadrant(true)
-                        .isAttack(false)
-                        .conditions(List.of(notMoved))
-                        .build();
-                CustomMove pawnCapture = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
-                        .isMirrorXAxis(false)
-                        .isMove(false)
-                        .build();
+    private Conditional<Piece> targetIsPieceTypeCondition(Point point, PieceType type) {
+        return new PropertyCondition<>(new AbsoluteReference<>(point), Comparator.EQUAL,
+                new Property<>("type"), type);
+    }
 
-                Conditional<Piece> enPassantCond1 = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                        Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
-                Conditional<Piece> enPassantCond2 = new ReferenceCondition<>(new PathReference<>(Location.LAST_MOVED),
-                        Comparator.EQUAL, new PathReference<>(Location.PATH_END, vector.shift(colour, Direction.BACK)));
-                Conditional<Piece> enPassantCond3 = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                        Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
+    private Conditional<Piece> emptyPathCondition(Point start, Point end) {
+        return new ReferenceCondition<>(new PathReference<>(Location.PATH, start, end), Comparator.DOES_NOT_EXIST,
+                null);
+    }
 
-                LogEntry<Point, Piece> followUp = new ChessLogEntry(vector, null,
-                        this.board.getPiece(vector.shift(colour, Direction.BACK)));
-                CustomMove enPassant = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
-                        .isMirrorXAxis(false)
-                        .isAttack(false)
-                        .conditions(List.of(enPassantCond1, enPassantCond2, enPassantCond3))
-                        .followUp(followUp)
-                        .build();
-                return new CustomPiece(PieceType.PAWN, colour, vector, hasMoved, pawnBaseMove, pawnCharge,
-                        pawnCapture, enPassant);
-            }
+    private Conditional<Piece> lastMovedIsPieceTypeCondition(PieceType type) {
+        return new PropertyCondition<>(new LogReference<>(this.log), Comparator.EQUAL,
+                new Property<>("type"), type);
+    }
+
+    private Conditional<Piece> lastMovedIsNearbyPieceCondition(Piece piece, int shiftX, int shiftY) {
+        return new ReferenceCondition<>(new LogReference<>(this.log), Comparator.EQUAL,
+                new PieceReference(piece, Direction.AT, shiftX, shiftY));
+    }
+
+    private Conditional<Piece> lastMovedTravelledDistanceCondition(int distance) {
+        // Todo: create LogCondition to handle lastMovedDistance
+        return new PropertyCondition<>(new LogReference<>(this.log), Comparator.EQUAL,
+                new Property<>("lastMoveDistance"), distance);
+    }
+
+    // PATHS
+
+    private Path vertical() {
+        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
+        // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
+        return new Path(new Point(plane.getMinX(), plane.getMinY() + 1), new Point(plane.getMinX(), plane.getMaxY()));
+    }
+
+    private Path horizontal() {
+        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
+        // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
+        return new Path(new Point(plane.getMinX() + 1, plane.getMinY()), new Point(plane.getMaxX(), plane.getMinY()));
+    }
+
+    private Path diagonal() {
+        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
+        // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
+        return new Path(new Point(plane.getMinX() + 1, plane.getMinY() + 1),
+                new Point(plane.getMaxX(), plane.getMaxY()));
+    }
+
+    // PIECES
+
+    private CustomPiece knight(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMoveL1 = new CustomMove(new Path(new Point(1, 2)), CustomMoveType.JUMP, true, true);
+        CustomMove baseMoveL2 = new CustomMove(new Path(new Point(2, 1)), CustomMoveType.JUMP, true, true);
+        return new CustomPiece(PieceType.KNIGHT, colour, point, hasMoved, baseMoveL1, baseMoveL2);
+    }
+
+    private CustomPiece rook(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
+        CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
+        return new CustomPiece(PieceType.ROOK, colour, point, hasMoved, baseMoveV, baseMoveH);
+    }
+
+    private CustomPiece bishop(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
+        return new CustomPiece(PieceType.BISHOP, colour, point, hasMoved, baseMoveD);
+    }
+
+    private CustomPiece queen(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
+        CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
+        CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
+        return new CustomPiece(PieceType.QUEEN, colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
+    }
+
+    private CustomPiece king(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMoveV = new CustomMove(new Path(new Point(0, 1)), CustomMoveType.ADVANCE, true, false);
+        CustomMove baseMoveH = new CustomMove(new Path(new Point(1, 0)), CustomMoveType.ADVANCE, false, true);
+        CustomMove baseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
+        CustomPiece king = new CustomPiece(PieceType.KING, colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
+
+        Plane<Piece> plane = this.board.getPieces(); // For dimensions
+        {
+            // Castle - King side
+            Point kingSideRook = new Point(plane.getMaxX(), plane.getMinY()); // Assuming a standard board
+            CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            this.selfNotMovedCondition(king),
+                            this.targetNotMovedCondition(kingSideRook),
+                            this.targetIsPieceTypeCondition(kingSideRook, PieceType.ROOK),
+                            this.emptyPathCondition(point.shift(colour, Direction.RIGHT), kingSideRook)
+                    ))
+                    .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.board.getPiece(kingSideRook)))
+                    .build();
+            king.addMove(castleKingSide);
         }
-        return null;
+        {
+            // Castle - Queen side
+            Point queenSideRook = new Point(plane.getMinX(), plane.getMinY()); // Assuming a standard board
+            CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(true)
+                    .isSpecificQuadrant(false)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            this.selfNotMovedCondition(king),
+                            this.targetNotMovedCondition(queenSideRook),
+                            this.targetIsPieceTypeCondition(queenSideRook, PieceType.ROOK),
+                            this.emptyPathCondition(point.shift(colour, Direction.LEFT), queenSideRook)
+                    ))
+                    .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.board.getPiece(queenSideRook)))
+                    .build();
+            king.addMove(castleQueenSide);
+        }
+        return king;
+    }
+
+    private CustomPiece pawn(Colour colour, Point point, boolean hasMoved) {
+        CustomMove baseMove = new CustomMove.Builder(new Path(new Point(0, 1)), CustomMoveType.ADVANCE)
+                .isMirrorXAxis(false)
+                .isMirrorYAxis(false)
+                .isSpecificQuadrant(true)
+                .isAttack(false)
+                .build();
+        CustomPiece pawn = new CustomPiece(PieceType.PAWN, colour, point, hasMoved, baseMove);
+
+        {
+            // Pawns can only capture one space diagonal from their front
+            CustomMove pawnCapture = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+                    .isMirrorXAxis(false)
+                    .isMove(false)
+                    .build();
+            pawn.addMove(pawnCapture);
+        }
+        {
+            // Pawns can move forward two spaces if they have not moved
+            CustomMove pawnCharge = new CustomMove.Builder(new Path(new Point(0, 1), new Point(0, 2)),
+                    CustomMoveType.ADVANCE)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(this.selfNotMovedCondition(pawn)))
+                    .build();
+            pawn.addMove(pawnCharge);
+        }
+
+        // En Passant is split into two due to limitations with References, as they don't have CustomPiece's mirroring
+        // Todo: Create LogEntry that uses references, so a relative location can be used for the followUp
+        {
+            LogEntry<Point, Piece> followUpRight = new ChessLogEntry(point, null,
+                    this.board.getPiece(point.shift(colour, Direction.BACK)));
+            CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            this.lastMovedIsPieceTypeCondition(PieceType.PAWN),
+                            this.lastMovedIsNearbyPieceCondition(null, 1, 0),
+                            this.lastMovedTravelledDistanceCondition(2)
+                    ))
+                    .followUp(followUpRight)
+                    .build();
+            pawn.addMove(enPassantRight);
+        }
+        {
+            LogEntry<Point, Piece> followUpLeft = new ChessLogEntry(point, null,
+                    this.board.getPiece(point.shift(colour, Direction.BACK)));
+            CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(true)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            this.lastMovedIsPieceTypeCondition(PieceType.PAWN),
+                            this.lastMovedIsNearbyPieceCondition(null, -1, 0),
+                            this.lastMovedTravelledDistanceCondition(2)
+                    ))
+                    .followUp(followUpLeft)
+                    .build();
+            pawn.addMove(enPassantLeft);
+        }
+        return pawn;
     }
 
 }
