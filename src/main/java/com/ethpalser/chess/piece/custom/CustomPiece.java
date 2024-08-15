@@ -3,6 +3,7 @@ package com.ethpalser.chess.piece.custom;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -57,15 +58,19 @@ public class CustomPiece implements Piece {
     }
 
     @Override
+    public Point getPoint() {
+        return this.position;
+    }
+
+    @Override
     public MoveSet getMoves(Board board) {
         Set<Point> set = new HashSet<>();
         // todo: update to use Movements, which requires refactoring all custom logic to use ChessPiece and ChessBoard
         return new MoveSet(set);
     }
 
-    @Override
-    public Point getPoint() {
-        return this.position;
+    public void addMove(CustomMove move) {
+        this.customMoves.add(move);
     }
 
     /**
