@@ -23,23 +23,23 @@ public class CustomBoard implements Board {
     private final Plane<Piece> pieces;
 
     public CustomBoard() {
-        Plane<Piece> map = new Plane<>(0, 0, 8, 8);
-        int length = map.length();
-        map.putAll(this.generatePiecesInRank(length, 0));
-        map.putAll(this.generatePiecesInRank(length, 1));
-        map.putAll(this.generatePiecesInRank(length, map.length() - 2));
-        map.putAll(this.generatePiecesInRank(length, map.length() - 1));
-        this.pieces = map;
+        Plane<Piece> plane = new Plane<>(0, 0, 7, 7);
+        int length = plane.length();
+        plane.putAll(this.generatePiecesInRank(plane, length, 0));
+        plane.putAll(this.generatePiecesInRank(plane, length, 1));
+        plane.putAll(this.generatePiecesInRank(plane, length, plane.length() - 2));
+        plane.putAll(this.generatePiecesInRank(plane, length, plane.length() - 1));
+        this.pieces = plane;
     }
 
     public CustomBoard(List<String> pieces) {
-        Plane<Piece> map = new Plane<>();
-        CustomPieceFactory pf = new CustomPieceFactory(this, null);
+        Plane<Piece> plane = new Plane<>(0, 0, 7, 7);
+        CustomPieceFactory pf = new CustomPieceFactory(plane, null);
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);
-            map.put(customPiece.getPoint(), customPiece);
+            plane.put(customPiece.getPoint(), customPiece);
         }
-        this.pieces = map;
+        this.pieces = plane;
     }
 
     @Override
@@ -108,11 +108,11 @@ public class CustomBoard implements Board {
 
     // PRIVATE METHODS
 
-    private Map<Point, CustomPiece> generatePiecesInRank(int length, int y) {
+    private Map<Point, CustomPiece> generatePiecesInRank(Plane<Piece> plane, int length, int y) {
         Map<Point, CustomPiece> map = new HashMap<>();
         Colour colour = y < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
 
-        CustomPieceFactory customPieceFactory = new CustomPieceFactory(this, null);
+        CustomPieceFactory customPieceFactory = new CustomPieceFactory(plane, null);
         if (y == 0 || y == length - 1) {
             for (int x = 0; x < 8; x++) {
                 Point vector = new Point(x, y);

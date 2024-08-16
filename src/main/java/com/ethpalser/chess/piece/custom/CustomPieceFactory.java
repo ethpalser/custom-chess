@@ -1,6 +1,5 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -31,11 +30,11 @@ import java.util.regex.Pattern;
 
 public class CustomPieceFactory {
 
-    private final Board board;
+    private final Plane<Piece> plane;
     private final Log<Point, Piece> log;
 
-    public CustomPieceFactory(Board board, Log<Point, Piece> log) {
-        this.board = board;
+    public CustomPieceFactory(Plane<Piece> plane, Log<Point, Piece> log) {
+        this.plane = plane;
         this.log = log;
     }
 
@@ -105,19 +104,16 @@ public class CustomPieceFactory {
     // PATHS
 
     private Path vertical() {
-        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
         return new Path(new Point(plane.getMinX(), plane.getMinY() + 1), new Point(plane.getMinX(), plane.getMaxY()));
     }
 
     private Path horizontal() {
-        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
         return new Path(new Point(plane.getMinX() + 1, plane.getMinY()), new Point(plane.getMaxX(), plane.getMinY()));
     }
 
     private Path diagonal() {
-        Plane<Piece> plane = this.board.getPieces(); // Used for dimensions
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
         return new Path(new Point(plane.getMinX() + 1, plane.getMinY() + 1),
                 new Point(plane.getMaxX(), plane.getMaxY()));
@@ -155,7 +151,6 @@ public class CustomPieceFactory {
         CustomMove baseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
         CustomPiece king = new CustomPiece(PieceType.KING, colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
 
-        Plane<Piece> plane = this.board.getPieces(); // For dimensions
         {
             // Castle - King side
             Point kingSideRook = new Point(plane.getMaxX(), plane.getMinY()); // Assuming a standard board
@@ -170,7 +165,7 @@ public class CustomPieceFactory {
                             this.targetIsPieceTypeCondition(kingSideRook, PieceType.ROOK),
                             this.emptyPathCondition(point.shift(colour, Direction.RIGHT), kingSideRook)
                     ))
-                    .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.board.getPiece(kingSideRook)))
+                    .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.plane.get(kingSideRook)))
                     .build();
             king.addMove(castleKingSide);
         }
@@ -188,7 +183,7 @@ public class CustomPieceFactory {
                             this.targetIsPieceTypeCondition(queenSideRook, PieceType.ROOK),
                             this.emptyPathCondition(point.shift(colour, Direction.LEFT), queenSideRook)
                     ))
-                    .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.board.getPiece(queenSideRook)))
+                    .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.plane.get(queenSideRook)))
                     .build();
             king.addMove(castleQueenSide);
         }
@@ -227,7 +222,7 @@ public class CustomPieceFactory {
 
         // En Passant is split into two due to limitations with References, as they don't have CustomPiece's mirroring
         {
-            LogEntry<Point, Piece> followUpRight = new ReferenceLogEntry<>(this.board.getPieces(),
+            LogEntry<Point, Piece> followUpRight = new ReferenceLogEntry<>(this.plane,
                     new PieceReference(pawn, Direction.AT, 1, 0), null);
             CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)
@@ -244,7 +239,7 @@ public class CustomPieceFactory {
             pawn.addMove(enPassantRight);
         }
         {
-            LogEntry<Point, Piece> followUpLeft = new ReferenceLogEntry<>(this.board.getPieces(),
+            LogEntry<Point, Piece> followUpLeft = new ReferenceLogEntry<>(this.plane,
                     new PieceReference(pawn, Direction.AT, -1, 0), null);
             CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)

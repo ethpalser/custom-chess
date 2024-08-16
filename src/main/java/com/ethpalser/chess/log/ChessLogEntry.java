@@ -23,7 +23,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.moved = moved;
         this.captured = captured;
         // For this to work this object must be created after verifying but before executing the move from start to end
-        this.isFirstMove = !this.moved.hasMoved();
+        this.isFirstMove = this.moved != null && !this.moved.hasMoved();
         this.followUp = null;
     }
 

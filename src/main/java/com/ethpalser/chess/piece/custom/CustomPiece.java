@@ -7,6 +7,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +30,7 @@ public class CustomPiece implements Piece {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;
-        this.customMoves = Arrays.asList(customMoves);
+        this.customMoves = new ArrayList<>(Arrays.asList(customMoves));
         this.hasMoved = false;
         this.code = pieceType.getCode();
     }
