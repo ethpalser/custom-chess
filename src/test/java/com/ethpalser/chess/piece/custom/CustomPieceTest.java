@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

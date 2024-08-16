@@ -1,6 +1,5 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

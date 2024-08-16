@@ -1,6 +1,5 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.board.custom;
 
-import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
