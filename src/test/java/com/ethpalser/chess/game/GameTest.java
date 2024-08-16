@@ -1,16 +1,16 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.StandardBoard;
+import com.ethpalser.chess.board.custom.CustomBoard;
+import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.ThreatMap;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.piece.Colour;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
