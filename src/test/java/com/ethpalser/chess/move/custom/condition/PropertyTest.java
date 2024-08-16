@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom.movement;
+package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;

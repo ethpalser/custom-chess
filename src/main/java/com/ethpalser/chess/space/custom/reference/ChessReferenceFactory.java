@@ -1,4 +1,4 @@
-package com.ethpalser.chess.space.reference;
+package com.ethpalser.chess.space.custom.reference;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
@@ -6,6 +6,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.custom.Location;
 
 public class ChessReferenceFactory {
 

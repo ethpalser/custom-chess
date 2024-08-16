@@ -1,4 +1,4 @@
-package com.ethpalser.chess.space.reference;
+package com.ethpalser.chess.space.custom;
 
 public enum Location {
     LAST_MOVED,

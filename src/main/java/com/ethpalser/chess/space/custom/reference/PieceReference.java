@@ -1,9 +1,10 @@
-package com.ethpalser.chess.space.reference;
+package com.ethpalser.chess.space.custom.reference;
 
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.custom.Location;
 import java.util.List;
 
 public class PieceReference implements Reference<Piece> {

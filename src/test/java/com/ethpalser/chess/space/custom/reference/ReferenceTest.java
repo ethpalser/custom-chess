@@ -1,4 +1,4 @@
-package com.ethpalser.chess.space.reference;
+package com.ethpalser.chess.space.custom.reference;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.StandardBoard;
@@ -10,6 +10,12 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
+import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.space.custom.reference.LogReference;
+import com.ethpalser.chess.space.custom.reference.PathReference;
+import com.ethpalser.chess.space.custom.reference.PieceReference;
+import com.ethpalser.chess.space.custom.reference.Reference;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;

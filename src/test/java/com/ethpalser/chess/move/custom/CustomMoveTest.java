@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom.movement;
+package com.ethpalser.chess.move.custom;
 
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.move.custom.CustomMoveType;

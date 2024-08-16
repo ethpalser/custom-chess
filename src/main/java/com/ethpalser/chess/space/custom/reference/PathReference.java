@@ -1,9 +1,10 @@
-package com.ethpalser.chess.space.reference;
+package com.ethpalser.chess.space.custom.reference;
 
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
+import com.ethpalser.chess.space.custom.Location;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

@@ -4,7 +4,7 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
-import com.ethpalser.chess.space.reference.Reference;
+import com.ethpalser.chess.space.custom.reference.Reference;
 
 public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, T> {
 

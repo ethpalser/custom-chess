@@ -2,7 +2,7 @@ package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
-import com.ethpalser.chess.space.reference.Reference;
+import com.ethpalser.chess.space.custom.reference.Reference;
 import java.util.List;
 
 public class ReferenceCondition<T extends Positional> implements Conditional<T> {
