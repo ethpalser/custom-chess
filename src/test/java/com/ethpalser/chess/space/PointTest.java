@@ -60,6 +60,14 @@ class PointTest {
     }
 
     @Test
+    void equals_coordinateWithSameClassAndValueButDifferentType_isTrue() {
+        Comparable<Point> pointA = new Point(5, 7);
+        Point pointB = new Point(5, 7);
+        boolean isEqual = pointB.equals(pointA) && pointA.equals(pointB);
+        assertTrue(isEqual);
+    }
+
+    @Test
     void hashCode_notEqualCoordinate_isNotEqual() {
         Point coA = new Point(5, 7);
         Point coB = new Point(5, 5);

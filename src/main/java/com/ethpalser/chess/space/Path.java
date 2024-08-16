@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
@@ -14,11 +15,13 @@ public class Path implements Iterable<Point> {
 
     public Path(Point end) {
         this.linkedHashSet = new LinkedHashSet<>();
-        this.linkedHashSet.add(end);
+        if (end != null) {
+            this.linkedHashSet.add(end);
+        }
     }
 
     public Path(List<Point> points) {
-        this.linkedHashSet = points.stream().collect(Collector.of(
+        LinkedHashSet<Point> set = points.stream().collect(Collector.of(
                 (Supplier<LinkedHashSet<Point>>) LinkedHashSet::new,
                 HashSet::add,
                 (map, map2) -> {
@@ -26,9 +29,14 @@ public class Path implements Iterable<Point> {
                     return map;
                 }
         ));
+        set.remove(null);
+        set.removeIf(Objects::isNull);
+        this.linkedHashSet = set;
     }
 
     public Path(LinkedHashSet<Point> set) {
+        set.remove(null);
+        set.removeIf(Objects::isNull);
         this.linkedHashSet = set;
     }
 
@@ -59,16 +67,22 @@ public class Path implements Iterable<Point> {
 
                 set = new LinkedHashSet<>();
                 // Build the path along the line until an edge is exceeded
-                while (x != end.getX() + dirX && y != end.getY() + dirY) {
-                    Point point = new Point(x, y);
-                    set.add(point);
+                do {
+                    set.add(new Point(x, y));
                     x = x + dirX;
                     y = y + dirY;
-                }
+                } while ((x != end.getX() || y != end.getY()));
+                // Loop only continues until the end point is reached, so this is added after
+                set.add(end);
             }
             default -> set = new LinkedHashSet<>();
         }
+        set.remove(null);
         this.linkedHashSet = set;
+    }
+
+    public boolean hasPoint(Point point) {
+        return this.linkedHashSet.contains(point);
     }
 
     public Set<Point> toSet() {
@@ -94,7 +108,9 @@ public class Path implements Iterable<Point> {
         int prime = 63;
         int result = 1;
         for (Point vector : this) {
-            result = result * prime + vector.hashCode();
+            if (vector != null) {
+                result = result * prime + vector.hashCode();
+            }
         }
         return result;
     }

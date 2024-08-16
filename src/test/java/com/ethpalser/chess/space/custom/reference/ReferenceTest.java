@@ -9,6 +9,7 @@ import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -126,6 +127,12 @@ class ReferenceTest {
         Point end = new Point(1, 0);
 
         Reference<Piece> ref = new PathReference<>(Location.PATH, start, end);
+
+        // Forcefully remove piece from board
+        Path path = new Path(start, end);
+        for (Point p : path) {
+            board.addPiece(p, null);
+        }
 
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }

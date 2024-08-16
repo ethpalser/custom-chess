@@ -1,5 +1,7 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -147,4 +149,29 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
         return this.maxX - this.minX + 1;
     }
 
+    // Temporary
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = this.length() - 1; y >= 0; y--) {
+            for (int x = 0; x <= this.width() - 1; x++) {
+                Piece piece = (Piece) get(this.at(x, y));
+                if (piece == null) {
+                    sb.append("|   ");
+                } else {
+                    sb.append("| ");
+                    if (PieceType.PAWN.getCode().equals(piece.getCode())) {
+                        sb.append("P ");
+                    } else {
+                        sb.append(piece.getCode()).append(" ");
+                    }
+                }
+            }
+            sb.append("| ").append(1 + y).append("\n");
+        }
+        for (int x = 0; x < this.width(); x++) {
+            sb.append("  ").append((char) ('a' + x)).append(" ");
+        }
+        return sb.toString();
+    }
 }

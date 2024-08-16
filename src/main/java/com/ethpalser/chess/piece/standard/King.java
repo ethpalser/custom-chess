@@ -60,7 +60,7 @@ public class King implements Piece {
 
         // castling
         // not moved and not threatened (need to use the correct threat map)
-        if (!this.hasMoved && opponentThreats.getPieces(this.point).isEmpty()) {
+        if (!this.hasMoved && opponentThreats != null && opponentThreats.getPieces(this.point).isEmpty()) {
             int startRank = this.colour == Colour.WHITE ? board.getMinY() : board.getMaxY();
             // king side
             Piece kingSideRook = board.get(new Point(board.getMinX(), startRank));
@@ -115,6 +115,9 @@ public class King implements Piece {
     // PRIVATE METHODS
 
     private boolean isSafe(ThreatMap threatMap, Point point) {
+        if (threatMap == null || point == null) {
+            return false;
+        }
         return threatMap.getPieces(point).isEmpty();
     }
 
@@ -129,5 +132,10 @@ public class King implements Piece {
             return Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return this.getCode() + this.getPoint().toString();
     }
 }

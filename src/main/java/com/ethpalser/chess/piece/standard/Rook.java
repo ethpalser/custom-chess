@@ -62,4 +62,8 @@ public class Rook implements Piece {
         return this.hasMoved;
     }
 
+    @Override
+    public String toString() {
+        return this.getCode() + this.getPoint().toString();
+    }
 }

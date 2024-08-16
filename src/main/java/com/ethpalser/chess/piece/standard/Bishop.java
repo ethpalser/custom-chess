@@ -61,4 +61,9 @@ public class Bishop implements Piece {
     public boolean hasMoved() {
         return this.hasMoved;
     }
+
+    @Override
+    public String toString() {
+        return this.getCode() + this.getPoint().toString();
+    }
 }

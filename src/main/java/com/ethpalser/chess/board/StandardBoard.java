@@ -60,7 +60,7 @@ public class StandardBoard implements Board {
             throw new IllegalActionException("piece cannot move as it does not exist at " + start);
         }
 
-        Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(start);
+        Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(end);
         if (move == null) {
             throw new IllegalActionException("this piece cannot move to " + end);
         }

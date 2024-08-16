@@ -130,8 +130,7 @@ public class Point implements Comparable<Point> {
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
-        if (!board.isInBounds(point.getX(), point.getY()) || (board.get(point) != null
-                && board.get(point).getColour() == colour)) {
+        if (!board.isInBounds(point) || (board.get(point) != null && board.get(point).getColour() == colour)) {
             return null;
         }
         return point;

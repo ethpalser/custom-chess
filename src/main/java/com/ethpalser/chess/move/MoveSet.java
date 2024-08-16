@@ -18,7 +18,9 @@ public class MoveSet {
     public MoveSet(Point... points) {
         Set<Movement> moves = new HashSet<>();
         for (Point p : points) {
-            moves.add(new Move(p));
+            if (p != null) {
+                moves.add(new Move(p));
+            }
         }
         moves.remove(null);
         this.set = moves;
@@ -27,7 +29,9 @@ public class MoveSet {
     public MoveSet(Path... paths) {
         Set<Movement> moves = new HashSet<>();
         for (Path path : paths) {
-            moves.add(new Move(path));
+            if (!path.toSet().isEmpty()) {
+                moves.add(new Move(path));
+            }
         }
         moves.remove(null);
         this.set = moves;
@@ -42,7 +46,7 @@ public class MoveSet {
     }
 
     public Movement getMove(Point point) {
-        return this.set.stream().filter(m -> m.getPath().toSet().contains(point)).findFirst().orElse(null);
+        return this.set.stream().filter(m -> m.getPath().hasPoint(point)).findFirst().orElse(null);
     }
 
     public void addMove(Movement move) {
