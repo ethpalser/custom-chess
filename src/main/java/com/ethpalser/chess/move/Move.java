@@ -49,7 +49,6 @@ public class Move implements Movement {
 
     @Override
     public int hashCode() {
-        // FollowUp is irrelevant when used in a HashSet, as there cannot be overlap with paths
         return Objects.hash(this.path, this.followUpMove);
     }
 
