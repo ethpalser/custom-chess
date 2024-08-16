@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.CustomBoard;
+import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.StandardBoard;
 import com.ethpalser.chess.log.ChessLog;

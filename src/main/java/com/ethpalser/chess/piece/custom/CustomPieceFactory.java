@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.log.ReferenceLogEntry;
+import com.ethpalser.chess.log.custom.ReferenceLogEntry;
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.move.custom.condition.Comparator;

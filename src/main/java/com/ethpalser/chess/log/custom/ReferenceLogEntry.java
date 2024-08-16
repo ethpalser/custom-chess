@@ -1,5 +1,6 @@
-package com.ethpalser.chess.log;
+package com.ethpalser.chess.log.custom;
 
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;

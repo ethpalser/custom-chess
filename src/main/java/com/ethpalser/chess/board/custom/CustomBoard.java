@@ -1,5 +1,6 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.board.custom;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;

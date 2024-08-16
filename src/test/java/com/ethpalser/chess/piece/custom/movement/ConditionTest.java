@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom.movement;
 
-import com.ethpalser.chess.board.CustomBoard;
+import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.Conditional;

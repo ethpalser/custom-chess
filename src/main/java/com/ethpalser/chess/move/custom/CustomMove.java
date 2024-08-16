@@ -1,6 +1,6 @@
 package com.ethpalser.chess.move.custom;
 
-import com.ethpalser.chess.board.CustomBoard;
+import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
