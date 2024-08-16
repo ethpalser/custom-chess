@@ -3,7 +3,6 @@ package com.ethpalser.chess.game;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.ThreatMap;
@@ -70,9 +69,9 @@ public class ChessGame {
                     + ", piece: " + movingPiece.getColour() + ")");
         }
 
-        this.board.movePiece(start, end, this.log, this.getThreatMap(Colour.opposite(this.turn)));
-        // Todo: update movePiece to return a LogEntry
-        this.log.push(new ChessLogEntry(start, end, movingPiece));
+        LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
+                this.getThreatMap(Colour.opposite(this.turn)));
+        this.log.push(entry);
         // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
         if (this.isKingInCheck(this.turn)) {
             this.undoUpdate(1, false);
