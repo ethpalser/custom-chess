@@ -9,19 +9,12 @@ public class Point implements Comparable<Point> {
     private final int x;
     private final int y;
 
-    private final int minX;
-    private final int minY;
-    private final int maxX;
-    private final int maxY;
+    private static final int MAX_WIDTH = 64;
+    private static final int MAX_HEIGHT = 64;
 
     public Point() {
         this.x = 0;
         this.y = 0;
-        // Default bounds
-        this.minX = 0;
-        this.minY = 0;
-        this.maxX = 31;
-        this.maxY = 31;
     }
 
     /**
@@ -31,7 +24,8 @@ public class Point implements Comparable<Point> {
      * @param y An integer between 0 and 31 along the y-axis.
      */
     public Point(int x, int y) {
-        this(x, y, 0, 0, 31, 31);
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -42,7 +36,7 @@ public class Point implements Comparable<Point> {
      * @param y An integer between 0 and 10 along the y-axis.
      */
     public Point(char x, char y) {
-        this(x - 'a', y - '1', 0, 0, 10, 10);
+        this(x - 'a', y - '1');
     }
 
     /**
@@ -55,35 +49,8 @@ public class Point implements Comparable<Point> {
         this(s.charAt(s.length() - 2), s.charAt(s.length() - 1));
     }
 
-    /**
-     * Instantiate a Vector2D with specified bounds. All Vector2D must have bounds for hashing. It is
-     * recommended to use a Factory method of a class with these bounds to ensure consistency and to abstract the
-     * min and max. Vector2Ds are most compatible with those with the same min and max, and to safely compare these
-     * vectors it is recommended to convert them into the same size.
-     *
-     * @param xVal     Integer co-ordinate on x-axis
-     * @param yVal     Integer co-ordinate on y-axis
-     * @param xBounds1 Represents one bound of the x-axis (ex. min. x value)
-     * @param yBounds1 Represents one bound of the y-axis (ex. min. y value)
-     * @param xBounds2 Represents one bound of the x-axis
-     * @param yBounds2 Represents one bound of the y-axis
-     */
-    public Point(int xVal, int yVal, int xBounds1, int yBounds1, int xBounds2, int yBounds2) {
-        this.x = xVal;
-        this.y = yVal;
-        // width * height >= Integer.MAX_VALUE, using division to avoid overflow
-        if (Integer.MAX_VALUE / Math.abs(xBounds1 + xBounds2 + 1) <= Math.abs(yBounds1 + yBounds2 + 1)) {
-            throw new ArithmeticException("Bounds exceed allowed size of " + Integer.MAX_VALUE);
-        }
-        // Default bounds
-        this.minX = Math.min(xBounds1, xBounds2);
-        this.minY = Math.min(yBounds1, yBounds2);
-        this.maxX = Math.max(xBounds1, xBounds2);
-        this.maxY = Math.max(yBounds1, yBounds2);
-    }
-
     public Point(Point copy) {
-        this(copy.x, copy.y, copy.minX, copy.minY, copy.maxX, copy.maxY);
+        this(copy.x, copy.y);
     }
 
     public int getX() {
@@ -111,7 +78,7 @@ public class Point implements Comparable<Point> {
         if (y < 0)
             quad += 2;
         // Each x, y value maps to a distinct positive integer in a bounded space
-        return boundsWidth() * boundsHeight() * quad + Math.abs(this.y) * boundsWidth() + Math.abs(this.x);
+        return MAX_WIDTH * MAX_HEIGHT * quad + Math.abs(this.y) * MAX_WIDTH + Math.abs(this.x);
     }
 
     @Override
@@ -135,16 +102,6 @@ public class Point implements Comparable<Point> {
         return "" + xChar + (this.y + 1);
     }
 
-    private int boundsWidth() {
-        // This can only be 1 or greater
-        return this.maxX - this.minX + 1;
-    }
-
-    private int boundsHeight() {
-        // This can only be 1 or greater
-        return this.maxY - this.minY + 1;
-    }
-
     /**
      * Creates a new Vector from the current Vector shifted one space in the given direction.
      *
@@ -160,17 +117,11 @@ public class Point implements Comparable<Point> {
         int dir = Colour.WHITE.equals(colour) ? 1 : -1;
         return switch (direction) {
             case AT -> this;
-            case FRONT -> new Point(this.x, this.y + dir, this.minX, this.minY, this.maxX, this.maxY);
-            case BACK -> new Point(this.x, this.y - dir, this.minX, this.minY, this.maxX, this.maxY);
-            case RIGHT -> new Point(this.x + dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
-            case LEFT -> new Point(this.x - dir, this.y, this.minX, this.minY, this.maxX, this.maxY);
+            case FRONT -> new Point(this.x, this.y + dir);
+            case BACK -> new Point(this.x, this.y - dir);
+            case RIGHT -> new Point(this.x + dir, this.y);
+            case LEFT -> new Point(this.x - dir, this.y);
         };
-    }
-
-    // Temporary
-    public boolean isValidLocation(Point point) {
-        return this.minX <= point.getX() && point.getX() <= this.maxX
-                && this.minY <= point.getY() && point.getY() <= this.minY;
     }
 
     // STATIC METHODS

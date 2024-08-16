@@ -316,7 +316,7 @@ public class CustomMove {
         if (vector == null || colour == null) {
             throw new NullPointerException();
         }
-        if (!vector.isValidLocation(vector)) {
+        if (!board.isInBounds(vector)) {
             return false;
         }
         if (board != null) {
@@ -335,7 +335,7 @@ public class CustomMove {
         if (vector == null) {
             throw new NullPointerException();
         }
-        if (!vector.isValidLocation(vector) || board == null) {
+        if (!board.isInBounds(vector) || board == null) {
             return false;
         }
         Piece customPiece = board.get(vector);

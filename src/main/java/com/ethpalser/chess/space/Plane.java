@@ -19,8 +19,8 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
         space = new HashMap<>();
         this.minX = 0;
         this.minY = 0;
-        this.maxX = 31;
-        this.maxY = 31;
+        this.maxX = 63;
+        this.maxY = 63;
     }
 
     public Plane(int x1, int y1, int x2, int y2) {
@@ -97,11 +97,11 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
     }
 
     public Point at(int x, int y) throws IndexOutOfBoundsException {
-        if (x < minX || x > maxX || y < minY || y > maxY) {
+        if (!this.isInBounds(x, y)) {
             String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space. " + this.printBounds();
             throw new IndexOutOfBoundsException(errMsg);
         }
-        return new Point(x, y, this.minX, this.minY, this.maxX, this.maxY);
+        return new Point(x, y);
     }
 
     public Point at(char x, char y) throws IndexOutOfBoundsException {
@@ -117,6 +117,10 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
 
     public boolean isInBounds(int x, int y) {
         return minX <= x && x <= maxX && minY <= y && y <= maxY;
+    }
+
+    public boolean isInBounds(Point point) {
+        return point != null && this.isInBounds(point.getX(), point.getY());
     }
 
     public int getMinX() {
