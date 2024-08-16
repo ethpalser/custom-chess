@@ -70,7 +70,7 @@ public class ChessGame {
                     + ", piece: " + movingPiece.getColour() + ")");
         }
 
-        this.board.movePiece(start, end);
+        this.board.movePiece(start, end, this.log, this.getThreatMap(Colour.opposite(this.turn)));
         // Todo: update movePiece to return a LogEntry
         this.log.push(new ChessLogEntry(start, end, movingPiece));
         // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)

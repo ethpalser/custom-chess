@@ -4,6 +4,9 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.StandardBoard;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.ThreatMap;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
@@ -35,8 +38,11 @@ class ReferenceTest {
     void absoluteRef_getReferences_givenPieceMovedOntoLocation_thenHasPiece() {
         // Given
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
-        board.movePiece(new Point(4, 1), new Point(4, 3));
+        board.movePiece(new Point(4, 1), new Point(4, 3), log, threatMap);
         // Then
         assertFalse(reference.getReferences(board.getPieces()).isEmpty());
         assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(4, 3)));
@@ -99,12 +105,15 @@ class ReferenceTest {
     @Test
     void pathRef_getReferences_givenDestinationLocationAndFilled_thenIsNotEmpty() {
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+
         Point start = new Point(4, 1);
         Point end = new Point(4, 3);
         Piece piece = board.getPiece(start);
 
         Reference<Piece> ref = new PathReference<>(Location.PATH_END, end);
-        board.movePiece(start, end);
+        board.movePiece(start, end, log, threatMap);
 
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -134,11 +143,13 @@ class ReferenceTest {
     @Test
     void pieceRef_getReferences_givenAtLocationAndMoved_thenIsItself() {
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
         Piece piece = board.getPiece(4, 1); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.AT);
-        board.movePiece(new Point(4, 1), new Point(4, 2));
+        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -146,11 +157,13 @@ class ReferenceTest {
     @Test
     void pieceRef_getReferences_givenBackOfLocationAndMovedUpOne_thenIsEmpty() {
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
         Piece piece = board.getPiece(4, 1); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
-        board.movePiece(new Point(4, 1), new Point(4, 2));
+        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }
@@ -158,13 +171,15 @@ class ReferenceTest {
     @Test
     void pieceRef_getReferences_givenRightOfLocationAndPawnToRight_thenIsPawn() {
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
         Piece refPiece = board.getPiece(4, 1); // e1 pawn
         Piece rightPiece = board.getPiece(5, 1); // f1 pawn
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
-        board.movePiece(new Point(4, 1), new Point(4, 2));
-        board.movePiece(new Point(5, 1), new Point(5, 2));
+        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        board.movePiece(new Point(5, 1), new Point(5, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(rightPiece));
     }

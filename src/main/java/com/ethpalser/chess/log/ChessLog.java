@@ -25,7 +25,7 @@ public class ChessLog implements Log<Point, Piece> {
             ChessLogEntry rec = new ChessLogEntry(board, s);
             this.logStack.push(rec);
             // Manually move the piece on the board, ignoring all checks
-            board.movePiece(rec.getStart(), rec.getEnd());
+            board.movePiece(rec.getStart(), rec.getEnd(), null, null);
         }
     }
 

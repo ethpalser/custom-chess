@@ -1,7 +1,9 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Movement;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -46,7 +48,8 @@ public class StandardBoard implements Board {
     }
 
     @Override
-    public void movePiece(Point start, Point end) {
+    public void movePiece(Point start, Point end,
+            Log<Point, Piece> log, ThreatMap threatMap) {
         if (start == null || end == null) {
             throw new NullPointerException();
         }
@@ -54,8 +57,8 @@ public class StandardBoard implements Board {
         if (piece == null) {
             throw new IllegalActionException("piece cannot move as it does not exist at " + start);
         }
-        // Todo: need log and threats for pawn and king
-        Movement move = piece.getMoves(this.getPieces(), null, null).getMove(start);
+
+        Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(start);
         if (move == null) {
             throw new IllegalActionException("this piece cannot move to " + end);
         }

@@ -1,5 +1,7 @@
 package com.ethpalser.chess.board;
 
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -16,7 +18,8 @@ public interface Board {
 
     void addPiece(Point point, Piece piece);
 
-    void movePiece(Point start, Point end);
+    void movePiece(Point start, Point end,
+            Log<Point, Piece> log, ThreatMap threatMap);
 
     boolean isInBounds(int x, int y);
 

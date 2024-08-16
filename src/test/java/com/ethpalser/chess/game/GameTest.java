@@ -4,6 +4,10 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.CustomBoard;
 import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.StandardBoard;
+import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.ThreatMap;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.piece.Colour;
@@ -89,8 +93,10 @@ class GameTest {
         Point source = new Point(pieceX, pieceY); // White Knight
         Point target = new Point(nextX, nextY); // White Pawn
         Board board = new StandardBoard();
-        board.movePiece(new Point(nextX, 1), new Point(nextX, nextY)); // Filler
-        board.movePiece(new Point(0, 6), new Point(0, 5)); // Filler
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+        board.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
+        board.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
 
         ChessGame game = new ChessGame(board);
 
@@ -258,14 +264,16 @@ class GameTest {
         Point source = new Point(4, 6);
         Point target = new Point(4, 4);
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // White move
-        board.movePiece(new Point(3, 1), new Point(3, 3));
+        board.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
         // Black move (filler)
-        board.movePiece(new Point(1, 6), new Point(1, 5));
+        board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
-        board.movePiece(new Point(3, 3), new Point(3, 4));
+        board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         // Black move
-        board.movePiece(source, target);
+        board.movePiece(source, target, log, threatMap);
 
         ChessGame game = new ChessGame(board);
 
@@ -285,14 +293,16 @@ class GameTest {
         Point source = new Point(2, 6);
         Point target = new Point(2, 4);
         Board board = new StandardBoard();
+        Log<Point, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // White move
-        board.movePiece(new Point(3, 1), new Point(3, 3));
+        board.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
         // Black move (filler)
-        board.movePiece(new Point(1, 6), new Point(1, 5));
+        board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
-        board.movePiece(new Point(3, 3), new Point(3, 4));
+        board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         // Black move
-        board.movePiece(source, target);
+        board.movePiece(source, target, log, threatMap);
 
         ChessGame game = new ChessGame(board);
 
