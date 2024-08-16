@@ -216,6 +216,7 @@ public class Point implements Comparable<Point> {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
+                // a piece was encountered, so the path ends at or just before this
                 break;
             }
             set.add(pos);
@@ -242,6 +243,7 @@ public class Point implements Comparable<Point> {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
+                // a piece was encountered, so the path ends at or just before this
                 break;
             }
             set.add(pos);
@@ -271,6 +273,7 @@ public class Point implements Comparable<Point> {
                 if (board.getPiece(pos).getColour() != colour) {
                     set.add(pos);
                 }
+                // a piece was encountered, so the path ends at or just before this
                 break;
             }
             set.add(pos);
