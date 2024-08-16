@@ -1,6 +1,5 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -9,9 +8,8 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Pawn implements Piece {
 
@@ -41,13 +39,14 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board board) {
-        throw new UnsupportedOperationException();
+    public MoveSet getMoves(Plane<Piece> board) {
+        System.err.println("generally unsupported method used by pawn: getMoves(Plane<Piece> board)");
+        return this.getMoves(board, null);
     }
 
     @Override
-    public MoveSet getMoves(Board board, Log<Point, Piece> log) {
-        int nextY = this.colour == Colour.WHITE ? this.point.getY() + 1 : this.point.getY() -1;
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
+        int nextY = this.colour == Colour.WHITE ? this.point.getY() + 1 : this.point.getY() - 1;
         MoveSet moveSet = new MoveSet(
                 Point.generateValidPointOrNull(board, this.point, this.colour, 0, nextY),
                 Point.generateCapturePointOrNull(board, this.point, this.colour, -1, nextY),
@@ -69,7 +68,7 @@ public class Pawn implements Piece {
             Point peekEnd = lastMove.getEnd();
 
             // a pawn moved forward two
-            if (lastMove.isFirstOccurrence() && "P".equals(board.getPiece(peekEnd).getCode())
+            if (lastMove.isFirstOccurrence() && "P".equals(board.get(peekEnd).getCode())
                     && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getX() + 2 == peekStart.getY())
                     || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getX() - 2 == peekStart.getY()))
             ) {
@@ -77,13 +76,13 @@ public class Pawn implements Piece {
                 Point left = Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
                 if (left != null && left.equals(peekEnd)) {
                     Point enPassPoint = Point.generateValidPointOrNull(board, this.point, this.colour, -1, nextY);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.getPiece(left))));
+                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.get(left))));
                 }
                 // that pawn is to the right of this pawn
                 Point right = Point.generateValidPointOrNull(board, this.point, this.colour, 1, 0);
                 if (right != null && right.equals(peekEnd)) {
                     Point enPassPoint = Point.generateValidPointOrNull(board, this.point, this.colour, 1, nextY);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.getPiece(right))));
+                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.get(right))));
                 }
             }
         }

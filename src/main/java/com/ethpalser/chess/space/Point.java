@@ -1,7 +1,7 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import java.util.LinkedHashSet;
 
 public class Point implements Comparable<Point> {
@@ -175,45 +175,45 @@ public class Point implements Comparable<Point> {
 
     // STATIC METHODS
 
-    public static Point generateValidPointOrNull(Board board, Point start, Colour colour,
+    public static Point generateValidPointOrNull(Plane<Piece> board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
-        if (!board.isInBounds(point.getX(), point.getY()) || (board.getPiece(point) != null
-                && board.getPiece(point).getColour() == colour)) {
+        if (!board.isInBounds(point.getX(), point.getY()) || (board.get(point) != null
+                && board.get(point).getColour() == colour)) {
             return null;
         }
         return point;
     }
 
-    public static Point generateCapturePointOrNull(Board board, Point start, Colour colour,
+    public static Point generateCapturePointOrNull(Plane<Piece> board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
-        if (!board.isInBounds(point.getX(), point.getY()) || board.getPiece(point) == null
-                || board.getPiece(point).getColour() == colour) {
+        if (!board.isInBounds(point.getX(), point.getY()) || board.get(point) == null
+                || board.get(point).getColour() == colour) {
             return null;
         }
         // in bounds and opposite colour (i.e. can capture)
         return point;
     }
 
-    public static LinkedHashSet<Point> generateHorizontalMoves(Board board, Point start, Colour colour) {
+    public static LinkedHashSet<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateHorizontalMoves(board, start, colour, false));
         set.addAll(generateHorizontalMoves(board, start, colour, true));
         return set;
     }
 
-    public static LinkedHashSet<Point> generateHorizontalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean right) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
             Point pos = new Point(start.getX() + x, start.getY());
-            if (board.getPiece(pos) != null) {
-                if (board.getPiece(pos).getColour() != colour) {
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
@@ -225,22 +225,22 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateVerticalMoves(Board board, Point start, Colour colour) {
+    public static LinkedHashSet<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateVerticalMoves(board, start, colour, false));
         set.addAll(generateVerticalMoves(board, start, colour, true));
         return set;
     }
 
-    public static LinkedHashSet<Point> generateVerticalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean up) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
             Point pos = new Point(start.getX(), start.getY() + y);
-            if (board.getPiece(pos) != null) {
-                if (board.getPiece(pos).getColour() != colour) {
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
@@ -252,7 +252,7 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateDiagonalMoves(Board board, Point start, Colour colour) {
+    public static LinkedHashSet<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         set.addAll(generateDiagonalMoves(board, start, colour, false, false));
         set.addAll(generateDiagonalMoves(board, start, colour, false, true));
@@ -261,7 +261,7 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateDiagonalMoves(Board board, Point start, Colour colour,
+    public static LinkedHashSet<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean right, boolean up) {
         LinkedHashSet<Point> set = new LinkedHashSet<>();
         int x = right ? 1 : -1;
@@ -269,8 +269,8 @@ public class Point implements Comparable<Point> {
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Point pos = new Point(start.getX() + x, start.getY() + y);
-            if (board.getPiece(pos) != null) {
-                if (board.getPiece(pos).getColour() != colour) {
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
                     set.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this

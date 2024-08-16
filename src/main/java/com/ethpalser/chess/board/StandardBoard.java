@@ -55,7 +55,7 @@ public class StandardBoard implements Board {
             throw new IllegalActionException("piece cannot move as it does not exist at " + start);
         }
         // Todo: need log and threats for pawn and king
-        Movement move = piece.getMoves(this, null, null).getMove(start);
+        Movement move = piece.getMoves(this.getPieces(), null, null).getMove(start);
         if (move == null) {
             throw new IllegalActionException("this piece cannot move to " + end);
         }

@@ -1,9 +1,9 @@
 package com.ethpalser.chess.move;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,11 +17,11 @@ public class ThreatMap implements MoveMap {
     private final int length;
     private final int width;
 
-    public ThreatMap(Colour colour, Board board, Log<Point, Piece> log) {
+    public ThreatMap(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
         this.colour = colour;
         this.map = this.setup(colour, board, log);
-        this.length = board.getPieces().length();
-        this.width = board.getPieces().width();
+        this.length = board.length();
+        this.width = board.width();
     }
 
     @Override
@@ -50,8 +50,8 @@ public class ThreatMap implements MoveMap {
     }
 
     @Override
-    public void updateMoves(Board board, Log<Point, Piece> log, Point point) {
-        Piece piece = board.getPiece(point);
+    public void updateMoves(Plane<Piece> board, Log<Point, Piece> log, Point point) {
+        Piece piece = board.get(point);
         if (piece != null) {
             Set<Piece> threateningPieces = this.getPieces(point);
 
@@ -90,9 +90,9 @@ public class ThreatMap implements MoveMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<Piece>> setup(Colour colour, Board board, Log<Point, Piece> log) {
+    private Map<Point, Set<Piece>> setup(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
-        for (Piece piece : board.getPieces()) {
+        for (Piece piece : board) {
             if (colour.equals(piece.getColour())) {
                 MoveSet moveSet = piece.getMoves(board, log);
                 for (Point point : moveSet.getPoints()) {

@@ -9,6 +9,7 @@ import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 import java.util.Set;
@@ -37,8 +38,8 @@ public class ChessGame {
         // Assuming standard starting positions, and if this assumption changes it should be provided by the board
         this.whiteKing = new Point('e', '1');
         this.blackKing = new Point('e', '8');
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board, this.log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
     }
 
     public GameStatus updateGame(Action action) throws IllegalActionException {
@@ -222,7 +223,7 @@ public class ChessGame {
         Point oppKingPoint = this.getOpponentKingPosition(this.turn);
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Assuming King is in check
-        Set<Point> oppKingMoveSet = oppKing.getMoves(this.board, this.log).getPoints();
+        Set<Point> oppKingMoveSet = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();
         if (!oppKingMoveSet.isEmpty()) {
             for (Point p : oppKingMoveSet) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
@@ -248,7 +249,7 @@ public class ChessGame {
                 return false;
             }
             // Can a piece block its path?
-            Movement causingCheck = p.getMoves(this.board, this.log).getMove(oppKingPoint);
+            Movement causingCheck = p.getMoves(this.board.getPieces(), this.log).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
@@ -271,7 +272,7 @@ public class ChessGame {
         Point oppKingPoint = this.getOpponentKingPosition(this.turn);
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Can the opponent's king move, including captures that are not defended?
-        Set<Point> oppKingMoves = oppKing.getMoves(this.board, this.log).getPoints();
+        Set<Point> oppKingMoves = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();
         if (!oppKingMoves.isEmpty()) {
             return false;
         }
@@ -279,7 +280,7 @@ public class ChessGame {
         List<Piece> opponentPieces = this.board.getPieces().values().stream()
                 .filter(p -> oppColour.equals(p.getColour()) && !isKingPiece(p)).collect(Collectors.toList());
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(this.board, this.log).toSet().isEmpty()) {
+            if (!p.getMoves(this.board.getPieces(), this.log).toSet().isEmpty()) {
                 return false;
             }
         }
@@ -296,11 +297,12 @@ public class ChessGame {
         }
         this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
 
+        Plane<Piece> plane = this.board.getPieces();
         this.whiteThreats.clearMoves(logEntry.getStartObject());
-        this.whiteThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-        this.whiteThreats.updateMoves(this.board, this.log, logEntry.getStart());
+        this.whiteThreats.updateMoves(plane, this.log, logEntry.getEnd());
+        this.whiteThreats.updateMoves(plane, this.log, logEntry.getStart());
         this.blackThreats.clearMoves(logEntry.getStartObject());
-        this.blackThreats.updateMoves(this.board, this.log, logEntry.getEnd());
-        this.blackThreats.updateMoves(this.board, this.log, logEntry.getStart());
+        this.blackThreats.updateMoves(plane, this.log, logEntry.getEnd());
+        this.blackThreats.updateMoves(plane, this.log, logEntry.getStart());
     }
 }

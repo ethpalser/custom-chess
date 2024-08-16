@@ -1,6 +1,5 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -10,9 +9,8 @@ import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import java.util.HashSet;
-import java.util.Set;
 
 public class King implements Piece {
 
@@ -42,12 +40,13 @@ public class King implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board board) {
-        throw new UnsupportedOperationException();
+    public MoveSet getMoves(Plane<Piece> board) {
+        System.err.println("generally unsupported method for king used: getMoves(Plane<Piece> board)");
+        return this.getMoves(board, null, null);
     }
 
     @Override
-    public MoveSet getMoves(Board board, Log<Point, Piece> log, ThreatMap opponentThreats) {
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap opponentThreats) {
         MoveSet moveSet = new MoveSet(
                 this.generateSafePointOrNull(board, opponentThreats, -1, 0), // left
                 this.generateSafePointOrNull(board, opponentThreats, -1, 1), // top left
@@ -62,9 +61,9 @@ public class King implements Piece {
         // castling
         // not moved and not threatened (need to use the correct threat map)
         if (!this.hasMoved && opponentThreats.getPieces(this.point).isEmpty()) {
-            int startRank = this.colour == Colour.WHITE ? board.getPieces().getMinY() : board.getPieces().getMaxY();
+            int startRank = this.colour == Colour.WHITE ? board.getMinY() : board.getMaxY();
             // king side
-            Piece kingSideRook = board.getPiece(new Point(board.getPieces().getMinX(), startRank));
+            Piece kingSideRook = board.get(new Point(board.getMinX(), startRank));
             if (kingSideRook != null && !kingSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
@@ -80,7 +79,7 @@ public class King implements Piece {
                 ), kingSideRookMove));
             }
             // queen side
-            Piece queenSideRook = board.getPiece(new Point(board.getPieces().getMaxX(), startRank));
+            Piece queenSideRook = board.get(new Point(board.getMaxX(), startRank));
             if (queenSideRook != null && !queenSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
@@ -119,12 +118,12 @@ public class King implements Piece {
         return threatMap.getPieces(point).isEmpty();
     }
 
-    private boolean isEmptyAndSafe(Board board, ThreatMap threatMap, int x, int y) {
+    private boolean isEmptyAndSafe(Plane<Piece> board, ThreatMap threatMap, int x, int y) {
         Point p = new Point(x, y);
-        return board.getPiece(p) == null && isSafe(threatMap, p);
+        return board.get(p) == null && isSafe(threatMap, p);
     }
 
-    private Point generateSafePointOrNull(Board board, ThreatMap threatMap, int xOffset, int yOffset) {
+    private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
             return Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);

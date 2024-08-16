@@ -1,11 +1,11 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,10 +59,10 @@ public class CustomPiece implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board board) {
+    public MoveSet getMoves(Plane<Piece> board) {
         Set<Movement> replacements = new HashSet<>();
-        for(CustomMove customMove : this.customMoves) {
-            replacements.addAll(customMove.toMovementList(board.getPieces(), this.colour, this.position));
+        for (CustomMove customMove : this.customMoves) {
+            replacements.addAll(customMove.toMovementList(board, this.colour, this.position));
         }
         return new MoveSet(replacements);
     }
