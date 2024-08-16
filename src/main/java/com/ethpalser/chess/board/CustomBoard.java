@@ -1,7 +1,6 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -74,7 +73,12 @@ public class CustomBoard implements Board {
             throw new NullPointerException();
         }
         CustomPiece piece = (CustomPiece) this.getPiece(start);
-        Movement move = piece.getMoves(this, null, null).getMove(end);
+        if (piece == null) {
+            throw new IllegalActionException("piece cannot move as it does not exist at " + start);
+        }
+        // Todo: need log and threats for pawn and king
+        Movement move = piece.getMoves(this, null, null)
+                .getMove(this.pieces, piece.getColour(), start, end);
         if (move == null) {
             throw new IllegalActionException("this piece cannot move to " + end);
         }
