@@ -1,7 +1,6 @@
 package com.ethpalser.chess.move.custom;
 
 import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
@@ -12,31 +11,25 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class CustomMove implements Movement {
+public class CustomMove {
 
     private final Path pathBase;
     private final CustomMoveType moveType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
-    private final boolean isMove;
     private final boolean isAttack;
     private final List<Conditional<Piece>> conditions;
     private final LogEntry<Point, Piece> followUp;
-
-    public boolean isMove() {
-        return this.isMove;
-    }
-
-    public boolean isAttack() {
-        return this.isAttack;
-    }
 
     public static class Builder {
         // required
@@ -102,7 +95,6 @@ public class CustomMove implements Movement {
         this.mirrorXAxis = builder.mirrorXAxis;
         this.mirrorYAxis = builder.mirrorYAxis;
         this.isSpecificQuadrant = builder.isSpecificQuadrant;
-        this.isMove = builder.isMove;
         this.isAttack = builder.isAttack;
         this.conditions = builder.conditions;
         this.followUp = builder.followUp;
@@ -114,13 +106,11 @@ public class CustomMove implements Movement {
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.isSpecificQuadrant = false;
-        this.isMove = true;
         this.isAttack = true;
         this.conditions = List.of();
         this.followUp = null;
     }
 
-    @Override
     public Path getPath() {
         return this.pathBase;
     }
@@ -134,10 +124,12 @@ public class CustomMove implements Movement {
      * @param end    Location the piece is requested to move to
      * @return {@link Path}
      */
-    @Override
     public Path getPath(Plane<Piece> board, Colour colour, Point start, Point end) {
         if (colour == null || start == null || end == null) {
             throw new NullPointerException();
+        }
+        if (!this.passesConditions(board)) {
+            return null;
         }
 
         // Determine direction
@@ -154,29 +146,141 @@ public class CustomMove implements Movement {
             return null;
         }
 
+        // Generate a new path that is shifted by the start point along the path template
         List<Point> vectors = new LinkedList<>();
-        for (Point vector : this.getPath()) {
+        for (Point vector : this.pathBase) {
             int nextX = !negX ? vector.getX() + start.getX() : start.getX() - vector.getX();
             int nextY = !negY ? vector.getY() + start.getY() : start.getY() - vector.getY();
             if (!board.isInBounds(nextX, nextY)) {
                 break;
             }
-            vectors.add(new Point(nextX, nextY));
+            Point point = new Point(nextX, nextY);
+            if (board.get(point) != null) {
+                if (board.get(point).getColour() != colour) {
+                    vectors.add(new Point(nextX, nextY));
+                }
+                // A piece was encountered, so the path ends here
+                break;
+            } else {
+                vectors.add(new Point(nextX, nextY));
+            }
             // Destination has been added, so there is no need to add more
             if (end.getX() == nextX && end.getY() == nextY) {
                 break;
             }
         }
-        if (vectors.isEmpty() || !end.equals(vectors.get(vectors.size() - 1))) {
-            return null; // No path that reaches this end from this start
+
+        if (vectors.isEmpty()) {
+            return null; // The path does not exist
         }
         return new Path(vectors);
     }
 
-    @Override
     public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
         return Optional.ofNullable(this.followUp);
     }
+
+    public List<Movement> toMovementList(Plane<Piece> board, Colour colour, Point start) {
+        return this.getPathsInAllQuadrants(board, colour, start).stream().map(p -> new Move(p, this.followUp))
+                .collect(Collectors.toList());
+    }
+
+    // PRIVATE
+
+    private List<Path> getPathsInAllQuadrants(Plane<Piece> board, Colour colour, Point offset) {
+        List<Path> list = new ArrayList<>();
+        if (mirrorXAxis || Colour.WHITE.equals(colour)) {
+            {
+                Path pathQ1 = this.getPathInQuadrant(board, colour, offset, true, true);
+                if (pathQ1 != null) {
+                    list.add(pathQ1);
+                }
+            }
+            if (mirrorYAxis) {
+                Path pathQ4 = this.getPathInQuadrant(board, colour, offset, false, true);
+                if (pathQ4 != null) {
+                    list.add(pathQ4);
+                }
+            }
+        }
+        if (mirrorXAxis || !Colour.WHITE.equals(colour)) {
+            {
+                Path pathQ2 = this.getPathInQuadrant(board, colour, offset, true, false);
+                if (pathQ2 != null) {
+                    list.add(pathQ2);
+                }
+            }
+            if (mirrorYAxis) {
+                Path pathQ3 = this.getPathInQuadrant(board, colour, offset, false, false);
+                if (pathQ3 != null) {
+                    list.add(pathQ3);
+                }
+            }
+        }
+        return list;
+    }
+
+    private Path getPathInQuadrant(Plane<Piece> board, Colour colour, Point offset, boolean isRight, boolean isUp) {
+        if (!this.passesConditions(board) || colour == null || offset == null) {
+            return null;
+        }
+        LinkedHashSet<Point> points = new LinkedHashSet<>();
+        for (Point p : this.pathBase) {
+            Point next = this.getVectorInQuadrant(p, offset, isRight, isUp);
+            // Not a valid location, out of bounds, or fails its conditions
+            // Note: For some conditions, it will always fail regardless of the point
+            if (next == null || !board.isInBounds(next.getX(), next.getY())) {
+                break;
+            }
+
+            if (board.get(next) != null) {
+                // Can capture opponent pieces, so this is a valid move
+                // Note: All attacks are moves, but not all moves are attacks (ex. pawn)
+                if (this.isAttack && !board.get(next).getColour().equals(colour)) {
+                    points.add(next);
+                }
+                // A piece was encountered and this piece cannot move anywhere on the path, so the path ends here
+                if (!CustomMoveType.JUMP.equals(this.moveType)) {
+                    break;
+                }
+            } else {
+                points.add(next);
+            }
+        }
+        if (points.isEmpty()) {
+            return null;
+        }
+        return new Path(points);
+    }
+
+    private Point getVectorInQuadrant(Point vector, Point offset, boolean isRight, boolean isUp) {
+        if (vector == null || offset == null) {
+            return null;
+        }
+        int x = isRight ? offset.getX() + vector.getX() : offset.getX() - vector.getX();
+        int y = isUp ? offset.getY() + vector.getY() : offset.getY() - vector.getY();
+        return new Point(x, y);
+    }
+
+    /**
+     * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
+     *
+     * @param board {@link CustomBoard} for the Condition to verify with
+     * @return true if all Condition pass, otherwise false
+     */
+    private boolean passesConditions(Plane<Piece> board) {
+        if (board == null) {
+            return false;
+        }
+        for (Conditional<Piece> condition : this.conditions) {
+            if (!condition.isExpected(board)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // DEPRECIATED METHODS
 
     /**
      * Retrieves all possible vectors that the Piece with this colour at this location can move to.
@@ -185,14 +289,16 @@ public class CustomMove implements Movement {
      * @param offset {@link Point} representing the position of the piece
      * @return Map of {@link Point}
      */
-    public Set<Point> getCoordinates(Colour colour, Point offset) {
+    @Deprecated(since = "2024-08-15")
+    private Set<Point> getCoordinates(Colour colour, Point offset) {
         if (colour == null || offset == null) {
             throw new NullPointerException();
         }
         return this.getCoordinates(colour, offset, null, false, false);
     }
 
-    public Set<Point> getCoordinates(Colour colour, Point offset, CustomBoard board,
+    @Deprecated(since = "2024-08-15")
+    private Set<Point> getCoordinates(Colour colour, Point offset, Plane<Piece> board,
             boolean withDefend, boolean ignoreKing) {
         if (colour == null || offset == null) {
             throw new NullPointerException();
@@ -204,7 +310,8 @@ public class CustomMove implements Movement {
         }
     }
 
-    private Set<Point> getVectorsInSpecificQuadrant(Point offset, Colour colour, CustomBoard board,
+    @Deprecated(since = "2024-08-15")
+    private Set<Point> getVectorsInSpecificQuadrant(Point offset, Colour colour, Plane<Piece> board,
             boolean withDefend, boolean ignoreKing) {
         if (offset == null || colour == null) {
             throw new NullPointerException();
@@ -213,7 +320,7 @@ public class CustomMove implements Movement {
         boolean isUp = Colour.WHITE.equals(colour) && !mirrorXAxis || !Colour.WHITE.equals(colour) && mirrorXAxis;
 
         Set<Point> set = new HashSet<>();
-        for (Point vector : this.getPath()) {
+        for (Point vector : this.pathBase) {
             Point v = getVectorInQuadrant(vector, offset, isRight, isUp);
             if (canMoveInQuadrant(v, colour, board, withDefend, ignoreKing))
                 set.add(v);
@@ -223,7 +330,8 @@ public class CustomMove implements Movement {
         return set;
     }
 
-    private Set<Point> getVectorsInAllQuadrants(Point offset, Colour colour, CustomBoard board,
+    @Deprecated(since = "2024-08-15")
+    private Set<Point> getVectorsInAllQuadrants(Point offset, Colour colour, Plane<Piece> board,
             boolean withDefend, boolean ignoreKing) {
         if (offset == null || colour == null) {
             throw new NullPointerException();
@@ -234,7 +342,7 @@ public class CustomMove implements Movement {
         boolean blockBotLeft = false;
 
         Set<Point> set = new HashSet<>();
-        for (Point vector : this.getPath()) {
+        for (Point vector : this.pathBase) {
             if (mirrorXAxis || Colour.WHITE.equals(colour)) {
                 if (!blockTopRight) {
                     Point topRight = getVectorInQuadrant(vector, offset, true, true);
@@ -267,17 +375,8 @@ public class CustomMove implements Movement {
         return set;
     }
 
-    private Point getVectorInQuadrant(Point vector, Point offset, boolean isRight,
-            boolean isUp) {
-        if (vector == null || offset == null) {
-            throw new NullPointerException();
-        }
-        int x = isRight ? offset.getX() + vector.getX() : offset.getX() - vector.getX();
-        int y = isUp ? offset.getY() + vector.getY() : offset.getY() - vector.getY();
-        return new Point(x, y);
-    }
-
-    private boolean canMoveInQuadrant(Point vector, Colour colour, CustomBoard board,
+    @Deprecated(since = "2024-08-15")
+    private boolean canMoveInQuadrant(Point vector, Colour colour, Plane<Piece> board,
             boolean withDefend, boolean ignoreKing) {
         if (vector == null || colour == null) {
             throw new NullPointerException();
@@ -286,7 +385,7 @@ public class CustomMove implements Movement {
             return false;
         }
         if (board != null) {
-            Piece p = board.getPiece(vector);
+            Piece p = board.get(vector);
             if (p != null) {
                 return withDefend || !colour.equals(p.getColour()) || PieceType.KING.getCode().equals(p.getCode()) && ignoreKing;
             } else {
@@ -296,42 +395,16 @@ public class CustomMove implements Movement {
         return true;
     }
 
-    private boolean isBlockedInQuadrant(Point vector, CustomBoard board, boolean ignoreKing) {
+    @Deprecated(since = "2024-08-15")
+    private boolean isBlockedInQuadrant(Point vector, Plane<Piece> board, boolean ignoreKing) {
         if (vector == null) {
             throw new NullPointerException();
         }
         if (!vector.isValidLocation(vector) || board == null) {
             return false;
         }
-        Piece customPiece = board.getPiece(vector);
+        Piece customPiece = board.get(vector);
         return customPiece != null && !(PieceType.KING.getCode().equals(customPiece.getCode()) && ignoreKing);
-    }
-
-    /**
-     * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
-     *
-     * @param board  {@link CustomBoard} for the Condition to verify with
-     * @param action {@link Action} representing the movement attempted for a Piece at a location to a destination
-     * @return true if all Condition pass, otherwise false
-     */
-    public boolean passesConditions(CustomBoard board, Action action) {
-        if (board == null || action == null) {
-            throw new NullPointerException();
-        }
-        Piece pStart = board.getPiece(action.getStart());
-        Piece pEnd = board.getPiece(action.getEnd());
-        if (!this.isAttack && this.isMove && pEnd != null) {
-            return false;
-        }
-        if (this.isAttack && !this.isMove && (pEnd == null || pStart.getColour().equals(pEnd.getColour()))) {
-            return false;
-        }
-        for (Conditional<Piece> condition : this.conditions) {
-            if (!condition.isExpected(board.getPieces())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -341,6 +414,7 @@ public class CustomMove implements Movement {
      * @param colour Colour of the piece, to determine which direction is forward.
      * @return 2D boolean array, true are valid locations
      */
+    @Deprecated(since = "2024-08-15")
     public boolean[][] drawCoordinates(Colour colour) {
         if (colour == null) {
             throw new NullPointerException();
@@ -355,6 +429,7 @@ public class CustomMove implements Movement {
      * @param colour Colour of the piece, to determine which direction is forward.
      * @return 2D boolean array, true are valid locations
      */
+    @Deprecated(since = "2024-08-15")
     public boolean[][] drawCoordinates(Colour colour, Point offset) {
         if (colour == null || offset == null) {
             throw new NullPointerException();
