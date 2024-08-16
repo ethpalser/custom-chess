@@ -1,7 +1,6 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 
@@ -36,18 +35,6 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         // For this to work this object must be created after verifying but before executing the move from start to end
         this.isFirstMove = !this.moved.hasMoved();
         this.followUp = followUpMove;
-    }
-
-    public ChessLogEntry(Action action, Piece moved) {
-        this(action.getStart(), action.getEnd(), moved);
-    }
-
-    public ChessLogEntry(Action action, Piece moved, Piece captured) {
-        this(action.getStart(), action.getEnd(), moved, captured);
-    }
-
-    public ChessLogEntry(Action action, Piece moved, Piece captured, LogEntry<Point, Piece> followUpMove) {
-        this(action.getStart(), action.getEnd(), moved, captured, followUpMove);
     }
 
     public ChessLogEntry(Board board, String log) {
