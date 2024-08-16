@@ -1,6 +1,9 @@
 package com.ethpalser.chess.move;
 
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -43,6 +46,10 @@ public class MoveSet {
 
     public Movement getMove(Point point) {
         return this.set.stream().filter(m -> m.getPath().toSet().contains(point)).findFirst().orElse(null);
+    }
+
+    public Movement getMove(Plane<Piece> plane, Colour colour, Point start, Point end) {
+        return this.set.stream().filter(m -> m.getPath(plane, colour, start, end) != null).findFirst().orElse(null);
     }
 
     public void addMove(Movement move) {
