@@ -1,7 +1,9 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
@@ -70,7 +72,7 @@ public class CustomBoard implements Board {
     }
 
     @Override
-    public void movePiece(Point start, Point end,
+    public LogEntry<Point, Piece> movePiece(Point start, Point end,
             Log<Point, Piece> log, ThreatMap threatMap) {
         if (start == null || end == null) {
             throw new NullPointerException();
@@ -84,6 +86,7 @@ public class CustomBoard implements Board {
             throw new IllegalActionException("this piece cannot move to " + end);
         }
 
+        Piece captured = this.getPiece(end);
         this.pieces.remove(start);
         this.pieces.put(end, piece);
         piece.move(end);
@@ -94,6 +97,7 @@ public class CustomBoard implements Board {
             this.pieces.put(m.getEnd(), followUp);
             this.pieces.remove(null); // If the piece is meant to be removed it was put here
         });
+        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
     }
 
     @Override

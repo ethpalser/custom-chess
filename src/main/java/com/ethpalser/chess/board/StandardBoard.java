@@ -1,7 +1,9 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
@@ -48,7 +50,7 @@ public class StandardBoard implements Board {
     }
 
     @Override
-    public void movePiece(Point start, Point end,
+    public LogEntry<Point, Piece> movePiece(Point start, Point end,
             Log<Point, Piece> log, ThreatMap threatMap) {
         if (start == null || end == null) {
             throw new NullPointerException();
@@ -63,6 +65,7 @@ public class StandardBoard implements Board {
             throw new IllegalActionException("this piece cannot move to " + end);
         }
 
+        Piece captured = this.getPiece(end);
         this.piecesOnBoard.remove(start);
         this.piecesOnBoard.put(end, piece);
         piece.move(end);
@@ -73,6 +76,7 @@ public class StandardBoard implements Board {
             this.piecesOnBoard.put(m.getEnd(), followUp);
             this.piecesOnBoard.remove(null); // If the piece is meant to be removed it was put here
         });
+        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
     }
 
     @Override
