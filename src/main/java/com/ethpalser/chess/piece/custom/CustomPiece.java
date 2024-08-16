@@ -1,28 +1,23 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.CustomBoard;
-import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CustomPiece implements Piece {
 
     private final PieceType type;
     private final String code;
     private final Colour colour;
-    private final List<Movement> customMoves;
+    private final List<CustomMove> customMoves;
     private Point position;
     private boolean hasMoved;
 
@@ -65,7 +60,11 @@ public class CustomPiece implements Piece {
 
     @Override
     public MoveSet getMoves(Board board) {
-        return new MoveSet(new HashSet<>(this.customMoves));
+        Set<Movement> replacements = new HashSet<>();
+        for(CustomMove customMove : this.customMoves) {
+            replacements.addAll(customMove.toMovementList(board.getPieces(), this.colour, this.position));
+        }
+        return new MoveSet(replacements);
     }
 
     public void addMove(CustomMove move) {
@@ -100,88 +99,9 @@ public class CustomPiece implements Piece {
         return hasMoved;
     }
 
-    /**
-     * Retrieves the first movement among all of its possible movements that are able to reach the destination, can
-     * be traversed and has all its conditions met.
-     *
-     * @param board       {@link CustomBoard} used for reference
-     * @param destination {@link Point} the piece is requested to move to
-     * @return Movement if any are valid, otherwise null
-     */
-    @Deprecated
-    public CustomMove getMovement(CustomBoard board, Point destination) {
-        if (board == null || destination == null) {
-            throw new NullPointerException();
-        }
-        for (Movement m : this.customMoves) {
-            CustomMove move = (CustomMove) m; // Todo: Test that this works
-            Path path = move.getPath(board.getPieces(), this.colour, this.position, destination);
-            if (path != null && this.isTraversable(path, board)
-                    && move.passesConditions(board, new Action(this.colour, this.position, destination))) {
-                return move;
-            }
-        }
-        return null;
-    }
-
-    @Deprecated
-    public Set<Point> getMovementSet(Point location, CustomBoard board) {
-        if (location == null) {
-            throw new NullPointerException();
-        }
-        return this.getMovementSet(location, board, true, true, false, false);
-    }
-
-    @Deprecated
-    public Set<Point> getMovementSet(Point location, CustomBoard board, boolean includeMove,
-            boolean includeAttack, boolean includeDefend, boolean ignoreKing) {
-        if (location == null) {
-            throw new NullPointerException();
-        }
-        Set<Point> set = new HashSet<>();
-        for (Movement m : this.customMoves) {
-            CustomMove move = (CustomMove) m;
-            if (move != null && (includeMove && move.isMove() || includeAttack && move.isAttack())) {
-                Set<Point> vectorSet = move.getCoordinates(this.colour, location, board, includeDefend, ignoreKing);
-                if (board != null) {
-                    for (Point v : vectorSet) {
-                        if (!includeMove || move.passesConditions(board, new Action(this.colour, this.getPoint(),
-                                v))) {
-                            set.add(v);
-                        }
-                    }
-                } else {
-                    set.addAll(vectorSet);
-                }
-            }
-        }
-        return set;
-    }
-
     @Override
     public String toString() {
         return this.type.getCode() + position.toString();
-    }
-
-    /**
-     * Iterates through the path to determine if there is a piece in the path between the start and end.
-     *
-     * @param board {@link CustomBoard} referred to for checking pieces
-     * @return true if no piece is in the middle of the path, false otherwise
-     */
-    private boolean isTraversable(Path path, CustomBoard board) {
-        if (board == null) {
-            throw new NullPointerException();
-        }
-        Iterator<Point> iterator = path.iterator();
-        while (iterator.hasNext()) {
-            Point vector = iterator.next();
-            if (board.getPiece(vector) != null && iterator.hasNext()) {
-                // Piece is in the middle of the path
-                return false;
-            }
-        }
-        return true;
     }
 
 }
