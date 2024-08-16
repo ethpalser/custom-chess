@@ -14,9 +14,7 @@ import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +26,7 @@ public class CustomMove {
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
     private final boolean isAttack;
+    private final boolean isMove;
     private final List<Conditional<Piece>> conditions;
     private final LogEntry<Point, Piece> followUp;
 
@@ -96,6 +95,7 @@ public class CustomMove {
         this.mirrorYAxis = builder.mirrorYAxis;
         this.isSpecificQuadrant = builder.isSpecificQuadrant;
         this.isAttack = builder.isAttack;
+        this.isMove = builder.isMove;
         this.conditions = builder.conditions;
         this.followUp = builder.followUp;
     }
@@ -107,6 +107,7 @@ public class CustomMove {
         this.mirrorYAxis = mirrorYAxis;
         this.isSpecificQuadrant = false;
         this.isAttack = true;
+        this.isMove = true;
         this.conditions = List.of();
         this.followUp = null;
     }
@@ -243,8 +244,11 @@ public class CustomMove {
                 if (!CustomMoveType.JUMP.equals(this.moveType)) {
                     break;
                 }
-            } else {
-                points.add(next);
+            }
+            else {
+                if (this.isMove) {
+                    points.add(next);
+                }
             }
         }
         if (points.isEmpty()) {
