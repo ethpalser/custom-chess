@@ -38,16 +38,6 @@ public class Move implements Movement {
     }
 
     @Override
-    public Path getPath(Plane<Piece> plane, Colour colour, Point start, Point end) {
-        // Note: ignoring plane and colour (this method exists because of CustomMove)
-        Set<Point> pointSet = this.path.toSet();
-        if (pointSet.contains(start) && pointSet.contains(end)) {
-            return this.path;
-        }
-        return null;
-    }
-
-    @Override
     public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
         return Optional.ofNullable(this.followUpMove);
     }
