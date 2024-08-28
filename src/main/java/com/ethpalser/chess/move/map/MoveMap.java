@@ -1,14 +1,13 @@
 package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.move.Quantifiable;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.Set;
 
-public interface MoveMap extends Quantifiable<Integer> {
+public interface MoveMap {
 
     Colour getColour();
 
@@ -44,5 +43,7 @@ public interface MoveMap extends Quantifiable<Integer> {
      * @param point
      */
     void updateMoves(Plane<Piece> board, Log<Point, Piece> log, Point point);
+
+    Number getValue();
 
 }
