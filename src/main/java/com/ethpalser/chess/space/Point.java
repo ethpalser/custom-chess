@@ -78,7 +78,7 @@ public class Point implements Comparable<Point> {
     @Override
     public int hashCode() {
         // Each x, y value maps to a distinct positive integer in a bounded space
-        // Min x and min y at 0 equals 0. Max x and max y at 31 equals 961
+        // Min x and min y at 0 equals 0. Max x and max y at 31 equals 1023
         return this.y * (MAX_WIDTH + 1) + this.x;
     }
 
