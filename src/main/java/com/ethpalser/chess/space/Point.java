@@ -25,18 +25,8 @@ public class Point implements Comparable<Point> {
      * @param y An integer between 0 and 31 along the y-axis.
      */
     public Point(int x, int y) {
-        // Forcing x to be within bounds
-        if (x > MAX_WIDTH) {
-            this.x = MAX_WIDTH;
-        } else {
-            this.x = Math.max(x, 0);
-        }
-        // Forcing y to be within bounds
-        if (y > MAX_HEIGHT) {
-            this.y = MAX_HEIGHT;
-        } else {
-            this.y = Math.max(y, 0);
-        }
+        this.x = x;
+        this.y = y;
     }
 
     /**
