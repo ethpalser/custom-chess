@@ -1,5 +1,7 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -142,6 +144,65 @@ public class Path implements Iterable<Point> {
                 return CUSTOM;
             }
         }
+    }
+
+    public static Path horizontal(Plane<Piece> board, Point start, Colour colour, boolean right) {
+        List<Point> set = new LinkedList<>();
+        int x = right ? 1 : -1;
+        // while within the board's boundaries
+        while (board.isInBounds(start.getX() + x, start.getY())) {
+            Point pos = new Point(start.getX() + x, start.getY());
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
+                    set.add(pos);
+                }
+                // a piece was encountered, so the path ends at or just before this
+                break;
+            }
+            set.add(pos);
+            x = right ? x + 1 : x - 1;
+        }
+        return new Path(set);
+    }
+
+    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up) {
+        List<Point> set = new LinkedList<>();
+        int y = up ? 1 : -1;
+        // while within the board's boundaries
+        while (board.isInBounds(start.getX(), start.getY() + y)) {
+            Point pos = new Point(start.getX(), start.getY() + y);
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
+                    set.add(pos);
+                }
+                // a piece was encountered, so the path ends at or just before this
+                break;
+            }
+            set.add(pos);
+            y = up ? y + 1 : y - 1;
+        }
+        return new Path(set);
+    }
+
+    public static Path diagonal(Plane<Piece> board, Point start, Colour colour, boolean right, boolean up) {
+        List<Point> list = new LinkedList<>();
+        int x = right ? 1 : -1;
+        int y = up ? 1 : -1;
+        // while within the board's boundaries
+        while (board.isInBounds(start.getX() + x, start.getY() + y)) {
+            Point pos = new Point(start.getX() + x, start.getY() + y);
+            if (board.get(pos) != null) {
+                if (board.get(pos).getColour() != colour) {
+                    list.add(pos);
+                }
+                // a piece was encountered, so the path ends at or just before this
+                break;
+            }
+            list.add(pos);
+            x = right ? x + 1 : x - 1;
+            y = up ? y + 1 : y - 1;
+        }
+        return new Path(list);
     }
 
 }

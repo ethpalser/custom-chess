@@ -35,14 +35,14 @@ public class Knight implements Piece {
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
         return new MoveSet(
-                Point.generateValidPointOrNull(board, this.point, this.colour, -2, 1), // left 2 up
-                Point.generateValidPointOrNull(board, this.point, this.colour, -1, 2), // up 2 left
-                Point.generateValidPointOrNull(board, this.point, this.colour, 1, 2), // up 2 right
-                Point.generateValidPointOrNull(board, this.point, this.colour, 2, 1), // right 2 up
-                Point.generateValidPointOrNull(board, this.point, this.colour, 2, -1), // right 2 down
-                Point.generateValidPointOrNull(board, this.point, this.colour, 1, -2), // down 2 right
-                Point.generateValidPointOrNull(board, this.point, this.colour, -1, -2), // down 2 left
-                Point.generateValidPointOrNull(board, this.point, this.colour, -2, -1) // left 2 down
+                Point.validOrNull(board, this.point, this.colour, -2, 1), // left 2 up
+                Point.validOrNull(board, this.point, this.colour, -1, 2), // up 2 left
+                Point.validOrNull(board, this.point, this.colour, 1, 2), // up 2 right
+                Point.validOrNull(board, this.point, this.colour, 2, 1), // right 2 up
+                Point.validOrNull(board, this.point, this.colour, 2, -1), // right 2 down
+                Point.validOrNull(board, this.point, this.colour, 1, -2), // down 2 right
+                Point.validOrNull(board, this.point, this.colour, -1, -2), // down 2 left
+                Point.validOrNull(board, this.point, this.colour, -2, -1) // left 2 down
         );
     }
 

@@ -129,7 +129,7 @@ public class King implements Piece {
     private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
-            return Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
+            return Point.validOrNull(board, this.point, this.colour, -1, 0);
         }
         return null;
     }

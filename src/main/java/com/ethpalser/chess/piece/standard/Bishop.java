@@ -41,10 +41,10 @@ public class Bishop implements Piece {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, false, false))),
-                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, false, true))),
-                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, false))),
-                new Move(new Path(Point.generateDiagonalMoves(board, this.point, this.colour, true, true)))
+                new Move(Path.diagonal(board, this.point, this.colour, false, false)),
+                new Move(Path.diagonal(board, this.point, this.colour, false, true)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, false)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, true))
         );
     }
 

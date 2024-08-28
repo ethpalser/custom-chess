@@ -2,8 +2,6 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Point implements Comparable<Point> {
 
@@ -129,7 +127,7 @@ public class Point implements Comparable<Point> {
 
     // STATIC METHODS
 
-    public static Point generateValidPointOrNull(Plane<Piece> board, Point start, Colour colour,
+    public static Point validOrNull(Plane<Piece> board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or (exists and matching colour)
@@ -139,7 +137,7 @@ public class Point implements Comparable<Point> {
         return point;
     }
 
-    public static Point generateCapturePointOrNull(Plane<Piece> board, Point start, Colour colour,
+    public static Point captureOrNull(Plane<Piece> board, Point start, Colour colour,
             int xOffset, int yOffset) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // not in bounds or empty or matching colour
@@ -149,91 +147,6 @@ public class Point implements Comparable<Point> {
         }
         // in bounds and opposite colour (i.e. can capture)
         return point;
-    }
-
-    public static List<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour) {
-        List<Point> set = new LinkedList<>();
-        set.addAll(generateHorizontalMoves(board, start, colour, false));
-        set.addAll(generateHorizontalMoves(board, start, colour, true));
-        return set;
-    }
-
-    public static List<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour,
-            boolean right) {
-        List<Point> set = new LinkedList<>();
-        int x = right ? 1 : -1;
-        // while within the board's boundaries
-        while (board.isInBounds(start.getX() + x, start.getY())) {
-            Point pos = new Point(start.getX() + x, start.getY());
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
-                    set.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                break;
-            }
-            set.add(pos);
-            x = right ? x + 1 : x - 1;
-        }
-        return set;
-    }
-
-    public static List<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour) {
-        List<Point> set = new LinkedList<>();
-        set.addAll(generateVerticalMoves(board, start, colour, false));
-        set.addAll(generateVerticalMoves(board, start, colour, true));
-        return set;
-    }
-
-    public static List<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour,
-            boolean up) {
-        List<Point> set = new LinkedList<>();
-        int y = up ? 1 : -1;
-        // while within the board's boundaries
-        while (board.isInBounds(start.getX(), start.getY() + y)) {
-            Point pos = new Point(start.getX(), start.getY() + y);
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
-                    set.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                break;
-            }
-            set.add(pos);
-            y = up ? y + 1 : y - 1;
-        }
-        return set;
-    }
-
-    public static List<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour) {
-        List<Point> set = new LinkedList<>();
-        set.addAll(generateDiagonalMoves(board, start, colour, false, false));
-        set.addAll(generateDiagonalMoves(board, start, colour, false, true));
-        set.addAll(generateDiagonalMoves(board, start, colour, true, false));
-        set.addAll(generateDiagonalMoves(board, start, colour, true, true));
-        return set;
-    }
-
-    public static List<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour,
-            boolean right, boolean up) {
-        List<Point> set = new LinkedList<>();
-        int x = right ? 1 : -1;
-        int y = up ? 1 : -1;
-        // while within the board's boundaries
-        while (board.isInBounds(start.getX() + x, start.getY() + y)) {
-            Point pos = new Point(start.getX() + x, start.getY() + y);
-            if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
-                    set.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                break;
-            }
-            set.add(pos);
-            x = right ? x + 1 : x - 1;
-            y = up ? y + 1 : y - 1;
-        }
-        return set;
     }
 
 }

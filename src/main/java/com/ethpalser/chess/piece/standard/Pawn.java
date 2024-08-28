@@ -48,16 +48,16 @@ public class Pawn implements Piece {
     public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
         int yOffset = this.colour == Colour.WHITE ? + 1 : - 1;
         MoveSet moveSet = new MoveSet(
-                Point.generateValidPointOrNull(board, this.point, this.colour, 0, yOffset),
-                Point.generateCapturePointOrNull(board, this.point, this.colour, -1, yOffset),
-                Point.generateCapturePointOrNull(board, this.point, this.colour, 1, yOffset)
+                Point.validOrNull(board, this.point, this.colour, 0, yOffset),
+                Point.captureOrNull(board, this.point, this.colour, -1, yOffset),
+                Point.captureOrNull(board, this.point, this.colour, 1, yOffset)
         );
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
             moveSet.addMove(new Move(new Path(
-                    Point.generateValidPointOrNull(board, this.point, this.colour, 0, yOffset),
-                    Point.generateValidPointOrNull(board, this.point, this.colour, 0, yOffset * 2)
+                    Point.validOrNull(board, this.point, this.colour, 0, yOffset),
+                    Point.validOrNull(board, this.point, this.colour, 0, yOffset * 2)
             )));
         }
 
@@ -73,15 +73,15 @@ public class Pawn implements Piece {
                     || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getX() - 2 == peekStart.getY()))
             ) {
                 // that pawn is to the left of this pawn
-                Point left = Point.generateValidPointOrNull(board, this.point, this.colour, -1, 0);
+                Point left = Point.validOrNull(board, this.point, this.colour, -1, 0);
                 if (left != null && left.equals(peekEnd)) {
-                    Point enPassPoint = Point.generateValidPointOrNull(board, this.point, this.colour, -1, yOffset);
+                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, -1, yOffset);
                     moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.get(left))));
                 }
                 // that pawn is to the right of this pawn
-                Point right = Point.generateValidPointOrNull(board, this.point, this.colour, 1, 0);
+                Point right = Point.validOrNull(board, this.point, this.colour, 1, 0);
                 if (right != null && right.equals(peekEnd)) {
-                    Point enPassPoint = Point.generateValidPointOrNull(board, this.point, this.colour, 1, yOffset);
+                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, 1, yOffset);
                     moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.get(right))));
                 }
             }
