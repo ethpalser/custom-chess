@@ -51,7 +51,13 @@ public class ChessLog implements Log<Point, Piece> {
 
     @Override
     public boolean equals(Object o) {
-        return this.logStack.equals(o);
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof ChessLog)) {
+            return false;
+        }
+        return this.logStack.equals(((ChessLog) o).logStack) && this.undoStack.equals(((ChessLog) o).undoStack);
     }
 
     @Override
@@ -66,7 +72,22 @@ public class ChessLog implements Log<Point, Piece> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return this.logStack.contains(c);
+        for (Object o : c) {
+            if (!(o instanceof LogEntry)) {
+                return false;
+            }
+            boolean exists = false;
+            for (LogEntry<Point, Piece> entry : this.logStack) {
+                if (entry.equals(o)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -111,12 +132,17 @@ public class ChessLog implements Log<Point, Piece> {
 
     @Override
     public void push(LogEntry<Point, Piece> actionRecord) {
-        this.logStack.push(actionRecord);
+        if (actionRecord != null) {
+            this.logStack.push(actionRecord);
+        }
     }
 
     @Override
     public LogEntry<Point, Piece> pop() {
-        return this.logStack.pop();
+        if (!logStack.isEmpty()) {
+            return this.logStack.pop();
+        }
+        return null;
     }
 
     @Override
