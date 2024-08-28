@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ChessGame {
+public class ChessGame implements Game {
 
     private final Board board;
     private final ChessLog log;
@@ -41,6 +41,7 @@ public class ChessGame {
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
     }
 
+    @Override
     public GameStatus updateGame(Action action) throws IllegalActionException {
         if (action == null) {
             throw new IllegalActionException("action cannot be null");
@@ -89,14 +90,12 @@ public class ChessGame {
         return this.status;
     }
 
+    @Override
     public GameStatus getStatus() {
         return status;
     }
 
-    public GameStatus undoUpdate() {
-        return this.undoUpdate(1, true);
-    }
-
+    @Override
     public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
         for (int i = 0; i < beforeCurrent; i++) {
             LogEntry<Point, Piece> logEntry;
@@ -117,10 +116,7 @@ public class ChessGame {
         return this.checkGameStatus();
     }
 
-    public GameStatus redoUpdate() {
-        return this.redoUpdate(1);
-    }
-
+    @Override
     public GameStatus redoUpdate(int afterCurrent) {
         for (int i = 0; i < afterCurrent; i++) {
             LogEntry<Point, Piece> logEntry = this.log.redo();
@@ -134,6 +130,16 @@ public class ChessGame {
             }
         }
         return this.checkGameStatus();
+    }
+
+    @Override
+    public Iterable<Action> potentialUpdates() {
+        return List.of();
+    }
+
+    @Override
+    public int evaluateState() {
+        return 0;
     }
 
     // PRIVATE METHODS
