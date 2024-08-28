@@ -14,7 +14,7 @@ import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-class GameTest {
+class ChessGameTest {
 
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
