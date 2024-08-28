@@ -1,43 +1,24 @@
 package com.ethpalser.chess.space;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 
 public class Path implements Iterable<Point> {
 
-    private final LinkedHashSet<Point> linkedHashSet;
+    private final List<Point> pointList;
 
     public Path(Point end) {
-        this.linkedHashSet = new LinkedHashSet<>();
+        this.pointList = new LinkedList<>();
         if (end != null) {
-            this.linkedHashSet.add(end);
+            this.pointList.add(end);
         }
     }
 
     public Path(List<Point> points) {
-        LinkedHashSet<Point> set = points.stream().collect(Collector.of(
-                (Supplier<LinkedHashSet<Point>>) LinkedHashSet::new,
-                HashSet::add,
-                (map, map2) -> {
-                    map.addAll(map2);
-                    return map;
-                }
-        ));
-        set.remove(null);
-        set.removeIf(Objects::isNull);
-        this.linkedHashSet = set;
-    }
-
-    public Path(LinkedHashSet<Point> set) {
-        set.remove(null);
-        set.removeIf(Objects::isNull);
-        this.linkedHashSet = set;
+        this.pointList = points;
     }
 
     /**
@@ -48,14 +29,14 @@ public class Path implements Iterable<Point> {
      * @param end   {@link Point} representing the last vector of the path
      */
     public Path(Point start, Point end) {
-        LinkedHashSet<Point> set;
+        List<Point> list;
         switch (PathType.fromPoints(start, end)) {
             case POINT, CUSTOM -> {
-                set = new LinkedHashSet<>();
+                list = new LinkedList<>();
                 if (start != null)
-                    set.add(start);
+                    list.add(start);
                 if (end != null)
-                    set.add(end);
+                    list.add(end);
             }
             case VERTICAL, HORIZONTAL, DIAGONAL -> {
                 int x = start.getX();
@@ -65,33 +46,33 @@ public class Path implements Iterable<Point> {
                 int dirX = diffX == 0 ? 0 : diffX / Math.abs(diffX); // 0 for Vertical
                 int dirY = diffY == 0 ? 0 : diffY / Math.abs(diffY); // 0 for Horizontal
 
-                set = new LinkedHashSet<>();
+                list = new LinkedList<>();
                 // Build the path along the line until an edge is exceeded
                 do {
-                    set.add(new Point(x, y));
+                    list.add(new Point(x, y));
                     x = x + dirX;
                     y = y + dirY;
                 } while ((x != end.getX() || y != end.getY()));
                 // Loop only continues until the end point is reached, so this is added after
-                set.add(end);
+                list.add(end);
             }
-            default -> set = new LinkedHashSet<>();
+            default -> list = new LinkedList<>();
         }
-        set.remove(null);
-        this.linkedHashSet = set;
+        list.remove(null);
+        this.pointList = list;
     }
 
     public boolean hasPoint(Point point) {
-        return this.linkedHashSet.contains(point);
+        return this.pointList.contains(point);
     }
 
     public Set<Point> toSet() {
-        return this.linkedHashSet;
+        return new LinkedHashSet<>(this.pointList);
     }
 
     @Override
     public Iterator<Point> iterator() {
-        return this.linkedHashSet.iterator();
+        return this.pointList.iterator();
     }
 
     @Override
@@ -105,11 +86,12 @@ public class Path implements Iterable<Point> {
 
     @Override
     public int hashCode() {
-        int prime = 63;
-        int result = 1;
+        // This hash has little value. It is possible for path hashes to overlap
+        // ex. Path A: [(1, 0), (4, 0)] and Path B: [(2, 0), (3, 0)] are equal
+        int result = 0;
         for (Point vector : this) {
             if (vector != null) {
-                result = result * prime + vector.hashCode();
+                result += vector.hashCode();
             }
         }
         return result;

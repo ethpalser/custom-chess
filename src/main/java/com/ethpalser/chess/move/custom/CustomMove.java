@@ -14,6 +14,7 @@ import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -156,7 +157,7 @@ public class CustomMove {
         if (!this.passesConditions(board) || colour == null || offset == null) {
             return null;
         }
-        LinkedHashSet<Point> points = new LinkedHashSet<>();
+        List<Point> points = new LinkedList<>();
         for (Point p : this.pathBase) {
             Point next = this.getVectorInQuadrant(p, offset, isRight, isUp);
             // Not a valid location, out of bounds, or fails its conditions

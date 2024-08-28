@@ -25,7 +25,7 @@ public class StandardBoard implements Board {
     private final Plane<Piece> piecesOnBoard;
 
     public StandardBoard() {
-        Plane<Piece> map = new Plane<>(0, 0, 7, 7);
+        Plane<Piece> map = new Plane<>();
         int length = map.length();
         map.putAll(this.generatePiecesInRank(length, 0));
         map.putAll(this.generatePiecesInRank(length, 1));

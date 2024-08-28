@@ -2,15 +2,16 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Point implements Comparable<Point> {
 
     private final int x;
     private final int y;
 
-    private static final int MAX_WIDTH = 64;
-    private static final int MAX_HEIGHT = 64;
+    public static final int MAX_WIDTH = 31;
+    public static final int MAX_HEIGHT = 31;
 
     public Point() {
         this.x = 0;
@@ -24,8 +25,18 @@ public class Point implements Comparable<Point> {
      * @param y An integer between 0 and 31 along the y-axis.
      */
     public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
+        // Forcing x to be within bounds
+        if (x > MAX_WIDTH) {
+            this.x = MAX_WIDTH;
+        } else {
+            this.x = Math.max(x, 0);
+        }
+        // Forcing y to be within bounds
+        if (y > MAX_HEIGHT) {
+            this.y = MAX_HEIGHT;
+        } else {
+            this.y = Math.max(y, 0);
+        }
     }
 
     /**
@@ -70,15 +81,17 @@ public class Point implements Comparable<Point> {
         return this.hashCode() - o.hashCode();
     }
 
+    /**
+     * A Point's hash code is its x and y value if it were in a 1D array. The maximum value for x and y is 31.
+     * For x and y such that 0 <= [x, y] < 31, its hash code is within 32^2 (1024).
+     *
+     * @return int mapping of its array index in a 1D array.
+     */
     @Override
     public int hashCode() {
-        int quad = 0;
-        if (x < 0)
-            quad += 1;
-        if (y < 0)
-            quad += 2;
         // Each x, y value maps to a distinct positive integer in a bounded space
-        return MAX_WIDTH * MAX_HEIGHT * quad + Math.abs(this.y) * MAX_WIDTH + Math.abs(this.x);
+        // Min x and min y at 0 equals 0. Max x and max y at 31 equals 961
+        return this.y * (MAX_WIDTH + 1) + this.x;
     }
 
     @Override
@@ -148,16 +161,16 @@ public class Point implements Comparable<Point> {
         return point;
     }
 
-    public static LinkedHashSet<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+    public static List<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour) {
+        List<Point> set = new LinkedList<>();
         set.addAll(generateHorizontalMoves(board, start, colour, false));
         set.addAll(generateHorizontalMoves(board, start, colour, true));
         return set;
     }
 
-    public static LinkedHashSet<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour,
+    public static List<Point> generateHorizontalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean right) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+        List<Point> set = new LinkedList<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
@@ -175,16 +188,16 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+    public static List<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour) {
+        List<Point> set = new LinkedList<>();
         set.addAll(generateVerticalMoves(board, start, colour, false));
         set.addAll(generateVerticalMoves(board, start, colour, true));
         return set;
     }
 
-    public static LinkedHashSet<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour,
+    public static List<Point> generateVerticalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean up) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+        List<Point> set = new LinkedList<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
@@ -202,8 +215,8 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+    public static List<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour) {
+        List<Point> set = new LinkedList<>();
         set.addAll(generateDiagonalMoves(board, start, colour, false, false));
         set.addAll(generateDiagonalMoves(board, start, colour, false, true));
         set.addAll(generateDiagonalMoves(board, start, colour, true, false));
@@ -211,9 +224,9 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public static LinkedHashSet<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour,
+    public static List<Point> generateDiagonalMoves(Plane<Piece> board, Point start, Colour colour,
             boolean right, boolean up) {
-        LinkedHashSet<Point> set = new LinkedHashSet<>();
+        List<Point> set = new LinkedList<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
         // while within the board's boundaries

@@ -23,7 +23,7 @@ public class CustomBoard implements Board {
     private final Plane<Piece> pieces;
 
     public CustomBoard() {
-        Plane<Piece> plane = new Plane<>(0, 0, 7, 7);
+        Plane<Piece> plane = new Plane<>();
         int length = plane.length();
         plane.putAll(this.generatePiecesInRank(plane, length, 0));
         plane.putAll(this.generatePiecesInRank(plane, length, 1));
@@ -33,7 +33,7 @@ public class CustomBoard implements Board {
     }
 
     public CustomBoard(List<String> pieces) {
-        Plane<Piece> plane = new Plane<>(0, 0, 7, 7);
+        Plane<Piece> plane = new Plane<>();
         CustomPieceFactory pf = new CustomPieceFactory(plane, null);
         for (String s : pieces) {
             CustomPiece customPiece = pf.build(s);

@@ -21,17 +21,16 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
         space = new HashMap<>();
         this.minX = 0;
         this.minY = 0;
-        this.maxX = 63;
-        this.maxY = 63;
+        this.maxX = 7;
+        this.maxY = 7;
     }
 
-    public Plane(int x1, int y1, int x2, int y2) {
+    public Plane(int maxX, int maxY) {
         space = new HashMap<>();
-
-        this.minX = Math.min(x1, x2);
-        this.minY = Math.min(y1, y2);
-        this.maxX = Math.max(x1, x2);
-        this.maxY = Math.max(y1, y2);
+        this.minX = 0;
+        this.minY = 0;
+        this.maxX = maxX;
+        this.maxY = maxY;
     }
 
     @Override
