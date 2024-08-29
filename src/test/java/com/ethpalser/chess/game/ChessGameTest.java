@@ -76,7 +76,7 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, invalid);
-        assertThrows(IndexOutOfBoundsException.class, () -> game.updateGame(action));
+        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
@@ -459,7 +459,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
         CustomBoard board = new CustomBoard(BoardTestCases.checkmateKingCannotMove);
-        ChessGame game = new ChessGame(new StandardBoard());
+        ChessGame game = new ChessGame(board);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
