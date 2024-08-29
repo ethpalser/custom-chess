@@ -3,6 +3,7 @@ package com.ethpalser.chess.game;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
@@ -39,6 +40,16 @@ public class ChessGame implements Game {
         this.blackKing = new Point('e', '8');
         this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+    }
+
+    @Override
+    public Log<Point, Piece> getLog() {
+        return this.log;
+    }
+
+    @Override
+    public GameStatus getStatus() {
+        return status;
     }
 
     @Override
@@ -88,11 +99,6 @@ public class ChessGame implements Game {
         this.status = this.checkGameStatus();
         this.turn = Colour.opposite(this.turn);
         return this.status;
-    }
-
-    @Override
-    public GameStatus getStatus() {
-        return status;
     }
 
     @Override

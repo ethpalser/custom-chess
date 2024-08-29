@@ -1,10 +1,16 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
+
 public interface Game {
 
-    GameStatus updateGame(Action action);
+    Log<Point, Piece> getLog();
 
     GameStatus getStatus();
+
+    GameStatus updateGame(Action action);
 
     GameStatus undoUpdate(int changesToUndo, boolean saveForRedo);
 
