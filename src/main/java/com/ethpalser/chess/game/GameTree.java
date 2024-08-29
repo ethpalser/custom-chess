@@ -49,6 +49,10 @@ public class GameTree {
             if (alpha >= WINNING_THRESHOLD) {
                 return alpha;
             }
+            // Maximize once at the deepest ply, as this will be the most informed
+            if (d == depth) {
+                best = Math.max(best, alpha);
+            }
         }
         return best;
     }
