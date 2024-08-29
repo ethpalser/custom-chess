@@ -6,7 +6,9 @@ import com.ethpalser.chess.board.StandardBoard;
 import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -27,7 +29,7 @@ class ChessGameTest {
         Point nextC = new Point(nextX, nextY);
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         Action action = new Action(Colour.WHITE, pieceC, nextC);
 
@@ -50,7 +52,7 @@ class ChessGameTest {
         Point nextC = new Point(nextX, nextY);
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, nextC);
@@ -72,7 +74,7 @@ class ChessGameTest {
         Point invalid = new Point(nextX, nextY);
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, invalid);
@@ -98,7 +100,7 @@ class ChessGameTest {
         board.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
         board.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -123,7 +125,7 @@ class ChessGameTest {
         Point target = new Point(nextX, nextY); // Black Pawn
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -148,7 +150,7 @@ class ChessGameTest {
         Point target = new Point(nextX, nextY); // Black Pawn
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
         board.addPiece(new Point(0, 1), null); // Can be sufficient for path checks
 
         // When
@@ -173,7 +175,7 @@ class ChessGameTest {
         Point target = new Point(nextX, nextY); // Empty
         Board board = new StandardBoard();
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -198,7 +200,7 @@ class ChessGameTest {
         Board board = new StandardBoard();
         board.addPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -220,7 +222,7 @@ class ChessGameTest {
         board.addPiece(new Point(5, 0), null);
         board.addPiece(new Point(6, 0), null);
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -245,7 +247,7 @@ class ChessGameTest {
         board.addPiece(new Point(3, 0), null);
 
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -272,13 +274,16 @@ class ChessGameTest {
         board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
         board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
-        // Black move
+        // Black move (with log updated for piece to check)
+        LogEntry<Point, Piece> entry = new ChessLogEntry(source, target, board.getPiece(source));
         board.movePiece(source, target, log, threatMap);
+        log.add(entry);
 
-        ChessGame game = new ChessGame(board);
+        ChessGame game = new ChessGame(board, log);
 
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
+
         game.updateGame(action); // En Passant
 
         // Then
@@ -302,9 +307,14 @@ class ChessGameTest {
         // White move
         board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         // Black move
-        board.movePiece(source, target, log, threatMap);
+        LogEntry<Point, Piece> entry = new ChessLogEntry(source, target, board.getPiece(source));
+        System.out.println(entry);
 
-        ChessGame game = new ChessGame(board);
+        board.movePiece(source, target, log, threatMap);
+        log.add(entry);
+
+        ChessGame game = new ChessGame(board, log);
+        System.out.println(board);
 
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));
@@ -319,8 +329,9 @@ class ChessGameTest {
     // region In Progress Game
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
-        CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanMove);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressPieceCanMove);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
         GameStatus status = game.updateGame(action);
@@ -331,8 +342,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
-        CustomBoard board = new CustomBoard(BoardTestCases.inProgressPieceCanCapture);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressPieceCanCapture);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
@@ -343,8 +355,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
-        CustomBoard board = new CustomBoard(BoardTestCases.inProgressNotOnlyKings);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressNotOnlyKings);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '2'));
         GameStatus status = game.updateGame(action);
@@ -358,8 +371,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
-        CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotMove);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.stalematePieceCannotMove);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
         GameStatus status = game.updateGame(action);
@@ -370,8 +384,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
-        CustomBoard board = new CustomBoard(BoardTestCases.stalematePieceCannotCapture);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.stalematePieceCannotCapture);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
@@ -382,8 +397,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
-        CustomBoard board = new CustomBoard(BoardTestCases.stalemateOnlyKings);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.stalemateOnlyKings);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('e', '1'), new Point('e', '2'));
         GameStatus status = game.updateGame(action);
@@ -396,8 +412,9 @@ class ChessGameTest {
     // region Check in Game
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanCapture);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkPieceCanCapture);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
@@ -408,8 +425,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkPieceCanBlock);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkPieceCanBlock);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
         GameStatus status = game.updateGame(action);
@@ -420,8 +438,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkKingCanMove);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkKingCanMove);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
@@ -434,8 +453,9 @@ class ChessGameTest {
     // region Checkmate in Game
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotCapture);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmatePieceCannotCapture);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);
@@ -446,8 +466,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkmatePieceCannotBlock);
-        ChessGame game = new ChessGame(new StandardBoard());
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmatePieceCannotBlock);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
         GameStatus status = game.updateGame(action);
@@ -458,8 +479,9 @@ class ChessGameTest {
 
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
-        CustomBoard board = new CustomBoard(BoardTestCases.checkmateKingCannotMove);
-        ChessGame game = new ChessGame(board);
+        Log<Point, Piece> log = new ChessLog();
+        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmateKingCannotMove);
+        ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
         GameStatus status = game.updateGame(action);

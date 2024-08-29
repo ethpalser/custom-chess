@@ -18,6 +18,7 @@ import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class StandardBoard implements Board {
@@ -46,7 +47,19 @@ public class StandardBoard implements Board {
 
     @Override
     public void addPiece(Point point, Piece piece) {
-        this.piecesOnBoard.put(point, piece);
+        if (point == null) {
+            return;
+        }
+        if (piece == null) {
+            this.piecesOnBoard.remove(point);
+        } else {
+            // Removes the piece from its original location
+            this.piecesOnBoard.remove(piece.getPoint());
+            // Replaces the piece at the new point
+            this.piecesOnBoard.put(point, piece);
+            // Updates the piece to be at its new location
+            piece.move(point);
+        }
     }
 
     @Override
@@ -71,10 +84,12 @@ public class StandardBoard implements Board {
         piece.move(end);
 
         move.getFollowUpMove().ifPresent(m -> {
+            System.out.println("before: " + m);
             Piece followUp = m.getStartObject();
             this.piecesOnBoard.remove(m.getStart());
             this.piecesOnBoard.put(m.getEnd(), followUp);
             this.piecesOnBoard.remove(null); // If the piece is meant to be removed it was put here
+            System.out.println("after: " + m);
         });
         return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
     }
@@ -95,11 +110,15 @@ public class StandardBoard implements Board {
                     sb.append("|   ");
                 } else {
                     sb.append("| ");
-                    if (PieceType.PAWN.getCode().equals(customPiece.getCode())) {
-                        sb.append("P ");
-                    } else {
-                        sb.append(customPiece.getCode()).append(" ");
+
+                    String code = customPiece.getCode();
+                    if ("".equals(code)) {
+                        code = "P"; // In some cases that pawn's code is an empty string
                     }
+                    if (Colour.WHITE.equals(customPiece.getColour())) {
+                        code = code.toLowerCase(Locale.ROOT);
+                    }
+                    sb.append(code).append(" ");
                 }
             }
             sb.append("|\n");

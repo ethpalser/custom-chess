@@ -46,7 +46,7 @@ public class Pawn implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
-        int yOffset = this.colour == Colour.WHITE ? + 1 : - 1;
+        int yOffset = this.colour == Colour.WHITE ? +1 : -1;
         MoveSet moveSet = new MoveSet(
                 Point.validOrNull(board, this.point, this.colour, 0, yOffset),
                 Point.captureOrNull(board, this.point, this.colour, -1, yOffset),
@@ -62,15 +62,15 @@ public class Pawn implements Piece {
         }
 
         // en passant (there must be at least one move)
-        if (log != null && log.size() > 1) {
+        if (log != null && !log.isEmpty()) {
             LogEntry<Point, Piece> lastMove = log.peek();
             Point peekStart = lastMove.getStart();
             Point peekEnd = lastMove.getEnd();
 
             // a pawn moved forward two
-            if (lastMove.isFirstOccurrence() && "P".equals(board.get(peekEnd).getCode())
-                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getX() + 2 == peekStart.getY())
-                    || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getX() - 2 == peekStart.getY()))
+            if (lastMove.isFirstOccurrence() && board.get(peekEnd) != null && "P".equals(board.get(peekEnd).getCode())
+                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
+                    || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
             ) {
                 // that pawn is to the left of this pawn
                 Point left = Point.validOrNull(board, this.point, this.colour, -1, 0);

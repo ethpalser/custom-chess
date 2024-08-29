@@ -62,37 +62,39 @@ public class King implements Piece {
         // not moved and not threatened (need to use the correct threat map)
         if (!this.hasMoved && opponentThreats != null && opponentThreats.getPieces(this.point).isEmpty()) {
             int startRank = this.colour == Colour.WHITE ? board.getMinY() : board.getMaxY();
-            // king side
-            Piece kingSideRook = board.get(new Point(board.getMinX(), startRank));
-            if (kingSideRook != null && !kingSideRook.hasMoved()
+
+            // queen side (towards the left)
+            Piece queenSideRook = board.get(new Point(board.getMinX(), startRank));
+            if (queenSideRook != null && !queenSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
-                LogEntry<Point, Piece> kingSideRookMove = new ChessLogEntry(
+                LogEntry<Point, Piece> queenSideRookMove = new ChessLogEntry(
                         new Point(0, startRank),
                         new Point(this.point.getX() - 1, this.point.getY()),
-                        kingSideRook
+                        queenSideRook
                 );
                 moveSet.addMove(new Move(new Path(
                         new Point(this.point.getX() - 1, this.point.getY()),
                         new Point(this.point.getX() - 2, this.point.getY())
-                ), kingSideRookMove));
+                ), queenSideRookMove));
             }
-            // queen side
-            Piece queenSideRook = board.get(new Point(board.getMaxX(), startRank));
-            if (queenSideRook != null && !queenSideRook.hasMoved()
+
+            // king side (towards the right)
+            Piece kingSideRook = board.get(new Point(board.getMaxX(), startRank));
+            if (kingSideRook != null && !kingSideRook.hasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
-                LogEntry<Point, Piece> queenSideRookMove = new ChessLogEntry(
-                        new Point(0, startRank),
+                LogEntry<Point, Piece> kingSideRookMove = new ChessLogEntry(
+                        new Point(board.getMaxX(), startRank),
                         new Point(this.point.getX() + 1, this.point.getY()),
-                        queenSideRook
+                        kingSideRook
                 );
                 moveSet.addMove(new Move(new Path(
                         new Point(this.point.getX() + 1, this.point.getY()),
                         new Point(this.point.getX() + 2, this.point.getY())
-                ), queenSideRookMove));
+                ), kingSideRookMove));
             }
         }
         return moveSet;

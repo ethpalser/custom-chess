@@ -113,8 +113,8 @@ public class CustomMove {
         this.followUp = null;
     }
 
-    public List<Movement> toMovementList(Plane<Piece> board, Colour colour, Point start) {
-        return this.getPathsInAllQuadrants(board, colour, start).stream().map(p -> new Move(p, this.followUp))
+    public List<Movement> toMovementList(Plane<Piece> board, Colour offset, Point start) {
+        return this.getPathsInAllQuadrants(board, offset, start).stream().map(p -> new Move(p, this.followUp))
                 .collect(Collectors.toList());
     }
 

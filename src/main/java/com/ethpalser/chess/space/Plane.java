@@ -1,10 +1,12 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,6 +62,9 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
 
     @Override
     public T put(Point key, T value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value added to plane cannot be null; occurred at point " + key);
+        }
         return space.put(key, value);
     }
 
@@ -159,11 +164,15 @@ public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
                     sb.append("|   ");
                 } else {
                     sb.append("| ");
-                    if (PieceType.PAWN.getCode().equals(piece.getCode())) {
-                        sb.append("P ");
-                    } else {
-                        sb.append(piece.getCode()).append(" ");
+
+                    String code = piece.getCode();
+                    if ("".equals(code)) {
+                        code = "P"; // In some cases that pawn's code is an empty string
                     }
+                    if (Colour.WHITE.equals(piece.getColour())) {
+                        code = code.toLowerCase(Locale.ROOT);
+                    }
+                    sb.append(code).append(" ");
                 }
             }
             sb.append("| ").append(1 + y).append("\n");

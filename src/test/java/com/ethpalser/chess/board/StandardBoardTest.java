@@ -1,6 +1,7 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.board.custom.CustomBoard;
+import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -52,13 +53,13 @@ class StandardBoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        CustomBoard board = new CustomBoard();
+        CustomBoard board = new CustomBoard(new ChessLog());
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        CustomBoard board = new CustomBoard();
+        CustomBoard board = new CustomBoard(new ChessLog());
         int y = 1;
         for (int x = 0; x < board.getPieces().width(); x++) {
             board.addPiece(new Point(x, y), null);

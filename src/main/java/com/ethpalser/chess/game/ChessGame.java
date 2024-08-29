@@ -2,13 +2,13 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class ChessGame implements Game {
 
     private final Board board;
-    private final ChessLog log;
+    private final Log<Point, Piece> log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
 
@@ -27,19 +27,25 @@ public class ChessGame implements Game {
     private Point whiteKing;
     private Point blackKing;
 
-    public ChessGame(Board board) {
+    public ChessGame(Board board, Log<Point, Piece> log) {
         if (board == null) {
             throw new NullPointerException("board cannot be null");
         }
         this.board = board;
-        this.log = new ChessLog();
+        this.log = log;
         this.status = GameStatus.PENDING;
         this.turn = Colour.WHITE;
-        // Assuming standard starting positions, and if this assumption changes it should be provided by the board
-        this.whiteKing = new Point('e', '1');
-        this.blackKing = new Point('e', '8');
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+        for (Piece p : this.board.getPieces()) {
+            if (PieceType.KING.getCode().equals(p.getCode())) {
+                if (Colour.WHITE.equals(p.getColour())) {
+                    this.whiteKing = p.getPoint();
+                } else {
+                    this.blackKing = p.getPoint();
+                }
+            }
+        }
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), log);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
     }
 
     @Override
@@ -172,11 +178,11 @@ public class ChessGame implements Game {
         return "K".equals(piece.getCode());
     }
 
-    private boolean isKingInCheck(Colour playerColour) {
-        if (playerColour == null) {
+    private boolean isKingInCheck(Colour kingColour) {
+        if (kingColour == null) {
             throw new NullPointerException();
         }
-        return this.hasThreats(playerColour, this.getOpponentKingPosition(this.turn));
+        return this.hasThreats(Colour.opposite(kingColour), getKingPosition(kingColour));
     }
 
     private void updateKingPosition(Piece piece, Point update) {
@@ -189,11 +195,11 @@ public class ChessGame implements Game {
         }
     }
 
-    private Point getOpponentKingPosition(Colour colour) {
+    private Point getKingPosition(Colour colour) {
         if (Colour.WHITE.equals(colour)) {
-            return this.blackKing;
-        } else {
             return this.whiteKing;
+        } else {
+            return this.blackKing;
         }
     }
 
@@ -231,7 +237,7 @@ public class ChessGame implements Game {
 
     private boolean isCheckmate() {
         Colour oppColour = Colour.opposite(this.turn);
-        Point oppKingPoint = this.getOpponentKingPosition(this.turn);
+        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Assuming King is in check
         Set<Point> oppKingMoveSet = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();
@@ -280,7 +286,7 @@ public class ChessGame implements Game {
             return true;
         }
         Colour oppColour = Colour.opposite(this.turn);
-        Point oppKingPoint = this.getOpponentKingPosition(this.turn);
+        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Can the opponent's king move, including captures that are not defended?
         Set<Point> oppKingMoves = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();

@@ -35,7 +35,11 @@ public class ThreatMap implements MoveMap {
         if (point == null) {
             return Set.of();
         }
-        return this.map.get(point);
+        Set<Piece> piecesThreateningPoint = this.map.get(point);
+        if (piecesThreateningPoint != null) {
+            return piecesThreateningPoint;
+        }
+        return Set.of();
     }
 
     @Override
@@ -57,7 +61,10 @@ public class ThreatMap implements MoveMap {
             Set<Piece> threateningPieces = this.getPieces(point);
 
             // Expensive operation. This can be improved by knowing the paths to replace.
-            this.map.get(point).clear();
+            Set<Piece> pieceSet = this.getPieces(point);
+            if (!pieceSet.isEmpty()) {
+                pieceSet.clear();
+            }
             for (Piece c : threateningPieces) {
                 this.clearMoves(c);
                 for (Point p : piece.getMoves(board, log).getPoints()) {
@@ -94,6 +101,10 @@ public class ThreatMap implements MoveMap {
     private Map<Point, Set<Piece>> setup(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
         for (Piece piece : board) {
+            if (piece == null) {
+                System.out.println("null piece in board");
+                continue;
+            }
             if (colour.equals(piece.getColour())) {
                 MoveSet moveSet = piece.getMoves(board, log);
                 for (Point point : moveSet.getPoints()) {

@@ -220,8 +220,9 @@ public class CustomPieceFactory {
             pawn.addMove(pawnCharge);
         }
 
-        // En Passant is split into two due to limitations with References, as they don't have CustomPiece's mirroring
+        // En Passant is split into two due to limitations with References, as refs don't have CustomPiece's mirroring
         {
+            // En Passant front-right
             LogEntry<Point, Piece> followUpRight = new ReferenceLogEntry<>(this.plane,
                     new PieceReference(pawn, Direction.AT, 1, 0), null);
             CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
@@ -239,6 +240,7 @@ public class CustomPieceFactory {
             pawn.addMove(enPassantRight);
         }
         {
+            // En Passant front-left
             LogEntry<Point, Piece> followUpLeft = new ReferenceLogEntry<>(this.plane,
                     new PieceReference(pawn, Direction.AT, -1, 0), null);
             CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)

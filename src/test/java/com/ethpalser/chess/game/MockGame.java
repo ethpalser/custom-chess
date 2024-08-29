@@ -1,5 +1,8 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -29,6 +32,11 @@ public class MockGame implements Game {
             }
         }
         return GameStatus.ONGOING;
+    }
+
+    @Override
+    public Log<Point, Piece> getLog() {
+        return null;
     }
 
     @Override
