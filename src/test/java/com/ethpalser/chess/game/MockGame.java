@@ -22,7 +22,6 @@ public class MockGame implements Game {
     public GameStatus updateGame(Action action) {
         for (MockNode node : current.getNext()) {
             int val = action.getEnd().getX();
-            System.out.println(val);
             if (node.getValue() == val) {
                 this.logStack.push(this.current);
                 this.current = node;
