@@ -219,13 +219,6 @@ public class ChessGame implements Game {
         }
     }
 
-    private boolean kingCanMove(Colour kingColour) {
-        Piece king = this.board.getPiece(this.getKingPosition(kingColour));
-        // Can the opponent's king move, including captures that are not defended?
-        MoveSet oppKingMoves = king.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn));
-        return oppKingMoves != null && !oppKingMoves.isEmpty();
-    }
-
     private ThreatMap getThreatMap(Colour colour) {
         if (Colour.WHITE.equals(colour)) {
             return whiteThreats;
