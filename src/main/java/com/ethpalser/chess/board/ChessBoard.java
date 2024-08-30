@@ -110,8 +110,9 @@ public class ChessBoard implements Board {
         if (followUp != null) {
             Piece toForcePush = followUp.getStartObject();
             this.pieces.remove(followUp.getStart());
-            this.pieces.put(followUp.getEnd(), toForcePush);
-            this.pieces.remove(null); // If the piece is meant to be removed it was put here
+            if (followUp.getEnd() != null) {
+                this.pieces.put(followUp.getEnd(), toForcePush);
+            }
         }
         return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
     }
