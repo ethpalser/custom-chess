@@ -95,13 +95,14 @@ public class CustomBoard implements Board {
         this.pieces.put(end, piece);
         piece.move(end);
 
-        move.getFollowUpMove().ifPresent(m -> {
-            Piece followUp = m.getStartObject();
-            this.pieces.remove(m.getStart());
-            this.pieces.put(m.getEnd(), followUp);
+        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
+        if (followUp != null) {
+            Piece toForcePush = followUp.getStartObject();
+            this.pieces.remove(followUp.getStart());
+            this.pieces.put(followUp.getEnd(), toForcePush);
             this.pieces.remove(null); // If the piece is meant to be removed it was put here
-        });
-        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
+        }
+        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
     }
 
     @Override

@@ -35,8 +35,8 @@ public class Move implements Movement {
     }
 
     @Override
-    public Optional<LogEntry<Point, Piece>> getFollowUpMove() {
-        return Optional.ofNullable(this.followUpMove);
+    public LogEntry<Point, Piece> getFollowUpMove() {
+        return this.followUpMove;
     }
 
     @Override

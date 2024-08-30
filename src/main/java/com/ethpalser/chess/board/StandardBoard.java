@@ -83,13 +83,14 @@ public class StandardBoard implements Board {
         this.piecesOnBoard.put(end, piece);
         piece.move(end);
 
-        move.getFollowUpMove().ifPresent(m -> {
-            Piece followUp = m.getStartObject();
-            this.piecesOnBoard.remove(m.getStart());
-            this.piecesOnBoard.put(m.getEnd(), followUp);
+        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
+        if (followUp != null) {
+            Piece toForcePush = followUp.getStartObject();
+            this.piecesOnBoard.remove(followUp.getStart());
+            this.piecesOnBoard.put(followUp.getEnd(), toForcePush);
             this.piecesOnBoard.remove(null); // If the piece is meant to be removed it was put here
-        });
-        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
+        }
+        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
     }
 
     @Override

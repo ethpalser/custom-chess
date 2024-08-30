@@ -10,6 +10,6 @@ public interface Movement {
 
     Path getPath();
 
-    Optional<LogEntry<Point, Piece>> getFollowUpMove();
+    LogEntry<Point, Piece> getFollowUpMove();
 
 }
