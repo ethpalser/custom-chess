@@ -41,21 +41,33 @@ public class King implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
-        System.err.println("generally unsupported method for king used: getMoves(Plane<Piece> board)");
+        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board)");
         return this.getMoves(board, null, null);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap opponentThreats) {
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
+        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board, Log<Point, Piece> log)");
+        return this.getMoves(board, log, null);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats) {
+        return this.getMoves(board, log, threats, false, false);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap opponentThreats,
+            boolean onlyAttacks, boolean includeDefends) {
         MoveSet moveSet = new MoveSet(
-                this.generateSafePointOrNull(board, opponentThreats, -1, 0), // left
-                this.generateSafePointOrNull(board, opponentThreats, -1, 1), // top left
-                this.generateSafePointOrNull(board, opponentThreats, 0, 1), // top
-                this.generateSafePointOrNull(board, opponentThreats, 1, 1), // top right
-                this.generateSafePointOrNull(board, opponentThreats, 1, 0), // right
-                this.generateSafePointOrNull(board, opponentThreats, 1, -1), // bottom right
-                this.generateSafePointOrNull(board, opponentThreats, 0, -1), // bottom
-                this.generateSafePointOrNull(board, opponentThreats, -1, -1) // bottom left
+                this.generateSafePointOrNull(board, opponentThreats, -1, 0, includeDefends), // left
+                this.generateSafePointOrNull(board, opponentThreats, -1, 1, includeDefends), // top left
+                this.generateSafePointOrNull(board, opponentThreats, 0, 1, includeDefends), // top
+                this.generateSafePointOrNull(board, opponentThreats, 1, 1, includeDefends), // top right
+                this.generateSafePointOrNull(board, opponentThreats, 1, 0, includeDefends), // right
+                this.generateSafePointOrNull(board, opponentThreats, 1, -1, includeDefends), // bot right
+                this.generateSafePointOrNull(board, opponentThreats, 0, -1, includeDefends), // bottom
+                this.generateSafePointOrNull(board, opponentThreats, -1, -1, includeDefends) // bot left
         );
 
         // castling
@@ -128,10 +140,11 @@ public class King implements Piece {
         return board.get(p) == null && isSafe(threatMap, p);
     }
 
-    private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset) {
+    private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset,
+            boolean includeDefends) {
         Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
         if (isSafe(threatMap, p)) {
-            return Point.validOrNull(board, this.point, this.colour, -1, 0);
+            return Point.validOrNull(board, this.point, this.colour, -1, 0, includeDefends);
         }
         return null;
     }

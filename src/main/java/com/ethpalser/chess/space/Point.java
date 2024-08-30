@@ -128,25 +128,25 @@ public class Point implements Comparable<Point> {
     // STATIC METHODS
 
     public static Point validOrNull(Plane<Piece> board, Point start, Colour colour,
-            int xOffset, int yOffset) {
+            int xOffset, int yOffset, boolean includeDefends) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // not in bounds or (exists and matching colour)
-        if (!board.isInBounds(point) || (board.get(point) != null && board.get(point).getColour() == colour)) {
-            return null;
+        // in bounds and either open, can capture or can defend (if allowed)
+        if (board.isInBounds(point) && (includeDefends
+                || (board.get(point) != null && !board.get(point).getColour().equals(colour)))) {
+            return point;
         }
-        return point;
+        return null;
     }
 
     public static Point captureOrNull(Plane<Piece> board, Point start, Colour colour,
-            int xOffset, int yOffset) {
+            int xOffset, int yOffset, boolean includeDefends) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // not in bounds or empty or matching colour
-        if (!board.isInBounds(point.getX(), point.getY()) || board.get(point) == null
-                || board.get(point).getColour() == colour) {
-            return null;
+        // in bounds and either open, can capture or can defend (if allowed)
+        if (board.isInBounds(point) && (includeDefends
+                || (board.get(point) != null && board.get(point).getColour().equals(colour)))) {
+            return point;
         }
-        // in bounds and opposite colour (i.e. can capture)
-        return point;
+        return null;
     }
 
 }

@@ -18,14 +18,15 @@ public interface Piece extends Positional {
     MoveSet getMoves(Plane<Piece> board);
 
     default MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
-        // log ignored
-        return this.getMoves(board);
+        return this.getMoves(board, log, null, false, false);
     }
 
     default MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats) {
-        // threats ignored, and likely log as well
-        return this.getMoves(board, log);
+        return this.getMoves(board, log, threats, false, false);
     }
+
+    MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats, boolean onlyAttacks,
+            boolean includeDefends);
 
     default boolean canMove(Plane<Piece> board, Point destination) {
         if (board == null || destination == null) {

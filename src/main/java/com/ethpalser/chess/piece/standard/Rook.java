@@ -1,7 +1,9 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
@@ -37,14 +39,21 @@ public class Rook implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
+        // Log and Threats are not needed
+        return this.getMoves(board, null, null, false, false);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+            boolean onlyAttacks, boolean includeDefends) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(Path.horizontal(board, this.point, this.colour, false)),
-                new Move(Path.horizontal(board, this.point, this.colour, true)),
-                new Move(Path.vertical(board, this.point, this.colour, false)),
-                new Move(Path.vertical(board, this.point, this.colour, true))
+                new Move(Path.horizontal(board, this.point, this.colour, false, includeDefends)),
+                new Move(Path.horizontal(board, this.point, this.colour, true, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, false, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, true, includeDefends))
         );
     }
 

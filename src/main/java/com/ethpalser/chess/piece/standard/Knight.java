@@ -1,6 +1,8 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
@@ -34,15 +36,22 @@ public class Knight implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
+        // Log and Threats are not needed
+        return this.getMoves(board, null, null, false, false);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+            boolean onlyAttacks, boolean includeDefends) {
         return new MoveSet(
-                Point.validOrNull(board, this.point, this.colour, -2, 1), // left 2 up
-                Point.validOrNull(board, this.point, this.colour, -1, 2), // up 2 left
-                Point.validOrNull(board, this.point, this.colour, 1, 2), // up 2 right
-                Point.validOrNull(board, this.point, this.colour, 2, 1), // right 2 up
-                Point.validOrNull(board, this.point, this.colour, 2, -1), // right 2 down
-                Point.validOrNull(board, this.point, this.colour, 1, -2), // down 2 right
-                Point.validOrNull(board, this.point, this.colour, -1, -2), // down 2 left
-                Point.validOrNull(board, this.point, this.colour, -2, -1) // left 2 down
+                Point.validOrNull(board, this.point, this.colour, -2, 1, includeDefends), // left 2 up
+                Point.validOrNull(board, this.point, this.colour, -1, 2, includeDefends), // up 2 left
+                Point.validOrNull(board, this.point, this.colour, 1, 2, includeDefends), // up 2 right
+                Point.validOrNull(board, this.point, this.colour, 2, 1, includeDefends), // right 2 up
+                Point.validOrNull(board, this.point, this.colour, 2, -1, includeDefends), // right 2 down
+                Point.validOrNull(board, this.point, this.colour, 1, -2, includeDefends), // down 2 right
+                Point.validOrNull(board, this.point, this.colour, -1, -2, includeDefends), // down 2 left
+                Point.validOrNull(board, this.point, this.colour, -2, -1, includeDefends) // left 2 down
         );
     }
 

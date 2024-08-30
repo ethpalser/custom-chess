@@ -146,14 +146,15 @@ public class Path implements Iterable<Point> {
         }
     }
 
-    public static Path horizontal(Plane<Piece> board, Point start, Colour colour, boolean right) {
+    public static Path horizontal(Plane<Piece> board, Point start, Colour colour, boolean right,
+            boolean includeDefends) {
         List<Point> set = new LinkedList<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
             Point pos = new Point(start.getX() + x, start.getY());
             if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+                if (board.get(pos).getColour() != colour || includeDefends) {
                     set.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
@@ -165,14 +166,14 @@ public class Path implements Iterable<Point> {
         return new Path(set);
     }
 
-    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up) {
+    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up, boolean includeDefends) {
         List<Point> set = new LinkedList<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
             Point pos = new Point(start.getX(), start.getY() + y);
             if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+                if (board.get(pos).getColour() != colour || includeDefends) {
                     set.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
@@ -184,7 +185,8 @@ public class Path implements Iterable<Point> {
         return new Path(set);
     }
 
-    public static Path diagonal(Plane<Piece> board, Point start, Colour colour, boolean right, boolean up) {
+    public static Path diagonal(Plane<Piece> board, Point start, Colour colour, boolean right, boolean up,
+            boolean includeDefends) {
         List<Point> list = new LinkedList<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
@@ -192,7 +194,7 @@ public class Path implements Iterable<Point> {
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Point pos = new Point(start.getX() + x, start.getY() + y);
             if (board.get(pos) != null) {
-                if (board.get(pos).getColour() != colour) {
+                if (board.get(pos).getColour() != colour || includeDefends) {
                     list.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this

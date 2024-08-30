@@ -1,7 +1,9 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
@@ -37,14 +39,21 @@ public class Bishop implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
+        // Log and Threats are not needed
+        return this.getMoves(board, null, null, false, false);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+            boolean onlyAttacks, boolean includeDefends) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(Path.diagonal(board, this.point, this.colour, false, false)),
-                new Move(Path.diagonal(board, this.point, this.colour, false, true)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, false)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, true))
+                new Move(Path.diagonal(board, this.point, this.colour, false, false, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, false, true, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, false, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, true, includeDefends))
         );
     }
 
