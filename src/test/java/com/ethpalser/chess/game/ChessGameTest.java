@@ -2,8 +2,8 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardTestCases;
+import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
@@ -328,7 +328,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressPieceCanMove);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.inProgressPieceCanMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
@@ -341,7 +341,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressPieceCanCapture);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.inProgressPieceCanCapture);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -354,7 +354,7 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.inProgressNotOnlyKings);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.inProgressNotOnlyKings);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '2'));
@@ -370,7 +370,7 @@ class ChessGameTest {
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.stalematePieceCannotMove);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.stalematePieceCannotMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('g', '4'));
@@ -383,7 +383,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.stalematePieceCannotCapture);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.stalematePieceCannotCapture);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -396,7 +396,7 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.stalemateOnlyKings);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.stalemateOnlyKings);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('e', '1'), new Point('e', '2'));
@@ -411,7 +411,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkPieceCanCapture);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkPieceCanCapture);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -424,7 +424,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkPieceCanBlock);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkPieceCanBlock);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -437,7 +437,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkKingCanMove);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkKingCanMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -452,7 +452,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmatePieceCannotCapture);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkmatePieceCannotCapture);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -465,7 +465,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmatePieceCannotBlock);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkmatePieceCannotBlock);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -478,7 +478,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
         Log<Point, Piece> log = new ChessLog();
-        CustomBoard board = new CustomBoard(log, BoardTestCases.checkmateKingCannotMove);
+        Board board = new ChessBoard(BoardType.CUSTOM, log, BoardTestCases.checkmateKingCannotMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));

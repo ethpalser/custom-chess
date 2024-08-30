@@ -1,6 +1,8 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.custom.CustomBoard;
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.BoardType;
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
@@ -24,11 +26,12 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
+        Log<Point, Piece> log = new ChessLog();
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, log);
 
         // When
         Point selected = new Point(4, 4);
@@ -44,7 +47,7 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
 
         // When
         Point selected = new Point(4, 4);
@@ -61,7 +64,7 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, log);
         Piece customPiece = board.getPiece(2, 1);
         board.addPiece(new Point(2, 2), customPiece);
 
@@ -79,7 +82,7 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
                 Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         Piece customPiece = board.getPiece(2, 1);
         board.addPiece(new Point(2, 3), customPiece);
 
@@ -112,7 +115,7 @@ class ConditionTest {
         // Given
         Log<Point, Piece> log = new ChessLog();
 
-        CustomBoard board = new CustomBoard(log);
+        Board board = new ChessBoard(BoardType.CUSTOM, log);
         Piece white = board.getPiece(4, 1);
         board.addPiece(new Point(4, 4), white);
 
@@ -143,12 +146,9 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
-        // When
-        CustomBoard board = new CustomBoard(new ChessLog());
-        Point selected = new Point(4, 1);
-        Point destination = new Point(5, 2);
-        boolean result = condition.isExpected(board.getPieces());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         // Then
+        boolean result = condition.isExpected(board.getPieces());
         assertFalse(result);
     }
 
@@ -158,16 +158,13 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         board.addPiece(new Point(4, 1), null);
         Piece king = board.getPiece(4, 0);
         board.addPiece(new Point(4, 1), king);
 
-        // When
-        Point selected = new Point(4, 1);
-        Point destination = new Point(5, 2);
-        boolean result = condition.isExpected(board.getPieces());
         // Then
+        boolean result = condition.isExpected(board.getPieces());
         assertFalse(result);
     }
 
@@ -177,17 +174,14 @@ class ConditionTest {
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
                 Comparator.FALSE, new Property<>("hasMoved"), false);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         Piece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
         board.addPiece(new Point(0, 2), rook);
         board.addPiece(new Point(0, 0), rook);
 
-        // When
-        Point selected = new Point(4, 0);
-        Point destination = new Point(2, 0);
-        boolean result = condition.isExpected(board.getPieces());
         // Then
+        boolean result = condition.isExpected(board.getPieces());
         assertFalse(result);
     }
 
@@ -197,12 +191,10 @@ class ConditionTest {
         Conditional<Piece> condition = new ReferenceCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
                 Comparator.DOES_NOT_EXIST, null);
 
-        CustomBoard board = new CustomBoard(new ChessLog());
-        // When
-        Point selected = new Point(4, 0);
-        Point destination = new Point(2, 0);
-        boolean result = condition.isExpected(board.getPieces());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
+
         // Then
+        boolean result = condition.isExpected(board.getPieces());
         assertFalse(result);
     }
 
@@ -210,7 +202,7 @@ class ConditionTest {
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         board.addPiece(new Point(1, 0), null);
         board.addPiece(new Point(2, 0), null);
         board.addPiece(new Point(3, 0), null);
@@ -224,10 +216,6 @@ class ConditionTest {
         Conditional<Piece> conditionD = new ReferenceCondition<>(new PathReference<>(Location.PATH,
                 new Point(3, 0), new Point(2, 0)), Comparator.DOES_NOT_EXIST, null);
 
-        // When
-        Point selected = new Point(4, 0);
-        Point destination = new Point(2, 0);
-        Action action = new Action(Colour.WHITE, selected, destination);
         // Then
         assertTrue(conditionA.isExpected(board.getPieces()));
         assertTrue(conditionB.isExpected(board.getPieces()));

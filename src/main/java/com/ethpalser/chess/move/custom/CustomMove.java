@@ -1,6 +1,5 @@
 package com.ethpalser.chess.move.custom;
 
-import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
@@ -13,10 +12,8 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomMove {
@@ -230,7 +227,7 @@ public class CustomMove {
     /**
      * Verifies that all {@link Conditional} defined in this Movement are meeting their criteria.
      *
-     * @param board {@link CustomBoard} for the Condition to verify with
+     * @param board {@link Plane} for the Condition to verify with
      * @return true if all Condition pass, otherwise false
      */
     private boolean passesConditions(Plane<Piece> board) {

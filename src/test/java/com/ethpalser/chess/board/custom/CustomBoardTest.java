@@ -1,5 +1,8 @@
 package com.ethpalser.chess.board.custom;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.BoardType;
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -13,7 +16,7 @@ class CustomBoardTest {
 
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
 
         assertEquals(8, board.getPieces().length());
         assertEquals(8, board.getPieces().width());
@@ -52,13 +55,13 @@ class CustomBoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         int y = 1;
         for (int x = 0; x < board.getPieces().width(); x++) {
             board.addPiece(new Point(x, y), null);
