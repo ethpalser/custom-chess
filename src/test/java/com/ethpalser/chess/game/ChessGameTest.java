@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardTestCases;
-import com.ethpalser.chess.board.StandardBoard;
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
@@ -27,7 +27,7 @@ class ChessGameTest {
         int nextY = 3;
         Point pieceC = new Point(pieceX, pieceY); // Nothing at location
         Point nextC = new Point(nextX, nextY);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
@@ -50,7 +50,7 @@ class ChessGameTest {
         int nextY = 0;
         Point pieceC = new Point(pieceX, pieceY); // White Knight
         Point nextC = new Point(nextX, nextY);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
@@ -72,7 +72,7 @@ class ChessGameTest {
         int nextY = -2;
         Point pieceC = new Point(pieceX, pieceY); // White Knight
         Point invalid = new Point(nextX, nextY);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
@@ -94,7 +94,7 @@ class ChessGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Knight
         Point target = new Point(nextX, nextY); // White Pawn
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         board.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
@@ -123,7 +123,7 @@ class ChessGameTest {
         int nextY = 6;
         Point source = new Point(pieceX, pieceY); // White Rook
         Point target = new Point(nextX, nextY); // Black Pawn
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
@@ -148,7 +148,7 @@ class ChessGameTest {
         int nextY = 6;
         Point source = new Point(pieceX, pieceY); // White Rook
         Point target = new Point(nextX, nextY); // Black Pawn
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
         board.addPiece(new Point(0, 1), null); // Can be sufficient for path checks
@@ -173,7 +173,7 @@ class ChessGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Bishop
         Point target = new Point(nextX, nextY); // Empty
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
@@ -197,7 +197,7 @@ class ChessGameTest {
         int nextY = 2;
         Point source = new Point(pieceX, pieceY); // White Bishop
         Point target = new Point(nextX, nextY); // Empty
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         board.addPiece(new Point(3, 1), null); // Clearing the path for a Bishop's move
 
         ChessGame game = new ChessGame(board, new ChessLog());
@@ -218,7 +218,7 @@ class ChessGameTest {
         // Given
         Point source = new Point(4, 0);
         Point target = new Point(6, 0);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         board.addPiece(new Point(5, 0), null);
         board.addPiece(new Point(6, 0), null);
 
@@ -241,7 +241,7 @@ class ChessGameTest {
         // Given
         Point source = new Point(4, 0);
         Point target = new Point(2, 0);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         board.addPiece(new Point(1, 0), null);
         board.addPiece(new Point(2, 0), null);
         board.addPiece(new Point(3, 0), null);
@@ -265,7 +265,7 @@ class ChessGameTest {
         // Given
         Point source = new Point(4, 6);
         Point target = new Point(4, 4);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // White move
@@ -297,7 +297,7 @@ class ChessGameTest {
         // Given
         Point source = new Point(2, 6);
         Point target = new Point(2, 4);
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // White move

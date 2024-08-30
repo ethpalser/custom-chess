@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
-class StandardBoardTest {
+class ChessBoardTest {
 
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
-        Board board = new StandardBoard();
+        Board board = new ChessBoard();
 
         assertEquals(8, board.getPieces().length());
         assertEquals(8, board.getPieces().width());

@@ -8,7 +8,6 @@ import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Bishop;
 import com.ethpalser.chess.piece.standard.King;
 import com.ethpalser.chess.piece.standard.Knight;
@@ -21,11 +20,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class StandardBoard implements Board {
+public class ChessBoard implements Board {
 
     private final Plane<Piece> piecesOnBoard;
 
-    public StandardBoard() {
+    public ChessBoard() {
         Plane<Piece> map = new Plane<>();
         int length = map.length();
         map.putAll(this.generatePiecesInRank(length, 0));
