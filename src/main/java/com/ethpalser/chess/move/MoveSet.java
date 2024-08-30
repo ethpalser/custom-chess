@@ -61,6 +61,10 @@ public class MoveSet {
         return points;
     }
 
+    public boolean isEmpty() {
+        return this.set.isEmpty();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

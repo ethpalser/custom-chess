@@ -2,6 +2,7 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -153,7 +154,8 @@ public class Path implements Iterable<Point> {
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
             Point pos = new Point(start.getX() + x, start.getY());
-            if (board.get(pos) != null) {
+            Piece piece = board.get(pos);
+            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
                 if (board.get(pos).getColour() != colour || includeDefends) {
                     set.add(pos);
                 }
@@ -172,7 +174,8 @@ public class Path implements Iterable<Point> {
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
             Point pos = new Point(start.getX(), start.getY() + y);
-            if (board.get(pos) != null) {
+            Piece piece = board.get(pos);
+            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
                 if (board.get(pos).getColour() != colour || includeDefends) {
                     set.add(pos);
                 }
@@ -193,7 +196,8 @@ public class Path implements Iterable<Point> {
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Point pos = new Point(start.getX() + x, start.getY() + y);
-            if (board.get(pos) != null) {
+            Piece piece = board.get(pos);
+            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
                 if (board.get(pos).getColour() != colour || includeDefends) {
                     list.add(pos);
                 }

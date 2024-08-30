@@ -5,12 +5,15 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.util.Tuple;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class ThreatMap {
@@ -27,7 +30,7 @@ public class ThreatMap {
         this.width = board.width();
     }
 
-    public boolean hasThreat(Point point) {
+    public boolean hasNoThreats(Point point) {
         return this.getPieces(point).isEmpty();
     }
 
@@ -36,7 +39,10 @@ public class ThreatMap {
             return Set.of();
         }
         Set<Piece> piecesThreateningPoint = this.map.get(point);
-        return Objects.requireNonNullElseGet(piecesThreateningPoint, Set::of);
+        if (piecesThreateningPoint == null) {
+            return Set.of();
+        }
+        return piecesThreateningPoint;
     }
 
     private void clearMoves(Piece piece) {
@@ -58,18 +64,25 @@ public class ThreatMap {
             throw new NullPointerException(str);
         }
         Piece change = board.get(point);
+        List<Tuple<Piece, Path>> tupleList = new ArrayList<>();
         // Clear all places for each piece that could previously move here, then update their latest moves
         for (Piece piece : this.getPieces(point)) {
-            if (piece == change) {
+            if (piece.equals(change)) {
                 // skip this piece, as it moved to the point we are looking at and is handled after
                 continue;
             }
-            this.clearMoves(piece);
             MoveSet moves = piece.getMoves(board, log, this, true, true);
             Movement moveWithPoint = moves.getMove(point);
+            if (moveWithPoint != null) {
+                tupleList.add(new Tuple<>(piece, moveWithPoint.getPath()));
+            }
+        }
+        // Tuples are iterated instead of in the foreach above, as it could modify a set it is iterating through
+        for (Tuple<Piece, Path> tuple : tupleList) {
+            this.clearMoves(tuple.getFirst());
             // The only change from before and after are the paths that contain the impacted point
-            for (Point p : moveWithPoint.getPath()) {
-                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(piece);
+            for (Point p : tuple.getSecond()) {
+                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(tuple.getFirst());
             }
         }
         // Clear all places this piece previously threatened then update their latest moves
@@ -109,7 +122,6 @@ public class ThreatMap {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
         for (Piece piece : board) {
             if (piece == null) {
-                System.out.println("null piece in board");
                 continue;
             }
             if (colour.equals(piece.getColour())) {

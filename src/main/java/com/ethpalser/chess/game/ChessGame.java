@@ -4,6 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
@@ -196,7 +197,8 @@ public class ChessGame implements Game {
         if (kingColour == null) {
             throw new NullPointerException();
         }
-        return this.hasThreats(Colour.opposite(kingColour), getKingPosition(kingColour));
+        // Does the opponent have a threat on the current king's position
+        return !this.getThreatMap(Colour.opposite(kingColour)).hasNoThreats(getKingPosition(kingColour));
     }
 
     private void updateKingPosition(Piece piece, Point update) {
@@ -217,16 +219,19 @@ public class ChessGame implements Game {
         }
     }
 
+    private boolean kingCanMove(Colour kingColour) {
+        Piece king = this.board.getPiece(this.getKingPosition(kingColour));
+        // Can the opponent's king move, including captures that are not defended?
+        MoveSet oppKingMoves = king.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn));
+        return oppKingMoves != null && !oppKingMoves.isEmpty();
+    }
+
     private ThreatMap getThreatMap(Colour colour) {
         if (Colour.WHITE.equals(colour)) {
             return whiteThreats;
         } else {
             return blackThreats;
         }
-    }
-
-    private boolean hasThreats(Colour colour, Point point) {
-        return !this.getThreatMap(colour).getPieces(point).isEmpty();
     }
 
     private GameStatus checkGameStatus() {
@@ -252,14 +257,15 @@ public class ChessGame implements Game {
     private boolean isCheckmate() {
         Colour oppColour = Colour.opposite(this.turn);
         Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
-        Piece oppKing = this.board.getPiece(oppKingPoint);
+
         // Assuming King is in check
-        Set<Point> oppKingMoveSet = oppKing.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn))
-                .getPoints();
-        if (!oppKingMoveSet.isEmpty()) {
-            for (Point p : oppKingMoveSet) {
+        MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
+                .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn));
+        if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
+            System.out.println(oppKingMoveSet);
+            for (Point p : oppKingMoveSet.getPoints()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (!hasThreats(this.turn, p)) {
+                if (this.getThreatMap(this.turn).hasNoThreats(p)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -287,7 +293,7 @@ public class ChessGame implements Game {
             }
             for (Point c : causingCheck.getPath()) {
                 // Yes, there is at least one piece that can move to a point along the path causing check
-                if (!this.getThreatMap(oppColour).getPieces(c).isEmpty()) {
+                if (this.getThreatMap(oppColour).hasNoThreats(c)) {
                     return false;
                 }
             }
@@ -296,22 +302,10 @@ public class ChessGame implements Game {
     }
 
     private boolean isStalemate() {
-        // Only kings remain, which is a stalemate
-        if (this.board.getPieces().size() <= 2) {
-            return true;
-        }
         Colour oppColour = Colour.opposite(this.turn);
-        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
-        Piece oppKing = this.board.getPiece(oppKingPoint);
-        // Can the opponent's king move, including captures that are not defended?
-        System.out.println(this.getThreatMap(this.turn));
-        Set<Point> oppKingMoves = oppKing.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn))
-                .getPoints();
-        for (Point moves : oppKingMoves) {
-            System.out.println(moves);
-        }
-        if (!oppKingMoves.isEmpty()) {
-            return false;
+        // Only kings remain, which is a stalemate
+        if (this.board.getPieces().size() <= 2 || kingCanMove(oppColour)) {
+            return true;
         }
         // Are there any non-king opponent pieces that can move?
         List<Piece> opponentPieces = this.board.getPieces().values().stream()
@@ -341,8 +335,11 @@ public class ChessGame implements Game {
             return;
         }
         this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
-        this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
         this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
-        this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
+        // End can be null when removing a piece
+        if (logEntry.getEnd() != null) {
+            this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
+            this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
+        }
     }
 }

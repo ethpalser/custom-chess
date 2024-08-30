@@ -131,7 +131,7 @@ public class Point implements Comparable<Point> {
             int xOffset, int yOffset, boolean includeDefends) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends
+        if (board.isInBounds(point) && (includeDefends || board.get(point) == null
                 || (board.get(point) != null && !board.get(point).getColour().equals(colour)))) {
             return point;
         }
@@ -142,7 +142,7 @@ public class Point implements Comparable<Point> {
             int xOffset, int yOffset, boolean includeDefends) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
         // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends
+        if (board.isInBounds(point) && (includeDefends || board.get(point) == null
                 || (board.get(point) != null && board.get(point).getColour().equals(colour)))) {
             return point;
         }

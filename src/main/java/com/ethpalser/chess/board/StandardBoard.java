@@ -75,7 +75,7 @@ public class StandardBoard implements Board {
 
         Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(end);
         if (move == null) {
-            throw new IllegalActionException("this piece cannot move to " + end);
+            throw new IllegalActionException("piece (" + piece.getCode() + ") cannot move to " + end);
         }
 
         Piece captured = this.getPiece(end);
@@ -84,12 +84,10 @@ public class StandardBoard implements Board {
         piece.move(end);
 
         move.getFollowUpMove().ifPresent(m -> {
-            System.out.println("before: " + m);
             Piece followUp = m.getStartObject();
             this.piecesOnBoard.remove(m.getStart());
             this.piecesOnBoard.put(m.getEnd(), followUp);
             this.piecesOnBoard.remove(null); // If the piece is meant to be removed it was put here
-            System.out.println("after: " + m);
         });
         return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove().orElse(null));
     }
