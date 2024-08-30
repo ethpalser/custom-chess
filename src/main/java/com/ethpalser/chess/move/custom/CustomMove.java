@@ -113,19 +113,29 @@ public class CustomMove {
         this.followUp = null;
     }
 
-    public boolean isMove() {
-        return this.isMove;
-    }
-
-    public boolean isAttack() {
-        return this.isAttack;
-    }
-
     public List<Movement> toMovementList(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
             boolean onlyAttacks, boolean includeDefend) {
-        return this.getPathsInAllQuadrants(board, threatMap, colour, offset, onlyAttacks, includeDefend).stream()
-                .map(p -> new Move(p, this.followUp))
-                .collect(Collectors.toList());
+        if (colour == null || offset == null) {
+            throw new NullPointerException("one or more arguments are null, colour: " + (colour == null)
+                    + " point offset: " + (offset == null));
+        }
+        if (this.isSpecificQuadrant) {
+            boolean isRight = !mirrorYAxis;
+            boolean isUp = (Colour.WHITE.equals(colour) && !mirrorXAxis)
+                    || (!Colour.WHITE.equals(colour) && mirrorXAxis);
+            Path path = this.getPathInQuadrant(board, threatMap, colour, offset, isRight, isUp, onlyAttacks,
+                    includeDefend);
+            if (path != null) {
+                return List.of(new Move(path, this.followUp));
+            } else {
+                return List.of();
+            }
+        } else {
+            return this.getPathsInAllQuadrants(board, threatMap, colour, offset, onlyAttacks, includeDefend)
+                    .stream()
+                    .map(p -> new Move(p, this.followUp))
+                    .collect(Collectors.toList());
+        }
     }
 
     // PRIVATE
@@ -135,13 +145,15 @@ public class CustomMove {
         List<Path> list = new ArrayList<>();
         if (mirrorXAxis || Colour.WHITE.equals(colour)) {
             {
-                Path pathQ1 = this.getPathInQuadrant(board, threatMap, colour, offset, true, true, onlyAttacks, includeDefend);
+                Path pathQ1 = this.getPathInQuadrant(board, threatMap, colour, offset, true, true, onlyAttacks,
+                        includeDefend);
                 if (pathQ1 != null) {
                     list.add(pathQ1);
                 }
             }
             if (mirrorYAxis) {
-                Path pathQ4 = this.getPathInQuadrant(board, threatMap, colour, offset, false, true, onlyAttacks, includeDefend);
+                Path pathQ4 = this.getPathInQuadrant(board, threatMap, colour, offset, false, true, onlyAttacks,
+                        includeDefend);
                 if (pathQ4 != null) {
                     list.add(pathQ4);
                 }
@@ -149,13 +161,15 @@ public class CustomMove {
         }
         if (mirrorXAxis || !Colour.WHITE.equals(colour)) {
             {
-                Path pathQ2 = this.getPathInQuadrant(board, threatMap, colour, offset, true, false, onlyAttacks, includeDefend);
+                Path pathQ2 = this.getPathInQuadrant(board, threatMap, colour, offset, true, false, onlyAttacks,
+                        includeDefend);
                 if (pathQ2 != null) {
                     list.add(pathQ2);
                 }
             }
             if (mirrorYAxis) {
-                Path pathQ3 = this.getPathInQuadrant(board, threatMap, colour, offset, false, false, onlyAttacks, includeDefend);
+                Path pathQ3 = this.getPathInQuadrant(board, threatMap, colour, offset, false, false, onlyAttacks,
+                        includeDefend);
                 if (pathQ3 != null) {
                     list.add(pathQ3);
                 }
