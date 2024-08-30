@@ -1,8 +1,10 @@
 package com.ethpalser.chess.piece.custom;
 
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.CustomMove;
+import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
@@ -18,7 +20,7 @@ public class CustomPiece implements Piece {
     private final PieceType type;
     private final String code;
     private final Colour colour;
-    private final List<CustomMove> customMoves;
+    private final List<CustomMove> moveSpecifications;
     private Point position;
     private boolean hasMoved;
 
@@ -26,11 +28,11 @@ public class CustomPiece implements Piece {
         this(pieceType, colour, vector, (CustomMove) null);
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, CustomMove... customMoves) {
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, CustomMove... specifications) {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;
-        this.customMoves = new ArrayList<>(Arrays.asList(customMoves));
+        this.moveSpecifications = new ArrayList<>(Arrays.asList(specifications));
         this.hasMoved = false;
         this.code = pieceType.getCode();
     }
@@ -61,15 +63,29 @@ public class CustomPiece implements Piece {
 
     @Override
     public MoveSet getMoves(Plane<Piece> board) {
-        Set<Movement> replacements = new HashSet<>();
-        for (CustomMove customMove : this.customMoves) {
-            replacements.addAll(customMove.toMovementList(board, this.colour, this.position));
+        return this.getMoves(board, null, null, false, false);
+    }
+
+    @Override
+    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+            boolean onlyAttacks, boolean includeDefends) {
+        Set<Movement> movements = new HashSet<>();
+        if (onlyAttacks) {
+            for (CustomMove spec : this.moveSpecifications) {
+                if (spec.isAttack()) {
+                    movements.addAll(spec.toMovementList(board, this.colour, this.position, includeDefends));
+                }
+            }
+        } else {
+            for (CustomMove spec : this.moveSpecifications) {
+                movements.addAll(spec.toMovementList(board, this.colour, this.position, includeDefends));
+            }
         }
-        return new MoveSet(replacements);
+        return new MoveSet(movements);
     }
 
     public void addMove(CustomMove move) {
-        this.customMoves.add(move);
+        this.moveSpecifications.add(move);
     }
 
     /**
