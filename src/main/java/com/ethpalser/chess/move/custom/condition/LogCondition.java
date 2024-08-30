@@ -44,8 +44,6 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
                             Math.abs(start.getX() - end.getX()),
                             Math.abs(start.getY() - end.getY())
                     );
-                    System.out.println(diff);
-                    System.out.println(expected);
                 }
 
                 return switch (this.comparator) {
