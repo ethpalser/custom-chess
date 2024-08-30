@@ -5,7 +5,8 @@ public enum PropertyType {
     TYPE("type"),
     POINT("point"),
     HAS_MOVED("hasMoved"),
-    DISTANCE_MOVED("lastDistanceMoved");
+    DISTANCE_MOVED("lastDistanceMoved"),
+    COLOUR("colour");
 
     private final String label;
 

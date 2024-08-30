@@ -36,6 +36,9 @@ class ConditionTest {
         // When
         Point selected = new Point(4, 4);
         Point destination = new Point(5, 5);
+        Piece black = board.getPiece(selected);
+        board.addPiece(destination, black);
+        log.add(new ChessLogEntry(selected, destination, black, null));
         boolean result = condition.isExpected(board.getPieces());
         // Then
         assertFalse(result);
@@ -44,14 +47,18 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsNotPawn_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.EQUAL, new Property<>("type"), PieceType.PAWN);
+        Log<Point, Piece> log = new ChessLog();
+        Conditional<Piece> condition = new LogCondition<>(log, Comparator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
 
         // When
         Point selected = new Point(4, 4);
         Point destination = new Point(5, 5);
+        Piece black = board.getPiece(selected);
+        board.addPiece(destination, black);
+        log.add(new ChessLogEntry(selected, destination, black, null));
+
         boolean result = condition.isExpected(board.getPieces());
         // Then
         assertFalse(result);
@@ -61,8 +68,8 @@ class ConditionTest {
     void evaluate_enPassantLastMovedAdvancedOneSpace_isFalse() {
         // Given
         // En Passant condition requires moving 2
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
+        Log<Point, Piece> log = new ChessLog();
+        Conditional<Piece> condition = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
 
         Board board = new ChessBoard(BoardType.CUSTOM, log);
         Piece customPiece = board.getPiece(2, 1);
@@ -71,16 +78,20 @@ class ConditionTest {
         // When
         Point selected = new Point(4, 1);
         Point destination = new Point(5, 2);
+        Piece black = board.getPiece(selected);
+        board.addPiece(destination, black);
+        log.add(new ChessLogEntry(selected, destination, black, null));
+
         boolean result = condition.isExpected(board.getPieces());
         // Then
         assertFalse(result);
     }
 
     @Test
-    void evaluate_enPassantLastMovedAdvancedTwoSpaces_isFalse() {
+    void evaluate_enPassantLastMovedAdvancedTwoSpaces_isTrue() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.EQUAL, new Property<>("lastMoveDistance"), 1);
+        Log<Point, Piece> log = new ChessLog();
+        Conditional<Piece> condition = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         Piece customPiece = board.getPiece(2, 1);
@@ -88,23 +99,35 @@ class ConditionTest {
 
         // When
         Point selected = new Point(4, 1);
-        Point destination = new Point(5, 2);
+        Point destination = new Point(4, 3);
+        Piece white = board.getPiece(selected);
+        board.addPiece(destination, white);
+        log.add(new ChessLogEntry(selected, destination, white, null));
+
         boolean result = condition.isExpected(board.getPieces());
         // Then
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test
     void evaluate_enPassantLastMovedAndAdjacentIsSameColour_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.NOT_EQUAL, new Property<>("colour"), null);
+        Log<Point, Piece> log = new ChessLog();
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        Board board = new ChessBoard(BoardType.CUSTOM, log);
+        Piece customPiece = board.getPiece(2, 1);
+        board.addPiece(new Point(2, 3), customPiece);
+
+        Conditional<Piece> condition = new LogCondition<>(log, Comparator.NOT_EQUAL, PropertyType.COLOUR,
+                customPiece.getColour());
 
         // When
         Point selected = new Point(4, 1);
-        Point destination = new Point(5, 2);
+        Point destination = new Point(4, 3);
+        Piece white = board.getPiece(selected);
+        board.addPiece(destination, white);
+        log.add(new ChessLogEntry(selected, destination, white, null));
+
         boolean result = condition.isExpected(board.getPieces());
         // Then
         assertFalse(result);
@@ -119,12 +142,6 @@ class ConditionTest {
         Piece white = board.getPiece(4, 1);
         board.addPiece(new Point(4, 4), white);
 
-        Point enPassantTargetStart = new Point(5, 6);
-        Point enPassantTargetEnd = new Point(5, 4);
-        Piece black = board.getPiece(enPassantTargetStart);
-        board.addPiece(enPassantTargetEnd, black);
-        log.add(new ChessLogEntry(enPassantTargetStart, enPassantTargetEnd, black, null));
-
         Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
                 new Property<>("code"), PieceType.PAWN.getCode());
         Conditional<Piece> conditionB = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
@@ -132,8 +149,12 @@ class ConditionTest {
                 new PieceReference(white, Direction.AT, 1, 0)); // Testing en passant to right
 
         // When
-        Point selected = new Point(4, 4);
-        Point destination = new Point(5, 5);
+        Point enPassantTargetStart = new Point(5, 6);
+        Point enPassantTargetEnd = new Point(5, 4);
+        Piece black = board.getPiece(enPassantTargetStart);
+        board.addPiece(enPassantTargetEnd, black);
+        log.add(new ChessLogEntry(enPassantTargetStart, enPassantTargetEnd, black, null));
+
         // Then
         assertTrue(conditionA.isExpected(board.getPieces()));
         assertTrue(conditionB.isExpected(board.getPieces()));

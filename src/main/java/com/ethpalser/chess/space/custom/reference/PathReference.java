@@ -59,7 +59,7 @@ public class PathReference<T extends Positional> implements Reference<T> {
                         .collect(Collectors.toList());
             }
             default -> {
-                System.err.println("Unsupported Location{" + location + "} for reference");
+                System.err.println("Unsupported Location{" + location + "} for path reference");
                 return List.of();
             }
         }
