@@ -70,16 +70,9 @@ public class CustomPiece implements Piece {
     public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
         Set<Movement> movements = new HashSet<>();
-        if (onlyAttacks) {
-            for (CustomMove spec : this.moveSpecifications) {
-                if (spec.isAttack()) {
-                    movements.addAll(spec.toMovementList(board, this.colour, this.position, includeDefends));
-                }
-            }
-        } else {
-            for (CustomMove spec : this.moveSpecifications) {
-                movements.addAll(spec.toMovementList(board, this.colour, this.position, includeDefends));
-            }
+        for (CustomMove spec : this.moveSpecifications) {
+            movements.addAll(spec.toMovementList(board, threats, this.colour, this.position, onlyAttacks,
+                    includeDefends));
         }
         return new MoveSet(movements);
     }

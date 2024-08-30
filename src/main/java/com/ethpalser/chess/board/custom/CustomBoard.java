@@ -93,7 +93,6 @@ public class CustomBoard implements Board {
         Piece captured = this.getPiece(end);
         this.pieces.remove(start);
         this.pieces.put(end, piece);
-        System.out.println(this.pieces);
         piece.move(end);
 
         move.getFollowUpMove().ifPresent(m -> {

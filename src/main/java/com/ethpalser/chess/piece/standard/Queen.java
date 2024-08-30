@@ -50,14 +50,14 @@ public class Queen implements Piece {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(Path.horizontal(board, this.point, this.colour, false, includeDefends)),
-                new Move(Path.horizontal(board, this.point, this.colour, true, includeDefends)),
-                new Move(Path.vertical(board, this.point, this.colour, false, includeDefends)),
-                new Move(Path.vertical(board, this.point, this.colour, true, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, false, false, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, false, true, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, false, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, true, includeDefends))
+                new Move(Path.horizontal(board, this.point, this.colour, false, onlyAttacks, includeDefends)),
+                new Move(Path.horizontal(board, this.point, this.colour, true, onlyAttacks, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, false, onlyAttacks, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, true, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, false, false, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, false, true, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, false, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, this.point, this.colour, true, true, onlyAttacks, includeDefends))
         );
     }
 

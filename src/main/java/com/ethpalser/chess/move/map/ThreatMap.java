@@ -5,6 +5,7 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -32,6 +33,16 @@ public class ThreatMap {
 
     public boolean hasNoThreats(Point point) {
         return this.getPieces(point).isEmpty();
+    }
+
+    public boolean hasNoThreats(Point point, boolean ignoreKing) {
+        Set<Piece> set = this.getPieces(point);
+        for (Piece p : set) {
+            if (!ignoreKing || !PieceType.KING.getCode().equals(p.getCode())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Set<Piece> getPieces(Point point) {
@@ -125,7 +136,7 @@ public class ThreatMap {
                 continue;
             }
             if (colour.equals(piece.getColour())) {
-                MoveSet moveSet = piece.getMoves(board, log);
+                MoveSet moveSet = piece.getMoves(board, log, null, true, true);
                 for (Point point : moveSet.getPoints()) {
                     piecesThreateningPoint.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
                 }

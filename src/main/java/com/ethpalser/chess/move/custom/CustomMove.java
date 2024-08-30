@@ -5,6 +5,7 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.condition.Conditional;
+import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -120,25 +121,27 @@ public class CustomMove {
         return this.isAttack;
     }
 
-    public List<Movement> toMovementList(Plane<Piece> board, Colour offset, Point start, boolean includeDefend) {
-        return this.getPathsInAllQuadrants(board, offset, start, includeDefend).stream()
+    public List<Movement> toMovementList(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+            boolean onlyAttacks, boolean includeDefend) {
+        return this.getPathsInAllQuadrants(board, threatMap, colour, offset, onlyAttacks, includeDefend).stream()
                 .map(p -> new Move(p, this.followUp))
                 .collect(Collectors.toList());
     }
 
     // PRIVATE
 
-    private List<Path> getPathsInAllQuadrants(Plane<Piece> board, Colour colour, Point offset, boolean includeDefend) {
+    private List<Path> getPathsInAllQuadrants(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+            boolean onlyAttacks, boolean includeDefend) {
         List<Path> list = new ArrayList<>();
         if (mirrorXAxis || Colour.WHITE.equals(colour)) {
             {
-                Path pathQ1 = this.getPathInQuadrant(board, colour, offset, true, true, includeDefend);
+                Path pathQ1 = this.getPathInQuadrant(board, threatMap, colour, offset, true, true, onlyAttacks, includeDefend);
                 if (pathQ1 != null) {
                     list.add(pathQ1);
                 }
             }
             if (mirrorYAxis) {
-                Path pathQ4 = this.getPathInQuadrant(board, colour, offset, false, true, includeDefend);
+                Path pathQ4 = this.getPathInQuadrant(board, threatMap, colour, offset, false, true, onlyAttacks, includeDefend);
                 if (pathQ4 != null) {
                     list.add(pathQ4);
                 }
@@ -146,13 +149,13 @@ public class CustomMove {
         }
         if (mirrorXAxis || !Colour.WHITE.equals(colour)) {
             {
-                Path pathQ2 = this.getPathInQuadrant(board, colour, offset, true, false, includeDefend);
+                Path pathQ2 = this.getPathInQuadrant(board, threatMap, colour, offset, true, false, onlyAttacks, includeDefend);
                 if (pathQ2 != null) {
                     list.add(pathQ2);
                 }
             }
             if (mirrorYAxis) {
-                Path pathQ3 = this.getPathInQuadrant(board, colour, offset, false, false, includeDefend);
+                Path pathQ3 = this.getPathInQuadrant(board, threatMap, colour, offset, false, false, onlyAttacks, includeDefend);
                 if (pathQ3 != null) {
                     list.add(pathQ3);
                 }
@@ -161,33 +164,36 @@ public class CustomMove {
         return list;
     }
 
-    private Path getPathInQuadrant(Plane<Piece> board, Colour colour, Point offset, boolean isRight, boolean isUp,
-            boolean includeDefend) {
+    private Path getPathInQuadrant(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+            boolean isRight, boolean isUp, boolean onlyAttacks, boolean includeDefend) {
         if (!this.passesConditions(board) || colour == null || offset == null) {
             return null;
         }
+
+        boolean isKing = PieceType.KING.getCode().equals(board.get(offset).getCode());
         List<Point> points = new LinkedList<>();
         for (Point p : this.pathBase) {
             Point next = this.getVectorInQuadrant(p, offset, isRight, isUp);
+            boolean isSafe = threatMap != null && threatMap.hasNoThreats(next);
             // Not a valid location, out of bounds, or fails its conditions
-            // Note: For some conditions, it will always fail regardless of the point
-            if (next == null || !board.isInBounds(next.getX(), next.getY())) {
+            if (next == null || !board.isInBounds(next) || (isKing && !isSafe)) {
                 break;
             }
 
-            if (board.get(next) != null) {
-                // Can capture opponent pieces, so this is a valid move if it is an opponent piece or defending
-                // Note: All attacks are moves, but not all moves are attacks (ex. pawn)
-                if (this.isAttack && (includeDefend || !board.get(next).getColour().equals(colour))) {
+            Piece piece = board.get(next);
+            if (piece != null) {
+                boolean canCapture = !board.get(next).getColour().equals(colour);
+                if (this.isAttack && (canCapture || includeDefend)) {
                     points.add(next);
                 }
-                // A piece was encountered and this piece cannot move anywhere on the path, so the path ends here
-                if (!CustomMoveType.JUMP.equals(this.moveType)) {
-                    break;
+
+                boolean passAnyPiece = CustomMoveType.JUMP.equals(this.moveType);
+                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
+                if (!passAnyPiece && !passOppKing) {
+                    break; // A piece was encountered and this piece cannot move beyond it, so the path ends here
                 }
-            }
-            else {
-                if (this.isMove) {
+            } else {
+                if ((this.isMove && !onlyAttacks) || (this.isAttack && onlyAttacks)) {
                     points.add(next);
                 }
             }

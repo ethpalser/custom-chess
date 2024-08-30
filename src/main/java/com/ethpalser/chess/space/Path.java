@@ -148,48 +148,59 @@ public class Path implements Iterable<Point> {
     }
 
     public static Path horizontal(Plane<Piece> board, Point start, Colour colour, boolean right,
-            boolean includeDefends) {
-        List<Point> set = new LinkedList<>();
+            boolean onlyAttacks, boolean includeDefends) {
+        List<Point> list = new LinkedList<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX() + x, start.getY())) {
             Point pos = new Point(start.getX() + x, start.getY());
             Piece piece = board.get(pos);
-            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
-                if (board.get(pos).getColour() != colour || includeDefends) {
-                    set.add(pos);
+            if (piece != null) {
+                boolean canCapture = !board.get(pos).getColour().equals(colour);
+                if (canCapture || includeDefends) {
+                    list.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
-                break;
+                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
+                if (!passOppKing) {
+                    break;
+                }
+            } else {
+                list.add(pos);
             }
-            set.add(pos);
             x = right ? x + 1 : x - 1;
         }
-        return new Path(set);
+        return new Path(list);
     }
 
-    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up, boolean includeDefends) {
-        List<Point> set = new LinkedList<>();
+    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up,
+            boolean onlyAttacks, boolean includeDefends) {
+        List<Point> list = new LinkedList<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
         while (board.isInBounds(start.getX(), start.getY() + y)) {
             Point pos = new Point(start.getX(), start.getY() + y);
             Piece piece = board.get(pos);
-            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
-                if (board.get(pos).getColour() != colour || includeDefends) {
-                    set.add(pos);
+            if (piece != null) {
+                boolean canCapture = !board.get(pos).getColour().equals(colour);
+                if (canCapture || includeDefends) {
+                    list.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
-                break;
+                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
+                if (!passOppKing) {
+                    break;
+                }
+            } else {
+                list.add(pos);
             }
-            set.add(pos);
             y = up ? y + 1 : y - 1;
         }
-        return new Path(set);
+        return new Path(list);
     }
 
     public static Path diagonal(Plane<Piece> board, Point start, Colour colour, boolean right, boolean up,
-            boolean includeDefends) {
+            boolean onlyAttacks, boolean includeDefends) {
         List<Point> list = new LinkedList<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
@@ -197,14 +208,19 @@ public class Path implements Iterable<Point> {
         while (board.isInBounds(start.getX() + x, start.getY() + y)) {
             Point pos = new Point(start.getX() + x, start.getY() + y);
             Piece piece = board.get(pos);
-            if (piece != null && !PieceType.KING.getCode().equals(piece.getCode())) {
-                if (board.get(pos).getColour() != colour || includeDefends) {
+            if (piece != null) {
+                boolean canCapture = !board.get(pos).getColour().equals(colour);
+                if (canCapture || includeDefends) {
                     list.add(pos);
                 }
                 // a piece was encountered, so the path ends at or just before this
-                break;
+                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
+                if (!passOppKing) {
+                    break;
+                }
+            } else {
+                list.add(pos);
             }
-            list.add(pos);
             x = right ? x + 1 : x - 1;
             y = up ? y + 1 : y - 1;
         }

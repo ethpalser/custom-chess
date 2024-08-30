@@ -50,10 +50,10 @@ public class Rook implements Piece {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(Path.horizontal(board, this.point, this.colour, false, includeDefends)),
-                new Move(Path.horizontal(board, this.point, this.colour, true, includeDefends)),
-                new Move(Path.vertical(board, this.point, this.colour, false, includeDefends)),
-                new Move(Path.vertical(board, this.point, this.colour, true, includeDefends))
+                new Move(Path.horizontal(board, this.point, this.colour, false, onlyAttacks, includeDefends)),
+                new Move(Path.horizontal(board, this.point, this.colour, true, onlyAttacks, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, false, onlyAttacks, includeDefends)),
+                new Move(Path.vertical(board, this.point, this.colour, true, onlyAttacks, includeDefends))
         );
     }
 

@@ -262,7 +262,6 @@ public class ChessGame implements Game {
         MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
                 .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn));
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
-            System.out.println(oppKingMoveSet);
             for (Point p : oppKingMoveSet.getPoints()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
                 if (this.getThreatMap(this.turn).hasNoThreats(p)) {
@@ -292,8 +291,8 @@ public class ChessGame implements Game {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             for (Point c : causingCheck.getPath()) {
-                // Yes, there is at least one piece that can move to a point along the path causing check
-                if (this.getThreatMap(oppColour).hasNoThreats(c)) {
+                // Yes, there is at least one non-king piece that can move to a point along the path causing check
+                if (this.getThreatMap(oppColour).hasNoThreats(c, true)) {
                     return false;
                 }
             }
@@ -302,16 +301,16 @@ public class ChessGame implements Game {
     }
 
     private boolean isStalemate() {
-        Colour oppColour = Colour.opposite(this.turn);
         // Only kings remain, which is a stalemate
-        if (this.board.getPieces().size() <= 2 || kingCanMove(oppColour)) {
+        if (this.board.getPieces().size() <= 2) {
             return true;
         }
-        // Are there any non-king opponent pieces that can move?
+        // Are there any opponent pieces that can move?
         List<Piece> opponentPieces = this.board.getPieces().values().stream()
-                .filter(p -> oppColour.equals(p.getColour()) && !isKingPiece(p)).collect(Collectors.toList());
+                .filter(p -> Colour.opposite(this.turn).equals(p.getColour()))
+                .collect(Collectors.toList());
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(this.board.getPieces(), this.log).toSet().isEmpty()) {
+            if (!p.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn)).isEmpty()) {
                 return false;
             }
         }

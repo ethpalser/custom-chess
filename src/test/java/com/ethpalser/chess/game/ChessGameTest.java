@@ -100,7 +100,7 @@ class ChessGameTest {
         board.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
         board.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
 
-        ChessGame game = new ChessGame(board, new ChessLog());
+        ChessGame game = new ChessGame(board, log);
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
