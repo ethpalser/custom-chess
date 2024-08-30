@@ -23,7 +23,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.moved = moved;
         this.captured = captured;
         // For this to work this object must be created after verifying but before executing the move from start to end
-        this.isFirstMove = this.moved != null && !this.moved.hasMoved();
+        this.isFirstMove = this.moved != null && !this.moved.getHasMoved();
         this.followUp = null;
     }
 
@@ -33,7 +33,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.moved = moved;
         this.captured = captured;
         // For this to work this object must be created after verifying but before executing the move from start to end
-        this.isFirstMove = !this.moved.hasMoved();
+        this.isFirstMove = !this.moved.getHasMoved();
         this.followUp = followUpMove;
     }
 
@@ -48,7 +48,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         // This only works by recreating the log by simulating the game forward. This fails recreating in reverse.
         this.moved = board.getPiece(start);
         this.captured = board.getPiece(end);
-        this.isFirstMove = !this.moved.hasMoved();
+        this.isFirstMove = !this.moved.getHasMoved();
         this.followUp = null; // Todo: check for specific log strings involving enPassant and castle
     }
 

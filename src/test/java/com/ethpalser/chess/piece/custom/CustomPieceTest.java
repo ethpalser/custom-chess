@@ -12,7 +12,7 @@ class CustomPieceTest {
         Point start = new Point(2, 0);
         CustomPiece bishop = new CustomPiece(PieceType.BISHOP, Colour.WHITE, start);
         assertNotEquals(null, bishop.getPoint());
-        assertFalse(bishop.hasMoved());
+        assertFalse(bishop.getHasMoved());
     }
 
     @Test
@@ -26,7 +26,7 @@ class CustomPieceTest {
         bishop.move(next);
         assertEquals(x, bishop.getPoint().getX());
         assertEquals(y, bishop.getPoint().getY());
-        assertFalse(bishop.hasMoved());
+        assertFalse(bishop.getHasMoved());
     }
 
     @Test
@@ -45,7 +45,7 @@ class CustomPieceTest {
         bishop.move(next);
         assertEquals(nextX, bishop.getPoint().getX());
         assertEquals(nextY, bishop.getPoint().getY());
-        assertTrue(bishop.hasMoved());
+        assertTrue(bishop.getHasMoved());
     }
 
     @Test
@@ -61,6 +61,6 @@ class CustomPieceTest {
         bishop.move(next);
         assertEquals(nextX, bishop.getPoint().getX());
         assertEquals(nextY, bishop.getPoint().getY());
-        assertTrue(bishop.hasMoved());
+        assertTrue(bishop.getHasMoved());
     }
 }

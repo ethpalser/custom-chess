@@ -285,6 +285,7 @@ class ChessGameTest {
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
 
         game.updateGame(action); // En Passant
+        System.out.println(board);
 
         // Then
         assertNull(board.getPiece(3, 4));

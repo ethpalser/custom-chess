@@ -77,7 +77,7 @@ public class King implements Piece {
 
             // queen side (towards the left)
             Piece queenSideRook = board.get(new Point(board.getMinX(), startRank));
-            if (queenSideRook != null && !queenSideRook.hasMoved()
+            if (queenSideRook != null && !queenSideRook.getHasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
             ) {
@@ -94,7 +94,7 @@ public class King implements Piece {
 
             // king side (towards the right)
             Piece kingSideRook = board.get(new Point(board.getMaxX(), startRank));
-            if (kingSideRook != null && !kingSideRook.hasMoved()
+            if (kingSideRook != null && !kingSideRook.getHasMoved()
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
                     && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
             ) {
@@ -122,7 +122,7 @@ public class King implements Piece {
     }
 
     @Override
-    public boolean hasMoved() {
+    public boolean getHasMoved() {
         return this.hasMoved;
     }
 

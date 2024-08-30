@@ -105,13 +105,13 @@ public class CustomPiece implements Piece {
      * @return true or false
      */
     @Override
-    public boolean hasMoved() {
+    public boolean getHasMoved() {
         return hasMoved;
     }
 
     @Override
     public String toString() {
-        return this.type.getCode() + position.toString();
+        return this.getCode() + this.getPoint().toString();
     }
 
 }

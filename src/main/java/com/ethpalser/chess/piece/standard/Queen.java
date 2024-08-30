@@ -71,7 +71,7 @@ public class Queen implements Piece {
     }
 
     @Override
-    public boolean hasMoved() {
+    public boolean getHasMoved() {
         return this.hasMoved;
     }
 

@@ -3,12 +3,17 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.board.custom.CustomBoard;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.ChessLogEntry;
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.space.custom.reference.LogReference;
 import com.ethpalser.chess.space.custom.reference.PathReference;
+import com.ethpalser.chess.space.custom.reference.PieceReference;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -104,23 +109,24 @@ class ConditionTest {
     @Test
     void evaluate_enPassantLastMovedIsPawnAndMovedTwoAndIsAdjacentAndIsOppositeColour_isTrue() {
         // Given
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.TRUE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionB = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.EQUAL, new Property<>("lastMoveDistance"), 2);
-        Conditional<Piece> conditionC = new PropertyCondition<>(new PathReference<>(Location.LAST_MOVED),
-                Comparator.NOT_EQUAL, new Property<>("colour"), null);
+        Log<Point, Piece> log = new ChessLog();
 
-        CustomBoard board = new CustomBoard(new ChessLog());
+        CustomBoard board = new CustomBoard(log);
         Piece white = board.getPiece(4, 1);
         board.addPiece(new Point(4, 4), white);
         Piece black = board.getPiece(5, 6);
         board.addPiece(new Point(5, 4), black);
 
+        Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
+                new Property<>("type"), PieceType.PAWN);
+        Conditional<Piece> conditionB = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Conditional<Piece> conditionC = new ReferenceCondition<>(new LogReference<>(log), Comparator.EQUAL,
+                new PieceReference(white, Direction.AT, 1, 0)); // Testing en passant to right
+
         // When
         Point selected = new Point(4, 4);
         Point destination = new Point(5, 5);
-        Action action = new Action(Colour.WHITE, selected, destination);
+        log.add(new ChessLogEntry(selected, destination, board.getPiece(selected), board.getPiece(destination)));
         // Then
         assertTrue(conditionA.isExpected(board.getPieces()));
         assertTrue(conditionB.isExpected(board.getPieces()));

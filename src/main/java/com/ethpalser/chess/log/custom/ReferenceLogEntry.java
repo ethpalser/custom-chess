@@ -69,6 +69,6 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
         if (ref == null) {
             return false;
         }
-        return ref.hasMoved();
+        return ref.getHasMoved();
     }
 }
