@@ -57,10 +57,15 @@ public class ThreatMap {
                     ", point: " + (point == null);
             throw new NullPointerException(str);
         }
+        Piece change = board.get(point);
         // Clear all places for each piece that could previously move here, then update their latest moves
         for (Piece piece : this.getPieces(point)) {
+            if (piece == change) {
+                // skip this piece, as it moved to the point we are looking at and is handled after
+                continue;
+            }
             this.clearMoves(piece);
-            MoveSet moves = piece.getMoves(board, log, this);
+            MoveSet moves = piece.getMoves(board, log, this, true, true);
             Movement moveWithPoint = moves.getMove(point);
             // The only change from before and after are the paths that contain the impacted point
             for (Point p : moveWithPoint.getPath()) {
@@ -68,10 +73,9 @@ public class ThreatMap {
             }
         }
         // Clear all places this piece previously threatened then update their latest moves
-        Piece change = board.get(point);
         if (change != null && this.colour.equals(change.getColour())) {
             this.clearMoves(change);
-            MoveSet moves = change.getMoves(board, log, this);
+            MoveSet moves = change.getMoves(board, log, this, true, true);
             for (Point p : moves.getPoints()) {
                 this.map.computeIfAbsent(p, k -> new HashSet<>()).add(change);
             }
