@@ -11,6 +11,7 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.space.custom.reference.LogReference;
 import com.ethpalser.chess.space.custom.reference.PathReference;
 import com.ethpalser.chess.space.custom.reference.PieceReference;
@@ -114,11 +115,15 @@ class ConditionTest {
         CustomBoard board = new CustomBoard(log);
         Piece white = board.getPiece(4, 1);
         board.addPiece(new Point(4, 4), white);
-        Piece black = board.getPiece(5, 6);
-        board.addPiece(new Point(5, 4), black);
+
+        Point enPassantTargetStart = new Point(5, 6);
+        Point enPassantTargetEnd = new Point(5, 4);
+        Piece black = board.getPiece(enPassantTargetStart);
+        board.addPiece(enPassantTargetEnd, black);
+        log.add(new ChessLogEntry(enPassantTargetStart, enPassantTargetEnd, black, null));
 
         Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
-                new Property<>("type"), PieceType.PAWN);
+                new Property<>("code"), PieceType.PAWN.getCode());
         Conditional<Piece> conditionB = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         Conditional<Piece> conditionC = new ReferenceCondition<>(new LogReference<>(log), Comparator.EQUAL,
                 new PieceReference(white, Direction.AT, 1, 0)); // Testing en passant to right
@@ -126,7 +131,6 @@ class ConditionTest {
         // When
         Point selected = new Point(4, 4);
         Point destination = new Point(5, 5);
-        log.add(new ChessLogEntry(selected, destination, board.getPiece(selected), board.getPiece(destination)));
         // Then
         assertTrue(conditionA.isExpected(board.getPieces()));
         assertTrue(conditionB.isExpected(board.getPieces()));
@@ -205,27 +209,30 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
-                Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionB = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
-                Comparator.FALSE, new Property<>("hasMoved"), null);
-        Conditional<Piece> conditionC = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
-                Comparator.DOES_NOT_EXIST);
 
         CustomBoard board = new CustomBoard(new ChessLog());
         board.addPiece(new Point(1, 0), null);
         board.addPiece(new Point(2, 0), null);
         board.addPiece(new Point(3, 0), null);
 
+        Conditional<Piece> conditionA = new PropertyCondition<>(new PieceReference(board.getPiece(4, 0)),
+                Comparator.FALSE, new Property<>("hasMoved"), false);
+        Conditional<Piece> conditionB = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
+                Comparator.FALSE, new Property<>("hasMoved"), false);
+        Conditional<Piece> conditionC = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
+                Comparator.EQUAL, new Property<>("code"), PieceType.ROOK.getCode());
+        Conditional<Piece> conditionD = new ReferenceCondition<>(new PathReference<>(Location.PATH,
+                new Point(3, 0), new Point(2, 0)), Comparator.DOES_NOT_EXIST, null);
+
         // When
         Point selected = new Point(4, 0);
         Point destination = new Point(2, 0);
         Action action = new Action(Colour.WHITE, selected, destination);
-        boolean result = conditionA.isExpected(board.getPieces())
-                && conditionB.isExpected(board.getPieces())
-                && conditionC.isExpected(board.getPieces());
         // Then
-        assertTrue(result);
+        assertTrue(conditionA.isExpected(board.getPieces()));
+        assertTrue(conditionB.isExpected(board.getPieces()));
+        assertTrue(conditionC.isExpected(board.getPieces()));
+        assertTrue(conditionD.isExpected(board.getPieces()));
     }
 
 

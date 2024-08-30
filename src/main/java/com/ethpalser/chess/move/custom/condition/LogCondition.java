@@ -2,16 +2,17 @@ package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
 
-public class LogCondition<T extends Comparable<T>, U extends Positional> implements Conditional<U> {
+public class LogCondition<T extends Positional> implements Conditional<T> {
 
-    private final Log<T, U> log;
+    private final Log<Point, T> log;
     private final Comparator comparator;
     private final PropertyType propType;
     private final Object expected;
 
-    public LogCondition(Log<T, U> log, Comparator comparator, PropertyType propType, Object expected) {
+    public LogCondition(Log<Point, T> log, Comparator comparator, PropertyType propType, Object expected) {
         this.log = log;
         this.comparator = comparator;
         this.propType = propType;
@@ -19,7 +20,7 @@ public class LogCondition<T extends Comparable<T>, U extends Positional> impleme
     }
 
     @Override
-    public boolean isExpected(Plane<U> plane) {
+    public boolean isExpected(Plane<T> plane) {
         if (this.log.peek() == null) {
             return false;
         }
@@ -32,14 +33,18 @@ public class LogCondition<T extends Comparable<T>, U extends Positional> impleme
                 };
             }
             case DISTANCE_MOVED -> {
-                T start = this.log.peek().getStart();
-                T end = this.log.peek().getEnd();
+                Point start = this.log.peek().getStart();
+                Point end = this.log.peek().getEnd();
                 int diff;
                 if (start == null || end == null) {
                     diff = 0;
                 }
                 else {
-                    diff = start.compareTo(end);
+                    diff = Math.max(
+                            Math.abs(start.getX() - end.getX()),
+                            Math.abs(start.getY() - end.getY())
+                    );
+                    System.out.println(diff);
                 }
 
                 return switch (this.comparator) {
