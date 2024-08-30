@@ -9,7 +9,6 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 import java.util.Set;
@@ -90,10 +89,21 @@ public class ChessGame implements Game {
         LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
                 this.getThreatMap(Colour.opposite(this.turn)));
         this.log.push(entry);
-        // Is the moving piece pinned? (a pinned piece cannot move, as it will cause the king to be in check)
+
+        // Update opponent's threats with the move performed
+        this.getThreatMap(Colour.opposite(this.turn)).refreshThreats(this.board.getPieces(), this.log, start);
+        // Does moving this piece put turn player in check? (opponent's updated threats now include turn player's king)
         if (this.isKingInCheck(this.turn)) {
             this.undoUpdate(1, false);
             throw new IllegalActionException("cannot perform move as player's king will be in check");
+        }
+
+        // Update remaining threats
+        this.getThreatMap(Colour.opposite(this.turn)).refreshThreats(this.board.getPieces(), this.log, end);
+        this.getThreatMap(this.turn).refreshThreats(this.board.getPieces(), this.log, start);
+        this.getThreatMap(this.turn).refreshThreats(this.board.getPieces(), this.log, end);
+        if (entry.getSubLogEntry() != null) {
+            this.applyLogEntryToThreats(entry.getSubLogEntry());
         }
 
         Piece expectingEmpty = this.board.getPiece(start);
@@ -121,9 +131,11 @@ public class ChessGame implements Game {
             }
             // FollowUp moves are applied first while undoing, as they are the most recent board change
             if (logEntry.getSubLogEntry() != null) {
-                this.applyLog(logEntry.getSubLogEntry());
+                this.applyLogEntryToBoard(logEntry.getSubLogEntry());
+                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
             }
-            this.applyLog(logEntry);
+            this.applyLogEntryToBoard(logEntry);
+            this.applyLogEntryToThreats(logEntry);
         }
         return this.checkGameStatus();
     }
@@ -135,10 +147,12 @@ public class ChessGame implements Game {
             if (logEntry == null) {
                 break;
             }
-            this.applyLog(logEntry);
+            this.applyLogEntryToBoard(logEntry);
+            this.applyLogEntryToThreats(logEntry);
             // FollowUp moves are applied last while redoing, as they are the most recent board change
             if (logEntry.getSubLogEntry() != null) {
-                this.applyLog(logEntry.getSubLogEntry());
+                this.applyLogEntryToBoard(logEntry.getSubLogEntry());
+                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
             }
         }
         return this.checkGameStatus();
@@ -240,7 +254,8 @@ public class ChessGame implements Game {
         Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Assuming King is in check
-        Set<Point> oppKingMoveSet = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();
+        Set<Point> oppKingMoveSet = oppKing.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn))
+                .getPoints();
         if (!oppKingMoveSet.isEmpty()) {
             for (Point p : oppKingMoveSet) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
@@ -289,7 +304,12 @@ public class ChessGame implements Game {
         Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
         Piece oppKing = this.board.getPiece(oppKingPoint);
         // Can the opponent's king move, including captures that are not defended?
-        Set<Point> oppKingMoves = oppKing.getMoves(this.board.getPieces(), this.log).getPoints();
+        System.out.println(this.getThreatMap(this.turn));
+        Set<Point> oppKingMoves = oppKing.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn))
+                .getPoints();
+        for (Point moves : oppKingMoves) {
+            System.out.println(moves);
+        }
         if (!oppKingMoves.isEmpty()) {
             return false;
         }
@@ -304,22 +324,25 @@ public class ChessGame implements Game {
         return true;
     }
 
-    private void applyLog(LogEntry<Point, Piece> logEntry) {
+    private void applyLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
         if (logEntry == null) {
-            throw new NullPointerException();
+            System.err.println("cannot apply null log entry to board");
+            return;
         }
-
         if (logEntry.getEndObject() != null) {
             this.board.addPiece(logEntry.getEndObject().getPoint(), logEntry.getEndObject());
         }
         this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
+    }
 
-        Plane<Piece> plane = this.board.getPieces();
-        this.whiteThreats.clearMoves(logEntry.getStartObject());
-        this.whiteThreats.updateMoves(plane, this.log, logEntry.getEnd());
-        this.whiteThreats.updateMoves(plane, this.log, logEntry.getStart());
-        this.blackThreats.clearMoves(logEntry.getStartObject());
-        this.blackThreats.updateMoves(plane, this.log, logEntry.getEnd());
-        this.blackThreats.updateMoves(plane, this.log, logEntry.getStart());
+    private void applyLogEntryToThreats(LogEntry<Point, Piece> logEntry) {
+        if (logEntry == null) {
+            System.err.println("cannot apply null log entry to threats");
+            return;
+        }
+        this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
+        this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
+        this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
+        this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
     }
 }

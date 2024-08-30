@@ -308,13 +308,11 @@ class ChessGameTest {
         board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         // Black move
         LogEntry<Point, Piece> entry = new ChessLogEntry(source, target, board.getPiece(source));
-        System.out.println(entry);
 
         board.movePiece(source, target, log, threatMap);
         log.add(entry);
 
         ChessGame game = new ChessGame(board, log);
-        System.out.println(board);
 
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));

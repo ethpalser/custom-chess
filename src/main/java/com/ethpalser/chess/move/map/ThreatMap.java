@@ -2,6 +2,7 @@ package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Plane;
@@ -9,9 +10,10 @@ import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-public class ThreatMap implements MoveMap {
+public class ThreatMap {
 
     private final Colour colour;
     private final Map<Point, Set<Piece>> map;
@@ -25,56 +27,57 @@ public class ThreatMap implements MoveMap {
         this.width = board.width();
     }
 
-    @Override
-    public Colour getColour() {
-        return this.colour;
+    public boolean hasThreat(Point point) {
+        return this.getPieces(point).isEmpty();
     }
 
-    @Override
     public Set<Piece> getPieces(Point point) {
         if (point == null) {
             return Set.of();
         }
         Set<Piece> piecesThreateningPoint = this.map.get(point);
-        if (piecesThreateningPoint != null) {
-            return piecesThreateningPoint;
-        }
-        return Set.of();
+        return Objects.requireNonNullElseGet(piecesThreateningPoint, Set::of);
     }
 
-    @Override
-    public void clearMoves(Piece piece) {
+    private void clearMoves(Piece piece) {
         for (Point p : this.map.keySet()) {
             this.clearMoves(piece, p);
         }
     }
 
-    @Override
-    public void clearMoves(Piece piece, Point point) {
+    private void clearMoves(Piece piece, Point point) {
         this.map.get(point).remove(piece);
     }
 
-    @Override
-    public void updateMoves(Plane<Piece> board, Log<Point, Piece> log, Point point) {
-        Piece piece = board.get(point);
-        if (piece != null) {
-            Set<Piece> threateningPieces = this.getPieces(point);
-
-            // Expensive operation. This can be improved by knowing the paths to replace.
-            Set<Piece> pieceSet = this.getPieces(point);
-            if (!pieceSet.isEmpty()) {
-                pieceSet.clear();
+    public void refreshThreats(Plane<Piece> board, Log<Point, Piece> log, Point point) {
+        if (board == null || log == null || point == null) {
+            String str = "one or more arguments are null" +
+                    " board: " + (board == null) +
+                    ", log: " + (log == null) +
+                    ", point: " + (point == null);
+            throw new NullPointerException(str);
+        }
+        // Clear all places for each piece that could previously move here, then update their latest moves
+        for (Piece piece : this.getPieces(point)) {
+            this.clearMoves(piece);
+            MoveSet moves = piece.getMoves(board, log, this);
+            Movement moveWithPoint = moves.getMove(point);
+            // The only change from before and after are the paths that contain the impacted point
+            for (Point p : moveWithPoint.getPath()) {
+                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(piece);
             }
-            for (Piece c : threateningPieces) {
-                this.clearMoves(c);
-                for (Point p : piece.getMoves(board, log).getPoints()) {
-                    this.map.computeIfAbsent(p, k -> new HashSet<>()).add(c);
-                }
+        }
+        // Clear all places this piece previously threatened then update their latest moves
+        Piece change = board.get(point);
+        if (change != null && this.colour.equals(change.getColour())) {
+            this.clearMoves(change);
+            MoveSet moves = change.getMoves(board, log, this);
+            for (Point p : moves.getPoints()) {
+                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(change);
             }
         }
     }
 
-    @Override
     public Integer getValue() {
         return null;
     }
@@ -114,5 +117,4 @@ public class ThreatMap implements MoveMap {
         }
         return piecesThreateningPoint;
     }
-
 }
