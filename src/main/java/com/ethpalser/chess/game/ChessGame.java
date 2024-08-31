@@ -4,13 +4,16 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -161,7 +164,27 @@ public class ChessGame implements Game {
 
     @Override
     public Iterable<Action> potentialUpdates() {
-        return List.of();
+        List<Action> potentialCaptures = new ArrayList<>(64);
+        List<Action> quietActions = new ArrayList<>(128);
+        for (Piece piece : this.board.getPieces()) {
+            MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
+                    this.getThreatMap(Colour.opposite(piece.getColour())));
+            for (Movement m : moves.toSet()) {
+                Path path = m.getPath();
+                if (path != null && path.length() > 0) {
+                    // The last point in a path is a potential capture
+                    potentialCaptures.add(new Action(piece.getColour(), piece.getPoint(),
+                            path.getPoint(path.length() - 1)));
+                    // Remaining points are quiet actions (no captures)
+                    for (int i = 0; i < path.length() - 1; i++) {
+                        quietActions.add(new Action(piece.getColour(), piece.getPoint(), path.getPoint(i)));
+                    }
+                }
+            }
+        }
+        // Potential captures initially have priority for evaluating board state (can change by game tree)
+        potentialCaptures.addAll(quietActions);
+        return potentialCaptures;
     }
 
     @Override
