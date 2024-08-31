@@ -106,8 +106,26 @@ public class ThreatMap {
         }
     }
 
-    public Integer getValue() {
-        return null;
+    public Integer evaluate(Plane<Piece> board) {
+        int direction = Colour.WHITE.equals(this.colour) ? 1 : -1;
+
+        List<Point> pawnThreats = new ArrayList<>();
+        for (Piece p : board) {
+            if (PieceType.PAWN.getCode().equals(p.getCode()) && this.colour.equals(p.getColour())) {
+                Point left = Point.validOrNull(board, p.getPoint(), this.colour, -1, direction, true);
+                if (left != null) {
+                    pawnThreats.add(left);
+                }
+
+                Point right = Point.validOrNull(board, p.getPoint(), this.colour, 1, direction, true);
+                if (right != null) {
+                    pawnThreats.add(right);
+                }
+            }
+        }
+        return this.calculatePawnWall(pawnThreats)
+                + this.calculatePawnCenterControl(pawnThreats, board.width() / 2, board.length() / 2)
+                + this.calculateDoubleFilePawns(pawnThreats);
     }
 
     @Override
@@ -143,5 +161,57 @@ public class ThreatMap {
             }
         }
         return piecesThreateningPoint;
+    }
+
+    private int calculatePawnWall(List<Point> pawnThreats) {
+        int sum = 0;
+        // Pawn defends
+        for (Point p : pawnThreats) {
+            for (Piece piece : this.map.get(p)) {
+                // This is a pawn that is defended by at least one other pawn. Doubled-up defends count for one each.
+                if (PieceType.PAWN.getCode().equals(piece.getCode())) {
+                    sum++; // Currently, an arbitrarily set amount
+                }
+            }
+        }
+        return sum;
+    }
+
+    private int calculatePawnCenterControl(List<Point> pawnThreats, int midX, int midY) {
+        int midX2;
+        int midY2;
+        if (midX % 2 == 0) {
+            midX2 = midX - 1;
+        } else {
+            midX2 = midX;
+        }
+        if (midY % 2 == 0) {
+            midY2 = midY - 1;
+        } else {
+            midY2 = midY;
+        }
+
+        Point midPoint1 = new Point(midX, midY);
+        Point midPoint2 = new Point(midX2, midY2);
+        int sum = 0;
+        for (Point p : pawnThreats) {
+            // A pawn has threat over a centre position on the board, which is often valuable
+            if (p.equals(midPoint1) || p.equals(midPoint2)) {
+                sum++;  // Currently, an arbitrarily set amount
+            }
+        }
+        return sum;
+    }
+
+    private int calculateDoubleFilePawns(List<Point> pawnThreats) {
+        Set<Integer> seen = new HashSet<>();
+        int sum = 0;
+        for (Point p : pawnThreats) {
+            if (seen.contains(p.getY())) {
+                sum -= 2;
+            }
+            seen.add(p.getY());
+        }
+        return sum;
     }
 }

@@ -166,10 +166,48 @@ public class ChessGame implements Game {
 
     @Override
     public int evaluateState() {
-        return 0;
+        return this.evaluateBoardState()
+                + this.whiteThreats.evaluate(this.board.getPieces())
+                - this.blackThreats.evaluate(this.board.getPieces());
     }
 
     // PRIVATE METHODS
+
+    private int evaluateBoardState() {
+        int whiteSum = 0;
+        int blackSum = 0;
+        for (Piece p : board.getPieces()) {
+            if (Colour.WHITE.equals(p.getColour())) {
+                whiteSum += this.getPieceValue(p);
+            } else {
+                blackSum += this.getPieceValue(p);
+            }
+        }
+        return whiteSum - blackSum;
+    }
+
+    private int getPieceValue(Piece p) {
+        if (p == null) {
+            return 0;
+        }
+        int value;
+        switch (PieceType.fromCode(p.getCode())) {
+            case PAWN -> value = 1;
+            case BISHOP, KNIGHT -> value = 3;
+            case ROOK -> value = 5;
+            case QUEEN -> value = 9;
+            case CUSTOM -> {
+                // Currently, this uses MoveSet, but this would be more accurate to use its blueprint
+                MoveSet moveSet = p.getMoves(this.board.getPieces(), this.log,
+                        this.getThreatMap(Colour.opposite(p.getColour())));
+                int numMoves = moveSet.getPoints().size();
+                int base = (int) Math.ceil(numMoves / 3.0);
+                value = base + base / 3;
+            }
+            default -> value = 0;
+        }
+        return value;
+    }
 
     private boolean isNotPlayerAction(Colour colour) {
         return !this.turn.equals(colour);
