@@ -65,6 +65,14 @@ public class Path implements Iterable<Point> {
         this.pointList = list;
     }
 
+    public int length() {
+        return this.pointList.size();
+    }
+
+    public Point getPoint(int index) {
+        return this.pointList.get(index);
+    }
+
     public boolean hasPoint(Point point) {
         return this.pointList.contains(point);
     }
