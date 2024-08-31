@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 public class GameTree {
 
-    private static final int WINNING_THRESHOLD = Integer.MAX_VALUE;
+    private static final int WINNING_THRESHOLD = Integer.MAX_VALUE / 4;
     private final Game root;
 
     public GameTree(Game root) {
