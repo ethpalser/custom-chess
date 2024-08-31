@@ -4,7 +4,6 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
@@ -26,9 +25,10 @@ public class ChessGame implements Game {
     private final ThreatMap blackThreats;
 
     private GameStatus status;
-    private Colour turn;
+    private Colour player;
     private Point whiteKing;
     private Point blackKing;
+    private int turn;
 
     public ChessGame(Board board, Log<Point, Piece> log) {
         if (board == null) {
@@ -37,7 +37,7 @@ public class ChessGame implements Game {
         this.board = board;
         this.log = log;
         this.status = GameStatus.PENDING;
-        this.turn = Colour.WHITE;
+        this.player = Colour.WHITE;
         for (Piece p : this.board.getPieces()) {
             if (PieceType.KING.getCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
@@ -49,6 +49,7 @@ public class ChessGame implements Game {
         }
         this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), log);
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
+        this.turn = log.size();
     }
 
     @Override
@@ -59,6 +60,11 @@ public class ChessGame implements Game {
     @Override
     public GameStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public int getTurn() {
+        return this.turn;
     }
 
     @Override
@@ -75,7 +81,7 @@ public class ChessGame implements Game {
         }
         if (isNotPlayerAction(player)) {
             throw new IllegalActionException("not the acting player's turn (actor: " + player
-                    + ", turn: " + this.turn + ")");
+                    + ", turn: " + this.player + ")");
         }
         if (isNotInBoardBounds(start, end)) {
             throw new IllegalActionException("cannot perform move as one of the start or end are not on the board");
@@ -91,21 +97,21 @@ public class ChessGame implements Game {
         }
 
         LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
-                this.getThreatMap(Colour.opposite(this.turn)));
+                this.getThreatMap(Colour.opposite(this.player)));
         this.log.push(entry);
 
         // Update opponent's threats with the move performed
-        this.getThreatMap(Colour.opposite(this.turn)).refreshThreats(this.board.getPieces(), this.log, start);
+        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, start);
         // Does moving this piece put turn player in check? (opponent's updated threats now include turn player's king)
-        if (this.isKingInCheck(this.turn)) {
+        if (this.isKingInCheck(this.player)) {
             this.undoUpdate(1, false);
             throw new IllegalActionException("cannot perform move as player's king will be in check");
         }
 
         // Update remaining threats
-        this.getThreatMap(Colour.opposite(this.turn)).refreshThreats(this.board.getPieces(), this.log, end);
-        this.getThreatMap(this.turn).refreshThreats(this.board.getPieces(), this.log, start);
-        this.getThreatMap(this.turn).refreshThreats(this.board.getPieces(), this.log, end);
+        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, end);
+        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, start);
+        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, end);
         if (entry.getSubLogEntry() != null) {
             this.applyLogEntryToThreats(entry.getSubLogEntry());
         }
@@ -117,7 +123,8 @@ public class ChessGame implements Game {
 
         this.updateKingPosition(movingPiece, end);
         this.status = this.checkGameStatus();
-        this.turn = Colour.opposite(this.turn);
+        this.player = Colour.opposite(this.player);
+        this.turn++;
         return this.status;
     }
 
@@ -233,7 +240,7 @@ public class ChessGame implements Game {
     }
 
     private boolean isNotPlayerAction(Colour colour) {
-        return !this.turn.equals(colour);
+        return !this.player.equals(colour);
     }
 
     private boolean isNotInBoardBounds(Point start, Point end) {
@@ -244,7 +251,7 @@ public class ChessGame implements Game {
         if (piece == null) {
             throw new NullPointerException();
         }
-        return !this.turn.equals(piece.getColour());
+        return !this.player.equals(piece.getColour());
     }
 
     private boolean isKingPiece(Piece piece) {
@@ -289,12 +296,12 @@ public class ChessGame implements Game {
     }
 
     private GameStatus checkGameStatus() {
-        Colour opponent = Colour.opposite(this.turn);
+        Colour opponent = Colour.opposite(this.player);
         // Is there a check, checkmate or stalemate?
         GameStatus nextStatus;
         if (isKingInCheck(opponent)) {
             if (this.isCheckmate()) {
-                nextStatus = GameStatus.colourWinStatus(this.turn);
+                nextStatus = GameStatus.colourWinStatus(this.player);
             } else {
                 nextStatus = GameStatus.colourInCheckStatus(opponent);
             }
@@ -309,16 +316,16 @@ public class ChessGame implements Game {
     }
 
     private boolean isCheckmate() {
-        Colour oppColour = Colour.opposite(this.turn);
-        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.turn));
+        Colour oppColour = Colour.opposite(this.player);
+        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.player));
 
         // Assuming King is in check
         MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
-                .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn));
+                .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player));
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
             for (Point p : oppKingMoveSet.getPoints()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.getThreatMap(this.turn).hasNoThreats(p)) {
+                if (this.getThreatMap(this.player).hasNoThreats(p)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -326,7 +333,7 @@ public class ChessGame implements Game {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Piece> sourcesOfCheck = this.getThreatMap(this.turn).getPieces(oppKingPoint);
+        Set<Piece> sourcesOfCheck = this.getThreatMap(this.player).getPieces(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
@@ -361,10 +368,10 @@ public class ChessGame implements Game {
         }
         // Are there any opponent pieces that can move?
         List<Piece> opponentPieces = this.board.getPieces().values().stream()
-                .filter(p -> Colour.opposite(this.turn).equals(p.getColour()))
+                .filter(p -> Colour.opposite(this.player).equals(p.getColour()))
                 .collect(Collectors.toList());
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.turn)).isEmpty()) {
+            if (!p.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player)).isEmpty()) {
                 return false;
             }
         }

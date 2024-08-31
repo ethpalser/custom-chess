@@ -10,6 +10,8 @@ public interface Game {
 
     GameStatus getStatus();
 
+    int getTurn();
+
     GameStatus updateGame(Action action);
 
     GameStatus undoUpdate(int changesToUndo, boolean saveForRedo);

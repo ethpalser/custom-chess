@@ -45,6 +45,11 @@ public class MockGame implements Game {
     }
 
     @Override
+    public int getTurn() {
+        return 0;
+    }
+
+    @Override
     public GameStatus undoUpdate(int changesToUndo, boolean saveForRedo) {
         if (this.logStack.isEmpty()) {
             return GameStatus.ONGOING;
