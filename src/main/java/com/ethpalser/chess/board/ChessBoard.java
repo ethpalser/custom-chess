@@ -128,23 +128,26 @@ public class ChessBoard implements Board {
         StringBuilder sb = new StringBuilder();
         for (int y = this.pieces.length() - 1; y >= 0; y--) {
             for (int x = 0; x <= this.pieces.width() - 1; x++) {
-                Piece customPiece = getPiece(x, y);
-                if (customPiece == null) {
+                Piece piece = this.pieces.get(this.pieces.at(x, y));
+                if (piece == null) {
                     sb.append("|   ");
                 } else {
                     sb.append("| ");
 
-                    String code = customPiece.getCode();
+                    String code = piece.getCode();
                     if ("".equals(code)) {
                         code = "P"; // In some cases that pawn's code is an empty string
                     }
-                    if (Colour.WHITE.equals(customPiece.getColour())) {
+                    if (Colour.WHITE.equals(piece.getColour())) {
                         code = code.toLowerCase(Locale.ROOT);
                     }
                     sb.append(code).append(" ");
                 }
             }
-            sb.append("|\n");
+            sb.append("| ").append(1 + y).append("\n");
+        }
+        for (int x = 0; x < this.pieces.width(); x++) {
+            sb.append("  ").append((char) ('a' + x)).append(" ");
         }
         return sb.toString();
     }
