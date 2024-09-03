@@ -11,9 +11,14 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CustomMove {
@@ -42,32 +47,32 @@ public class CustomMove {
         private LogEntry<Point, Piece> followUp = null;
 
         public Builder(Path path, CustomMoveType moveType) {
-            this.path = path;
-            this.moveType = moveType;
+            this.path = Objects.requireNonNullElse(path, new Path(List.of()));
+            this.moveType = Objects.requireNonNullElse(moveType, CustomMoveType.ADVANCE);
         }
 
-        public Builder isMirrorXAxis(boolean bool) {
-            this.mirrorXAxis = bool;
+        public Builder isMirrorXAxis(Boolean bool) {
+            this.mirrorXAxis = Objects.requireNonNullElse(bool, false);
             return this;
         }
 
-        public Builder isMirrorYAxis(boolean bool) {
-            this.mirrorYAxis = bool;
+        public Builder isMirrorYAxis(Boolean bool) {
+            this.mirrorYAxis = Objects.requireNonNullElse(bool, false);
             return this;
         }
 
-        public Builder isSpecificQuadrant(boolean bool) {
-            this.isSpecificQuadrant = bool;
+        public Builder isSpecificQuadrant(Boolean bool) {
+            this.isSpecificQuadrant = Objects.requireNonNullElse(bool, false);
             return this;
         }
 
-        public Builder isAttack(boolean bool) {
-            this.isAttack = bool;
+        public Builder isAttack(Boolean bool) {
+            this.isAttack = Objects.requireNonNullElse(bool, true);
             return this;
         }
 
-        public Builder isMove(boolean bool) {
-            this.isMove = bool;
+        public Builder isMove(Boolean bool) {
+            this.isMove = Objects.requireNonNullElse(bool, true);
             return this;
         }
 
@@ -116,6 +121,10 @@ public class CustomMove {
             throw new NullPointerException("one or more arguments are null, colour: " + (colour == null)
                     + " point offset: " + (offset == null));
         }
+        if (this.pathBase == null || this.pathBase.length() == 0) {
+            System.err.println("path base is not defined");
+            return List.of();
+        }
         if (this.isSpecificQuadrant) {
             boolean isRight = !mirrorYAxis;
             boolean isUp = (Colour.WHITE.equals(colour) && !mirrorXAxis)
@@ -133,6 +142,31 @@ public class CustomMove {
                     .map(p -> new Move(p, this.followUp))
                     .collect(Collectors.toList());
         }
+    }
+
+    public String toJson() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", this.moveType.toString());
+        map.put("mirrorXAxis", this.mirrorXAxis);
+        map.put("mirrorYAxis", this.mirrorYAxis);
+        map.put("onlySpecificQuadrant", this.isSpecificQuadrant);
+        map.put("isAttack", this.isAttack);
+        map.put("isMove", this.isMove);
+        // Path
+        List<String> pathList = new ArrayList<>();
+        for (Point p : this.pathBase) {
+            pathList.add(p.toString());
+        }
+        map.put("pathBase", pathList);
+        // Conditions
+        List<String> conditionList = new ArrayList<>();
+        for (Conditional<Piece> c : this.conditions) {
+            conditionList.add(c.toJson());
+        }
+        map.put("conditions", conditionList);
+        return gson.toJson(map);
     }
 
     // PRIVATE
@@ -233,6 +267,9 @@ public class CustomMove {
     private boolean passesConditions(Plane<Piece> board) {
         if (board == null) {
             return false;
+        }
+        if (this.conditions == null) {
+            return true;
         }
         for (Conditional<Piece> condition : this.conditions) {
             if (!condition.isExpected(board)) {
