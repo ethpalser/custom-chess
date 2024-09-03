@@ -25,6 +25,9 @@ public class LogReference<T extends Comparable<T>, U extends Positional> impleme
 
     @Override
     public List<U> getReferences(Plane<U> plane) {
+        if (this.log == null) {
+            return List.of();
+        }
         LogEntry<T, U> entry = log.peek();
         if (entry != null) {
             if (entry.getStartObject() != null) {
