@@ -93,34 +93,6 @@ class ReferenceTest {
     }
 
     @Test
-    void pathRef_getReferences_givenStartLocationAndFilled_thenIsNotEmpty() {
-        Board board = new ChessBoard();
-        Point start = new Point(4, 1);
-        Point end = new Point(4, 3);
-        Piece piece = board.getPiece(start);
-
-        Reference<Piece> ref = new PathReference<>(Location.PATH_START, start, end);
-
-        assertTrue(ref.getReferences(board.getPieces()).contains(piece));
-    }
-
-    @Test
-    void pathRef_getReferences_givenDestinationLocationAndFilled_thenIsNotEmpty() {
-        Board board = new ChessBoard();
-        Log<Point, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
-
-        Point start = new Point(4, 1);
-        Point end = new Point(4, 3);
-        Piece piece = board.getPiece(start);
-
-        Reference<Piece> ref = new PathReference<>(Location.PATH_END, end);
-        board.movePiece(start, end, log, threatMap);
-
-        assertTrue(ref.getReferences(board.getPieces()).contains(piece));
-    }
-
-    @Test
     void pathRef_getReferences_givenPathToDestinationAndClear_thenIsEmpty() {
         Board board = new ChessBoard();
         Point start = new Point(3, 0);

@@ -27,7 +27,7 @@ class ConditionTest {
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
         Log<Point, Piece> log = new ChessLog();
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
                 Comparator.EQUAL,
                 new Property<>("type"), PieceType.PAWN);
 
@@ -164,7 +164,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
                 Comparator.EQUAL, new Property<>("type"), PieceType.KING);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
@@ -176,7 +176,7 @@ class ConditionTest {
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH_START),
+        Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
                 Comparator.FALSE, new Property<>("hasMoved"), null);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());

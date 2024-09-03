@@ -11,4 +11,6 @@ public interface Reference<T extends Positional> {
 
     List<T> getReferences(Plane<T> plane);
 
+    String toJson();
+
 }
