@@ -101,7 +101,11 @@ public class PieceReference implements Reference<Piece> {
         Gson gson = new Gson();
         Map<String, Object> map = new HashMap<>(4);
         map.put("location", Location.PIECE.toString());
-        map.put("point", this.piece.getPoint());
+        if (this.piece != null) {
+            map.put("point", this.piece.getPoint());
+        } else {
+            map.put("point", null);
+        }
         map.put("xOffset", this.shiftX);
         map.put("yOffset", this.shiftY);
         return gson.toJson(map);
