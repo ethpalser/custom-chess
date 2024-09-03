@@ -3,6 +3,7 @@ package com.ethpalser.chess.space;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -75,6 +76,10 @@ public class Path implements Iterable<Point> {
 
     public boolean hasPoint(Point point) {
         return this.pointList.contains(point);
+    }
+
+    public List<Point> toList() {
+        return new ArrayList<>(this.pointList);
     }
 
     public Set<Point> toSet() {
