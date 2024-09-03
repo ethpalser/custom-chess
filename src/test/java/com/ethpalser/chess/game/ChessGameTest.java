@@ -5,6 +5,7 @@ import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.game.view.GameView;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
@@ -13,10 +14,65 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
+import com.google.gson.Gson;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class ChessGameTest {
+
+    @Test
+    void testToJson_givenNewStandardBoard_thenHas32PiecesAndEmptyLogAndNoCustomPieces() {
+        // given
+        Board board = new ChessBoard(BoardType.STANDARD);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        // when
+        String jsonString = game.toJson();
+        System.out.println(jsonString);
+
+        // then
+        assertTrue(jsonString.contains("turn"));
+        assertTrue(jsonString.contains("log"));
+        assertTrue(jsonString.contains("board"));
+        assertTrue(jsonString.contains("pieces"));
+        assertTrue(jsonString.contains("width"));
+        assertTrue(jsonString.contains("length"));
+        assertTrue(jsonString.contains("pieceSpecs"));
+
+        Gson gson = new Gson();
+        GameView root = gson.fromJson(jsonString, GameView.class);
+        assertEquals(32, root.getBoard().getPieces().size());
+        assertTrue(root.getPieceSpecs().isEmpty());
+        assertTrue(root.getLog().isEmpty());
+    }
+
+    @Test
+    void testToJson_givenNewCustomBoard_thenHas32PiecesAndEmptyLogAndNoCustomPieces() {
+        // given
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        // when
+        String jsonString = game.toJson();
+        System.out.println(jsonString);
+
+        // then
+        assertTrue(jsonString.contains("turn"));
+        assertTrue(jsonString.contains("log"));
+        assertTrue(jsonString.contains("board"));
+        assertTrue(jsonString.contains("pieces"));
+        assertTrue(jsonString.contains("width"));
+        assertTrue(jsonString.contains("length"));
+        assertTrue(jsonString.contains("pieceSpecs"));
+
+        Gson gson = new Gson();
+        GameView root = gson.fromJson(jsonString, GameView.class);
+        assertEquals(32, root.getBoard().getPieces().size());
+        assertTrue(root.getPieceSpecs().isEmpty());
+        assertTrue(root.getLog().isEmpty());
+    }
 
     // region Piece Movement
     @Test
