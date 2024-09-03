@@ -8,8 +8,8 @@ public class Point implements Comparable<Point> {
     private final int x;
     private final int y;
 
-    public static final int MAX_WIDTH = 31;
-    public static final int MAX_HEIGHT = 31;
+    public static final int MAX_WIDTH = 26;
+    public static final int MAX_HEIGHT = 26;
 
     public Point() {
         this.x = 0;
