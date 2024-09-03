@@ -111,7 +111,7 @@ public class CustomPiece implements Piece {
 
     @Override
     public String toString() {
-        return this.getCode() + this.getPoint().toString();
+        return this.colour.toCode() + this.getCode() + this.position.toString() + (this.hasMoved ? "" : "*");
     }
 
 }

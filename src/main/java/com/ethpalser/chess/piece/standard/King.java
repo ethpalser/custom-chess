@@ -144,6 +144,6 @@ public class King implements Piece {
 
     @Override
     public String toString() {
-        return this.getCode() + this.getPoint().toString();
+        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }

@@ -81,7 +81,6 @@ public class Pawn implements Piece {
             LogEntry<Point, Piece> lastMove = log.peek();
             Point peekStart = lastMove.getStart();
             Point peekEnd = lastMove.getEnd();
-
             // a pawn moved forward two
             if (lastMove.isFirstOccurrence() && board.get(peekEnd) != null && "P".equals(board.get(peekEnd).getCode())
                     && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
@@ -120,6 +119,6 @@ public class Pawn implements Piece {
 
     @Override
     public String toString() {
-        return this.getCode() + this.getPoint().toString();
+        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }
