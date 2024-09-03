@@ -93,4 +93,8 @@ public class MockGame implements Game {
     public int evaluateState() {
         return this.current.getValue();
     }
+
+    public String toJson() {
+        return "";
+    }
 }
