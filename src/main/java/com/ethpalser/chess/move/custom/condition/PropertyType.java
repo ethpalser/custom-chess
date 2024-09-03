@@ -6,15 +6,26 @@ public enum PropertyType {
     POINT("point"),
     HAS_MOVED("hasMoved"),
     DISTANCE_MOVED("lastDistanceMoved"),
-    COLOUR("colour");
+    COLOUR("colour"),
+    CODE("code");
 
-    private final String label;
+    private final String display;
 
-    PropertyType(String label) {
-        this.label = label;
+    PropertyType(String display) {
+        this.display = display;
     }
 
-    public String getLabel() {
-        return label;
+    @Override
+    public String toString() {
+        return this.display;
+    }
+
+    public static PropertyType fromString(String string) {
+        for (PropertyType e : PropertyType.values()) {
+            if (e.display.equalsIgnoreCase(string)) {
+                return e;
+            }
+        }
+        return null;
     }
 }

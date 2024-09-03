@@ -9,7 +9,6 @@ import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.move.custom.condition.LogCondition;
-import com.ethpalser.chess.move.custom.condition.Property;
 import com.ethpalser.chess.move.custom.condition.PropertyCondition;
 import com.ethpalser.chess.move.custom.condition.PropertyType;
 import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
@@ -19,8 +18,8 @@ import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.space.custom.reference.LogReference;
 import com.ethpalser.chess.space.custom.reference.PathReference;
 import com.ethpalser.chess.space.custom.reference.PieceReference;
@@ -69,27 +68,27 @@ public class CustomPieceFactory {
 
     private Conditional<Piece> selfNotMovedCondition(Piece piece) {
         return new PropertyCondition<>(new PieceReference(piece), Comparator.FALSE,
-                new Property<>("hasMoved"), false);
+                PropertyType.HAS_MOVED, false);
     }
 
     private Conditional<Piece> targetNotMovedCondition(Point point) {
         return new PropertyCondition<>(new AbsoluteReference<>(point), Comparator.FALSE,
-                new Property<>("hasMoved"), false);
+                PropertyType.HAS_MOVED, false);
     }
 
     private Conditional<Piece> targetIsPieceTypeCondition(Point point, PieceType type) {
         return new PropertyCondition<>(new AbsoluteReference<>(point), Comparator.EQUAL,
-                new Property<>("type"), type);
+                PropertyType.TYPE, type);
     }
 
     private Conditional<Piece> emptyPathCondition(Point start, Point end) {
-        return new ReferenceCondition<>(new PathReference<>(Location.PATH, start, end), Comparator.DOES_NOT_EXIST,
+        return new ReferenceCondition<>(new PathReference<>(Location.PATH, start, end), Comparator.EQUAL,
                 null);
     }
 
     private Conditional<Piece> lastMovedIsPieceTypeCondition(PieceType type) {
         return new PropertyCondition<>(new LogReference<>(this.log), Comparator.EQUAL,
-                new Property<>("type"), type);
+                PropertyType.TYPE, type);
     }
 
     private Conditional<Piece> lastMovedIsNearbyPieceCondition(Piece piece, int shiftX, int shiftY) {

@@ -4,21 +4,24 @@ public enum Comparator {
     FALSE,
     TRUE,
     EQUAL,
-    NOT_EQUAL,
-    EXIST,
-    DOES_NOT_EXIST;
+    NOT_EQUAL;
 
-    /**
-     * This uses the given Comparator to return if it is allowed for Conditionals that only have one Reference, or
-     * that this only requires the Reference itself.
-     *
-     * @param comparator {@link Comparator}
-     * @return boolean
-     */
-    public static boolean canReferenceSelf(Comparator comparator) {
-        return switch (comparator) {
-            case FALSE, TRUE, EXIST, DOES_NOT_EXIST -> true;
-            default -> false;
+    @Override
+    public String toString() {
+        return switch (this) {
+            case FALSE -> "false";
+            case TRUE -> "true";
+            case EQUAL -> "equal";
+            case NOT_EQUAL -> "not equal";
         };
+    }
+
+    public static Comparator fromString(String string) {
+        for (Comparator c : Comparator.values()) {
+            if (c.toString().equalsIgnoreCase(string)) {
+                return c;
+            }
+        }
+        return EQUAL;
     }
 }

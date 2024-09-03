@@ -3,12 +3,15 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
+import com.google.gson.Gson;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PropertyCondition<T extends Positional> implements Conditional<T> {
 
     private final Reference<T> reference;
-    private final Property<T> property;
+    private final PropertyType property;
     private final Comparator comparator;
     private final Object expected;
 
@@ -16,13 +19,7 @@ public class PropertyCondition<T extends Positional> implements Conditional<T> {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(Reference<T> reference, Comparator comparator, Property<T> property, Object expected) {
-        if (reference == null || comparator == null) {
-            throw new NullPointerException();
-        }
-        if (property == null && !Comparator.canReferenceSelf(comparator)) {
-            throw new IllegalArgumentException("Cannot use a Comparator that requires an expected value.");
-        }
+    public PropertyCondition(Reference<T> reference, Comparator comparator, PropertyType property, Object expected) {
         this.reference = reference;
         this.comparator = comparator;
         this.property = property;
@@ -31,29 +28,34 @@ public class PropertyCondition<T extends Positional> implements Conditional<T> {
 
     @Override
     public boolean isExpected(Plane<T> plane) {
-        List<T> refList = this.reference.getReferences(plane);
+        if (this.comparator == null) {
+            return false;
+        }
+        if (this.reference == null) {
+            return this.expected == null;
+        }
 
+        List<T> refList = this.reference.getReferences(plane);
+        if (refList.isEmpty()) {
+            return Comparator.EQUAL.equals(this.comparator) && this.expected == null;
+        }
+
+        Property<T> prop = this.property != null ? new Property<>(this.property.toString()) : null;
         boolean refExists = false;
         for (T ref : refList) {
             if (ref != null) {
-                Object refProp = this.property != null ? this.property.fetch(ref) : null;
+                Object refProp = prop != null ? prop.fetch(ref) : null;
                 if (!isExpectedState(refProp)) {
                     return false;
                 }
                 refExists = true;
             }
         }
-        return refExists || Comparator.DOES_NOT_EXIST.equals(comparator);
+        return refExists;
     }
 
     private boolean isExpectedState(Object objProperty) {
         switch (this.comparator) {
-            case EXIST -> {
-                return objProperty != null;
-            }
-            case DOES_NOT_EXIST -> {
-                return objProperty == null;
-            }
             case FALSE -> {
                 return Boolean.FALSE.equals(objProperty);
             }
@@ -82,5 +84,17 @@ public class PropertyCondition<T extends Positional> implements Conditional<T> {
                 ", comparator=" + comparator +
                 ", expected=" + expected +
                 '}';
+    }
+
+    @Override
+    public String toJson() {
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "field");
+        map.put("field", this.property.toString());
+        map.put("assert", this.comparator.toString());
+        map.put("target", null);
+        map.put("expected", this.expected.toString());
+        return gson.toJson(map);
     }
 }

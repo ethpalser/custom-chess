@@ -3,11 +3,9 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Direction;
@@ -29,7 +27,7 @@ class ConditionTest {
         Log<Point, Piece> log = new ChessLog();
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
                 Comparator.EQUAL,
-                new Property<>("type"), PieceType.PAWN);
+                PropertyType.TYPE, PieceType.PAWN);
 
         Board board = new ChessBoard(BoardType.CUSTOM, log);
 
@@ -143,7 +141,7 @@ class ConditionTest {
         board.addPiece(new Point(4, 4), white);
 
         Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
-                new Property<>("code"), PieceType.PAWN.getCode());
+                PropertyType.CODE, PieceType.PAWN.getCode());
         Conditional<Piece> conditionB = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         Conditional<Piece> conditionC = new ReferenceCondition<>(new LogReference<>(log), Comparator.EQUAL,
                 new PieceReference(white, Direction.AT, 1, 0)); // Testing en passant to right
@@ -165,7 +163,7 @@ class ConditionTest {
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
-                Comparator.EQUAL, new Property<>("type"), PieceType.KING);
+                Comparator.EQUAL, PropertyType.TYPE, PieceType.KING);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         // Then
@@ -177,7 +175,7 @@ class ConditionTest {
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.PATH),
-                Comparator.FALSE, new Property<>("hasMoved"), null);
+                Comparator.FALSE, PropertyType.HAS_MOVED, null);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         board.addPiece(new Point(4, 1), null);
@@ -193,7 +191,7 @@ class ConditionTest {
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
         Conditional<Piece> condition = new PropertyCondition<>(new PathReference<>(Location.POINT, new Point(0, 0)),
-                Comparator.FALSE, new Property<>("hasMoved"), false);
+                Comparator.FALSE, PropertyType.HAS_MOVED, false);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
         Piece rook = board.getPiece(0, 0);
@@ -210,7 +208,7 @@ class ConditionTest {
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
         Conditional<Piece> condition = new ReferenceCondition<>(new PathReference<>(Location.POINT, new Point(1, 0)),
-                Comparator.DOES_NOT_EXIST, null);
+                Comparator.EQUAL, null);
 
         Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
 
@@ -229,13 +227,13 @@ class ConditionTest {
         board.addPiece(new Point(3, 0), null);
 
         Conditional<Piece> conditionA = new PropertyCondition<>(new PieceReference(board.getPiece(4, 0)),
-                Comparator.FALSE, new Property<>("hasMoved"), false);
+                Comparator.FALSE, PropertyType.HAS_MOVED, false);
         Conditional<Piece> conditionB = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
-                Comparator.FALSE, new Property<>("hasMoved"), false);
+                Comparator.FALSE, PropertyType.HAS_MOVED, false);
         Conditional<Piece> conditionC = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
-                Comparator.EQUAL, new Property<>("code"), PieceType.ROOK.getCode());
+                Comparator.EQUAL, PropertyType.CODE, PieceType.ROOK.getCode());
         Conditional<Piece> conditionD = new ReferenceCondition<>(new PathReference<>(Location.PATH,
-                new Point(3, 0), new Point(2, 0)), Comparator.DOES_NOT_EXIST, null);
+                new Point(3, 0), new Point(2, 0)), Comparator.EQUAL, null);
 
         // Then
         assertTrue(conditionA.isExpected(board.getPieces()));

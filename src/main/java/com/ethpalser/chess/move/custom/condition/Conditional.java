@@ -11,4 +11,6 @@ public interface Conditional<T extends Positional> {
 
     boolean isExpected(Plane<T> plane);
 
+    String toJson();
+
 }

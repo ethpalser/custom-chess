@@ -3,7 +3,10 @@ package com.ethpalser.chess.move.custom.condition;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
+import com.google.gson.Gson;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReferenceCondition<T extends Positional> implements Conditional<T> {
 
@@ -19,13 +22,20 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
 
     @Override
     public boolean isExpected(Plane<T> plane) {
+        if (comparator == null) {
+            return false;
+        }
+        if (target == null) {
+            return expected == null;
+        }
+
         List<T> tRefs = this.target.getReferences(plane);
 
         switch (this.comparator) {
-            case FALSE, DOES_NOT_EXIST -> {
+            case FALSE -> {
                 return tRefs == null || tRefs.isEmpty();
             }
-            case TRUE, EXIST -> {
+            case TRUE -> {
                 return tRefs != null && !tRefs.isEmpty();
             }
             case EQUAL -> {
@@ -57,5 +67,17 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
                 ", comparator=" + comparator +
                 ", expected=" + expected +
                 '}';
+    }
+
+    @Override
+    public String toJson() {
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "point");
+        map.put("field", null);
+        map.put("assert", this.comparator.toString());
+        map.put("target", this.target.toJson());
+        map.put("expected", this.expected.toJson());
+        return gson.toJson(map);
     }
 }

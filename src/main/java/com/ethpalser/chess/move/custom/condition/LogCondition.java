@@ -4,6 +4,9 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
+import com.google.gson.Gson;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LogCondition<T extends Positional> implements Conditional<T> {
 
@@ -21,7 +24,7 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
 
     @Override
     public boolean isExpected(Plane<T> plane) {
-        if (this.log.peek() == null) {
+        if (this.comparator == null || this.log == null || this.log.peek() == null) {
             return false;
         }
         switch (this.propType) {
@@ -56,5 +59,17 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
                 return false;
             }
         }
+    }
+
+    @Override
+    public String toJson() {
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "log");
+        map.put("field", this.propType.toString());
+        map.put("assert", this.comparator.toString());
+        map.put("target", null);
+        map.put("expected", this.expected.toString());
+        return gson.toJson(map);
     }
 }
