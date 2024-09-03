@@ -2,6 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.game.view.GameView;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.MoveSet;
@@ -14,9 +15,7 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.google.gson.Gson;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import com.google.gson.GsonBuilder;
@@ -54,6 +53,11 @@ public class ChessGame implements Game {
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
         this.turn = log.size();
         this.player = this.turn % 2 == 0 ? Colour.WHITE : Colour.BLACK;
+    }
+
+    @Override
+    public Board getBoard() {
+        return this.board;
     }
 
     @Override
@@ -206,28 +210,46 @@ public class ChessGame implements Game {
     }
 
     public String toJson() {
-        // Setting this up manually instead of having Gson do it all automatically
-        Map<String, Object> map = new HashMap<>();
-        map.put("turn", this.turn);
-
-        Map<String, Object> boardMap = new HashMap<>();
-        boardMap.put("width", this.board.getPieces().width());
-        boardMap.put("length", this.board.getPieces().length());
-        List<String> pieces = new ArrayList<>();
-        for (Piece p : this.board.getPieces()) {
-            pieces.add(p.toString());
-        }
-        boardMap.put("pieces", pieces);
-        map.put("board", boardMap);
-
-        List<String> logEntries = new ArrayList<>();
-        for (LogEntry<Point, Piece> entry : this.log) {
-            logEntries.add(entry.toString());
-        }
-        map.put("log", logEntries);
-
-        Gson gson = new GsonBuilder().create();
-        return gson.toJson(map);
+//        // Setting this up manually instead of having Gson do it all automatically
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("turn", this.turn);
+//        // board info
+//        Map<String, Object> boardMap = new HashMap<>();
+//        boardMap.put("width", this.board.getPieces().width());
+//        boardMap.put("length", this.board.getPieces().length());
+//        // Piece info
+//        List<String> pieces = new ArrayList<>();
+//        Map<String, List<String>> customMoveSpecs = new HashMap<>();
+//        for (Piece p : this.board.getPieces()) {
+//            pieces.add(p.toString());
+//            if (p instanceof CustomPiece && customMoveSpecs.get(p.getCode()) == null) {
+//                List<String> customMove = new ArrayList<>();
+//                for (CustomMove m : ((CustomPiece) p).getMoveSpecs()) {
+//                    customMove.add(m.toJson());
+//                }
+//                customMoveSpecs.put(p.getCode(), customMove);
+//            }
+//        }
+//        boardMap.put("pieces", pieces);
+//        map.put("board", boardMap);
+//        if (customMoveSpecs.isEmpty()) {
+//            map.put("pieceSpecs", "null");
+//        } else {
+//            map.put("pieceSpecs", customMoveSpecs);
+//        }
+//        // log info
+//        List<String> logEntries = new ArrayList<>();
+//        for (LogEntry<Point, Piece> entry : this.log) {
+//            logEntries.add(entry.toString());
+//        }
+//        map.put("log", logEntries);
+//        // custom piece specification info
+//
+//        Gson gson = new GsonBuilder().create();
+//        return gson.toJson(map);
+        GameView info = new GameView(this);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(info);
     }
 
     // PRIVATE METHODS

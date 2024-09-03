@@ -1,10 +1,13 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 
 public interface Game {
+
+    Board getBoard();
 
     Log<Point, Piece> getLog();
 
