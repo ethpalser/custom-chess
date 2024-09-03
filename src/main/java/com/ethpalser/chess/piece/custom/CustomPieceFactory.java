@@ -166,7 +166,7 @@ public class CustomPieceFactory {
                     ))
                     .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.plane.get(kingSideRook)))
                     .build();
-            king.addMove(castleKingSide);
+            king.addMoveSpec(castleKingSide);
         }
         {
             // Castle - Queen side
@@ -184,7 +184,7 @@ public class CustomPieceFactory {
                     ))
                     .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.plane.get(queenSideRook)))
                     .build();
-            king.addMove(castleQueenSide);
+            king.addMoveSpec(castleQueenSide);
         }
         return king;
     }
@@ -204,7 +204,7 @@ public class CustomPieceFactory {
                     .isMirrorXAxis(false)
                     .isMove(false)
                     .build();
-            pawn.addMove(pawnCapture);
+            pawn.addMoveSpec(pawnCapture);
         }
         {
             // Pawns can move forward two spaces if they have not moved
@@ -216,7 +216,7 @@ public class CustomPieceFactory {
                     .isAttack(false)
                     .conditions(List.of(this.selfNotMovedCondition(pawn)))
                     .build();
-            pawn.addMove(pawnCharge);
+            pawn.addMoveSpec(pawnCharge);
         }
 
         // En Passant is split into two due to limitations with References, as refs don't have CustomPiece's mirroring
@@ -236,7 +236,7 @@ public class CustomPieceFactory {
                     ))
                     .followUp(followUpRight)
                     .build();
-            pawn.addMove(enPassantRight);
+            pawn.addMoveSpec(enPassantRight);
         }
         {
             // En Passant front-left
@@ -254,7 +254,7 @@ public class CustomPieceFactory {
                     ))
                     .followUp(followUpLeft)
                     .build();
-            pawn.addMove(enPassantLeft);
+            pawn.addMoveSpec(enPassantLeft);
         }
         return pawn;
     }

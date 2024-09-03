@@ -77,7 +77,11 @@ public class CustomPiece implements Piece {
         return new MoveSet(movements);
     }
 
-    public void addMove(CustomMove move) {
+    public List<CustomMove> getMoveSpecs() {
+        return this.moveSpecifications;
+    }
+
+    public void addMoveSpec(CustomMove move) {
         this.moveSpecifications.add(move);
     }
 
