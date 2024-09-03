@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom;
 
+import com.ethpalser.chess.game.view.MoveView;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
@@ -11,13 +12,9 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -144,29 +141,9 @@ public class CustomMove {
         }
     }
 
-    public String toJson() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", this.moveType.toString());
-        map.put("mirrorXAxis", this.mirrorXAxis);
-        map.put("mirrorYAxis", this.mirrorYAxis);
-        map.put("onlySpecificQuadrant", this.isSpecificQuadrant);
-        map.put("isAttack", this.isAttack);
-        map.put("isMove", this.isMove);
-        // Path
-        List<String> pathList = new ArrayList<>();
-        for (Point p : this.pathBase) {
-            pathList.add(p.toString());
-        }
-        map.put("pathBase", pathList);
-        // Conditions
-        List<String> conditionList = new ArrayList<>();
-        for (Conditional<Piece> c : this.conditions) {
-            conditionList.add(c.toJson());
-        }
-        map.put("conditions", conditionList);
-        return gson.toJson(map);
+    public MoveView toView() {
+        return new MoveView(this.pathBase, this.moveType, this.mirrorXAxis, this.mirrorYAxis, this.isSpecificQuadrant,
+                this.isMove, this.isAttack, this.conditions, this.followUp);
     }
 
     // PRIVATE
