@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 class ChessGameTest {
 
+    // region Piece Movement
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
         // Given
@@ -273,11 +274,14 @@ class ChessGameTest {
         // Black move (filler)
         board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
+        LogEntry<Point, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
+                board.getPiece(new Point(3, 3)));
         board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        log.push(entry1);
         // Black move (with log updated for piece to check)
-        LogEntry<Point, Piece> entry = new ChessLogEntry(source, target, board.getPiece(source));
+        LogEntry<Point, Piece> entry2 = new ChessLogEntry(source, target, board.getPiece(source));
         board.movePiece(source, target, log, threatMap);
-        log.add(entry);
+        log.push(entry2);
 
         ChessGame game = new ChessGame(board, log);
 
@@ -288,8 +292,8 @@ class ChessGameTest {
 
         // Then
         assertNull(board.getPiece(3, 4));
-        assertNull(board.getPiece(4, 4));
         assertNotNull(board.getPiece(4, 5));
+        assertNull(board.getPiece(4, 4));
     }
 
     @Test
@@ -305,12 +309,14 @@ class ChessGameTest {
         // Black move (filler)
         board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
+        LogEntry<Point, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
+                board.getPiece(new Point(3, 3)));
         board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        log.push(entry1);
         // Black move
-        LogEntry<Point, Piece> entry = new ChessLogEntry(source, target, board.getPiece(source));
-
+        LogEntry<Point, Piece> entry2 = new ChessLogEntry(source, target, board.getPiece(source));
         board.movePiece(source, target, log, threatMap);
-        log.add(entry);
+        log.push(entry2);
 
         ChessGame game = new ChessGame(board, log);
 
@@ -320,10 +326,11 @@ class ChessGameTest {
 
         // Then
         assertNull(board.getPiece(3, 4));
-        assertNull(board.getPiece(2, 4));
         assertNotNull(board.getPiece(2, 5));
+        assertNull(board.getPiece(2, 4));
     }
 
+    // endregion
     // region In Progress Game
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
