@@ -76,8 +76,16 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
         map.put("type", "point");
         map.put("field", null);
         map.put("assert", this.comparator.toString());
-        map.put("target", this.target.toJson());
-        map.put("expected", this.expected.toJson());
+        if (this.target != null) {
+            map.put("target", this.target.toJson());
+        } else {
+            map.put("target", null);
+        }
+        if (this.expected != null) {
+            map.put("expected", this.expected.toJson());
+        } else {
+            map.put("expected", null);
+        }
         return gson.toJson(map);
     }
 }
