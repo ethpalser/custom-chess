@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.game.view.ConditionalView;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -62,14 +63,7 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
     }
 
     @Override
-    public String toJson() {
-        Gson gson = new Gson();
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", "log");
-        map.put("field", this.propType.toString());
-        map.put("assert", this.comparator.toString());
-        map.put("target", null);
-        map.put("expected", this.expected.toString());
-        return gson.toJson(map);
+    public ConditionalView toView() {
+        return new ConditionalView(ConditionalType.LOG, null, this.propType, this.comparator, this.expected);
     }
 }

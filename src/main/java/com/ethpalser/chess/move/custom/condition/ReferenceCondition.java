@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.game.view.ConditionalView;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
@@ -70,22 +71,7 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
     }
 
     @Override
-    public String toJson() {
-        Gson gson = new Gson();
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", "point");
-        map.put("field", null);
-        map.put("assert", this.comparator.toString());
-        if (this.target != null) {
-            map.put("target", this.target.toJson());
-        } else {
-            map.put("target", null);
-        }
-        if (this.expected != null) {
-            map.put("expected", this.expected.toJson());
-        } else {
-            map.put("expected", null);
-        }
-        return gson.toJson(map);
+    public ConditionalView toView() {
+        return new ConditionalView(ConditionalType.PIECE, this.target, null, this.comparator, this.expected);
     }
 }

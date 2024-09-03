@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.game.view.ConditionalView;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 
@@ -11,6 +12,6 @@ public interface Conditional<T extends Positional> {
 
     boolean isExpected(Plane<T> plane);
 
-    String toJson();
+    ConditionalView toView();
 
 }
