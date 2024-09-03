@@ -1,9 +1,9 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.game.view.ConditionalView;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.view.ConditionalView;
 import java.util.List;
 
 public class PropertyCondition<T extends Positional> implements Conditional<T> {

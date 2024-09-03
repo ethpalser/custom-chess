@@ -1,6 +1,6 @@
 package com.ethpalser.chess.log;
 
-import com.ethpalser.chess.game.view.ActionView;
+import com.ethpalser.chess.view.ActionView;
 
 public interface LogEntry<T extends Comparable<T>, U> {
 

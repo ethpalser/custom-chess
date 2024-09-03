@@ -1,11 +1,11 @@
 package com.ethpalser.chess.log.custom;
 
-import com.ethpalser.chess.game.view.ActionView;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.view.ActionView;
 
 public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, T> {
 

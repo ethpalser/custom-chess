@@ -1,13 +1,10 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.game.view.ConditionalView;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
-import com.google.gson.Gson;
-import java.util.HashMap;
-import java.util.Map;
+import com.ethpalser.chess.view.ConditionalView;
 
 public class LogCondition<T extends Positional> implements Conditional<T> {
 
@@ -42,8 +39,7 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
                 int diff;
                 if (start == null || end == null) {
                     diff = 0;
-                }
-                else {
+                } else {
                     diff = Math.max(
                             Math.abs(start.getX() - end.getX()),
                             Math.abs(start.getY() - end.getY())

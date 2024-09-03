@@ -1,10 +1,10 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.view.ActionView;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
+import com.ethpalser.chess.view.ActionView;
 
 public class ChessLogEntry implements LogEntry<Point, Piece> {
 

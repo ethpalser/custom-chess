@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game.view;
+package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;

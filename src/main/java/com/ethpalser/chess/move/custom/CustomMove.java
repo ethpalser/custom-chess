@@ -1,6 +1,5 @@
 package com.ethpalser.chess.move.custom;
 
-import com.ethpalser.chess.game.view.MoveView;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
@@ -12,6 +11,7 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

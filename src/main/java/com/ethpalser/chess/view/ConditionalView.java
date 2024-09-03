@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game.view;
+package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.ConditionalType;

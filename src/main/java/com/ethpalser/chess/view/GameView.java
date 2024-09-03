@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game.view;
+package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.log.LogEntry;

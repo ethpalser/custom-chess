@@ -1,11 +1,11 @@
 package com.ethpalser.chess.space.custom.reference;
 
-import com.ethpalser.chess.game.view.ReferenceView;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.view.ReferenceView;
 import java.util.List;
 
 public class LogReference<T extends Comparable<T>, U extends Positional> implements Reference<U> {

@@ -5,7 +5,7 @@ import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.game.view.GameView;
+import com.ethpalser.chess.view.GameView;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
