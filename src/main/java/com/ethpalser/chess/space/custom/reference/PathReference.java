@@ -1,14 +1,12 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.game.view.ReferenceView;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.Location;
-import com.google.gson.Gson;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -64,13 +62,8 @@ public class PathReference<T extends Positional> implements Reference<T> {
     }
 
     @Override
-    public String toJson() {
-        Gson gson = new Gson();
-        Map<String, Object> map = new HashMap<>(4);
-        map.put("location", Location.PATH.toString());
-        map.put("point", this.start);
-        map.put("xOffset", this.end.getX() - this.start.getX());
-        map.put("yOffset", this.end.getY() - this.start.getY());
-        return gson.toJson(map);
+    public ReferenceView toView() {
+        return new ReferenceView(Location.PATH, this.start, this.end.getX() - this.start.getX(),
+                this.end.getY() - this.start.getY());
     }
 }

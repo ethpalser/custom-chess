@@ -1,5 +1,6 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.game.view.ReferenceView;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.Location;
@@ -11,6 +12,6 @@ public interface Reference<T extends Positional> {
 
     List<T> getReferences(Plane<T> plane);
 
-    String toJson();
+    ReferenceView toView();
 
 }
