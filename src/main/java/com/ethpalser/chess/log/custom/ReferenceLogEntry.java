@@ -1,5 +1,6 @@
 package com.ethpalser.chess.log.custom;
 
+import com.ethpalser.chess.game.view.ActionView;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -70,5 +71,10 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
             return false;
         }
         return ref.getHasMoved();
+    }
+
+    @Override
+    public ActionView toView() {
+        return new ActionView(this.startRef, this.endRef);
     }
 }

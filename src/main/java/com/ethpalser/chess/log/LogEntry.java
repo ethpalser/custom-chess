@@ -1,5 +1,7 @@
 package com.ethpalser.chess.log;
 
+import com.ethpalser.chess.game.view.ActionView;
+
 public interface LogEntry<T extends Comparable<T>, U> {
 
     T getStart();
@@ -21,5 +23,7 @@ public interface LogEntry<T extends Comparable<T>, U> {
     LogEntry<T, U> getSubLogEntry();
 
     boolean isFirstOccurrence();
+
+    ActionView toView();
 
 }

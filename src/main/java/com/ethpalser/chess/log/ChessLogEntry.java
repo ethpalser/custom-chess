@@ -1,8 +1,10 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.view.ActionView;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 
 public class ChessLogEntry implements LogEntry<Point, Piece> {
 
@@ -92,5 +94,10 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         }
         sb.append(this.end);
         return sb.toString();
+    }
+
+    @Override
+    public ActionView toView() {
+        return new ActionView(new AbsoluteReference<>(this.start), new AbsoluteReference<>(this.end));
     }
 }
