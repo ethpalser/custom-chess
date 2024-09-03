@@ -4,6 +4,14 @@ public enum Colour {
     WHITE,
     BLACK;
 
+    public String toCode() {
+        if (WHITE.equals(this)) {
+            return "w";
+        } else {
+            return "b";
+        }
+    }
+
     public static Colour opposite(Colour colour) {
         if (Colour.WHITE.equals(colour)) {
             return BLACK;
