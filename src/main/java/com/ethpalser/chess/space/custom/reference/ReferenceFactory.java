@@ -6,6 +6,7 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.view.ReferenceView;
 
 public class ReferenceFactory {
 
@@ -30,6 +31,31 @@ public class ReferenceFactory {
             }
             default -> {
                 return new PathReference<>(location, start, this.pathEnd(start, shiftX, shiftY));
+            }
+        }
+    }
+
+    public Reference<Piece> build(ReferenceView view) {
+        if (view == null) {
+            return null;
+        }
+        switch (view.getLocation()) {
+            case LAST_MOVED -> {
+                return new LogReference<>(this.log);
+            }
+            case PATH -> {
+                return new PathReference<>(view.getLocation(), view.getPoint(), this.pathEnd(view.getPoint(),
+                        view.getXOffset(), view.getYOffset()));
+            }
+            case PIECE -> {
+                return new PieceReference(this.board.getPiece(view.getPoint()), Direction.AT,
+                        view.getXOffset(), view.getYOffset());
+            }
+            case POINT -> {
+                return new AbsoluteReference<>(view.getPoint());
+            }
+            default -> {
+                return null;
             }
         }
     }
