@@ -9,8 +9,8 @@ public class GameTree {
         this.root = root;
     }
 
-    public Action nextBest(int minimaxDepth) {
-        if (this.root == null || minimaxDepth <= 0) {
+    public Action nextBest(int depth) {
+        if (this.root == null || depth <= 0) {
             return null;
         }
 
@@ -19,15 +19,25 @@ public class GameTree {
         Action best = null;
 
         boolean maximizingPlayer = this.root.getTurn() % 2 != 0; // Should correspond to when White player acts
-        Iterable<Action> iterable = this.root.potentialUpdates();
-        for (Action action : iterable) {
-            int value = alphabeta(action, minimaxDepth - 1, alpha, beta, !maximizingPlayer);
-            if (maximizingPlayer && value > alpha) {
-                alpha = value;
-                best = action;
-            } else if (!maximizingPlayer && value < beta) {
-                beta = value;
-                best = action;
+        for (int d = 1; d <= depth; d++) {
+            Iterable<Action> iterable = this.root.potentialUpdates();
+            for (Action action : iterable) {
+                int value = alphabeta(action, depth - 1, alpha, beta, !maximizingPlayer);
+                if (maximizingPlayer && value > alpha) {
+                    alpha = value;
+                    best = action;
+                    // Winning move shouldn't be ignored if available, as it was deemed min and max for a branch.
+                    if (alpha >= WINNING_THRESHOLD) {
+                        return action;
+                    }
+                } else if (!maximizingPlayer && value < beta) {
+                    beta = value;
+                    best = action;
+                    // Winning move shouldn't be ignored if available, as it was deemed min and max for a branch.
+                    if (beta <= -WINNING_THRESHOLD) {
+                        return action;
+                    }
+                }
             }
         }
         return best;
