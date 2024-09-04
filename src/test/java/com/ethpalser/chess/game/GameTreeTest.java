@@ -13,7 +13,7 @@ class GameTreeTest {
         MockGame game = new MockGame(testCase);
         GameTree tree = new GameTree(game);
 
-        Action result = tree.nextBest(1, true);
+        Action result = tree.nextBest(1);
 
         assertNull(result);
     }
@@ -24,7 +24,7 @@ class GameTreeTest {
         MockGame game = new MockGame(testCase);
         GameTree tree = new GameTree(game);
 
-        Action result = tree.nextBest(1, true);
+        Action result = tree.nextBest(1);
 
         assertNull(result);
     }
@@ -36,7 +36,7 @@ class GameTreeTest {
         MockGame game = new MockGame(testCase);
         GameTree tree = new GameTree(game);
 
-        Action result = tree.nextBest(-1, true);
+        Action result = tree.nextBest(-1);
 
         assertNull(result);
     }
@@ -48,11 +48,27 @@ class GameTreeTest {
         GameTree tree = new GameTree(game);
         int depth = 1;
 
-        Action result = tree.nextBest(depth, true);
+        Action result = tree.nextBest(depth);
 
         // Children from root are -5, 5 and 15 so 15 should be chosen
         assertNotNull(result);
         assertEquals(15, result.getEnd().getX());
+        assertEquals(tree.minimax(depth), result.getEnd().getX());
+    }
+
+
+    @Test
+    void testNextBest_givenDepthOfTwoGeneratingTree_thenNotNull() {
+        MockNode testCase = this.testSnapshotTree();
+        MockGame game = new MockGame(testCase);
+        GameTree tree = new GameTree(game);
+        int depth = 2;
+
+        Action result = tree.nextBest(depth);
+
+        // Children from root are -5, 5 and 15 so 15 should be chosen
+        assertNotNull(result);
+        assertEquals(-5, result.getEnd().getX());
         assertEquals(tree.minimax(depth), result.getEnd().getX());
     }
 
@@ -63,7 +79,7 @@ class GameTreeTest {
         GameTree tree = new GameTree(game);
         int depth = 4;
 
-        Action result = tree.nextBest(depth, true);
+        Action result = tree.nextBest(depth);
 
         assertNotNull(result);
         // Expected value was manually determined

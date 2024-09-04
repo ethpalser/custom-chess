@@ -36,4 +36,12 @@ public class Action {
         return end;
     }
 
+    @Override
+    public String toString() {
+        return "Action{" +
+                "colour=" + colour +
+                ", start=" + start +
+                ", end=" + end +
+                '}';
+    }
 }

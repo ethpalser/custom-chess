@@ -53,8 +53,8 @@ public class ChessGame implements Game {
         }
         this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), log);
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
-        this.turn = log.size();
-        this.player = this.turn % 2 == 0 ? Colour.WHITE : Colour.BLACK;
+        this.turn = log.size() + 1;
+        this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
     }
 
     public ChessGame(GameView view) {
@@ -204,6 +204,11 @@ public class ChessGame implements Game {
         List<Action> potentialCaptures = new ArrayList<>(64);
         List<Action> quietActions = new ArrayList<>(128);
         for (Piece piece : this.board.getPieces()) {
+            // Skip non-turn player
+            if (!this.player.equals(piece.getColour())) {
+                continue;
+            }
+
             MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
                     this.getThreatMap(Colour.opposite(piece.getColour())));
             for (Movement m : moves.toSet()) {

@@ -93,6 +93,24 @@ class ChessGameTest {
         }
     }
 
+    @Test
+    void testBotMovement_givenStartingBoard_thenBoardChanges() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+        GameTree tree = new GameTree(game);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+
+        // When
+        Action botBest = tree.nextBest(8);
+        game.updateGame(botBest);
+
+        // Then
+        assertNull(game.getBoard().getPiece(botBest.getStart()));
+        assertNotNull(game.getBoard().getPiece(botBest.getEnd()));
+    }
+
     // region Piece Movement
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {

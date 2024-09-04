@@ -9,7 +9,7 @@ public class GameTree {
         this.root = root;
     }
 
-    public Action nextBest(int minimaxDepth, boolean greaterIsBest) {
+    public Action nextBest(int minimaxDepth) {
         if (this.root == null || minimaxDepth <= 0) {
             return null;
         }
@@ -18,13 +18,14 @@ public class GameTree {
         int beta = Integer.MAX_VALUE;
         Action best = null;
 
-        Iterable<Action> iterable = root.potentialUpdates();
+        boolean maximizingPlayer = this.root.getTurn() % 2 != 0; // Should correspond to when White player acts
+        Iterable<Action> iterable = this.root.potentialUpdates();
         for (Action action : iterable) {
-            int value = alphabeta(action, minimaxDepth - 1, alpha, beta, !greaterIsBest);
-            if (greaterIsBest && value > alpha) {
+            int value = alphabeta(action, minimaxDepth - 1, alpha, beta, !maximizingPlayer);
+            if (maximizingPlayer && value > alpha) {
                 alpha = value;
                 best = action;
-            } else if (!greaterIsBest && value < beta) {
+            } else if (!maximizingPlayer && value < beta) {
                 beta = value;
                 best = action;
             }

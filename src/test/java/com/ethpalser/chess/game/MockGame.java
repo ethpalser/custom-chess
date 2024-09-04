@@ -52,7 +52,7 @@ public class MockGame implements Game {
 
     @Override
     public int getTurn() {
-        return 0;
+        return 1;
     }
 
     @Override
