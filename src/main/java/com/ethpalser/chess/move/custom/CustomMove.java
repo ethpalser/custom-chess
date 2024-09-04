@@ -1,9 +1,12 @@
 package com.ethpalser.chess.move.custom;
 
+import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.log.custom.ReferenceLogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.custom.condition.Conditional;
+import com.ethpalser.chess.move.custom.condition.ConditionalFactory;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -11,6 +14,8 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.custom.reference.ReferenceFactory;
+import com.ethpalser.chess.view.ConditionalView;
 import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -88,7 +93,7 @@ public class CustomMove {
         }
     }
 
-    public CustomMove(Builder builder) {
+    CustomMove(Builder builder) {
         this.pathBase = builder.path;
         this.moveType = builder.moveType;
         this.mirrorXAxis = builder.mirrorXAxis;
@@ -110,6 +115,40 @@ public class CustomMove {
         this.isMove = true;
         this.conditions = List.of();
         this.followUp = null;
+    }
+
+    public CustomMove(Plane<Piece> board, Log<Point, Piece> log, MoveView view) {
+        if (view == null) {
+            this.pathBase = null;
+            this.moveType = null;
+            this.mirrorXAxis = false;
+            this.mirrorYAxis = false;
+            this.isSpecificQuadrant = false;
+            this.isMove = true;
+            this.isAttack = true;
+            this.conditions = List.of();
+            this.followUp = null;
+        } else {
+            this.pathBase = new Path(view.getBase());
+            this.moveType = view.getType();
+            this.mirrorXAxis = view.isMirrorXAxis();
+            this.mirrorYAxis = view.isMirrorYAxis();
+            this.isSpecificQuadrant = view.isOnlySpecificQuadrant();
+            this.isMove = view.isMove();
+            this.isAttack = view.isAttack();
+            List<Conditional<Piece>> conditionalList = new ArrayList<>();
+            ConditionalFactory cFactory = new ConditionalFactory(board, log);
+            for (ConditionalView cv : view.getConditions()) {
+                conditionalList.add(cFactory.build(cv));
+            }
+            this.conditions = conditionalList;
+            ReferenceFactory rFactory = new ReferenceFactory(board, log);
+            this.followUp = new ReferenceLogEntry<>(
+                    board,
+                    rFactory.build(view.getFollowUp().getTarget()),
+                    rFactory.build(view.getFollowUp().getDestination())
+            );
+        }
     }
 
     public List<Movement> toMovementList(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,

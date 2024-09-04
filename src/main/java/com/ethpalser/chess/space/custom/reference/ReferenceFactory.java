@@ -1,19 +1,19 @@
 package com.ethpalser.chess.space.custom.reference;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
 import com.ethpalser.chess.view.ReferenceView;
 
 public class ReferenceFactory {
 
-    private final Board board;
+    private final Plane<Piece> board;
     private final Log<Point, Piece> log;
 
-    public ReferenceFactory(Board board, Log<Point, Piece> log) {
+    public ReferenceFactory(Plane<Piece> board, Log<Point, Piece> log) {
         this.board = board;
         this.log = log;
     }
@@ -21,7 +21,7 @@ public class ReferenceFactory {
     public Reference<Piece> build(Location location, Direction direction, Point start, int shiftX, int shiftY) {
         switch (location) {
             case PIECE -> {
-                return new PieceReference(board.getPiece(start), direction, shiftX, shiftY);
+                return new PieceReference(board.get(start), direction, shiftX, shiftY);
             }
             case POINT -> {
                 return new AbsoluteReference<>(start);
@@ -48,7 +48,7 @@ public class ReferenceFactory {
                         view.getXOffset(), view.getYOffset()));
             }
             case PIECE -> {
-                return new PieceReference(this.board.getPiece(view.getPoint()), Direction.AT,
+                return new PieceReference(this.board.get(view.getPoint()), Direction.AT,
                         view.getXOffset(), view.getYOffset());
             }
             case POINT -> {
