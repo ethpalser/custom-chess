@@ -5,7 +5,6 @@ import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.view.GameView;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
@@ -14,6 +13,7 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.view.GameView;
 import com.google.gson.Gson;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,6 @@ class ChessGameTest {
 
         // when
         String jsonString = game.toJson();
-        System.out.println(jsonString);
 
         // then
         assertTrue(jsonString.contains("turn"));
@@ -72,6 +71,26 @@ class ChessGameTest {
         assertEquals(32, root.getBoard().getPieces().size());
         assertTrue(root.getPieceSpecs().isEmpty());
         assertTrue(root.getLog().isEmpty());
+    }
+
+    @Test
+    void testFromJsonConstructor_givenSaveGameView_thenMatchesOriginal() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        // when
+        String jsonString = game.toJson();
+        Gson gson = new Gson();
+        GameView root = gson.fromJson(jsonString, GameView.class);
+        assertEquals(32, root.getBoard().getPieces().size());
+
+        // then
+        Game copy = new ChessGame(root);
+        for (Piece p : copy.getBoard().getPieces()) {
+            assertNotNull(game.getBoard().getPiece(p.getPoint()));
+            assertEquals(game.getBoard().getPiece(p.getPoint()).getCode(), p.getCode());
+        }
     }
 
     // region Piece Movement
