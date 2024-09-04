@@ -8,6 +8,7 @@ import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -19,6 +20,8 @@ import com.ethpalser.chess.piece.standard.Queen;
 import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.view.BoardView;
+import com.ethpalser.chess.view.MoveView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,12 +50,55 @@ public class ChessBoard implements Board {
     public ChessBoard(BoardType type, Log<Point, Piece> log, List<String> pieces) {
         Plane<Piece> plane = new Plane<>();
         if (BoardType.STANDARD.equals(type)) {
-            // todo Map a piece string to a piece
+            for (String s : pieces) {
+                PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);
+                // Expecting five tokens in the order of: Colour, Code (Type), File, Rank, hasMoved
+                Colour colour = Colour.fromCode(tokenizer.nextToken());
+                String code = tokenizer.nextToken();
+                Point point = new Point(tokenizer.nextToken() + tokenizer.nextToken());
+                boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
+
+                switch (PieceType.fromCode(code)) {
+                    case PAWN -> plane.put(point, new Pawn(colour, point, hasMoved));
+                    case ROOK -> plane.put(point, new Rook(colour, point, hasMoved));
+                    case KNIGHT -> plane.put(point, new Knight(colour, point, hasMoved));
+                    case BISHOP -> plane.put(point, new Bishop(colour, point, hasMoved));
+                    case QUEEN -> plane.put(point, new Queen(colour, point, hasMoved));
+                    case KING -> plane.put(point, new King(colour, point, hasMoved));
+                    default -> {
+                        // Do nothing, not a standard piece
+                    }
+                }
+            }
         } else {
             CustomPieceFactory pf = new CustomPieceFactory(plane, log);
             for (String s : pieces) {
                 CustomPiece customPiece = pf.build(s);
                 plane.put(customPiece.getPoint(), customPiece);
+            }
+        }
+        this.pieces = plane;
+    }
+
+    public ChessBoard(Log<Point, Piece> log, BoardView view, Map<String, List<MoveView>> customSpecMap) {
+        Plane<Piece> plane = new Plane<>(view.getWidth(), view.getLength());
+        CustomPieceFactory pf = new CustomPieceFactory(plane, log);
+        for (String s : view.getPieces()) {
+            PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);
+            // Expecting five tokens in the order of: Colour, Code (Type), File, Rank, hasMoved
+            Colour colour = Colour.fromCode(tokenizer.nextToken());
+            String code = tokenizer.nextToken();
+            Point point = new Point(tokenizer.nextToken() + tokenizer.nextToken());
+            boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
+
+            switch (PieceType.fromCode(code)) {
+                case PAWN -> plane.put(point, new Pawn(colour, point, hasMoved));
+                case ROOK -> plane.put(point, new Rook(colour, point, hasMoved));
+                case KNIGHT -> plane.put(point, new Knight(colour, point, hasMoved));
+                case BISHOP -> plane.put(point, new Bishop(colour, point, hasMoved));
+                case QUEEN -> plane.put(point, new Queen(colour, point, hasMoved));
+                case KING -> plane.put(point, new King(colour, point, hasMoved));
+                default -> plane.put(point, pf.build(code, colour, point, hasMoved, customSpecMap.get(code)));
             }
         }
         this.pieces = plane;
