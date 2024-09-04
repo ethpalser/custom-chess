@@ -37,6 +37,10 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
                 return tRefs != null && !tRefs.isEmpty();
             }
             case EQUAL -> {
+                if (this.expected == null) {
+                    return tRefs.isEmpty();
+                }
+
                 List<T> xRefs = this.expected.getReferences(plane);
                 for (T ref : tRefs) {
                     if (!xRefs.contains(ref))
@@ -45,6 +49,10 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
                 return true;
             }
             case NOT_EQUAL -> {
+                if (this.expected == null) {
+                    return !tRefs.isEmpty();
+                }
+
                 List<T> xPieces = this.expected.getReferences(plane);
                 for (T ref : tRefs) {
                     if (!xPieces.contains(ref))
