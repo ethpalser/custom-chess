@@ -23,6 +23,7 @@ import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.space.custom.reference.LogReference;
 import com.ethpalser.chess.space.custom.reference.PathReference;
 import com.ethpalser.chess.space.custom.reference.PieceReference;
+import com.ethpalser.chess.view.MoveView;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,8 +59,16 @@ public class CustomPieceFactory {
             case QUEEN -> this.queen(colour, vector, hasMoved);
             case KING -> this.king(colour, vector, hasMoved);
             case PAWN -> this.pawn(colour, vector, hasMoved);
-            default -> new CustomPiece(type, colour, vector, hasMoved); // Todo: Allow adding moves
+            default -> null; // Use the other build method for truly custom pieces
         };
+    }
+
+    public CustomPiece build(String code, Colour colour, Point point, boolean hasMoved, List<MoveView> moveSpecViews) {
+        CustomPiece piece = new CustomPiece(code, colour, point, hasMoved);
+        for (MoveView spec : moveSpecViews) {
+            piece.addMoveSpec(new CustomMove(this.plane, this.log, spec));
+        }
+        return piece;
     }
 
     // PRIVATE METHODS
@@ -123,32 +132,33 @@ public class CustomPieceFactory {
     private CustomPiece knight(Colour colour, Point point, boolean hasMoved) {
         CustomMove baseMoveL1 = new CustomMove(new Path(new Point(1, 2)), CustomMoveType.JUMP, true, true);
         CustomMove baseMoveL2 = new CustomMove(new Path(new Point(2, 1)), CustomMoveType.JUMP, true, true);
-        return new CustomPiece(PieceType.KNIGHT, colour, point, hasMoved, baseMoveL1, baseMoveL2);
+        return new CustomPiece(PieceType.KNIGHT.getCode(), colour, point, hasMoved, baseMoveL1, baseMoveL2);
     }
 
     private CustomPiece rook(Colour colour, Point point, boolean hasMoved) {
         CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
-        return new CustomPiece(PieceType.ROOK, colour, point, hasMoved, baseMoveV, baseMoveH);
+        return new CustomPiece(PieceType.ROOK.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH);
     }
 
     private CustomPiece bishop(Colour colour, Point point, boolean hasMoved) {
         CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
-        return new CustomPiece(PieceType.BISHOP, colour, point, hasMoved, baseMoveD);
+        return new CustomPiece(PieceType.BISHOP.getCode(), colour, point, hasMoved, baseMoveD);
     }
 
     private CustomPiece queen(Colour colour, Point point, boolean hasMoved) {
         CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
         CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
-        return new CustomPiece(PieceType.QUEEN, colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
+        return new CustomPiece(PieceType.QUEEN.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
     }
 
     private CustomPiece king(Colour colour, Point point, boolean hasMoved) {
         CustomMove baseMoveV = new CustomMove(new Path(new Point(0, 1)), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(new Path(new Point(1, 0)), CustomMoveType.ADVANCE, false, true);
         CustomMove baseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
-        CustomPiece king = new CustomPiece(PieceType.KING, colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
+        CustomPiece king = new CustomPiece(PieceType.KING.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH,
+                baseMoveD);
 
         {
             // Castle - King side
@@ -196,7 +206,7 @@ public class CustomPieceFactory {
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .build();
-        CustomPiece pawn = new CustomPiece(PieceType.PAWN, colour, point, hasMoved, baseMove);
+        CustomPiece pawn = new CustomPiece(PieceType.PAWN.getCode(), colour, point, hasMoved, baseMove);
 
         {
             // Pawns can only capture one space diagonal from their front

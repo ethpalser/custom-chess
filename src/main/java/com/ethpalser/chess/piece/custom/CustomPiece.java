@@ -37,9 +37,13 @@ public class CustomPiece implements Piece {
         this.code = pieceType.getCode();
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, boolean hasMoved, CustomMove... customMoves) {
-        this(pieceType, colour, vector, customMoves);
+    public CustomPiece(String code, Colour colour, Point vector, boolean hasMoved, CustomMove... customMoves) {
+        this.type = PieceType.fromCode(code);
+        this.code = code;
+        this.colour = colour;
+        this.position = vector;
         this.hasMoved = hasMoved;
+        this.moveSpecifications = new ArrayList<>(Arrays.asList(customMoves));
     }
 
     @Override

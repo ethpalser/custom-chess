@@ -22,6 +22,12 @@ public class Queen implements Piece {
         this.hasMoved = false;
     }
 
+    public Queen(Colour colour, Point point, boolean hasMoved) {
+        this.colour = colour;
+        this.point = point;
+        this.hasMoved = hasMoved;
+    }
+
     @Override
     public String getCode() {
         return "Q";

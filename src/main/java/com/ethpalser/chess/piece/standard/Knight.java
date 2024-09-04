@@ -19,6 +19,12 @@ public class Knight implements Piece {
         this.point = point;
     }
 
+    public Knight(Colour colour, Point point, boolean hasMoved) {
+        this.colour = colour;
+        this.point = point;
+        this.hasMoved = hasMoved;
+    }
+
     @Override
     public String getCode() {
         return "N";

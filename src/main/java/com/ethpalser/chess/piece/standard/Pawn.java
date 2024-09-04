@@ -24,6 +24,12 @@ public class Pawn implements Piece {
         this.hasMoved = false;
     }
 
+    public Pawn(Colour colour, Point point, boolean hasMoved) {
+        this.colour = colour;
+        this.point = point;
+        this.hasMoved = hasMoved;
+    }
+
     @Override
     public String getCode() {
         return "P"; // Often it is nothing or a 'P'

@@ -22,6 +22,12 @@ public class Bishop implements Piece {
         this.hasMoved = false;
     }
 
+    public Bishop(Colour colour, Point point, boolean hasMoved) {
+        this.colour = colour;
+        this.point = point;
+        this.hasMoved = hasMoved;
+    }
+
     @Override
     public String getCode() {
         return "B";

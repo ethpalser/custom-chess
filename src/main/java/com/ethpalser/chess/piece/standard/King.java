@@ -24,6 +24,12 @@ public class King implements Piece {
         this.hasMoved = false;
     }
 
+    public King(Colour colour, Point point, boolean hasMoved) {
+        this.colour = colour;
+        this.point = point;
+        this.hasMoved = hasMoved;
+    }
+
     @Override
     public String getCode() {
         return "K";
