@@ -1,7 +1,9 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.MoveSet;
@@ -53,6 +55,26 @@ public class ChessGame implements Game {
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
         this.turn = log.size();
         this.player = this.turn % 2 == 0 ? Colour.WHITE : Colour.BLACK;
+    }
+
+    public ChessGame(GameView view) {
+        this.turn = view.getTurn();
+        this.player = this.turn % 2 == 0 ? Colour.WHITE : Colour.BLACK;
+        this.log = new ChessLog();
+        this.board = new ChessBoard(this.log, view.getBoard(), view.getPieceSpecs());
+        for (Piece p : this.board.getPieces()) {
+            if (PieceType.KING.getCode().equals(p.getCode())) {
+                if (Colour.WHITE.equals(p.getColour())) {
+                    this.whiteKing = p.getPoint();
+                } else {
+                    this.blackKing = p.getPoint();
+                }
+            }
+        }
+        this.log.addAll(this.board.getPieces(), view.getLog());
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+        this.status = checkGameStatus();
     }
 
     @Override
