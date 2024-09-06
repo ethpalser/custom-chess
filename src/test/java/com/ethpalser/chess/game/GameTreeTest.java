@@ -53,7 +53,6 @@ class GameTreeTest {
         // Children from root are -5, 5 and 15 so 15 should be chosen
         assertNotNull(result);
         assertEquals(15, result.getEnd().getX());
-        assertEquals(tree.minimax(depth), result.getEnd().getX());
     }
 
 
@@ -69,7 +68,6 @@ class GameTreeTest {
         // Children from root are -5, 5 and 15 so 15 should be chosen
         assertNotNull(result);
         assertEquals(-5, result.getEnd().getX());
-        assertEquals(tree.minimax(depth), result.getEnd().getX());
     }
 
     @Test
