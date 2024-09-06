@@ -14,28 +14,33 @@ public class GameTree {
             return null;
         }
 
-        int alpha = Integer.MIN_VALUE;
-        int beta = Integer.MAX_VALUE;
         Action best = null;
 
         boolean maximizingPlayer = this.root.getTurn() % 2 != 0; // Should correspond to when White player acts
         for (int d = 1; d <= depth; d++) {
+            int alpha = Integer.MIN_VALUE;
+            int beta = Integer.MAX_VALUE;
+
             Iterable<Action> iterable = this.root.potentialUpdates();
             for (Action action : iterable) {
-                int value = alphabeta(action, depth - 1, alpha, beta, !maximizingPlayer);
+                int value = alphabeta(action, d - 1, alpha, beta, !maximizingPlayer);
                 if (maximizingPlayer && value > alpha) {
-                    alpha = value;
-                    best = action;
                     // Winning move shouldn't be ignored if available, as it was deemed min and max for a branch.
                     if (alpha >= WINNING_THRESHOLD) {
                         return action;
                     }
+                    if (d == depth) {
+                        alpha = value;
+                        best = action;
+                    }
                 } else if (!maximizingPlayer && value < beta) {
-                    beta = value;
-                    best = action;
                     // Winning move shouldn't be ignored if available, as it was deemed min and max for a branch.
                     if (beta <= -WINNING_THRESHOLD) {
                         return action;
+                    }
+                    if (d == depth) {
+                        beta = value;
+                        best = action;
                     }
                 }
             }
@@ -73,7 +78,22 @@ public class GameTree {
             return maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         }
 
-        this.root.updateGame(node);
+        // Todo: Game is not returning CHECK statuses
+        GameStatus status = this.root.updateGame(node);
+        if (GameStatus.NO_CHANGE.equals(status)) {
+            return maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        }
+        if (GameStatus.WHITE_WIN.equals(status)) {
+            int result = Integer.MAX_VALUE;
+            this.root.undoUpdate(1, false);
+            return result;
+        }
+        if (GameStatus.BLACK_WIN.equals(status)) {
+            int result = Integer.MIN_VALUE;
+            this.root.undoUpdate(1, false);
+            return result;
+        }
+
         Iterable<Action> it = this.root.potentialUpdates();
         if (depth <= 0 || !it.iterator().hasNext()) {
             int result = this.root.evaluateState();
