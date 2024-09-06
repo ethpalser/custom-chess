@@ -442,7 +442,7 @@ public class ChessGame implements Game {
         return true;
     }
 
-    private void applyLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
+    private void applyLogEntryToBoard(LogEntry<Point, Piece> logEntry, boolean undo) {
         if (logEntry == null) {
             System.err.println("cannot apply null log entry to board");
             return;
@@ -451,6 +451,18 @@ public class ChessGame implements Game {
             this.board.addPiece(logEntry.getEndObject().getPoint(), logEntry.getEndObject());
         }
         this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
+
+        if (undo) {
+            if (logEntry.isFirstOccurrence())
+                logEntry.getStartObject().setHasMoved(false);
+            if (isKingPiece(logEntry.getStartObject())) {
+                if (Colour.WHITE.equals(logEntry.getStartObject().getColour())) {
+                    this.whiteKing = logEntry.getStart();
+                } else {
+                    this.blackKing = logEntry.getStart();
+                }
+            }
+        }
     }
 
     private void applyLogEntryToThreats(LogEntry<Point, Piece> logEntry) {
