@@ -9,6 +9,7 @@ import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -29,7 +30,6 @@ class ChessGameTest {
 
         // when
         String jsonString = game.toJson();
-        System.out.println(jsonString);
 
         // then
         assertTrue(jsonString.contains("turn"));
@@ -90,6 +90,90 @@ class ChessGameTest {
         for (Piece p : copy.getBoard().getPieces()) {
             assertNotNull(game.getBoard().getPiece(p.getPoint()));
             assertEquals(game.getBoard().getPiece(p.getPoint()).getCode(), p.getCode());
+        }
+    }
+
+    @Test
+    void testPotentialUpdates_givenProgressedQueens_thenKingCannotMoveToThreatenedSpace() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("g4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d8"), new Point("d6")));
+        game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("e5")));
+
+        Iterable<Action> blackActions = game.potentialUpdates();
+        // These actions are for black, so only the white threat map is needed
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board.getPieces(), log);
+        MoveMap blackMoves = new MoveMap(Colour.BLACK, board.getPieces(), log, whiteThreats);
+
+        for (Action action : blackActions) {
+            Piece piece = board.getPiece(action.getStart());
+            assertNotNull(piece);
+            assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
+            assertTrue(piece.canMove(board.getPieces(), log, whiteThreats, action.getEnd()));
+        }
+    }
+
+    @Test
+    void testPotentialUpdates_givenKingInCheck_thenNonBlockingMovesCauseNoChange() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        GameStatus s1 = game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s1);
+        GameStatus s2 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
+        assertEquals(GameStatus.ONGOING, s2);
+        GameStatus s3 = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("h5")));
+        assertEquals(GameStatus.BLACK_IN_CHECK, s3);
+        GameStatus s4 = game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g5")));
+        assertEquals(GameStatus.NO_CHANGE, s4);
+
+        Iterable<Action> blackActions = game.potentialUpdates();
+        for (Action action : blackActions) {
+            GameStatus result = game.updateGame(action);
+            if (result == GameStatus.NO_CHANGE) {
+                fail("available actions must prevent check");
+            }
+        }
+    }
+
+    @Test
+    void testPotentialUpdates_givenKingInCheckmate_thenNoPotentialMoves() {
+
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        GameStatus s1 = game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s1);
+        GameStatus s2 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
+        assertEquals(GameStatus.ONGOING, s2);
+        GameStatus s3 = game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3")));
+        assertEquals(GameStatus.ONGOING, s3);
+        GameStatus s4 = game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g5")));
+        assertEquals(GameStatus.ONGOING, s4);
+        GameStatus s5 = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("h5")));
+        assertEquals(GameStatus.WHITE_WIN, s5);
+        GameStatus s6 = game.updateGame(new Action(Colour.BLACK, new Point("g5"), new Point("g4")));
+        assertEquals(GameStatus.WHITE_WIN, s6);
+
+        Iterable<Action> blackActions = game.potentialUpdates();
+        // These actions are for black, so only the white threat map is needed
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board.getPieces(), log);
+        MoveMap blackMoves = new MoveMap(Colour.BLACK, board.getPieces(), log, whiteThreats);
+
+        System.out.println(blackActions);
+        System.out.println(whiteThreats);
+        System.out.println(board);
+        System.out.println(blackMoves);
+
+        for (Action action : blackActions) {
+            fail("actions must be empty");
         }
     }
 
