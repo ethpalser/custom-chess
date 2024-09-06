@@ -10,6 +10,7 @@ import com.ethpalser.chess.move.custom.condition.ConditionalFactory;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
@@ -20,6 +21,7 @@ import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -231,25 +233,24 @@ public class CustomMove {
             return null;
         }
 
-        boolean isKing = PieceType.KING.getCode().equals(board.get(offset).getCode());
         List<Point> points = new LinkedList<>();
         for (Point p : this.pathBase) {
             Point next = this.getVectorInQuadrant(p, offset, isRight, isUp);
             boolean isSafe = threatMap != null && threatMap.hasNoThreats(next);
             // Not a valid location, out of bounds, or fails its conditions
-            if (next == null || !board.isInBounds(next) || (isKing && !isSafe)) {
+            if (next == null || !board.isInBounds(next) || (Pieces.isKing(board.get(offset)) && !isSafe)) {
                 break;
             }
 
-            Piece piece = board.get(next);
-            if (piece != null) {
-                boolean canCapture = !board.get(next).getColour().equals(colour);
+            Piece nPiece = board.get(next);
+            if (nPiece != null) {
+                boolean canCapture = Pieces.isOpponent(colour, nPiece);
                 if (this.isAttack && (canCapture || includeDefend)) {
                     points.add(next);
                 }
 
                 boolean passAnyPiece = CustomMoveType.JUMP.equals(this.moveType);
-                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
+                boolean passOppKing = onlyAttacks && canCapture && Pieces.isKing(nPiece);
                 if (!passAnyPiece && !passOppKing) {
                     break; // A piece was encountered and this piece cannot move beyond it, so the path ends here
                 }
