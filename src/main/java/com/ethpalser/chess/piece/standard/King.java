@@ -132,6 +132,11 @@ public class King implements Piece {
         return this.hasMoved;
     }
 
+    @Override
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
     // PRIVATE METHODS
 
     private boolean isEmptyAndSafe(Plane<Piece> board, ThreatMap threatMap, int x, int y) {

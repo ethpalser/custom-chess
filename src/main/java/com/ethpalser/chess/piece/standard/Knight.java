@@ -17,6 +17,7 @@ public class Knight implements Piece {
     public Knight(Colour colour, Point point) {
         this.colour = colour;
         this.point = point;
+        this.hasMoved = false;
     }
 
     public Knight(Colour colour, Point point, boolean hasMoved) {
@@ -73,6 +74,11 @@ public class Knight implements Piece {
     @Override
     public boolean getHasMoved() {
         return this.hasMoved;
+    }
+
+    @Override
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
     }
 
     @Override

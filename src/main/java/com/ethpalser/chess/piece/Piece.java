@@ -52,4 +52,6 @@ public interface Piece extends Positional {
     void move(Point destination);
 
     boolean getHasMoved();
+
+    void setHasMoved(boolean hasMoved);
 }

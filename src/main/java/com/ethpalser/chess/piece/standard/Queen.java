@@ -82,6 +82,11 @@ public class Queen implements Piece {
     }
 
     @Override
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    @Override
     public String toString() {
         return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
