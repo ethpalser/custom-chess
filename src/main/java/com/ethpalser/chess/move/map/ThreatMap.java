@@ -5,6 +5,7 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
@@ -35,14 +36,8 @@ public class ThreatMap {
         return this.getPieces(point).isEmpty();
     }
 
-    public boolean hasNoThreats(Point point, boolean ignoreKing) {
-        Set<Piece> set = this.getPieces(point);
-        for (Piece p : set) {
-            if (!ignoreKing || !PieceType.KING.getCode().equals(p.getCode())) {
-                return true;
-            }
-        }
-        return false;
+    public Colour getColour() {
+        return this.colour;
     }
 
     public Set<Piece> getPieces(Point point) {
@@ -63,7 +58,10 @@ public class ThreatMap {
     }
 
     private void clearMoves(Piece piece, Point point) {
-        this.map.get(point).remove(piece);
+        Set<Piece> set = this.map.get(point);
+        if (set != null) {
+            set.remove(piece);
+        }
     }
 
     public void refreshThreats(Plane<Piece> board, Log<Point, Piece> log, Point point) {
@@ -76,7 +74,13 @@ public class ThreatMap {
         }
         Piece change = board.get(point);
         List<Tuple<Piece, Path>> tupleList = new ArrayList<>();
-        // Clear all places for each piece that could previously move here, then update their latest moves
+        // Remove the impacting piece temporarily
+        board.remove(point);
+        if (change != null && this.colour.equals(change.getColour())) {
+            this.clearMoves(change);
+        }
+
+        // Get all paths that are along this point
         for (Piece piece : this.getPieces(point)) {
             if (piece.equals(change)) {
                 // skip this piece, as it moved to the point we are looking at and is handled after
@@ -88,17 +92,31 @@ public class ThreatMap {
                 tupleList.add(new Tuple<>(piece, moveWithPoint.getPath()));
             }
         }
-        // Tuples are iterated instead of in the foreach above, as it could modify a set it is iterating through
+
+        // Clear these paths
         for (Tuple<Piece, Path> tuple : tupleList) {
-            this.clearMoves(tuple.getFirst());
-            // The only change from before and after are the paths that contain the impacted point
             for (Point p : tuple.getSecond()) {
+                this.clearMoves(tuple.getFirst(), p);
+            }
+        }
+        // Add the piece back, so we can reapply threats with this piece present
+        if (change != null) {
+            board.put(point, change);
+        }
+
+        for (Tuple<Piece, Path> tuple : tupleList) {
+            // The only change from before and after are the paths that contain the impacted point
+            boolean seenChange = false;
+            for (Point p : tuple.getSecond()) {
+                if (seenChange)
+                    break;
+                if (p.equals(point))
+                    seenChange = true;
+                this.clearMoves(tuple.getFirst(), p);
                 this.map.computeIfAbsent(p, k -> new HashSet<>()).add(tuple.getFirst());
             }
         }
-        // Clear all places this piece previously threatened then update their latest moves
         if (change != null && this.colour.equals(change.getColour())) {
-            this.clearMoves(change);
             MoveSet moves = change.getMoves(board, log, this, true, true);
             for (Point p : moves.getPoints()) {
                 this.map.computeIfAbsent(p, k -> new HashSet<>()).add(change);
@@ -150,10 +168,7 @@ public class ThreatMap {
     private Map<Point, Set<Piece>> setup(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
         for (Piece piece : board) {
-            if (piece == null) {
-                continue;
-            }
-            if (colour.equals(piece.getColour())) {
+            if (piece != null && Pieces.isAllied(colour, piece)) {
                 MoveSet moveSet = piece.getMoves(board, log, null, true, true);
                 for (Point point : moveSet.getPoints()) {
                     piecesThreateningPoint.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
