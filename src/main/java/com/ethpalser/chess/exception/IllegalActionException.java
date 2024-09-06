@@ -1,6 +1,6 @@
 package com.ethpalser.chess.exception;
 
-public class IllegalActionException extends IllegalArgumentException {
+public class IllegalActionException extends RuntimeException {
 
     public IllegalActionException() {
         super();
