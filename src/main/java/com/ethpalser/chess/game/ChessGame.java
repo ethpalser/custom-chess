@@ -127,7 +127,6 @@ public class ChessGame implements Game {
             throw new IllegalActionException("not the acting player's piece (actor: " + player
                     + ", piece: " + movingPiece.getColour() + ")");
         }
-
         LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
                 this.getThreatMap(Colour.opposite(this.player)));
         this.log.push(entry);
@@ -226,23 +225,29 @@ public class ChessGame implements Game {
     public Iterable<Action> potentialUpdates() {
         List<Action> potentialCaptures = new ArrayList<>(64);
         List<Action> quietActions = new ArrayList<>(128);
-        for (Piece piece : this.board.getPieces()) {
-            // Skip non-turn player
-            if (!this.player.equals(piece.getColour())) {
-                continue;
-            }
 
-            MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
-                    this.getThreatMap(Colour.opposite(piece.getColour())));
-            for (Movement m : moves.toSet()) {
-                Path path = m.getPath();
-                if (path != null && path.length() > 0) {
-                    // The last point in a path is a potential capture
-                    potentialCaptures.add(new Action(piece.getColour(), piece.getPoint(),
-                            path.getPoint(path.length() - 1)));
-                    // Remaining points are quiet actions (no captures)
-                    for (int i = 0; i < path.length() - 1; i++) {
-                        quietActions.add(new Action(piece.getColour(), piece.getPoint(), path.getPoint(i)));
+        if (GameStatus.isCompletedGameStatus(this.status)) {
+            return List.of(); // It has been confirmed there are no moves, don't generate more
+        } else if (GameStatus.WHITE_IN_CHECK.equals(this.status)) {
+            return this.getActionsAgainstCheck(Colour.WHITE);
+        } else if (GameStatus.BLACK_IN_CHECK.equals(this.status)) {
+            return this.getActionsAgainstCheck(Colour.BLACK);
+        } else {
+            for (Piece piece : this.board.getPieces()) {
+                if (Pieces.isAllied(this.player, piece)) {
+                    MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
+                            this.getThreatMap(Colour.opposite(piece.getColour())));
+                    for (Movement m : moves.toSet()) {
+                        Path path = m.getPath();
+                        if (path != null && path.length() > 0) {
+                            // The last point in a path is a potential capture
+                            potentialCaptures.add(new Action(piece.getColour(), piece.getPoint(),
+                                    path.getPoint(path.length() - 1)));
+                            // Remaining points are quiet actions (no captures)
+                            for (int i = 0; i < path.length() - 1; i++) {
+                                quietActions.add(new Action(piece.getColour(), piece.getPoint(), path.getPoint(i)));
+                            }
+                        }
                     }
                 }
             }
@@ -301,6 +306,10 @@ public class ChessGame implements Game {
             default -> value = 0;
         }
         return value;
+    }
+
+    private Colour opponent() {
+        return Colour.opposite(this.player);
     }
 
     private boolean isNotPlayerAction(Colour colour) {
@@ -482,5 +491,51 @@ public class ChessGame implements Game {
             this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
             this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
         }
+    }
+
+    private List<Action> getActionsAgainstCheck(Colour playerInCheck) {
+        List<Action> actions = new ArrayList<>();
+        // This method assumes a player is in check
+        Colour causingCheck = Colour.opposite(playerInCheck);
+        Point inCheckKing = this.getKingPosition(playerInCheck);
+        MoveSet inCheckMoves = this.board.getPiece(inCheckKing).getMoves(this.board.getPieces(), this.log,
+                this.getThreatMap(causingCheck));
+
+        if (inCheckMoves != null && !inCheckMoves.isEmpty()) {
+            for (Point p : inCheckMoves.getPoints()) {
+                // Is there a location the opponent king can move to that is not threatened by the opponent?
+                if (this.getThreatMap(this.player).hasNoThreats(p)) {
+                    // Yes, so the king is not in checkmate
+                    actions.add(new Action(playerInCheck, inCheckKing, p));
+                }
+            }
+        }
+
+        // The opponent king cannot move, but can another piece move to block all sources of check?
+        Set<Piece> sourcesOfCheck = this.getThreatMap(causingCheck).getPieces(inCheckKing);
+        if (sourcesOfCheck.size() > 1) {
+            // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
+            return List.of();
+        }
+
+        for (Piece attacker : sourcesOfCheck) {
+            // Can this piece be captured by the opponent?
+            Set<Piece> defenders = this.getThreatMap(playerInCheck).getPieces(attacker.getPoint());
+            for (Piece defender : defenders) {
+                actions.add(new Action(playerInCheck, defender.getPoint(), attacker.getPoint()));
+            }
+            // Can a piece block its path?
+            Movement moveCausingCheck = attacker.getMoves(this.board.getPieces(), this.log).getMove(inCheckKing);
+            if (moveCausingCheck == null) {
+                throw new NullPointerException("exception in game state, move causing check should not be null");
+            }
+            MoveMap moveMap = this.getMoveMap(playerInCheck);
+            for (Point pointOnPath : moveCausingCheck.getPath()) {
+                for (Piece blocker : moveMap.getPieces(pointOnPath)) {
+                    actions.add(new Action(playerInCheck, blocker.getPoint(), pointOnPath));
+                }
+            }
+        }
+        return actions;
     }
 }
