@@ -359,6 +359,10 @@ public class ChessGame implements Game {
         }
     }
 
+    private MoveMap getMoveMap(Colour colour) {
+        return new MoveMap(colour, this.board.getPieces(), this.log, this.getThreatMap(Colour.opposite(colour)));
+    }
+
     private GameStatus checkGameStatus() {
         Colour opponent = Colour.opposite(this.player);
         // Is there a check, checkmate or stalemate?
@@ -415,9 +419,10 @@ public class ChessGame implements Game {
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
+            MoveMap moveMap = new MoveMap(oppColour, this.board.getPieces(), this.log, this.getThreatMap(this.player));
             for (Point c : causingCheck.getPath()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
-                if (this.getThreatMap(oppColour).hasNoThreats(c, true)) {
+                if (!moveMap.hasNoMove(c, true)) {
                     return false;
                 }
             }
