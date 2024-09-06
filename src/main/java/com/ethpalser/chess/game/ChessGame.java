@@ -8,9 +8,11 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
+import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
@@ -26,8 +28,8 @@ public class ChessGame implements Game {
 
     private final Board board;
     private final Log<Point, Piece> log;
-    private final ThreatMap whiteThreats;
-    private final ThreatMap blackThreats;
+    private ThreatMap whiteThreats;
+    private ThreatMap blackThreats;
 
     private GameStatus status;
     private Colour player;
@@ -107,7 +109,7 @@ public class ChessGame implements Game {
 
     public GameStatus updateGame(Point start, Point end, Colour player) throws IllegalActionException {
         if (GameStatus.isCompletedGameStatus(this.status)) {
-            throw new IllegalActionException("cannot update completed game");
+            return this.status;
         }
         if (isNotPlayerAction(player)) {
             throw new IllegalActionException("not the acting player's turn (actor: " + player
@@ -132,14 +134,15 @@ public class ChessGame implements Game {
 
         // Update opponent's threats with the move performed
         this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, start);
+        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, end);
         // Does moving this piece put turn player in check? (opponent's updated threats now include turn player's king)
         if (this.isKingInCheck(this.player)) {
-            this.undoUpdate(1, false);
-            throw new IllegalActionException("cannot perform move as player's king will be in check");
+            LogEntry<Point, Piece> logEntry = this.log.pop();
+            this.undoLogEntry(logEntry);
+            return GameStatus.NO_CHANGE;
         }
 
         // Update remaining threats
-        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, end);
         this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, start);
         this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, end);
         if (entry.getSubLogEntry() != null) {
@@ -170,15 +173,25 @@ public class ChessGame implements Game {
             if (logEntry == null) {
                 break;
             }
-            // FollowUp moves are applied first while undoing, as they are the most recent board change
-            if (logEntry.getSubLogEntry() != null) {
-                this.applyLogEntryToBoard(logEntry.getSubLogEntry());
-                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
-            }
-            this.applyLogEntryToBoard(logEntry);
-            this.applyLogEntryToThreats(logEntry);
+            this.undoLogEntry(logEntry);
+
+            this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
+            this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+            this.status = this.checkGameStatus();
+            this.player = Colour.opposite(this.player);
+            this.turn--;
         }
-        return this.checkGameStatus();
+        return this.status;
+    }
+
+    private void undoLogEntry(LogEntry<Point, Piece> logEntry) {
+        // FollowUp moves are applied first while undoing, as they are the most recent board change
+        if (logEntry.getSubLogEntry() != null) {
+            this.applyLogEntryToBoard(logEntry.getSubLogEntry(), true);
+            this.applyLogEntryToThreats(logEntry.getSubLogEntry());
+        }
+        this.applyLogEntryToBoard(logEntry, true);
+        this.applyLogEntryToThreats(logEntry);
     }
 
     @Override
@@ -188,15 +201,25 @@ public class ChessGame implements Game {
             if (logEntry == null) {
                 break;
             }
-            this.applyLogEntryToBoard(logEntry);
-            this.applyLogEntryToThreats(logEntry);
-            // FollowUp moves are applied last while redoing, as they are the most recent board change
-            if (logEntry.getSubLogEntry() != null) {
-                this.applyLogEntryToBoard(logEntry.getSubLogEntry());
-                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
-            }
+            this.redoLogEntry(logEntry);
+
+            this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
+            this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+            this.status = this.checkGameStatus();
+            this.player = Colour.opposite(this.player);
+            this.turn++;
         }
-        return this.checkGameStatus();
+        return this.status;
+    }
+
+    private void redoLogEntry(LogEntry<Point, Piece> logEntry) {
+        this.applyLogEntryToBoard(logEntry, false);
+        this.applyLogEntryToThreats(logEntry);
+        // FollowUp moves are applied last while redoing, as they are the most recent board change
+        if (logEntry.getSubLogEntry() != null) {
+            this.applyLogEntryToBoard(logEntry.getSubLogEntry(), false);
+            this.applyLogEntryToThreats(logEntry.getSubLogEntry());
+        }
     }
 
     @Override
