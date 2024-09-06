@@ -122,8 +122,10 @@ public class ChessBoard implements Board {
         if (piece == null) {
             this.pieces.remove(point);
         } else {
-            // Removes the piece from its original location
-            this.pieces.remove(piece.getPoint());
+            if (this.pieces.get(piece.getPoint()) != null && this.pieces.get(piece.getPoint()).equals(piece)) {
+                // Removes the piece from its original location
+                this.pieces.remove(piece.getPoint());
+            }
             // Replaces the piece at the new point
             this.pieces.put(point, piece);
             // Updates the piece to be at its new location
@@ -144,10 +146,12 @@ public class ChessBoard implements Board {
 
         Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(end);
         if (move == null) {
-            throw new IllegalActionException("piece (" + piece.getCode() + ") cannot move to " + end);
+            throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
         }
-
         Piece captured = this.getPiece(end);
+
+        LogEntry<Point, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
+
         this.pieces.remove(start);
         this.pieces.put(end, piece);
         piece.move(end);
@@ -160,7 +164,7 @@ public class ChessBoard implements Board {
                 this.pieces.put(followUp.getEnd(), toForcePush);
             }
         }
-        return new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
+        return response;
     }
 
     @Override
