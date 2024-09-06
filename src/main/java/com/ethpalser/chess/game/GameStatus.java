@@ -10,7 +10,8 @@ public enum GameStatus {
     BLACK_IN_CHECK,
     WHITE_WIN,
     BLACK_WIN,
-    STALEMATE;
+    STALEMATE,
+    NO_CHANGE;
 
     public static boolean isCompletedGameStatus(GameStatus status) {
         return switch (status) {
