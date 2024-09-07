@@ -82,14 +82,12 @@ public class ThreatMap {
 
         // Get all paths that are along this point
         for (Piece piece : this.getPieces(point)) {
-            if (piece.equals(change)) {
-                // skip this piece, as it moved to the point we are looking at and is handled after
-                continue;
-            }
-            MoveSet moves = piece.getMoves(board, log, this, true, true);
-            Movement moveWithPoint = moves.getMove(point);
-            if (moveWithPoint != null) {
-                tupleList.add(new Tuple<>(piece, moveWithPoint.getPath()));
+            if (!piece.equals(change)) {
+                MoveSet moves = piece.getMoves(board, log, this, true, true);
+                Movement moveWithPoint = moves.getMove(point);
+                if (moveWithPoint != null) {
+                    tupleList.add(new Tuple<>(piece, moveWithPoint.getPath()));
+                }
             }
         }
 
@@ -104,11 +102,12 @@ public class ThreatMap {
             board.put(point, change);
         }
 
+        boolean changeIsPresent = board.get(point) != null;
         for (Tuple<Piece, Path> tuple : tupleList) {
             // The only change from before and after are the paths that contain the impacted point
             boolean seenChange = false;
             for (Point p : tuple.getSecond()) {
-                if (seenChange)
+                if (seenChange && changeIsPresent)
                     break;
                 if (p.equals(point))
                     seenChange = true;
