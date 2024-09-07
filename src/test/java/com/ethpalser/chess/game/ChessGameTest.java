@@ -139,6 +139,7 @@ class ChessGameTest {
             if (result == GameStatus.NO_CHANGE) {
                 fail("available actions must prevent check");
             }
+            game.undoUpdate(1, true);
         }
     }
 
@@ -167,27 +168,60 @@ class ChessGameTest {
         ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board.getPieces(), log);
         MoveMap blackMoves = new MoveMap(Colour.BLACK, board.getPieces(), log, whiteThreats);
 
-        System.out.println(blackActions);
-        System.out.println(whiteThreats);
-        System.out.println(board);
-        System.out.println(blackMoves);
-
         for (Action action : blackActions) {
             fail("actions must be empty");
         }
     }
 
     @Test
-    void testBotMovement_givenStartingBoard_thenBoardChanges() {
+    void testPotentialUpdates_givenKingInCheckFromAdjacentPiece_thenKingCanCapture() {
+
         Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        GameStatus s1 = game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s1);
+        GameStatus s2 = game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g5")));
+        assertEquals(GameStatus.ONGOING, s2);
+        GameStatus s3 = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("h5")));
+        assertEquals(GameStatus.ONGOING, s3);
+        GameStatus s4 = game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5")));
+        assertEquals(GameStatus.ONGOING, s4);
+        GameStatus s5 = game.updateGame(new Action(Colour.WHITE, new Point("h5"), new Point("f7")));
+        assertEquals(GameStatus.BLACK_IN_CHECK, s5);
+
+        Iterable<Action> blackActions = game.potentialUpdates();
+        for (Action action : blackActions) {
+            GameStatus result = game.updateGame(action);
+            if (result == GameStatus.NO_CHANGE) {
+                fail("available actions must prevent check");
+            }
+            game.undoUpdate(1, true);
+        }
+
+        // Checking that a bug does not occur
+        GameStatus afterUndoG5F7 = game.undoUpdate(1, true);
+        assertEquals(GameStatus.ONGOING, afterUndoG5F7);
+        GameStatus afterUndoE7E5 = game.undoUpdate(1, true);
+        assertEquals(GameStatus.ONGOING, afterUndoE7E5);
+        GameStatus s6 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
+        System.out.println(new ThreatMap(Colour.WHITE, board.getPieces(), log));
+        assertEquals(GameStatus.NO_CHANGE, s6);
+    }
+
+    @Test
+    void testBotMovement_givenStartingBoard_thenBoardChanges() {
+        Board board = new ChessBoard(BoardType.STANDARD);
         Log<Point, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
         GameTree tree = new GameTree(game);
 
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
-
         // When
-        Action botBest = tree.nextBest(8);
+        Action botBest = tree.nextBest(5);
+        System.out.println(botBest);
+        System.out.println(board);
         game.updateGame(botBest);
 
         // Then
