@@ -462,7 +462,10 @@ public class ChessGame implements Game {
             return;
         }
         if (logEntry.getEndObject() != null) {
+            boolean endHasMoved = logEntry.getEndObject().getHasMoved();
             this.board.addPiece(logEntry.getEndObject().getPoint(), logEntry.getEndObject());
+            // Currently, addPiece is having the piece update its position, which in turn marks it as having moved
+            logEntry.getEndObject().setHasMoved(endHasMoved);
         }
         this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
 
