@@ -130,6 +130,7 @@ public class ChessGame implements Game {
         LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
                 this.getThreatMap(Colour.opposite(this.player)));
         this.log.push(entry);
+        this.updateKingPosition(movingPiece, end);
 
         // Update opponent's threats with the move performed
         this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, start);
@@ -138,6 +139,7 @@ public class ChessGame implements Game {
         if (this.isKingInCheck(this.player)) {
             LogEntry<Point, Piece> logEntry = this.log.pop();
             this.undoLogEntry(logEntry);
+            this.updateKingPosition(movingPiece, end);
             return GameStatus.NO_CHANGE;
         }
 
@@ -153,7 +155,6 @@ public class ChessGame implements Game {
             throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
 
-        this.updateKingPosition(movingPiece, end);
         this.status = this.checkGameStatus();
         this.player = Colour.opposite(this.player);
         this.turn++;
