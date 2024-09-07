@@ -206,7 +206,6 @@ class ChessGameTest {
         GameStatus afterUndoE7E5 = game.undoUpdate(1, true);
         assertEquals(GameStatus.ONGOING, afterUndoE7E5);
         GameStatus s6 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
-        System.out.println(new ThreatMap(Colour.WHITE, board.getPieces(), log));
         assertEquals(GameStatus.NO_CHANGE, s6);
     }
 
@@ -220,8 +219,6 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
         // When
         Action botBest = tree.nextBest(5);
-        System.out.println(botBest);
-        System.out.println(board);
         game.updateGame(botBest);
 
         // Then
