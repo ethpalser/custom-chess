@@ -467,6 +467,8 @@ public class ChessGame implements Game {
             this.board.addPiece(logEntry.getEndObject().getPoint(), logEntry.getEndObject());
             // Currently, addPiece is having the piece update its position, which in turn marks it as having moved
             logEntry.getEndObject().setHasMoved(endHasMoved);
+        } else {
+            this.board.addPiece(logEntry.getEnd(), null);
         }
         this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
 
