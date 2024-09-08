@@ -15,6 +15,8 @@ public interface Piece extends Positional {
 
     Point getPoint();
 
+    void setPoint(Point point);
+
     MoveSet getMoves(Plane<Piece> board);
 
     default MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
@@ -49,9 +51,18 @@ public interface Piece extends Positional {
         return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
     }
 
-    void move(Point destination);
-
     boolean getHasMoved();
 
     void setHasMoved(boolean hasMoved);
+
+    default void move(Point point) {
+        if (point == null) {
+            throw new IllegalArgumentException("piece cannot move to null");
+        }
+        if (point.equals(this.getPoint())) {
+            return;
+        }
+        this.setPoint(point);
+        this.setHasMoved(true);
+    }
 }

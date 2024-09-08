@@ -66,6 +66,11 @@ public class CustomPiece implements Piece {
     }
 
     @Override
+    public void setPoint(Point point) {
+        this.position = point;
+    }
+
+    @Override
     public MoveSet getMoves(Plane<Piece> board) {
         return this.getMoves(board, null, null, false, false);
     }
@@ -89,29 +94,6 @@ public class CustomPiece implements Piece {
         this.moveSpecifications.add(move);
     }
 
-    /**
-     * Updates this piece's position to the new {@link Point} destination. If this destination is not the same
-     * as its current position then it is considered to have moved.
-     *
-     * @param destination representing the new location of this piece.
-     */
-    @Override
-    public void move(Point destination) {
-        if (destination == null) {
-            throw new IllegalArgumentException("illegal argument, destination is null");
-        }
-        if (destination.equals(this.position)) {
-            return;
-        }
-        this.position = destination;
-        this.hasMoved = true;
-    }
-
-    /**
-     * Retrieves the value of hasMoved.
-     *
-     * @return true or false
-     */
     @Override
     public boolean getHasMoved() {
         return hasMoved;

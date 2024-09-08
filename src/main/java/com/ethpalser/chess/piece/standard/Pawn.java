@@ -46,6 +46,11 @@ public class Pawn implements Piece {
     }
 
     @Override
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+
+    @Override
     public MoveSet getMoves(Plane<Piece> board) {
         System.err.println("unsupported method used by pawn: getMoves(Plane<Piece> board)");
         return this.getMoves(board, null, null, false, false);
@@ -69,7 +74,7 @@ public class Pawn implements Piece {
             );
         }
         MoveSet moveSet = new MoveSet(
-                Point.validOrNull(board, this.point, this.colour, 0, yOffset, false),
+                Point.notCaptureOrNull(board, this.point, 0, yOffset),
                 Point.captureOrNull(board, this.point, this.colour, -1, yOffset, includeDefends),
                 Point.captureOrNull(board, this.point, this.colour, 1, yOffset, includeDefends)
         );
@@ -77,8 +82,8 @@ public class Pawn implements Piece {
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
             moveSet.addMove(new Move(new Path(
-                    Point.validOrNull(board, this.point, this.colour, 0, yOffset, false),
-                    Point.validOrNull(board, this.point, this.colour, 0, yOffset * 2, false)
+                    Point.notCaptureOrNull(board, this.point, 0, yOffset),
+                    Point.notCaptureOrNull(board, this.point, 0, yOffset * 2)
             )));
         }
 
@@ -107,15 +112,6 @@ public class Pawn implements Piece {
             }
         }
         return moveSet;
-    }
-
-    @Override
-    public void move(Point destination) {
-        if (destination == null) {
-            throw new IllegalArgumentException("destination cannot be null");
-        }
-        this.point = destination;
-        this.hasMoved = true;
     }
 
     @Override

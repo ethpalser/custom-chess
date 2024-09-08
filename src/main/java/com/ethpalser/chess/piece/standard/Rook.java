@@ -44,6 +44,11 @@ public class Rook implements Piece {
     }
 
     @Override
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+
+    @Override
     public MoveSet getMoves(Plane<Piece> board) {
         // Log and Threats are not needed
         return this.getMoves(board, null, null, false, false);
@@ -61,15 +66,6 @@ public class Rook implements Piece {
                 new Move(Path.vertical(board, this.point, this.colour, false, onlyAttacks, includeDefends)),
                 new Move(Path.vertical(board, this.point, this.colour, true, onlyAttacks, includeDefends))
         );
-    }
-
-    @Override
-    public void move(Point destination) {
-        if (destination == null) {
-            throw new IllegalArgumentException("destination cannot be null");
-        }
-        this.point = destination;
-        this.hasMoved = true;
     }
 
     @Override

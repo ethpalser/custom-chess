@@ -42,6 +42,11 @@ public class Knight implements Piece {
     }
 
     @Override
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+
+    @Override
     public MoveSet getMoves(Plane<Piece> board) {
         // Log and Threats are not needed
         return this.getMoves(board, null, null, false, false);
@@ -60,15 +65,6 @@ public class Knight implements Piece {
                 Point.validOrNull(board, this.point, this.colour, -1, -2, includeDefends), // down 2 left
                 Point.validOrNull(board, this.point, this.colour, -2, -1, includeDefends) // left 2 down
         );
-    }
-
-    @Override
-    public void move(Point destination) {
-        if (destination == null) {
-            throw new IllegalArgumentException("destination cannot be null");
-        }
-        this.point = destination;
-        this.hasMoved = true;
     }
 
     @Override

@@ -46,6 +46,11 @@ public class King implements Piece {
     }
 
     @Override
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+
+    @Override
     public MoveSet getMoves(Plane<Piece> board) {
         System.err.println("unsupported method for king used: getMoves(Plane<Piece> board)");
         return this.getMoves(board, null, null);
@@ -116,15 +121,6 @@ public class King implements Piece {
             }
         }
         return moveSet;
-    }
-
-    @Override
-    public void move(Point destination) {
-        if (destination == null) {
-            throw new IllegalArgumentException("destination cannot be null");
-        }
-        this.point = destination;
-        this.hasMoved = true;
     }
 
     @Override
