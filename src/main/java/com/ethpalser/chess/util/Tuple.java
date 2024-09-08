@@ -18,4 +18,11 @@ public class Tuple<T, U> {
         return this.second;
     }
 
+    @Override
+    public String toString() {
+        return "Tuple{" +
+                "first=" + first +
+                ", second=" + second +
+                '}';
+    }
 }
