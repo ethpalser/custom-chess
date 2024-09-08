@@ -197,7 +197,9 @@ class ConditionTest {
         Piece rook = board.getPiece(0, 0);
         // Forcing an illegal move, so it is marked as having moved
         board.addPiece(new Point(0, 2), rook);
+        board.getPiece(0, 2).setHasMoved(true);
         board.addPiece(new Point(0, 0), rook);
+        board.getPiece(0, 0).setHasMoved(true);
 
         // Then
         boolean result = condition.isExpected(board.getPieces());
