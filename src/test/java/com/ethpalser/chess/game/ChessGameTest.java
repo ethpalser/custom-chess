@@ -94,6 +94,53 @@ class ChessGameTest {
     }
 
     @Test
+    void testPotentialUpdates_givenPieceCaptured_thenCapturedNotInUpdates() {
+
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        GameStatus s1 = game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s1);
+        GameStatus s2 = game.updateGame(new Action(Colour.BLACK, new Point("g8"), new Point("f6")));
+        assertEquals(GameStatus.ONGOING, s2);
+        GameStatus s3 = game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3")));
+        assertEquals(GameStatus.ONGOING, s3);
+        GameStatus s4 = game.updateGame(new Action(Colour.BLACK, new Point("f6"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s4);
+        GameStatus s5 = game.updateGame(new Action(Colour.WHITE, new Point("c3"), new Point("e4")));
+        assertEquals(GameStatus.ONGOING, s5);
+
+        Iterable<Action> blackActions = game.potentialUpdates();
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board.getPieces(), log);
+        MoveMap blackMoves = new MoveMap(Colour.BLACK, board.getPieces(), log, whiteThreats);
+
+        for (Action action : blackActions) {
+            Piece piece = board.getPiece(action.getStart());
+            assertNotNull(piece);
+            assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
+            assertTrue(piece.canMove(board.getPieces(), log, whiteThreats, action.getEnd()));
+        }
+
+        // Checking that a bug does not occur
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6")));
+        game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("f6")));
+        game.undoUpdate(2, false);
+
+        Iterable<Action> blackActions2 = game.potentialUpdates();
+        ThreatMap whiteThreats2 = new ThreatMap(Colour.WHITE, board.getPieces(), log);
+        MoveMap blackMoves2 = new MoveMap(Colour.BLACK, board.getPieces(), log, whiteThreats);
+
+        for (Action action : blackActions2) {
+            Piece piece = board.getPiece(action.getStart());
+            assertNotNull(piece);
+            assertTrue(blackMoves2.getPieces(action.getEnd()).contains(piece));
+            assertTrue(piece.canMove(board.getPieces(), log, whiteThreats2, action.getEnd()));
+        }
+        game.undoUpdate(1, false);
+    }
+
+    @Test
     void testPotentialUpdates_givenProgressedQueens_thenKingCannotMoveToThreatenedSpace() {
         Board board = new ChessBoard(BoardType.CUSTOM);
         Log<Point, Piece> log = new ChessLog();
@@ -218,7 +265,7 @@ class ChessGameTest {
 
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
         // When
-        Action botBest = tree.nextBest(5);
+        Action botBest = tree.nextBest(7);
         game.updateGame(botBest);
 
         // Then
