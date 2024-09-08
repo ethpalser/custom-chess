@@ -111,7 +111,6 @@ public class ThreatMap {
                     break;
                 if (p.equals(point))
                     seenChange = true;
-                this.clearMoves(tuple.getFirst(), p);
                 this.map.computeIfAbsent(p, k -> new HashSet<>()).add(tuple.getFirst());
             }
         }
