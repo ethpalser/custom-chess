@@ -138,6 +138,15 @@ public class Point implements Comparable<Point> {
         return null;
     }
 
+    public static Point notCaptureOrNull(Plane<Piece> board, Point start, int xOffset, int yOffset) {
+        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
+        // in bounds and either open, can capture or can defend (if allowed)
+        if (board.isInBounds(point) && board.get(point) == null) {
+            return point;
+        }
+        return null;
+    }
+
     public static Point captureOrNull(Plane<Piece> board, Point start, Colour colour,
             int xOffset, int yOffset, boolean includeDefends) {
         Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
