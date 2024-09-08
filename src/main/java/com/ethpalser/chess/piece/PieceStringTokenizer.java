@@ -87,7 +87,6 @@ public class PieceStringTokenizer {
             tokens.add("P"); // default piece type
             return this.substringWithoutCode(piece);
         } else {
-            System.out.println(piece);
             if (piece.charAt(0) != '~') {
                 System.err.println("custom-piece string is invalid, missing starting '~' at index 1. string: " + piece);
                 tokens.add("P");
