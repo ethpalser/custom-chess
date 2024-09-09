@@ -257,15 +257,157 @@ class ChessGameTest {
     }
 
     @Test
+    void testEvaluateState_givenStartingBoard_thenZeroForBothPlayers() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        int value = game.evaluateState();
+        assertEquals(0, value);
+    }
+
+    @Test
+    void testEvaluateState_givenEdgePawnMovedForBothPlayers_thenZeroForBothPlayers() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a5")));
+
+        int value = game.evaluateState();
+        assertEquals(0, value);
+    }
+
+    @Test
+    void testEvaluateState_givenCentrePawnMovedForBothPlayers_thenZeroForBothPlayers() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e3")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d6")));
+
+        int value = game.evaluateState();
+        assertEquals(0, value);
+    }
+
+    @Test
+    void testEvaluateState_givenCentrePawnThreatenCenterForBothPlayers_thenZeroForBothPlayers() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+
+        int value = game.evaluateState();
+        assertEquals(0, value);
+    }
+
+    @Test
+    void testEvaluateState_givenWhiteCapturePawn_thenPositiveState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("d5")));
+
+        int value = game.evaluateState();
+        assertTrue(value > 0);
+    }
+
+    @Test
+    void testEvaluateState_givenBlackCapturePawn_thenNegativeState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d5"), new Point("e4")));
+
+        int value = game.evaluateState();
+        assertTrue(value < 0);
+    }
+
+
+    @Test
+    void testEvaluateState_givenWhiteControlCenter_thenPositiveState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h5")));
+
+        int value = game.evaluateState();
+        assertTrue(value < 0);
+    }
+
+
+    @Test
+    void testEvaluateState_givenBlackControlCenter_thenNegativeState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("h2"), new Point("h4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5")));
+
+        int value = game.evaluateState();
+        assertTrue(value < 0);
+    }
+
+    @Test
+    void testEvaluateState_givenWhitePawnChain_thenPositiveState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d3")));
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h5")));
+
+        int value = game.evaluateState();
+        assertTrue(value < 0);
+    }
+
+
+    @Test
+    void testEvaluateState_givenBlackPawnChain_thenNegativeState() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d6")));
+        game.updateGame(new Action(Colour.WHITE, new Point("h2"), new Point("h4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5")));
+
+        int value = game.evaluateState();
+        assertTrue(value < 0);
+    }
+
+    @Test
     void testBotMovement_givenStartingBoard_thenBoardChanges() {
-        Board board = new ChessBoard(BoardType.STANDARD);
+        Board board = new ChessBoard(BoardType.CUSTOM);
         Log<Point, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
         GameTree tree = new GameTree(game);
 
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6")));
         // When
-        Action botBest = tree.nextBest(7);
+        Action botBest = tree.nextBest(4);
         game.updateGame(botBest);
 
         // Then
