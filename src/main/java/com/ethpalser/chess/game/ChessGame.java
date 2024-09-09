@@ -292,7 +292,7 @@ public class ChessGame implements Game {
     public int evaluateState() {
         return this.evaluateBoardState()
                 + this.whiteThreats.evaluate(this.board.getPieces())
-                - this.blackThreats.evaluate(this.board.getPieces());
+                + this.blackThreats.evaluate(this.board.getPieces());
     }
 
     public String toJson() {

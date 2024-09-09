@@ -139,9 +139,9 @@ public class ThreatMap {
                 }
             }
         }
-        return this.calculatePawnWall(pawnThreats)
+        return direction * (this.calculatePawnWall(pawnThreats)
                 + this.calculatePawnCenterControl(pawnThreats, board.width() / 2, board.length() / 2)
-                + this.calculateDoubleFilePawns(pawnThreats);
+                + this.calculateDoubleFilePawns(pawnThreats));
     }
 
     @Override
