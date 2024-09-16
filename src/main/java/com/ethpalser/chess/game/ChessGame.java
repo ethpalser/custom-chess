@@ -250,6 +250,11 @@ public class ChessGame implements Game {
                 this.applyLogEntryToThreats(logEntry.getSubLogEntry());
             }
 
+            Piece promoted = logEntry.getPromotion();
+            if (promoted != null) {
+                this.board.addPiece(promoted.getPoint(), promoted);
+            }
+
             this.updateKingPosition(logEntry.getStartObject(), logEntry.getEnd());
             this.status = this.checkGameStatus();
             this.player = Colour.opposite(this.player);

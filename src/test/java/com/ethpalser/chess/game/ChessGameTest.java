@@ -415,6 +415,41 @@ class ChessGameTest {
         assertNotNull(game.getBoard().getPiece(botBest.getEnd()));
     }
 
+    @Test
+    void updateGame_pawnPromotion_changesToQueen() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+
+        game.updateGame(new Action(Colour.WHITE, new Point("b2"), new Point("b4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6")));
+        game.updateGame(new Action(Colour.WHITE, new Point("b4"), new Point("b5")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h6"), new Point("h5")));
+        game.updateGame(new Action(Colour.WHITE, new Point("b5"), new Point("b6")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h5"), new Point("h4")));
+        game.updateGame(new Action(Colour.WHITE, new Point("b6"), new Point("a7")));
+        game.updateGame(new Action(Colour.BLACK, new Point("h4"), new Point("h3")));
+
+        // When
+        Point start = new Point("a7");
+        Point end = new Point("b8");
+        game.updateGame(new Action(Colour.WHITE, start, end));
+
+        // Then
+        assertNotNull(board.getPiece(end));
+        assertNotNull(log.peek().getPromotion());
+        assertEquals("Q", board.getPiece(end).getCode());
+
+        // Testing Undo and Redo as well
+        game.undoUpdate();
+        assertNotNull(board.getPiece(start));
+        assertEquals("P", board.getPiece(start).getCode());
+
+        game.redoUpdate();
+        assertNotNull(board.getPiece(end));
+        assertEquals("Q", board.getPiece(end).getCode());
+    }
+
     // region Piece Movement
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {

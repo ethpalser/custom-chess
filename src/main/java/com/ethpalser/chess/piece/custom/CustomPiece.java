@@ -106,12 +106,24 @@ public class CustomPiece implements Piece {
 
     @Override
     public boolean canPromote(Plane<Piece> board) {
-        return false;
+        // Temporary work-around. This should be defined on construction by a configuration object/string
+        if (PieceType.PAWN.getCode().equals(this.code)) {
+            return Colour.WHITE.equals(this.colour) && this.getPoint().getY() == board.getMaxY()
+                    || Colour.BLACK.equals(this.colour) && this.getPoint().getY() == board.getMinY();
+        } else {
+            return false;
+        }
     }
 
     @Override
     public List<String> promoteOptions() {
-        return List.of();
+        // Temporary work-around. This should be defined on construction
+        if (PieceType.PAWN.getCode().equals(this.code)) {
+            return List.of(PieceType.QUEEN.getCode(), PieceType.KNIGHT.getCode(), PieceType.ROOK.getCode(),
+                    PieceType.BISHOP.getCode());
+        } else {
+            return List.of();
+        }
     }
 
     @Override
