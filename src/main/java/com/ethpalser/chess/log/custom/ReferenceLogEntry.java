@@ -60,6 +60,16 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
     }
 
     @Override
+    public T getPromotion() {
+        return null;
+    }
+
+    @Override
+    public void setPromotion(T promoted) {
+        // Do nothing
+    }
+
+    @Override
     public LogEntry<Point, T> getSubLogEntry() {
         return this.subLogEntry;
     }

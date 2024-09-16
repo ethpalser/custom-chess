@@ -12,6 +12,10 @@ public interface LogEntry<T extends Comparable<T>, U> {
 
     U getEndObject();
 
+    U getPromotion();
+
+    void setPromotion(U promoted);
+
     /**
      * This contains entries that happen simultaneously to the LogEntry, but may not have been recorded in a log.
      * This can occur when case for generating an entry forces a situation that would generate an additional entry,

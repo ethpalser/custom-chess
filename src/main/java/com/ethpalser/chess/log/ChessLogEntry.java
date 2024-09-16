@@ -14,6 +14,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
     private final Piece captured;
     private final boolean isFirstMove;
     private final LogEntry<Point, Piece> followUp;
+    private Piece promoted;
 
     public ChessLogEntry(Point start, Point end, Piece moved) {
         this(start, end, moved, null);
@@ -75,6 +76,16 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
     @Override
     public Piece getEndObject() {
         return this.captured;
+    }
+
+    @Override
+    public Piece getPromotion() {
+        return this.promoted;
+    }
+
+    @Override
+    public void setPromotion(Piece promoted) {
+        this.promoted = promoted;
     }
 
     @Override
