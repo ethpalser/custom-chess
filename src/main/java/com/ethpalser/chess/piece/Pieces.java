@@ -34,12 +34,24 @@ public class Pieces {
     }
 
     public static String asString(Piece piece) {
+        return asString(piece, piece.getCode());
+    }
+
+    /**
+     * Create a piece string using the given code instead of the piece's own code. Useful to define a piece
+     * string for a new piece using the remaining information.
+     *
+     * @param piece Piece
+     * @param code  String
+     * @return String
+     */
+    public static String asString(Piece piece, String code) {
         if (piece == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         sb.append(piece.getColour().toCode());
-        sb.append(piece.getCode());
+        sb.append(code);
         sb.append(piece.getPoint());
         if (piece.getHasMoved()) {
             sb.append("*");
