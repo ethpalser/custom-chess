@@ -9,6 +9,7 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import java.util.List;
 
 public class Rook implements Piece {
 
@@ -76,6 +77,16 @@ public class Rook implements Piece {
     @Override
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
+    }
+
+    @Override
+    public boolean canPromote(Plane<Piece> board) {
+        return false;
+    }
+
+    @Override
+    public List<String> promoteOptions() {
+        return List.of();
     }
 
     @Override

@@ -105,6 +105,16 @@ public class CustomPiece implements Piece {
     }
 
     @Override
+    public boolean canPromote(Plane<Piece> board) {
+        return false;
+    }
+
+    @Override
+    public List<String> promoteOptions() {
+        return List.of();
+    }
+
+    @Override
     public String toString() {
         return this.colour.toCode() + this.getCode() + this.position.toString() + (this.hasMoved ? "" : "*");
     }

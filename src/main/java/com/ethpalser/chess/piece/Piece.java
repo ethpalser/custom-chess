@@ -6,6 +6,7 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
+import java.util.List;
 
 public interface Piece extends Positional {
 
@@ -65,4 +66,9 @@ public interface Piece extends Positional {
         this.setPoint(point);
         this.setHasMoved(true);
     }
+
+    boolean canPromote(Plane<Piece> board);
+
+    List<String> promoteOptions();
+
 }

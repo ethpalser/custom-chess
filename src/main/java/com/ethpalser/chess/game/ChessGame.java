@@ -21,7 +21,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,14 +28,15 @@ public class ChessGame implements Game {
 
     private final Board board;
     private final Log<Point, Piece> log;
-    private ThreatMap whiteThreats;
-    private ThreatMap blackThreats;
+    private final ThreatMap whiteThreats;
+    private final ThreatMap blackThreats;
 
     private GameStatus status;
     private Colour player;
     private Point whiteKing;
     private Point blackKing;
     private int turn;
+    private Point promotePoint;
 
     public ChessGame(Board board, Log<Point, Piece> log) {
         if (board == null) {
@@ -113,21 +113,17 @@ public class ChessGame implements Game {
             return this.status;
         }
         if (isNotPlayerAction(player)) {
-            // System.err.println("not the acting player's turn (actor: " + player + ", turn: " + this.player + ")");
             return GameStatus.NO_CHANGE;
         }
         if (isNotInBoardBounds(start, end)) {
-            // System.err.println("cannot perform move as one of the start or end are not on the board");
             return GameStatus.NO_CHANGE;
         }
 
         Piece movingPiece = this.board.getPiece(start);
         if (movingPiece == null) {
-            // System.err.println("cannot perform move as there is no piece at " + start);
             return GameStatus.NO_CHANGE;
         }
         if (isNotAllowedToMove(movingPiece)) {
-            // System.err.println("not the acting player's piece (actor: " + player + ", piece: " + movingPiece.getColour() + ")");
             return GameStatus.NO_CHANGE;
         }
         LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
