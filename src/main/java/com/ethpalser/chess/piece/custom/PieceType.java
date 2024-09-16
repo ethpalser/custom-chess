@@ -7,7 +7,7 @@ public enum PieceType {
     BISHOP("B"),
     QUEEN("Q"),
     KING("K"),
-    CUSTOM("#");
+    CUSTOM("~custom~");
 
     private final String code;
 
