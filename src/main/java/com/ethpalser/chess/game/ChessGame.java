@@ -465,9 +465,6 @@ public class ChessGame implements Game {
         Colour oppColour = Colour.opposite(this.player);
         Point oppKingPoint = this.getKingPosition(Colour.opposite(this.player));
         if (oppKingPoint == null || this.board.getPiece(oppKingPoint) == null) {
-            System.out.println(this.whiteKing);
-            System.out.println(this.blackKing);
-            System.out.println(this.board);
         }
         // Assuming King is in check
         MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
@@ -499,9 +496,6 @@ public class ChessGame implements Game {
             // Can a piece block its path?
             Movement causingCheck = p.getMoves(this.board.getPieces(), this.log).getMove(oppKingPoint);
             if (causingCheck == null) {
-                System.out.println(this.board);
-                System.out.println(this.whiteThreats);
-                System.out.println(this.blackThreats);
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             MoveMap moveMap = new MoveMap(oppColour, this.board.getPieces(), this.log, this.getThreatMap(this.player));

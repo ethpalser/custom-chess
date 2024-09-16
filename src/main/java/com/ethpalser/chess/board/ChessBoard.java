@@ -147,7 +147,6 @@ public class ChessBoard implements Board {
 
         Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(end);
         if (move == null) {
-            System.out.println(this);
             throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
         }
         Piece captured = this.getPiece(end);

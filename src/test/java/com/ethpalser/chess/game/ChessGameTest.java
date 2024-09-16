@@ -316,7 +316,7 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("d5")));
 
         int value = game.evaluateState();
-        assertTrue(value > 0);
+        assertEquals(0, value);
     }
 
     @Test
@@ -331,7 +331,7 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.BLACK, new Point("d5"), new Point("e4")));
 
         int value = game.evaluateState();
-        assertTrue(value < 0);
+        assertEquals(0, value);
     }
 
 
@@ -347,7 +347,7 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h5")));
 
         int value = game.evaluateState();
-        assertTrue(value < 0);
+        assertTrue(value > 0);
     }
 
 
@@ -372,13 +372,13 @@ class ChessGameTest {
         Log<Point, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
 
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d3")));
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
         game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a5")));
-        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.WHITE, new Point("b2"), new Point("b3")));
         game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h5")));
 
         int value = game.evaluateState();
-        assertTrue(value < 0);
+        assertTrue(value > 0);
     }
 
 
@@ -389,9 +389,9 @@ class ChessGameTest {
         Game game = new ChessGame(board, log);
 
         game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a4")));
-        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d6")));
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a5")));
         game.updateGame(new Action(Colour.WHITE, new Point("h2"), new Point("h4")));
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5")));
+        game.updateGame(new Action(Colour.BLACK, new Point("b7"), new Point("b6")));
 
         int value = game.evaluateState();
         assertTrue(value < 0);
@@ -432,7 +432,8 @@ class ChessGameTest {
         Action action = new Action(Colour.WHITE, pieceC, nextC);
 
         // When
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
+        assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
         assertNull(board.getPiece(pieceX, pieceY));
@@ -476,7 +477,8 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, pieceC, invalid);
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
+        assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
         assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
