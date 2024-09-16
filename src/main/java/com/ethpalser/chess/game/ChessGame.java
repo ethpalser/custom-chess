@@ -13,6 +13,7 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
@@ -156,10 +157,44 @@ public class ChessGame implements Game {
             throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
 
+        // Promote the piece if it can be promoted
+        List<String> promoteOptions = movingPiece.promoteOptions();
+        if (movingPiece.canPromote(this.board.getPieces())) {
+            this.promotePoint = end;
+            if (!promoteOptions.isEmpty()) {
+                // TEMPORARY use only the first option for promotion
+                this.promotePiece(movingPiece.promoteOptions().get(0));
+            }
+        } else {
+            // Piece was not promoted (if promotion was not enforced), so remove ability to promote it
+            this.promotePoint = null;
+        }
+
         this.status = this.checkGameStatus();
         this.player = Colour.opposite(this.player);
         this.turn++;
         return this.status;
+    }
+
+    public void promotePiece(String selection) {
+        if (this.promotePoint == null) {
+            throw new IllegalActionException("cannot promote a piece when there are none to promote.");
+        }
+        Piece promoting = this.board.getPiece(this.promotePoint);
+        // Manually modify piece's string then convert it into a piece
+        String pieceStr = Pieces.asString(promoting, selection);
+        Piece replacement;
+        if (PieceType.fromCode(selection) == PieceType.CUSTOM) {
+            // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
+            CustomPieceFactory cpf = new CustomPieceFactory(this.board.getPieces(), this.log);
+            replacement = cpf.build(pieceStr);
+        } else {
+            // Build a standard piece using information from the piece string
+            replacement = Pieces.fromString(pieceStr);
+        }
+        // Update the board and latest log with this promotion
+        this.board.addPiece(this.promotePoint, replacement);
+        this.log.peek().setPromotion(replacement);
     }
 
     @Override
