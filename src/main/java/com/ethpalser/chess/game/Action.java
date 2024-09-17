@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Point;
 
 /**
  * Container for an attempted piece movement for a Player of this colour, Point start and Point end

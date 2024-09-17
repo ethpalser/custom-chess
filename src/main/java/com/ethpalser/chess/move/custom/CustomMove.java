@@ -11,7 +11,6 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -21,7 +20,6 @@ import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 

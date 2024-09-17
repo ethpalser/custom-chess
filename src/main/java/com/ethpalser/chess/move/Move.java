@@ -5,7 +5,6 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Move implements Movement {
 
