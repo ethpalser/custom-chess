@@ -39,15 +39,36 @@ Current Version (Unavailable):
 - Saving user access token / refresh token to be implemented
 - Local games using WASM for Java is under investigation
 
-## Known Limitations and Issues
-- CustomPiece class is tightly coupled with Log
-  - How? Conditions are constructed with a reference to all objects it requires.
-  - Fix. Rewrite conditions into a singular object with multiple configurations (such as ConditionalView) with its "verify" method accepting all relevant information (i.e. board, log, threat map) and reworking self-referencing conditions.
-- GameTree class only modifies a singular game's state
-  - Why? The log and conditions are not stateless, so efficient cloning of the game is not possible for transposition tables.
-  - Fix. Remove game state from log and conditions
-- GameTree class is slow. It is only usable up to a ply of 4, maybe 5.
-  - How? Unable to use transposition tables. Killer heuristic and checkmate heuristic need to be implemented. Quiessence will follow afterwards to improve intelligence.
-- Potential memory leaks
-  1. The log stores a reference to each piece. If a piece is removed it still exists in the log. If a new piece is added (ex. piece promotion) and then removed it will still be present in the log.
-  2. Conditions can store references to a piece which is then contained in that piece. This reference loop means that when the piece or game is removed it is still referenced by something in memory.
+## Contributing
+
+### Clone the repo
+```
+gh clone https://github.com/ethpalser/custom-chess
+cd custom-chess
+```
+
+### Build the project
+Using Gradle:
+```
+./gradlew build
+```
+
+### Run tests
+```
+gradle test
+```
+
+### Add local jar to project
+Example:
+``` Copying into another project "custom-chess-cli" libs folder
+cp ./build/libs/customizable-chess.jar ../custom-chess-cli/libs
+```
+In your other project
+``` build.gradle
+dependencies {
+    implementation files('libs/customizable-chess.jar')
+}
+```
+
+### Create a pull request
+If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
