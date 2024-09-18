@@ -60,11 +60,12 @@ gradle test
 
 ### Add local jar to project
 Example:
-``` Copying into another project "custom-chess-cli" libs folder
+In "custom-chess-cli", copy the jar into its libs folder
+```
 cp ./build/libs/customizable-chess.jar ../custom-chess-cli/libs
 ```
-In your other project
-``` build.gradle
+In "custom-chess-cli" build.gradle, add the local dependency
+```
 dependencies {
     implementation files('libs/customizable-chess.jar')
 }
