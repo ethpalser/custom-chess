@@ -58,18 +58,5 @@ Using Gradle:
 gradle test
 ```
 
-### Add local jar to project
-Example:
-In "custom-chess-cli", copy the jar into its libs folder
-```
-cp ./build/libs/customizable-chess.jar ../custom-chess-cli/libs
-```
-In "custom-chess-cli" build.gradle, add the local dependency
-```
-dependencies {
-    implementation files('libs/customizable-chess.jar')
-}
-```
-
 ### Create a pull request
 If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
