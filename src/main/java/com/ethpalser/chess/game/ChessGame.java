@@ -62,8 +62,8 @@ public class ChessGame implements Game {
     }
 
     public ChessGame(GameView view) {
-        this.turn = view.getTurn();
-        this.player = this.turn % 2 == 0 ? Colour.WHITE : Colour.BLACK;
+        this.turn = Math.max(view.getTurn(), 1);
+        this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
         this.log = new ChessLog();
         this.board = new ChessBoard(this.log, view.getBoard(), view.getPieceSpecs());
         for (Piece p : this.board.getPieces()) {
@@ -75,7 +75,7 @@ public class ChessGame implements Game {
                 }
             }
         }
-        this.log.addAll(this.board.getPieces(), view.getLog());
+        // this.log.addAll(this.board.getPieces(), view.getLog()); // todo: refactor log, it is a pain to recreate
         this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
         this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
         this.status = checkGameStatus();
@@ -335,6 +335,14 @@ public class ChessGame implements Game {
         GameView info = new GameView(this);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(info);
+    }
+
+    public static Game fromJson(String json) {
+        if (json == null) {
+            return null;
+        }
+        GameView info = new Gson().fromJson(json, GameView.class);
+        return new ChessGame(info);
     }
 
     // PRIVATE METHODS

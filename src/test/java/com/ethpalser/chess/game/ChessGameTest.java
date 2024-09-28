@@ -94,6 +94,27 @@ class ChessGameTest {
     }
 
     @Test
+    void testFromJson_givenSaveGameView_thenMatchesOriginal() {
+        Board board = new ChessBoard(BoardType.CUSTOM);
+        Log<Point, Piece> log = new ChessLog();
+        Game game = new ChessGame(board, log);
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d5")));
+
+        String json = game.toJson();
+
+        // when
+        Game copy = ChessGame.fromJson(json);
+
+        // then
+        for (Piece p : copy.getBoard().getPieces()) {
+            assertNotNull(game.getBoard().getPiece(p.getPoint()));
+            assertEquals(game.getBoard().getPiece(p.getPoint()).getCode(), p.getCode());
+        }
+        assertEquals(game.getTurn(), copy.getTurn());
+    }
+
+    @Test
     void testPotentialUpdates_givenPieceCaptured_thenCapturedNotInUpdates() {
 
         Board board = new ChessBoard(BoardType.CUSTOM);
