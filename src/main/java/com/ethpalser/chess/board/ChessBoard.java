@@ -81,7 +81,7 @@ public class ChessBoard implements Board {
     }
 
     public ChessBoard(Log<Point, Piece> log, BoardView view, Map<String, List<MoveView>> customSpecMap) {
-        Plane<Piece> plane = new Plane<>(view.getWidth(), view.getLength());
+        Plane<Piece> plane = new Plane<>(view.getWidth() - 1, view.getLength() - 1);
         CustomPieceFactory pf = new CustomPieceFactory(plane, log);
         for (String s : view.getPieces()) {
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);

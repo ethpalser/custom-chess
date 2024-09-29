@@ -112,6 +112,8 @@ class ChessGameTest {
             assertEquals(game.getBoard().getPiece(p.getPoint()).getCode(), p.getCode());
         }
         assertEquals(game.getTurn(), copy.getTurn());
+        assertEquals(game.getBoard().getPieces().getMaxX(), copy.getBoard().getPieces().getMaxX());
+        assertEquals(game.getBoard().getPieces().getMaxY(), copy.getBoard().getPieces().getMaxY());
     }
 
     @Test
