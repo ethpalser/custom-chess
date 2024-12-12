@@ -11,6 +11,8 @@ public class Point implements Comparable<Point> {
     public static final int MAX_WIDTH = 26;
     public static final int MAX_HEIGHT = 26;
 
+    public static final Point ORIGIN = new Point(0, 0);
+
     public Point() {
         this.x = 0;
         this.y = 0;

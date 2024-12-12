@@ -1,13 +1,16 @@
 package com.ethpalser.chess.board.custom;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.BoardType;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -16,7 +19,8 @@ class CustomBoardTest {
 
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
-        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), new ChessLog());
+        Board board = new ChessBoard(factory);
 
         assertEquals(8, board.getPieces().length());
         assertEquals(8, board.getPieces().width());
@@ -55,21 +59,19 @@ class CustomBoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), new ChessLog());
+        Board board = new ChessBoard(factory);
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
-        int y = 1;
-        for (int x = 0; x < board.getPieces().width(); x++) {
-            board.addPiece(new Point(x, y), null);
-        }
-
-        y = 6;
-        for (int x = 0; x < board.getPieces().width(); x++) {
-            board.addPiece(new Point(x, y), null);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), new ChessLog());
+        Board board = new ChessBoard(factory);
+        for (int y : new int[]{1, 6}) {
+            for (int x = 0; x < board.getPieces().width(); x++) {
+                board.addPiece(new Point(x, y), null);
+            }
         }
         assertEquals(16, board.getPieces().size());
 

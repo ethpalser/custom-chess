@@ -24,17 +24,11 @@ public class Property<T> {
         if (this.key == null) {
             return null;
         }
-
-        Field field;
-        try {
-            field = obj.getClass().getDeclaredField(this.key);
-        } catch (NoSuchFieldException ex) {
-            return null;
-        }
         // Uppercase first character of the name to follow getter-method syntax
-        String fieldName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+        String fieldName = key.substring(0, 1).toUpperCase() + key.substring(1);
 
         Class<?> objCls = obj.getClass();
+        // assume there is always a getter method for this field
         String methodName = "get" + fieldName;
         try {
             Method method = objCls.getMethod(methodName);

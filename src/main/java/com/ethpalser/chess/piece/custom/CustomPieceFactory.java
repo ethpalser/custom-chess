@@ -14,6 +14,7 @@ import com.ethpalser.chess.move.custom.condition.PropertyType;
 import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
@@ -25,50 +26,31 @@ import com.ethpalser.chess.space.custom.reference.PathReference;
 import com.ethpalser.chess.space.custom.reference.PieceReference;
 import com.ethpalser.chess.view.MoveView;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
-public class CustomPieceFactory {
+public class CustomPieceFactory implements PieceFactory {
 
+    private final Map<String, List<MoveView>> pieceSpecs;
     private final Plane<Piece> plane;
     private final Log<Point, Piece> log;
 
-    public CustomPieceFactory(Plane<Piece> plane, Log<Point, Piece> log) {
-        this.plane = plane;
-        this.log = log;
+    public CustomPieceFactory(Map<String, List<MoveView>> pieceSpecs, Plane<Piece> plane, Log<Point, Piece> log) {
+        this.pieceSpecs = pieceSpecs;
+        this.plane = plane; // Todo: Decouple this from pieces and factory
+        this.log = log; // Todo: Decouple this from pieces and factory
     }
 
-    public CustomPiece build(String string) {
-        Pattern pattern = Pattern.compile("^[A-Ha-h][1-8]\\*?#[wb][PRNBQK]");
-        Matcher matcher = pattern.matcher(string);
-        if (matcher.find()) {
-            String[] parts = string.split("#");
-            Point point = new Point(parts[0].charAt(0), parts[0].charAt(1));
-            return this.build(PieceType.fromCode(parts[1].substring(1)), Colour.fromCode(parts[1].substring(0, 1)),
-                    point, !parts[0].contains("*"));
-        } else {
-            throw new IllegalArgumentException("String (" + string + ") does not match the required format.");
-        }
-    }
-
-    public CustomPiece build(PieceType type, Colour colour, Point vector, boolean hasMoved) {
-        return switch (type) {
-            case KNIGHT -> this.knight(colour, vector, hasMoved);
-            case ROOK -> this.rook(colour, vector, hasMoved);
-            case BISHOP -> this.bishop(colour, vector, hasMoved);
-            case QUEEN -> this.queen(colour, vector, hasMoved);
-            case KING -> this.king(colour, vector, hasMoved);
-            case PAWN -> this.pawn(colour, vector, hasMoved);
-            default -> null; // Use the other build method for truly custom pieces
+    @Override
+    public Piece create(Colour colour, String code) {
+        return switch (PieceType.fromCode(code)) {
+            case KNIGHT -> this.knight(colour);
+            case ROOK -> this.rook(colour);
+            case BISHOP -> this.bishop(colour);
+            case QUEEN -> this.queen(colour);
+            case KING -> this.king(colour);
+            case PAWN -> this.pawn(colour);
+            default -> this.custom(colour, code);
         };
-    }
-
-    public CustomPiece build(String code, Colour colour, Point point, boolean hasMoved, List<MoveView> moveSpecViews) {
-        CustomPiece piece = new CustomPiece(code, colour, point, hasMoved);
-        for (MoveView spec : moveSpecViews) {
-            piece.addMoveSpec(new CustomMove(this.plane, this.log, spec));
-        }
-        return piece;
     }
 
     // PRIVATE METHODS
@@ -129,35 +111,35 @@ public class CustomPieceFactory {
 
     // PIECES
 
-    private CustomPiece knight(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece knight(Colour colour) {
         CustomMove baseMoveL1 = new CustomMove(new Path(new Point(1, 2)), CustomMoveType.JUMP, true, true);
         CustomMove baseMoveL2 = new CustomMove(new Path(new Point(2, 1)), CustomMoveType.JUMP, true, true);
-        return new CustomPiece(PieceType.KNIGHT.getCode(), colour, point, hasMoved, baseMoveL1, baseMoveL2);
+        return new CustomPiece(PieceType.KNIGHT.getCode(), colour, Point.ORIGIN, false, baseMoveL1, baseMoveL2);
     }
 
-    private CustomPiece rook(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece rook(Colour colour) {
         CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
-        return new CustomPiece(PieceType.ROOK.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH);
+        return new CustomPiece(PieceType.ROOK.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH);
     }
 
-    private CustomPiece bishop(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece bishop(Colour colour) {
         CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
-        return new CustomPiece(PieceType.BISHOP.getCode(), colour, point, hasMoved, baseMoveD);
+        return new CustomPiece(PieceType.BISHOP.getCode(), colour, Point.ORIGIN, false, baseMoveD);
     }
 
-    private CustomPiece queen(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece queen(Colour colour) {
         CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
         CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
-        return new CustomPiece(PieceType.QUEEN.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH, baseMoveD);
+        return new CustomPiece(PieceType.QUEEN.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH, baseMoveD);
     }
 
-    private CustomPiece king(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece king(Colour colour) {
         CustomMove baseMoveV = new CustomMove(new Path(new Point(0, 1)), CustomMoveType.ADVANCE, true, false);
         CustomMove baseMoveH = new CustomMove(new Path(new Point(1, 0)), CustomMoveType.ADVANCE, false, true);
         CustomMove baseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
-        CustomPiece king = new CustomPiece(PieceType.KING.getCode(), colour, point, hasMoved, baseMoveV, baseMoveH,
+        CustomPiece king = new CustomPiece(PieceType.KING.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH,
                 baseMoveD);
 
         {
@@ -172,7 +154,8 @@ public class CustomPieceFactory {
                             this.selfNotMovedCondition(king),
                             this.targetNotMovedCondition(kingSideRook),
                             this.targetIsPieceTypeCondition(kingSideRook, PieceType.ROOK),
-                            this.emptyPathCondition(point.shift(colour, Direction.RIGHT), kingSideRook)
+                            // Todo: Update pieces to have an internal start location, then use this off of its start
+                            this.emptyPathCondition(new Point().shift(colour, Direction.RIGHT), kingSideRook)
                     ))
                     .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.plane.get(kingSideRook)))
                     .build();
@@ -190,7 +173,8 @@ public class CustomPieceFactory {
                             this.selfNotMovedCondition(king),
                             this.targetNotMovedCondition(queenSideRook),
                             this.targetIsPieceTypeCondition(queenSideRook, PieceType.ROOK),
-                            this.emptyPathCondition(point.shift(colour, Direction.LEFT), queenSideRook)
+                            // Todo: Update pieces to have an internal start location, then use this off of its start
+                            this.emptyPathCondition(new Point().shift(colour, Direction.LEFT), queenSideRook)
                     ))
                     .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.plane.get(queenSideRook)))
                     .build();
@@ -199,14 +183,14 @@ public class CustomPieceFactory {
         return king;
     }
 
-    private CustomPiece pawn(Colour colour, Point point, boolean hasMoved) {
+    private CustomPiece pawn(Colour colour) {
         CustomMove baseMove = new CustomMove.Builder(new Path(new Point(0, 1)), CustomMoveType.ADVANCE)
                 .isMirrorXAxis(false)
                 .isMirrorYAxis(false)
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .build();
-        CustomPiece pawn = new CustomPiece(PieceType.PAWN.getCode(), colour, point, hasMoved, baseMove);
+        CustomPiece pawn = new CustomPiece(PieceType.PAWN.getCode(), colour, Point.ORIGIN, false, baseMove);
 
         {
             // Pawns can only capture one space diagonal from their front
@@ -267,6 +251,14 @@ public class CustomPieceFactory {
             pawn.addMoveSpec(enPassantLeft);
         }
         return pawn;
+    }
+
+    private CustomPiece custom(Colour colour, String code) {
+        CustomPiece piece = new CustomPiece(code, colour, Point.ORIGIN, false);
+        for (MoveView spec : this.pieceSpecs.get(code)) {
+            piece.addMoveSpec(new CustomMove(this.plane, this.log, spec));
+        }
+        return piece;
     }
 
 }

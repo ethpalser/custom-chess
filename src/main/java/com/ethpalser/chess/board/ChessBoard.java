@@ -8,82 +8,64 @@ import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
-import com.ethpalser.chess.piece.custom.CustomPiece;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.standard.Bishop;
-import com.ethpalser.chess.piece.standard.King;
-import com.ethpalser.chess.piece.standard.Knight;
 import com.ethpalser.chess.piece.standard.Pawn;
-import com.ethpalser.chess.piece.standard.Queen;
-import com.ethpalser.chess.piece.standard.Rook;
+import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.view.BoardView;
-import com.ethpalser.chess.view.MoveView;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class ChessBoard implements Board {
 
     private final Plane<Piece> pieces;
 
     public ChessBoard() {
-        this.pieces = this.standard();
+        this(new StandardPieceFactory());
     }
 
-    public ChessBoard(BoardType type) {
-        this(type, null);
-    }
+    public ChessBoard(PieceFactory factory) {
+        Plane<Piece> plane = new Plane<>(); // 8 x 8 plane, origin at (0, 0)
+        int min = 0;
+        int max = 7;
+        // Add all pieces for each rank
+        for (Integer rank : List.of(min, min + 1, max - 1, max)) {
+            Colour colour = rank < max / 2 ? Colour.WHITE : Colour.BLACK;
 
-    public ChessBoard(BoardType type, Log<Point, Piece> log) {
-        if (BoardType.STANDARD.equals(type)) {
-            this.pieces = this.standard();
-        } else {
-            this.pieces = this.custom(log);
-        }
-    }
-
-    public ChessBoard(BoardType type, Log<Point, Piece> log, List<String> pieces) {
-        Plane<Piece> plane = new Plane<>();
-        if (BoardType.STANDARD.equals(type)) {
-            for (String s : pieces) {
-                PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);
-                // Expecting five tokens in the order of: Colour, Code (Type), File, Rank, hasMoved
-                Colour colour = Colour.fromCode(tokenizer.nextToken());
-                String code = tokenizer.nextToken();
-                Point point = new Point(tokenizer.nextToken() + tokenizer.nextToken());
-                boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
-
-                switch (PieceType.fromCode(code)) {
-                    case PAWN -> plane.put(point, new Pawn(colour, point, hasMoved));
-                    case ROOK -> plane.put(point, new Rook(colour, point, hasMoved));
-                    case KNIGHT -> plane.put(point, new Knight(colour, point, hasMoved));
-                    case BISHOP -> plane.put(point, new Bishop(colour, point, hasMoved));
-                    case QUEEN -> plane.put(point, new Queen(colour, point, hasMoved));
-                    case KING -> plane.put(point, new King(colour, point, hasMoved));
-                    default -> {
-                        // Do nothing, not a standard piece
+            if (rank == min || rank == max) {
+                for (int file = 0; file < max + 1; file++) {
+                    Piece piece = switch (file) {
+                        case 0, 7 -> factory.create(colour, PieceType.ROOK.getCode());
+                        case 1, 6 -> factory.create(colour, PieceType.KNIGHT.getCode());
+                        case 2, 5 -> factory.create(colour, PieceType.BISHOP.getCode());
+                        case 3 -> factory.create(colour, PieceType.QUEEN.getCode());
+                        case 4 -> factory.create(colour, PieceType.KING.getCode());
+                        default -> null; // Default boards do not have custom pieces
+                    };
+                    if (piece != null) {
+                        Point point = new Point(file, rank);
+                        piece.setPoint(point);
+                        plane.put(point, piece);
                     }
                 }
-            }
-        } else {
-            CustomPieceFactory pf = new CustomPieceFactory(plane, log);
-            for (String s : pieces) {
-                CustomPiece customPiece = pf.build(s);
-                plane.put(customPiece.getPoint(), customPiece);
+            } else {
+                for (int file = 0; file < 8; file++) {
+                    Piece pawn = factory.create(colour, PieceType.PAWN.getCode());
+
+                    Point point = new Point(file, rank);
+                    pawn.setPoint(point);
+                    plane.put(point, new Pawn(colour, point));
+                }
             }
         }
         this.pieces = plane;
     }
 
-    public ChessBoard(Log<Point, Piece> log, BoardView view, Map<String, List<MoveView>> customSpecMap) {
-        Plane<Piece> plane = new Plane<>(view.getWidth() - 1, view.getLength() - 1);
-        CustomPieceFactory pf = new CustomPieceFactory(plane, log);
-        for (String s : view.getPieces()) {
+    public ChessBoard(PieceFactory factory, List<String> pieceStrings) {
+        Plane<Piece> plane = new Plane<>();
+        for (String s : pieceStrings) {
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);
             // Expecting five tokens in the order of: Colour, Code (Type), File, Rank, hasMoved
             Colour colour = Colour.fromCode(tokenizer.nextToken());
@@ -91,15 +73,10 @@ public class ChessBoard implements Board {
             Point point = new Point(tokenizer.nextToken() + tokenizer.nextToken());
             boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
 
-            switch (PieceType.fromCode(code)) {
-                case PAWN -> plane.put(point, new Pawn(colour, point, hasMoved));
-                case ROOK -> plane.put(point, new Rook(colour, point, hasMoved));
-                case KNIGHT -> plane.put(point, new Knight(colour, point, hasMoved));
-                case BISHOP -> plane.put(point, new Bishop(colour, point, hasMoved));
-                case QUEEN -> plane.put(point, new Queen(colour, point, hasMoved));
-                case KING -> plane.put(point, new King(colour, point, hasMoved));
-                default -> plane.put(point, pf.build(code, colour, point, hasMoved, customSpecMap.get(code)));
-            }
+            Piece piece = factory.create(colour, code);
+            piece.setPoint(point);
+            piece.setHasMoved(hasMoved);
+            plane.put(point, piece);
         }
         this.pieces = plane;
     }
@@ -203,83 +180,6 @@ public class ChessBoard implements Board {
             sb.append("  ").append((char) ('a' + x)).append(" ");
         }
         return sb.toString();
-    }
-
-    // PRIVATE METHODS
-
-    private Plane<Piece> standard() {
-        Plane<Piece> plane = new Plane<>();
-        int length = plane.length();
-        plane.putAll(this.generateStandardPiecesInRank(length, 0));
-        plane.putAll(this.generateStandardPiecesInRank(length, 1));
-        plane.putAll(this.generateStandardPiecesInRank(length, plane.length() - 2));
-        plane.putAll(this.generateStandardPiecesInRank(length, plane.length() - 1));
-        return plane;
-    }
-
-    private Plane<Piece> custom(Log<Point, Piece> log) {
-        Plane<Piece> plane = new Plane<>();
-        int length = plane.length();
-        plane.putAll(this.generateCustomPiecesInRank(length, 0, plane, log));
-        plane.putAll(this.generateCustomPiecesInRank(length, 1, plane, log));
-        plane.putAll(this.generateCustomPiecesInRank(length, plane.length() - 2, plane, log));
-        plane.putAll(this.generateCustomPiecesInRank(length, plane.length() - 1, plane, log));
-        return plane;
-    }
-
-    private Map<Point, Piece> generateStandardPiecesInRank(int length, int rank) {
-        Map<Point, Piece> map = new HashMap<>();
-        Colour colour = rank < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
-
-        if (rank == 0 || rank == length - 1) {
-            for (int file = 0; file < length; file++) {
-                Point point = new Point(file, rank);
-                Piece piece = switch (file) {
-                    case 0, 7 -> new Rook(colour, point);
-                    case 1, 6 -> new Knight(colour, point);
-                    case 2, 5 -> new Bishop(colour, point);
-                    case 3 -> new Queen(colour, point);
-                    case 4 -> new King(colour, point);
-                    default -> null;
-                };
-                map.put(point, piece);
-            }
-        } else if (rank == 1 || rank == length - 2) {
-            for (int file = 0; file < 8; file++) {
-                Point point = new Point(file, rank);
-                map.put(point, new Pawn(colour, point));
-            }
-        }
-        return map;
-    }
-
-    private Map<Point, CustomPiece> generateCustomPiecesInRank(int length, int rank, Plane<Piece> plane,
-            Log<Point, Piece> log) {
-        Map<Point, CustomPiece> map = new HashMap<>();
-        Colour colour = rank < (length - 1) / 2 ? Colour.WHITE : Colour.BLACK;
-
-        CustomPieceFactory customPieceFactory = new CustomPieceFactory(plane, log);
-        if (rank == 0 || rank == length - 1) {
-            for (int x = 0; x < 8; x++) {
-                Point vector = new Point(x, rank);
-                CustomPiece customPiece = switch (x) {
-                    case 0, 7 -> customPieceFactory.build(PieceType.ROOK, colour, vector, false);
-                    case 1, 6 -> customPieceFactory.build(PieceType.KNIGHT, colour, vector, false);
-                    case 2, 5 -> customPieceFactory.build(PieceType.BISHOP, colour, vector, false);
-                    case 3 -> customPieceFactory.build(PieceType.QUEEN, colour, vector, false);
-                    case 4 -> customPieceFactory.build(PieceType.KING, colour, vector, false);
-                    default -> null;
-                };
-                map.put(vector, customPiece);
-            }
-        } else if (rank == 1 || rank == length - 2) {
-            for (int x = 0; x < 8; x++) {
-                Point vector = new Point(x, rank);
-                CustomPiece customPiece = customPieceFactory.build(PieceType.PAWN, colour, vector, false);
-                map.put(vector, customPiece);
-            }
-        }
-        return map;
     }
 
 }

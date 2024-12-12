@@ -3,8 +3,12 @@ package com.ethpalser.chess.board;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -52,23 +56,18 @@ class ChessBoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
+        Board board = new ChessBoard();
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        Board board = new ChessBoard(BoardType.CUSTOM, new ChessLog());
-        int y = 1;
-        for (int x = 0; x < board.getPieces().width(); x++) {
-            board.addPiece(new Point(x, y), null);
-        }
-
-        y = 6;
-        for (int x = 0; x < board.getPieces().width(); x++) {
-            board.addPiece(new Point(x, y), null);
+        Board board = new ChessBoard();
+        for (int y : new int[]{1, 6}) {
+            for (int x = 0; x < board.getPieces().width(); x++) {
+                board.addPiece(new Point(x, y), null);
+            }
         }
         assertEquals(16, board.getPieces().size());
-
     }
 }

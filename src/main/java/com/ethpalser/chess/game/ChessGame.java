@@ -12,16 +12,20 @@ import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.view.GameView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +69,10 @@ public class ChessGame implements Game {
         this.turn = Math.max(view.getTurn(), 1);
         this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
         this.log = new ChessLog();
-        this.board = new ChessBoard(this.log, view.getBoard(), view.getPieceSpecs());
+        Plane<Piece> plane = new Plane<>(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
+        // Todo: Remove views
+        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), plane, this.log);
+        this.board = new ChessBoard(factory, view.getBoard().getPieces());
         for (Piece p : this.board.getPieces()) {
             if (PieceType.KING.getCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
@@ -186,8 +193,10 @@ public class ChessGame implements Game {
         Piece replacement;
         if (PieceType.fromCode(selection) == PieceType.CUSTOM) {
             // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            CustomPieceFactory cpf = new CustomPieceFactory(this.board.getPieces(), this.log);
-            replacement = cpf.build(pieceStr);
+            PieceFactory factory = new CustomPieceFactory(Map.of(), this.board.getPieces(), this.log);
+            PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
+            // colour then code
+            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
         } else {
             // Build a standard piece using information from the piece string
             replacement = Pieces.fromString(pieceStr);
