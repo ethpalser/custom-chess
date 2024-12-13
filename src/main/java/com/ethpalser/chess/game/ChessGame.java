@@ -443,7 +443,8 @@ public class ChessGame implements Game {
         System.out.println("King expected: " + this.getKingPosition(colour));
         for (int y = 0; y < this.board.getPieces().length(); y++) {
             for (int x = 0; x < this.board.getPieces().width(); x++) {
-                if (Pieces.isKing(this.board.getPiece(x, y)) && Pieces.isAllied(colour, this.board.getPiece(x, y))) {
+                Point p = new Point(x, y);
+                if (Pieces.isKing(this.board.getPiece(p)) && Pieces.isAllied(colour, this.board.getPiece(p))) {
                     return new Point(x, y);
                 }
             }

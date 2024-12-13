@@ -47,7 +47,7 @@ class ReferenceTest {
         board.movePiece(new Point(4, 1), new Point(4, 3), log, threatMap);
         // Then
         assertFalse(reference.getReferences(board.getPieces()).isEmpty());
-        assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(4, 3)));
+        assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(new Point(4, 3))));
     }
 
     @Test
@@ -65,7 +65,7 @@ class ReferenceTest {
         Board board = new ChessBoard();
         ChessLog log = new ChessLog();
         log.add(new ChessLogEntry(new Point(4, 1), new Point(4, 3),
-                board.getPiece(4, 1), board.getPiece(4, 3)));
+                board.getPiece(new Point(4, 1)), board.getPiece(new Point(4, 3))));
 
         Piece lastMoved = log.peek().getStartObject();
         Reference<Piece> ref = new LogReference<>(log);
@@ -113,7 +113,7 @@ class ReferenceTest {
     void pieceRef_getReferences_givenAtLocationAndNotMoved_thenIsItself() {
         Board board = new ChessBoard();
         // Given
-        Piece piece = board.getPiece(4, 1); // e1 pawn
+        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece);
         // Then
@@ -126,7 +126,7 @@ class ReferenceTest {
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
-        Piece piece = board.getPiece(4, 1); // e1 pawn
+        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.AT);
         board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
@@ -140,7 +140,7 @@ class ReferenceTest {
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
-        Piece piece = board.getPiece(4, 1); // e1 pawn
+        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
         board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
@@ -154,8 +154,8 @@ class ReferenceTest {
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
         // Given
-        Piece refPiece = board.getPiece(4, 1); // e1 pawn
-        Piece rightPiece = board.getPiece(5, 1); // f1 pawn
+        Piece refPiece = board.getPiece(new Point(4, 1)); // e1 pawn
+        Piece rightPiece = board.getPiece(new Point(5, 1)); // f1 pawn
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
         board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
@@ -168,8 +168,8 @@ class ReferenceTest {
     void pieceRef_getReferences_givenLeftFourOfKingAtStart_thenIsRook() {
         Board board = new ChessBoard();
         // Given
-        Piece refPiece = board.getPiece(4, 0); // d0 king
-        Piece expected = board.getPiece(0, 0); // a0 rook
+        Piece refPiece = board.getPiece(new Point(4, 0)); // d0 king
+        Piece expected = board.getPiece(new Point(0, 0)); // a0 rook
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.LEFT, 4);
         // Then
@@ -180,7 +180,7 @@ class ReferenceTest {
     void pieceRef_getReferences_givenOutOfBounds_thenIsEmpty() {
         Board board = new ChessBoard();
         // Given
-        Piece refPiece = board.getPiece(4, 0); // d0 king
+        Piece refPiece = board.getPiece(new Point(4, 0)); // d0 king
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.BACK, 2);
         // Then

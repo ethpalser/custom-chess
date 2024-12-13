@@ -26,13 +26,6 @@ public class Pieces {
         return player.equals(piece.getColour());
     }
 
-    public static boolean isOpponent(Colour player, Piece piece) {
-        if (player == null || piece == null) {
-            throw new IllegalArgumentException("args cannot be null args:[player=" + player + ", piece=" + piece + "]");
-        }
-        return !player.equals(piece.getColour());
-    }
-
     public static String asString(Piece piece) {
         return asString(piece, piece.getCode());
     }

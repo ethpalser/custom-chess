@@ -76,7 +76,7 @@ class ConditionTest {
 
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), log);
         Board board = new ChessBoard(factory);
-        Piece customPiece = board.getPiece(2, 1);
+        Piece customPiece = board.getPiece(new Point(2, 1));
         board.addPiece(new Point(2, 2), customPiece);
 
         // When
@@ -99,7 +99,7 @@ class ConditionTest {
 
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), log);
         Board board = new ChessBoard(factory);
-        Piece customPiece = board.getPiece(2, 1);
+        Piece customPiece = board.getPiece(new Point(2, 1));
         board.addPiece(new Point(2, 3), customPiece);
 
         // When
@@ -121,7 +121,7 @@ class ConditionTest {
 
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), log);
         Board board = new ChessBoard(factory);
-        Piece customPiece = board.getPiece(2, 1);
+        Piece customPiece = board.getPiece(new Point(2, 1));
         board.addPiece(new Point(2, 3), customPiece);
 
         Conditional<Piece> condition = new LogCondition<>(log, Comparator.NOT_EQUAL, PropertyType.COLOUR,
@@ -146,7 +146,7 @@ class ConditionTest {
 
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), log);
         Board board = new ChessBoard(factory);
-        Piece white = board.getPiece(4, 1);
+        Piece white = board.getPiece(new Point(4, 1));
         board.addPiece(new Point(4, 4), white);
 
         Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
@@ -163,7 +163,7 @@ class ConditionTest {
         log.add(new ChessLogEntry(enPassantTargetStart, enPassantTargetEnd, black, null));
 
         // Then
-        assertNotNull(board.getPiece(4, 4));
+        assertNotNull(board.getPiece(new Point(4, 4)));
         assertNotNull(board.getPiece(enPassantTargetEnd));
         assertNotNull(log.peek().getStartObject());
         assertEquals(log.peek().getStartObject().getCode(), PieceType.PAWN.getCode());
@@ -195,7 +195,7 @@ class ConditionTest {
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), new ChessLog());
         Board board = new ChessBoard(factory);
         board.addPiece(new Point(4, 1), null);
-        Piece king = board.getPiece(4, 0);
+        Piece king = board.getPiece(new Point(4, 0));
         board.addPiece(new Point(4, 1), king);
 
         // Then
@@ -211,12 +211,12 @@ class ConditionTest {
 
         PieceFactory factory = new CustomPieceFactory(Map.of(), new Plane<>(), new ChessLog());
         Board board = new ChessBoard(factory);
-        Piece rook = board.getPiece(0, 0);
+        Piece rook = board.getPiece(new Point(0, 0));
         // Forcing an illegal move, so it is marked as having moved
         board.addPiece(new Point(0, 2), rook);
-        board.getPiece(0, 2).setHasMoved(true);
+        board.getPiece(new Point(0, 2)).setHasMoved(true);
         board.addPiece(new Point(0, 0), rook);
-        board.getPiece(0, 0).setHasMoved(true);
+        board.getPiece(new Point(0, 0)).setHasMoved(true);
 
         // Then
         boolean result = condition.isExpected(board.getPieces());
@@ -246,7 +246,7 @@ class ConditionTest {
         board.addPiece(new Point(2, 0), null);
         board.addPiece(new Point(3, 0), null);
 
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PieceReference(board.getPiece(4, 0)),
+        Conditional<Piece> conditionA = new PropertyCondition<>(new PieceReference(board.getPiece(new Point(4, 0))),
                 Comparator.FALSE, PropertyType.HAS_MOVED, false);
         Conditional<Piece> conditionB = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
                 Comparator.FALSE, PropertyType.HAS_MOVED, false);

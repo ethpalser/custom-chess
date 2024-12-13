@@ -26,7 +26,7 @@ class ChessBoardTest {
         Piece piece;
         for (int x = 0; x < board.getPieces().width(); x++) {
             for (int y = 0; y < board.getPieces().length(); y++) {
-                piece = board.getPiece(x, y);
+                piece = board.getPiece(new Point(x, y));
                 if (piece == null) {
                     continue;
                 }

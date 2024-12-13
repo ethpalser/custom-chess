@@ -15,6 +15,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
+import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.view.GameView;
@@ -498,80 +499,80 @@ class ChessGameTest {
     @Test
     void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
         // Given
-        int pieceX = 2;
-        int pieceY = 2;
+        int x = 2;
+        int y = 2;
         int nextX = 4;
         int nextY = 3;
-        Point pieceC = new Point(pieceX, pieceY); // Nothing at location
-        Point nextC = new Point(nextX, nextY);
+        Point start = new Point(x, y); // Nothing at location
+        Point next = new Point(nextX, nextY);
         Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
-        Action action = new Action(Colour.WHITE, pieceC, nextC);
+        Action action = new Action(Colour.WHITE, start, next);
 
         // When
         GameStatus status = game.updateGame(action);
         assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
-        assertNull(board.getPiece(pieceX, pieceY));
+        assertNull(board.getPiece(start));
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void executeAction_toSameCoordinate_throwsIllegalActionException() {
         // Given
-        int pieceX = 1;
-        int pieceY = 0;
+        int x = 1;
+        int y = 0;
         int nextX = 1;
         int nextY = 0;
-        Point pieceC = new Point(pieceX, pieceY); // White Knight
-        Point nextC = new Point(nextX, nextY);
+        Point start = new Point(x, y); // White Knight
+        Point next = new Point(nextX, nextY);
         Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
-        Action action = new Action(Colour.WHITE, pieceC, nextC);
+        Action action = new Action(Colour.WHITE, start, next);
         assertThrows(IllegalActionException.class, () -> game.updateGame(action));
 
         // Then
-        assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
+        assertEquals(Colour.WHITE, board.getPiece(start).getColour());
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void executeAction_toInvalidCoordinate_throwsIndexOutOfBoundsException() {
         // Given
-        int pieceX = 1;
-        int pieceY = 0;
+        int x = 1;
+        int y = 0;
         int nextX = 0;
         int nextY = -2;
-        Point pieceC = new Point(pieceX, pieceY); // White Knight
+        Point start = new Point(x, y); // White Knight
         Point invalid = new Point(nextX, nextY);
         Board board = new ChessBoard();
 
         ChessGame game = new ChessGame(board, new ChessLog());
 
         // When
-        Action action = new Action(Colour.WHITE, pieceC, invalid);
+        Action action = new Action(Colour.WHITE, start, invalid);
         GameStatus status = game.updateGame(action);
         assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
-        assertEquals(Colour.WHITE, board.getPiece(pieceX, pieceY).getColour());
+        assertEquals(Colour.WHITE, board.getPiece(start).getColour());
         assertEquals(32, board.getPieces().size());
     }
 
     @Test
     void executeAction_toValidSameColourOccupiedCoordinate_throwsIllegalActionException() {
         // Given
-        int pieceX = 1;
-        int pieceY = 0;
+        int x = 1;
+        int y = 0;
         int nextX = 2;
         int nextY = 2;
-        Point source = new Point(pieceX, pieceY); // White Knight
+        Point source = new Point(x, y); // White Knight
         Point target = new Point(nextX, nextY); // White Pawn
         Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
@@ -708,10 +709,10 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.getPiece(4, 0));
-        assertNull(board.getPiece(7, 0));
+        assertNull(board.getPiece(source));
+        assertNull(board.getPiece(target.shift(Colour.WHITE, Direction.RIGHT)));
         assertNotNull(board.getPiece(target));
-        assertNotNull(board.getPiece(5, 0));
+        assertNotNull(board.getPiece(target.shift(Colour.WHITE, Direction.LEFT)));
     }
 
 
@@ -733,10 +734,10 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.getPiece(4, 0));
-        assertNull(board.getPiece(0, 0));
+        assertNull(board.getPiece(source));
+        assertNull(board.getPiece(target.shift(Colour.WHITE, Direction.LEFT).shift(Colour.WHITE, Direction.LEFT)));
         assertNotNull(board.getPiece(target));
-        assertNotNull(board.getPiece(3, 0));
+        assertNotNull(board.getPiece(target.shift(Colour.WHITE, Direction.RIGHT)));
     }
 
     @Test
@@ -769,9 +770,9 @@ class ChessGameTest {
         game.updateGame(action); // En Passant
 
         // Then
-        assertNull(board.getPiece(3, 4));
-        assertNotNull(board.getPiece(4, 5));
-        assertNull(board.getPiece(4, 4));
+        assertNull(board.getPiece(target.shift(Colour.WHITE, Direction.LEFT)));
+        assertNotNull(board.getPiece(target.shift(Colour.WHITE, Direction.FRONT)));
+        assertNull(board.getPiece(target));
     }
 
     @Test
@@ -803,9 +804,9 @@ class ChessGameTest {
         game.updateGame(action); // En Passant
 
         // Then
-        assertNull(board.getPiece(3, 4));
-        assertNotNull(board.getPiece(2, 5));
-        assertNull(board.getPiece(2, 4));
+        assertNull(board.getPiece(target.shift(Colour.WHITE, Direction.LEFT)));
+        assertNotNull(board.getPiece(target.shift(Colour.WHITE, Direction.FRONT)));
+        assertNull(board.getPiece(target));
     }
 
     // endregion

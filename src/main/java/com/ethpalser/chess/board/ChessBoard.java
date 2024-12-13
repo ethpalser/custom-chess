@@ -31,7 +31,7 @@ public class ChessBoard implements Board {
         int min = 0;
         int max = 7;
         // Add all pieces for each rank
-        for (Integer rank : List.of(min, min + 1, max - 1, max)) {
+        for (int rank : new int[]{min, min + 1, max - 1, max}) {
             Colour colour = rank < max / 2 ? Colour.WHITE : Colour.BLACK;
 
             if (rank == min || rank == max) {
@@ -148,9 +148,9 @@ public class ChessBoard implements Board {
     }
 
     @Override
-    public boolean isInBounds(int x, int y) {
-        return this.pieces.getMinX() <= x && x <= this.pieces.getMaxX()
-                && this.pieces.getMinY() <= y && y <= this.pieces.getMaxY();
+    public boolean isInBounds(Point point) {
+        return point != null && this.pieces.getMinX() <= point.getX() && point.getX() <= this.pieces.getMaxX()
+                && this.pieces.getMinY() <= point.getY() && point.getY() <= this.pieces.getMaxY();
     }
 
     @Override

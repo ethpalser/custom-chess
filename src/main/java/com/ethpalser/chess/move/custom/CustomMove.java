@@ -242,7 +242,7 @@ public class CustomMove {
 
             Piece nPiece = board.get(next);
             if (nPiece != null) {
-                boolean canCapture = Pieces.isOpponent(colour, nPiece);
+                boolean canCapture = !Pieces.isAllied(colour, nPiece);
                 if (this.isAttack && (canCapture || includeDefend)) {
                     points.add(next);
                 }

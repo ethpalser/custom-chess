@@ -29,7 +29,7 @@ class CustomBoardTest {
         Piece customPiece;
         for (int x = 0; x < board.getPieces().width(); x++) {
             for (int y = 0; y < board.getPieces().length(); y++) {
-                customPiece = board.getPiece(x, y);
+                customPiece = board.getPiece(new Point(x, y));
                 if (customPiece == null) {
                     continue;
                 }
