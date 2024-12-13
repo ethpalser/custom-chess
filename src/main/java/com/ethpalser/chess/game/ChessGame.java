@@ -4,6 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.log.ChessLog;
+import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.MoveSet;
@@ -108,6 +109,41 @@ public class ChessGame implements Game {
         return this.turn;
     }
 
+    public LogEntry<Point, Piece> movePiece(Point start, Point end,
+            Log<Point, Piece> log, ThreatMap threatMap) {
+        if (start == null || end == null) {
+            throw new NullPointerException();
+        }
+        Piece piece = this.board.getPiece(start);
+        if (piece == null) {
+            throw new IllegalActionException("piece cannot move as it does not exist at " + start);
+        }
+
+        Movement move = piece.getMoves(this.board.getPieces(), log, threatMap).getMove(end);
+        if (move == null) {
+            throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
+        }
+        Piece captured = this.board.getPiece(end);
+
+        LogEntry<Point, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
+
+        this.board.getPieces().remove(end);
+        this.board.getPieces().remove(start);
+        this.board.getPieces().put(end, piece);
+        piece.move(end);
+
+        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
+        if (followUp != null) {
+            Piece toForcePush = followUp.getStartObject();
+            this.board.getPieces().remove(followUp.getStart());
+            if (followUp.getEnd() != null) {
+                this.board.getPieces().put(followUp.getEnd(), toForcePush);
+            }
+        }
+        this.board.getPieces().remove(null);
+        return response;
+    }
+
     @Override
     public GameStatus updateGame(Action action) throws IllegalActionException {
         if (action == null) {
@@ -134,7 +170,7 @@ public class ChessGame implements Game {
         if (isNotAllowedToMove(movingPiece)) {
             return GameStatus.NO_CHANGE;
         }
-        LogEntry<Point, Piece> entry = this.board.movePiece(start, end, this.log,
+        LogEntry<Point, Piece> entry = this.movePiece(start, end, this.log,
                 this.getThreatMap(Colour.opposite(this.player)));
         this.log.push(entry);
         this.updateKingPosition(movingPiece, end);

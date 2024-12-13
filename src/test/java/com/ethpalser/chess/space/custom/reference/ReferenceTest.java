@@ -2,6 +2,7 @@ package com.ethpalser.chess.space.custom.reference;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
@@ -44,7 +45,11 @@ class ReferenceTest {
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
 
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
-        board.movePiece(new Point(4, 1), new Point(4, 3), log, threatMap);
+
+        ChessGame game = new ChessGame(board, log);
+        game.movePiece(new Point(4, 1), new Point(4, 3), log, threatMap);
+
+
         // Then
         assertFalse(reference.getReferences(board.getPieces()).isEmpty());
         assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(new Point(4, 3))));
@@ -129,7 +134,8 @@ class ReferenceTest {
         Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.AT);
-        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        ChessGame game = new ChessGame(board, log);
+        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(piece));
     }
@@ -143,7 +149,8 @@ class ReferenceTest {
         Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
-        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        ChessGame game = new ChessGame(board, log);
+        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).isEmpty());
     }
@@ -158,8 +165,9 @@ class ReferenceTest {
         Piece rightPiece = board.getPiece(new Point(5, 1)); // f1 pawn
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
-        board.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
-        board.movePiece(new Point(5, 1), new Point(5, 2), log, threatMap);
+        ChessGame game = new ChessGame(board, log);
+        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        game.movePiece(new Point(5, 1), new Point(5, 2), log, threatMap);
         // Then
         assertTrue(ref.getReferences(board.getPieces()).contains(rightPiece));
     }

@@ -577,10 +577,10 @@ class ChessGameTest {
         Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
-        board.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
-        board.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
 
         ChessGame game = new ChessGame(board, log);
+        game.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
+        game.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -748,21 +748,21 @@ class ChessGameTest {
         Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+
+        ChessGame game = new ChessGame(board, log);
         // White move
-        board.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
+        game.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
         // Black move (filler)
-        board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
+        game.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
         LogEntry<Point, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
                 board.getPiece(new Point(3, 3)));
-        board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        game.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         log.push(entry1);
         // Black move (with log updated for piece to check)
         LogEntry<Point, Piece> entry2 = new ChessLogEntry(source, target, board.getPiece(source));
-        board.movePiece(source, target, log, threatMap);
+        game.movePiece(source, target, log, threatMap);
         log.push(entry2);
-
-        ChessGame game = new ChessGame(board, log);
 
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
@@ -783,21 +783,21 @@ class ChessGameTest {
         Board board = new ChessBoard();
         Log<Point, Piece> log = new ChessLog();
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+
+        ChessGame game = new ChessGame(board, log);
         // White move
-        board.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
+        game.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
         // Black move (filler)
-        board.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
+        game.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
         // White move
         LogEntry<Point, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
                 board.getPiece(new Point(3, 3)));
-        board.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        game.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
         log.push(entry1);
         // Black move
         LogEntry<Point, Piece> entry2 = new ChessLogEntry(source, target, board.getPiece(source));
-        board.movePiece(source, target, log, threatMap);
+        game.movePiece(source, target, log, threatMap);
         log.push(entry2);
-
-        ChessGame game = new ChessGame(board, log);
 
         // When (White move)
         Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));

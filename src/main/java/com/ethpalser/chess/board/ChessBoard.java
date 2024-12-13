@@ -1,17 +1,10 @@
 package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Movement;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.standard.Pawn;
 import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -28,15 +21,15 @@ public class ChessBoard implements Board {
 
     public ChessBoard(PieceFactory factory) {
         Plane<Piece> plane = new Plane<>(); // 8 x 8 plane, origin at (0, 0)
-        int min = 0;
-        int max = 7;
-        // Add all pieces for each rank
-        for (int rank : new int[]{min, min + 1, max - 1, max}) {
-            Colour colour = rank < max / 2 ? Colour.WHITE : Colour.BLACK;
 
-            if (rank == min || rank == max) {
-                for (int file = 0; file < max + 1; file++) {
-                    Piece piece = switch (file) {
+        // Add all pieces for each rank
+        for (int rank : new int[]{plane.getMinY(), plane.getMinY() + 1, plane.getMaxY() - 1, plane.getMaxY()}) {
+            Colour colour = rank < plane.getMaxY() / 2 ? Colour.WHITE : Colour.BLACK;
+
+            for (int file = plane.getMinX(); file <= plane.getMaxX(); file++) {
+                Piece piece;
+                if (rank == plane.getMinY() || rank == plane.getMaxY()) {
+                    piece = switch (file) {
                         case 0, 7 -> factory.create(colour, PieceType.ROOK.getCode());
                         case 1, 6 -> factory.create(colour, PieceType.KNIGHT.getCode());
                         case 2, 5 -> factory.create(colour, PieceType.BISHOP.getCode());
@@ -44,19 +37,14 @@ public class ChessBoard implements Board {
                         case 4 -> factory.create(colour, PieceType.KING.getCode());
                         default -> null; // Default boards do not have custom pieces
                     };
-                    if (piece != null) {
-                        Point point = new Point(file, rank);
-                        piece.setPoint(point);
-                        plane.put(point, piece);
-                    }
+                } else {
+                    piece = factory.create(colour, PieceType.PAWN.getCode());
                 }
-            } else {
-                for (int file = 0; file < 8; file++) {
-                    Piece pawn = factory.create(colour, PieceType.PAWN.getCode());
 
+                if (piece != null) {
                     Point point = new Point(file, rank);
-                    pawn.setPoint(point);
-                    plane.put(point, new Pawn(colour, point));
+                    piece.setPoint(point);
+                    plane.put(point, piece);
                 }
             }
         }
@@ -109,42 +97,6 @@ public class ChessBoard implements Board {
             piece.setPoint(point);
         }
         this.pieces.remove(null);
-    }
-
-    @Override
-    public LogEntry<Point, Piece> movePiece(Point start, Point end,
-            Log<Point, Piece> log, ThreatMap threatMap) {
-        if (start == null || end == null) {
-            throw new NullPointerException();
-        }
-        Piece piece = this.pieces.get(start);
-        if (piece == null) {
-            throw new IllegalActionException("piece cannot move as it does not exist at " + start);
-        }
-
-        Movement move = piece.getMoves(this.getPieces(), log, threatMap).getMove(end);
-        if (move == null) {
-            throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
-        }
-        Piece captured = this.getPiece(end);
-
-        LogEntry<Point, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
-
-        this.pieces.remove(end);
-        this.pieces.remove(start);
-        this.pieces.put(end, piece);
-        piece.move(end);
-
-        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
-        if (followUp != null) {
-            Piece toForcePush = followUp.getStartObject();
-            this.pieces.remove(followUp.getStart());
-            if (followUp.getEnd() != null) {
-                this.pieces.put(followUp.getEnd(), toForcePush);
-            }
-        }
-        this.pieces.remove(null);
-        return response;
     }
 
     @Override
