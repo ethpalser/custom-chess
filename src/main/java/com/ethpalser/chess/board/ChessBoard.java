@@ -105,9 +105,9 @@ public class ChessBoard implements Board<Coordinate> {
         if (piece == null) {
             this.pieces.remove(point);
         } else {
-            if (this.pieces.get((Point) piece.getCoordinate()) != null && this.pieces.get((Point) piece.getCoordinate()).equals(piece)) {
+            if (this.pieces.get(piece.getCoordinate()) != null && this.pieces.get(piece.getCoordinate()).equals(piece)) {
                 // Removes the piece from its original location
-                this.pieces.remove((Point) piece.getCoordinate());
+                this.pieces.remove(piece.getCoordinate());
             }
             // Replaces the piece at the new point
             this.pieces.put(point, piece);
