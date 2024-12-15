@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.map;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
@@ -7,9 +8,10 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.util.Tuple;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,14 +24,20 @@ public class ThreatMap {
 
     private final Colour colour;
     private final Map<Point, Set<Piece>> map;
-    private final int length;
     private final int width;
+    private final int length;
 
-    public ThreatMap(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
+    public ThreatMap(Colour colour, Space space) {
+        if (colour == null || space == null) {
+            throw new IllegalArgumentException("Arguments cannot be null");
+        }
+        if (space.getDimension() < 2) {
+            throw new IllegalArgumentException("Space must be have 2 dimensions or greater");
+        }
         this.colour = colour;
-        this.map = this.setup(colour, board, log);
-        this.length = board.length();
-        this.width = board.width();
+        this.map = new HashMap<>();
+        this.width = space.length(1);
+        this.length = space.length(2);
     }
 
     public boolean hasNoThreats(Point point) {
@@ -64,7 +72,7 @@ public class ThreatMap {
         }
     }
 
-    public void refreshThreats(Plane<Piece> board, Log<Point, Piece> log, Point point) {
+    public void refreshThreats(Board<Coordinate> board, Log<Coordinate, Piece> log, Point point) {
         if (board == null || log == null || point == null) {
             String str = "one or more arguments are null" +
                     " board: " + (board == null) +
@@ -99,7 +107,7 @@ public class ThreatMap {
         }
         // Add the piece back, so we can reapply threats with this piece present
         if (change != null) {
-            board.put(point, change);
+            board.add(point, change);
         }
 
         boolean changeIsPresent = board.get(point) != null;
@@ -122,7 +130,7 @@ public class ThreatMap {
         }
     }
 
-    public Integer evaluate(Plane<Piece> board) {
+    public Integer evaluate(Board<Coordinate> board) {
         int direction = Colour.WHITE.equals(this.colour) ? 1 : -1;
 
         List<Piece> pawns = new ArrayList<>();
@@ -131,12 +139,12 @@ public class ThreatMap {
             if (PieceType.PAWN.getCode().equals(p.getCode()) && this.colour.equals(p.getColour())) {
                 pawns.add(p);
 
-                Point left = Point.validOrNull(board, p.getPoint(), this.colour, -1, direction, true);
+                Point left = Point.validOrNull(board, (Point) p.getCoordinate(), this.colour, -1, direction, true);
                 if (left != null) {
                     pawnThreats.add(left);
                 }
 
-                Point right = Point.validOrNull(board, p.getPoint(), this.colour, 1, direction, true);
+                Point right = Point.validOrNull(board, (Point) p.getCoordinate(), this.colour, 1, direction, true);
                 if (right != null) {
                     pawnThreats.add(right);
                 }
@@ -144,7 +152,7 @@ public class ThreatMap {
         }
 
         return direction * (this.calculatePawnWall(pawnThreats, pawns)
-                + this.calculatePawnCenterControl(pawnThreats, board.width() / 2, board.length() / 2)
+                + this.calculatePawnCenterControl(pawnThreats, this.width / 2, this.length / 2)
                 + this.calculateDoubleFilePawns(pawns));
     }
 
@@ -167,7 +175,7 @@ public class ThreatMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<Piece>> setup(Colour colour, Plane<Piece> board, Log<Point, Piece> log) {
+    private Map<Point, Set<Piece>> setup(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log) {
         Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
         for (Piece piece : board) {
             if (piece != null && Pieces.isAllied(colour, piece)) {
@@ -186,7 +194,7 @@ public class ThreatMap {
         for (Piece piece : pawns) {
             for (Point p : pawnThreats) {
                 // This is a pawn that is defended by at least one other pawn. Doubled-up defends count for one each.
-                if (PieceType.PAWN.getCode().equals(piece.getCode()) && piece.getPoint().equals(p)) {
+                if (PieceType.PAWN.getCode().equals(piece.getCode()) && piece.getCoordinate().equals(p)) {
                     sum++; // Currently, an arbitrarily set amount
                 }
             }
@@ -226,10 +234,10 @@ public class ThreatMap {
         Set<Integer> seen = new HashSet<>();
         int sum = 0;
         for (Piece p : pawns) {
-            if (seen.contains(p.getPoint().getX())) {
+            if (seen.contains(p.getCoordinate().getValue(1))) {
                 sum -= 1;
             }
-            seen.add(p.getPoint().getX());
+            seen.add(p.getCoordinate().getValue(1));
         }
         return sum;
     }

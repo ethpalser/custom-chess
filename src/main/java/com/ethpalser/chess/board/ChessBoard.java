@@ -6,29 +6,44 @@ import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.StandardPieceFactory;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class ChessBoard implements Board {
+public class ChessBoard implements Board<Coordinate> {
 
-    private final Plane<Piece> pieces;
+    private static final String OUT_OF_BOUNDS_MESSAGE = "Coordinate at %s is out of bounds";
+    private static final String UNAVAILABLE_MESSAGE = "Coordinate at %s is unavailable";
+
+    private final Space space;
+    private final Map<Coordinate, Piece> pieces;
 
     public ChessBoard() {
-        this(new StandardPieceFactory());
+        this(new Plane(8, 8), new StandardPieceFactory());
     }
 
-    public ChessBoard(PieceFactory factory) {
-        Plane<Piece> plane = new Plane<>(); // 8 x 8 plane, origin at (0, 0)
+    public ChessBoard(Space space, PieceFactory factory) {
+        this.space = space;
+        Map<Coordinate, Piece> plane = new HashMap<>();
+
+        int minX = this.space.min(1);
+        int minY = this.space.min(2);
+        int maxX = this.space.max(1);
+        int maxY = this.space.max(2);
 
         // Add all pieces for each rank
-        for (int rank : new int[]{plane.getMinY(), plane.getMinY() + 1, plane.getMaxY() - 1, plane.getMaxY()}) {
-            Colour colour = rank < plane.getMaxY() / 2 ? Colour.WHITE : Colour.BLACK;
+        for (int rank : new int[]{minY, minY + 1, maxY - 1, maxY}) {
+            Colour colour = rank < maxY / 2 ? Colour.WHITE : Colour.BLACK;
 
-            for (int file = plane.getMinX(); file <= plane.getMaxX(); file++) {
+            for (int file = minX; file <= maxX; file++) {
                 Piece piece;
-                if (rank == plane.getMinY() || rank == plane.getMaxY()) {
+                if (rank == minY || rank == maxY) {
                     piece = switch (file) {
                         case 0, 7 -> factory.create(colour, PieceType.ROOK.getCode());
                         case 1, 6 -> factory.create(colour, PieceType.KNIGHT.getCode());
@@ -43,7 +58,7 @@ public class ChessBoard implements Board {
 
                 if (piece != null) {
                     Point point = new Point(file, rank);
-                    piece.setPoint(point);
+                    piece.setCoordinate(point);
                     plane.put(point, piece);
                 }
             }
@@ -51,8 +66,10 @@ public class ChessBoard implements Board {
         this.pieces = plane;
     }
 
-    public ChessBoard(PieceFactory factory, List<String> pieceStrings) {
-        Plane<Piece> plane = new Plane<>();
+    public ChessBoard(Space space, PieceFactory factory, List<String> pieceStrings) {
+        this.space = space;
+        Map<Coordinate, Piece> plane = new HashMap<>();
+
         for (String s : pieceStrings) {
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(s);
             // Expecting five tokens in the order of: Colour, Code (Type), File, Rank, hasMoved
@@ -62,7 +79,7 @@ public class ChessBoard implements Board {
             boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
 
             Piece piece = factory.create(colour, code);
-            piece.setPoint(point);
+            piece.setCoordinate(point);
             piece.setHasMoved(hasMoved);
             plane.put(point, piece);
         }
@@ -70,68 +87,83 @@ public class ChessBoard implements Board {
     }
 
     @Override
-    public Plane<Piece> getPieces() {
-        return this.pieces;
-    }
-
-    @Override
-    public Piece getPiece(Point point) {
+    public Piece get(Coordinate point) throws IndexOutOfBoundsException {
+        if (this.space.isOutOfBounds(point)) {
+            throw new IndexOutOfBoundsException(String.format(OUT_OF_BOUNDS_MESSAGE, point));
+        }
         return this.pieces.get(point);
     }
 
     @Override
-    public void addPiece(Point point, Piece piece) {
-        if (point == null) {
-            return;
+    public void add(Coordinate point, Piece piece) throws IndexOutOfBoundsException {
+        if (this.space.isOutOfBounds(point)) {
+            throw new IndexOutOfBoundsException(String.format(OUT_OF_BOUNDS_MESSAGE, point));
+        }
+        if (this.space.isUnavailable(point)) {
+            throw new IndexOutOfBoundsException(String.format(UNAVAILABLE_MESSAGE, point));
         }
         if (piece == null) {
             this.pieces.remove(point);
         } else {
-            if (this.pieces.get(piece.getPoint()) != null && this.pieces.get(piece.getPoint()).equals(piece)) {
+            if (this.pieces.get((Point) piece.getCoordinate()) != null && this.pieces.get((Point) piece.getCoordinate()).equals(piece)) {
                 // Removes the piece from its original location
-                this.pieces.remove(piece.getPoint());
+                this.pieces.remove((Point) piece.getCoordinate());
             }
             // Replaces the piece at the new point
             this.pieces.put(point, piece);
             // Update the position of the piece, but not that it has moved. This insertion is not treated as a move.
-            piece.setPoint(point);
+            piece.setCoordinate(point);
         }
         this.pieces.remove(null);
     }
 
     @Override
-    public boolean isInBounds(Point point) {
-        return point != null && this.pieces.getMinX() <= point.getX() && point.getX() <= this.pieces.getMaxX()
-                && this.pieces.getMinY() <= point.getY() && point.getY() <= this.pieces.getMaxY();
+    public void remove(Coordinate point) throws IndexOutOfBoundsException {
+        if (this.space.isOutOfBounds(point)) {
+            throw new IndexOutOfBoundsException(String.format(OUT_OF_BOUNDS_MESSAGE, point));
+        }
+        this.pieces.remove(point);
+    }
+
+    @Override
+    public int count() {
+        return this.pieces.size();
+    }
+
+    @Override
+    public boolean rejects(Coordinate point) {
+        return point == null || this.space.isOutOfBounds(point) || this.space.isUnavailable(point);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int y = this.pieces.length() - 1; y >= 0; y--) {
-            for (int x = 0; x <= this.pieces.width() - 1; x++) {
-                Piece piece = this.pieces.get(this.pieces.at(x, y));
-                if (piece == null) {
-                    sb.append("|   ");
-                } else {
-                    sb.append("| ");
+        int width = this.space.length(1);
+        int height = this.space.length(2);
 
-                    String code = piece.getCode();
-                    if ("".equals(code)) {
-                        code = "P"; // In some cases that pawn's code is an empty string
-                    }
-                    if (Colour.WHITE.equals(piece.getColour())) {
-                        code = code.toLowerCase(Locale.ROOT);
-                    }
-                    sb.append(code).append(" ");
+        StringBuilder sb = new StringBuilder();
+        for (int y = height - 1; y >= 0; y--) {
+            for (int x = 0; x <= width - 1; x++) {
+                Piece piece = this.get(new Point(x, y));
+                String code;
+                if (piece == null) {
+                    code = " ";
+                } else if (Colour.BLACK.equals(piece.getColour())) {
+                    code = piece.getCode();
+                } else {
+                    code = piece.getCode().toLowerCase(Locale.ROOT);
                 }
+                sb.append("| ").append(code).append(" ");
             }
             sb.append("| ").append(1 + y).append("\n");
         }
-        for (int x = 0; x < this.pieces.width(); x++) {
+        for (int x = 0; x < width; x++) {
             sb.append("  ").append((char) ('a' + x)).append(" ");
         }
         return sb.toString();
     }
 
+    @Override
+    public Iterator<Piece> iterator() {
+        return this.pieces.values().iterator();
+    }
 }

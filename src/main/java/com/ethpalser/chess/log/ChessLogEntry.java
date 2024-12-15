@@ -1,23 +1,25 @@
 package com.ethpalser.chess.log;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Pawn;
 import com.ethpalser.chess.piece.standard.Rook;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.view.ActionView;
 
-public class ChessLogEntry implements LogEntry<Point, Piece> {
+public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
 
-    private final Point start;
-    private final Point end;
+    private final Coordinate start;
+    private final Coordinate end;
     private final Piece moved;
     private final Piece captured;
     private final boolean isFirstMove;
-    private final LogEntry<Point, Piece> followUp;
+    private final LogEntry<Coordinate, Piece> followUp;
     private Piece promoted;
 
     public ChessLogEntry(Point start, Point end, Piece moved) {
@@ -35,7 +37,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.promoted = null;
     }
 
-    public ChessLogEntry(Point start, Point end, Piece moved, Piece captured, LogEntry<Point, Piece> followUpMove) {
+    public ChessLogEntry(Point start, Point end, Piece moved, Piece captured, LogEntry<Coordinate, Piece> followUpMove) {
         this.start = start;
         this.end = end;
         this.moved = moved;
@@ -46,7 +48,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         this.promoted = null;
     }
 
-    public ChessLogEntry(Plane<Piece> board, String log) {
+    public ChessLogEntry(Board<Coordinate> board, String log) {
         // Cannot convert log string to entry
         if (log == null || log.isEmpty()) {
             this.start = null;
@@ -60,14 +62,14 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         }
         // Castling log entry
         if (log.contains("O-O-O") || log.contains("O-O")) {
-            int averageX = (board.getMinX() + board.getMaxX()) / 2;
+            int averageX = 4; // Todo: Get these from the board
             int pieceY;
             Colour pieceColour;
             if (log.charAt(0) == 'w') {
-                pieceY = board.getMinY();
+                pieceY = 0;
                 pieceColour = Colour.WHITE;
             } else {
-                pieceY = board.getMaxY();
+                pieceY = 0;
                 pieceColour = Colour.BLACK;
             }
             // King
@@ -88,7 +90,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
                 this.end = new Point(averageX - 2, pieceY);
                 // Rook
                 this.followUp = new ChessLogEntry(
-                        new Point(board.getMinX(), pieceY),
+                        new Point(0, pieceY),
                         new Point(averageX - 1, pieceY),
                         new Rook(pieceColour, new Point(averageX, pieceY), true)
                 );
@@ -96,7 +98,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
                 this.end = new Point(averageX + 2, pieceY);
                 // Rook
                 this.followUp = new ChessLogEntry(
-                        new Point(board.getMinX(), pieceY),
+                        new Point(0, pieceY),
                         new Point(averageX + 1, pieceY),
                         new Rook(pieceColour, new Point(averageX, pieceY), true)
                 );
@@ -139,12 +141,12 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
     }
 
     @Override
-    public Point getStart() {
+    public Coordinate getStart() {
         return this.start;
     }
 
     @Override
-    public Point getEnd() {
+    public Coordinate getEnd() {
         return this.end;
     }
 
@@ -173,7 +175,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
         return this.isFirstMove;
     }
 
-    public LogEntry<Point, Piece> getSubLogEntry() {
+    public LogEntry<Coordinate, Piece> getSubLogEntry() {
         return this.followUp;
     }
 
@@ -186,7 +188,7 @@ public class ChessLogEntry implements LogEntry<Point, Piece> {
             Colour colour = this.followUp.getStartObject().getColour();
             if ("R".equals(this.followUp.getStartObject().getCode())) {
                 // Not queen side rook
-                if (this.followUp.getStart().getY() != 0) {
+                if (this.followUp.getStart().getValue(Space.AXIS.Y) != 0) {
                     return colour.toCode() + "O-O";
                 } else {
                     return colour.toCode() + "O-O-O";

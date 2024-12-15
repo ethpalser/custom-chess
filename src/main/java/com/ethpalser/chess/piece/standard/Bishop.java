@@ -1,20 +1,21 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 
 public class Bishop implements Piece {
 
     private final Colour colour;
-    private Point point;
+    private Coordinate point;
     private boolean hasMoved;
 
     public Bishop(Colour colour, Point point) {
@@ -40,32 +41,32 @@ public class Bishop implements Piece {
     }
 
     @Override
-    public Point getPoint() {
+    public Coordinate getCoordinate() {
         return this.point;
     }
 
     @Override
-    public void setPoint(Point point) {
+    public void setCoordinate(Coordinate point) {
         this.point = point;
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board) {
+    public MoveSet getMoves(Board<Coordinate> board) {
         // Log and Threats are not needed
         return this.getMoves(board, null, null, false, false);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
         if (board == null) {
             throw new IllegalArgumentException("board cannot be null");
         }
         return new MoveSet(
-                new Move(Path.diagonal(board, this.point, this.colour, false, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, false, true, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, true, onlyAttacks, includeDefends))
+                new Move(Path.diagonal(board, (Point) this.point, this.colour, false, false, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, (Point) this.point, this.colour, false, true, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, (Point) this.point, this.colour, true, false, onlyAttacks, includeDefends)),
+                new Move(Path.diagonal(board, (Point) this.point, this.colour, true, true, onlyAttacks, includeDefends))
         );
     }
 
@@ -80,7 +81,7 @@ public class Bishop implements Piece {
     }
 
     @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         return false;
     }
 

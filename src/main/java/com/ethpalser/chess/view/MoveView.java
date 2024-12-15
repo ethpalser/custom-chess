@@ -4,6 +4,7 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.custom.CustomMoveType;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
@@ -23,7 +24,7 @@ public class MoveView {
 
     public MoveView(Path pathBase, CustomMoveType type, boolean mirrorXAxis, boolean mirrorYAxis,
             boolean onlySpecificQuadrant, boolean isMove, boolean isAttack, List<Conditional<Piece>> conditionals,
-            LogEntry<Point, Piece> followup) {
+            LogEntry<Coordinate, Piece> followup) {
         if (pathBase == null) {
             this.base = List.of();
         } else {

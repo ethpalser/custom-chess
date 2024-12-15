@@ -1,6 +1,8 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
@@ -8,12 +10,12 @@ import com.ethpalser.chess.view.ConditionalView;
 
 public class LogCondition<T extends Positional> implements Conditional<T> {
 
-    private final Log<Point, T> log;
+    private final Log<Coordinate, T> log;
     private final Comparator comparator;
     private final PropertyType propType;
     private final Object expected;
 
-    public LogCondition(Log<Point, T> log, Comparator comparator, PropertyType propType, Object expected) {
+    public LogCondition(Log<Coordinate, T> log, Comparator comparator, PropertyType propType, Object expected) {
         this.log = log;
         this.comparator = comparator;
         this.propType = propType;
@@ -21,7 +23,7 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
     }
 
     @Override
-    public boolean isExpected(Plane<T> plane) {
+    public boolean isExpected(Board<Coordinate> plane) {
         if (this.comparator == null || this.log == null || this.log.peek() == null) {
             return false;
         }
@@ -34,8 +36,8 @@ public class LogCondition<T extends Positional> implements Conditional<T> {
                 };
             }
             case DISTANCE_MOVED -> {
-                Point start = this.log.peek().getStart();
-                Point end = this.log.peek().getEnd();
+                Point start = (Point) this.log.peek().getStart();
+                Point end = (Point) this.log.peek().getEnd();
                 int diff;
                 if (start == null || end == null) {
                     diff = 0;

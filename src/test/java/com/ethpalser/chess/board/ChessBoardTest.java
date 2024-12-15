@@ -1,14 +1,12 @@
 package com.ethpalser.chess.board;
 
-import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.PieceFactory;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import java.util.Map;
+import com.ethpalser.chess.space.Space;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -17,21 +15,24 @@ class ChessBoardTest {
 
     @Test
     void initialize_default_is8x8AndHas32PiecesInCorrectLocation() {
-        Board board = new ChessBoard();
+        int width = 8;
+        int height = 8;
+        Space space = new Plane(width, height);
+        Board<Coordinate> board = new ChessBoard();
 
-        assertEquals(8, board.getPieces().length());
-        assertEquals(8, board.getPieces().width());
-        assertEquals(32, board.getPieces().size());
+        assertEquals(8, space.length(Space.AXIS.X));
+        assertEquals(8, space.length(Space.AXIS.Y));
+        assertEquals(32, board.count());
 
         Piece piece;
-        for (int x = 0; x < board.getPieces().width(); x++) {
-            for (int y = 0; y < board.getPieces().length(); y++) {
-                piece = board.getPiece(new Point(x, y));
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                piece = board.get(new Point(x, y));
                 if (piece == null) {
                     continue;
                 }
 
-                Point vector = piece.getPoint();
+                Point vector = (Point) piece.getCoordinate();
                 if (vector.getY() == 0 || vector.getY() == 1) {
                     assertEquals(Colour.WHITE, piece.getColour());
                 } else if (vector.getY() == 6 || vector.getY() == 7) {
@@ -56,18 +57,18 @@ class ChessBoardTest {
 
     @Test
     void count_newBoard_has32Pieces() {
-        Board board = new ChessBoard();
-        assertEquals(32, board.getPieces().size());
+        Board<Coordinate> board = new ChessBoard();
+        assertEquals(32, board.count());
     }
 
     @Test
     void count_playedBoardWithNoPawns_has16Pieces() {
-        Board board = new ChessBoard();
+        Board<Coordinate> board = new ChessBoard(); // This is setting up a default
         for (int y : new int[]{1, 6}) {
-            for (int x = 0; x < board.getPieces().width(); x++) {
-                board.addPiece(new Point(x, y), null);
+            for (int x = 0; x < 8; x++) {
+                board.add(new Point(x, y), null);
             }
         }
-        assertEquals(16, board.getPieces().size());
+        assertEquals(16, board.count());
     }
 }

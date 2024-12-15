@@ -9,27 +9,27 @@ class PlaneTest {
 
     @Test
     void testIsInBounds_givenPointWithinMinAndMax_thenTrue() {
-        Plane<Piece> plane = new Plane<>(7, 7);
+        Space plane = new Plane(8, 8);
         Point point = new Point(4,3);
-        boolean isInBounds = plane.isInBounds(point);
+        boolean isInBounds = plane.isOutOfBounds(point);
 
         assertTrue(isInBounds);
     }
 
     @Test
     void testIsInBounds_givenPointOutsideMin_thenTrue() {
-        Plane<Piece> plane = new Plane<>(7, 7);
+        Space plane = new Plane(8, 8);
         Point point = new Point(-1,3);
-        boolean isInBounds = plane.isInBounds(point);
+        boolean isInBounds = !plane.isOutOfBounds(point);
 
         assertFalse(isInBounds);
     }
 
     @Test
     void testIsInBounds_givenPointOutsideMax_thenTrue() {
-        Plane<Piece> plane = new Plane<>(7, 7);
+        Space plane = new Plane(8, 8);
         Point point = new Point(4,8);
-        boolean isInBounds = plane.isInBounds(point);
+        boolean isInBounds = !plane.isOutOfBounds(point);
 
         assertFalse(isInBounds);
     }

@@ -1,17 +1,14 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.Piece;
 
-public class Point implements Comparable<Point> {
+public class Point implements Coordinate, Comparable<Point> {
 
     private final int x;
     private final int y;
 
-    public static final int MAX_WIDTH = 26;
-    public static final int MAX_HEIGHT = 26;
-
-    public static final Point ORIGIN = new Point(0, 0);
+    public static final Point ORIGIN = new Point();
 
     public Point() {
         this.x = 0;
@@ -54,34 +51,59 @@ public class Point implements Comparable<Point> {
         this(copy.x, copy.y);
     }
 
+    @Override
+    public int getDimension() {
+        return 2;
+    }
+
+    @Override
+    public int getValue(int dimension) {
+        return switch (dimension) {
+            case 1 -> this.x;
+            case 2 -> this.y;
+            default -> throw new IndexOutOfBoundsException();
+        };
+    }
+
+    @Override
+    public int[] getValues() {
+        return new int[]{this.x, this.y};
+    }
+
+    @Override
+    public Coordinate translate(int magnitude, int... values) {
+        int[] newValues = new int[this.getDimension()];
+        for (int i = 0; i < newValues.length; i++) {
+            newValues[i] += this.getValue(i);
+            if (i < values.length) {
+                newValues[i] += magnitude * values[i];
+            }
+        }
+        return new Point(newValues[0], newValues[1]);
+    }
+
+    @Override
+    public int compareTo(Point o) {
+        if (o == null)
+            return -1;
+        int dimDiff = o.getDimension() - this.getDimension();
+        if (dimDiff != 0)
+            return dimDiff;
+
+        for (int d = 1; d <= o.getDimension(); d++) {
+            int valDiff = o.getValue(d) - this.getValue(d);
+            if (valDiff != 0)
+                return valDiff;
+        }
+        return 0;
+    }
+
     public int getX() {
         return this.x;
     }
 
     public int getY() {
         return this.y;
-    }
-
-    @Override
-    public int compareTo(Point o) {
-        if (o == null) {
-            return -1;
-        }
-        // The hashCodes are unique for every x,y combination
-        return this.hashCode() - o.hashCode();
-    }
-
-    /**
-     * A Point's hash code is its x and y value if it were in a 1D array. The maximum value for x and y is 31.
-     * For x and y such that 0 <= [x, y] < 31, its hash code is within 32^2 (1024).
-     *
-     * @return int mapping of its array index in a 1D array.
-     */
-    @Override
-    public int hashCode() {
-        // Each x, y value maps to a distinct positive integer in a bounded space
-        // Min x and min y at 0 equals 0. Max x and max y at 31 equals 1023
-        return this.y * (MAX_WIDTH + 1) + this.x;
     }
 
     @Override
@@ -129,32 +151,35 @@ public class Point implements Comparable<Point> {
 
     // STATIC METHODS
 
-    public static Point validOrNull(Plane<Piece> board, Point start, Colour colour,
+    public static Point validOrNull(Board<Coordinate> board, Point start, Colour colour,
             int xOffset, int yOffset, boolean includeDefends) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends || board.get(point) == null
-                || (board.get(point) != null && !board.get(point).getColour().equals(colour)))) {
+        Point point = (Point) start.translate(xOffset, yOffset);
+        // In general, valid spaces are empty or an opponent's piece
+        boolean isEmpty = board.get(point) == null;
+        boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);
+        // IncludeDefends is a special valid case only needed for algorithms considering opponent actions
+        if (!board.rejects(point) && (includeDefends || isEmpty || isOpponent)) {
             return point;
         }
         return null;
     }
 
-    public static Point notCaptureOrNull(Plane<Piece> board, Point start, int xOffset, int yOffset) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && board.get(point) == null) {
+    public static Point notCaptureOrNull(Board<Coordinate> board, Point start, int xOffset, int yOffset) {
+        Point point = (Point) start.translate(xOffset, yOffset);
+        // Non-capture points are always empty
+        if (!board.rejects(point) && board.get(point) == null) {
             return point;
         }
         return null;
     }
 
-    public static Point captureOrNull(Plane<Piece> board, Point start, Colour colour,
+    public static Point captureOrNull(Board<Coordinate> board, Point start, Colour colour,
             int xOffset, int yOffset, boolean includeDefends) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends || (board.get(point) != null
-                && !board.get(point).getColour().equals(colour)))) {
+        Point point = (Point) start.translate(xOffset, yOffset);
+        // Capture points are all valid spaces that are not empty
+        boolean isEmpty = board.get(point) == null;
+        boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);
+        if (!board.rejects(point) && (includeDefends || isOpponent)) {
             return point;
         }
         return null;

@@ -1,10 +1,12 @@
 package com.ethpalser.chess.move.map;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
@@ -18,10 +20,10 @@ public class MoveMap {
     private final int length;
     private final int width;
 
-    public MoveMap(Colour colour, Plane<Piece> board, Log<Point, Piece> log, ThreatMap threatMap) {
+    public MoveMap(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threatMap) {
         this.map = this.setup(colour, board, log, threatMap);
-        this.length = board.length();
-        this.width = board.width();
+        this.length = 8; // temp
+        this.width = 8; // temp
     }
 
     public Set<Point> getPoints() {
@@ -73,7 +75,7 @@ public class MoveMap {
 
     // PRIVATE METHODS
 
-    private Map<Point, Set<Piece>> setup(Colour colour, Plane<Piece> board, Log<Point, Piece> log,
+    private Map<Point, Set<Piece>> setup(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log,
             ThreatMap threatMap) {
         Map<Point, Set<Piece>> moves = new HashMap<>();
         for (Piece piece : board) {

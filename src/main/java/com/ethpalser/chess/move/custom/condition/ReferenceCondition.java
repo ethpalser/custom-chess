@@ -1,5 +1,7 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
@@ -19,7 +21,7 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
     }
 
     @Override
-    public boolean isExpected(Plane<T> plane) {
+    public boolean isExpected(Board<Coordinate> plane) {
         if (comparator == null) {
             return false;
         }

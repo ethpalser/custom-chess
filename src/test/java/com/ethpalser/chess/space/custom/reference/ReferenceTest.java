@@ -9,9 +9,13 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.standard.StandardPieceFactory;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.space.custom.Location;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,24 +29,26 @@ class ReferenceTest {
         Board board = new ChessBoard();
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
         // Then
-        assertTrue(reference.getReferences(board.getPieces()).isEmpty());
+        assertTrue(reference.getReferences(board).isEmpty());
     }
 
     @Test
     void absoluteRef_getReferences_givenLocationNotEmpty_thenHasPiece() {
         // Given
-        Board board = new ChessBoard();
+        Space space = new Plane(8, 8);
+        Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Reference<Piece> reference = new AbsoluteReference<>(new Point(0, 0));
         // Then
-        assertFalse(reference.getReferences(board.getPieces()).isEmpty());
+        assertFalse(reference.getReferences(board).isEmpty());
     }
 
     @Test
     void absoluteRef_getReferences_givenPieceMovedOntoLocation_thenHasPiece() {
         // Given
-        Board board = new ChessBoard();
-        Log<Point, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+        Space space = new Plane(8, 8);
+        Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
+        Log<Coordinate, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
 
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
 
@@ -51,8 +57,8 @@ class ReferenceTest {
 
 
         // Then
-        assertFalse(reference.getReferences(board.getPieces()).isEmpty());
-        assertTrue(reference.getReferences(board.getPieces()).contains(board.getPiece(new Point(4, 3))));
+        assertFalse(reference.getReferences(board).isEmpty());
+        assertTrue(reference.getReferences(board).contains(board.get(new Point(4, 3))));
     }
 
     @Test
@@ -62,7 +68,7 @@ class ReferenceTest {
 
         Reference<Piece> ref = new LogReference<>(log);
 
-        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+        assertTrue(ref.getReferences(board).isEmpty());
     }
 
     @Test
@@ -70,31 +76,31 @@ class ReferenceTest {
         Board board = new ChessBoard();
         ChessLog log = new ChessLog();
         log.add(new ChessLogEntry(new Point(4, 1), new Point(4, 3),
-                board.getPiece(new Point(4, 1)), board.getPiece(new Point(4, 3))));
+                board.get(new Point(4, 1)), board.get(new Point(4, 3))));
 
         Piece lastMoved = log.peek().getStartObject();
         Reference<Piece> ref = new LogReference<>(log);
 
-        assertTrue(ref.getReferences(board.getPieces()).contains(lastMoved));
+        assertTrue(ref.getReferences(board).contains(lastMoved));
     }
 
     @Test
     void pathRef_getReferences_givenVectorLocationAndEmpty_thenIsEmpty() {
         Board board = new ChessBoard();
-        Reference<Piece> ref = new PathReference<>(Location.POINT, new Point(4, 4));
+        Reference<Piece> ref = new PathReference(Location.POINT, new Point(4, 4));
 
-        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+        assertTrue(ref.getReferences(board).isEmpty());
     }
 
     @Test
     void pathRef_getReferences_givenVectorLocationAndFilled_thenIsNotEmpty() {
         Board board = new ChessBoard();
         Point point = new Point(4, 1);
-        Piece piece = board.getPiece(point);
+        Piece piece = board.get(point);
 
-        Reference<Piece> ref = new PathReference<>(Location.POINT, point);
+        Reference<Piece> ref = new PathReference(Location.POINT, point);
 
-        assertTrue(ref.getReferences(board.getPieces()).contains(piece));
+        assertTrue(ref.getReferences(board).contains(piece));
     }
 
     @Test
@@ -103,95 +109,98 @@ class ReferenceTest {
         Point start = new Point(3, 0);
         Point end = new Point(1, 0);
 
-        Reference<Piece> ref = new PathReference<>(Location.PATH, start, end);
+        Reference<Piece> ref = new PathReference(Location.PATH, start, end);
 
         // Forcefully remove piece from board
         Path path = new Path(start, end);
         for (Point p : path) {
-            board.addPiece(p, null);
+            board.add(p, null);
         }
 
-        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+        assertTrue(ref.getReferences(board).isEmpty());
     }
 
     @Test
     void pieceRef_getReferences_givenAtLocationAndNotMoved_thenIsItself() {
         Board board = new ChessBoard();
         // Given
-        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
+        Piece piece = board.get(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).contains(piece));
+        assertTrue(ref.getReferences(board).contains(piece));
     }
 
     @Test
     void pieceRef_getReferences_givenAtLocationAndMoved_thenIsItself() {
-        Board board = new ChessBoard();
-        Log<Point, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+        Space space = new Plane(8, 8);
+        Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
+        Log<Coordinate, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
         // Given
-        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
+        Piece piece = board.get(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.AT);
         ChessGame game = new ChessGame(board, log);
         game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).contains(piece));
+        assertTrue(ref.getReferences(board).contains(piece));
     }
 
     @Test
     void pieceRef_getReferences_givenBackOfLocationAndMovedUpOne_thenIsEmpty() {
-        Board board = new ChessBoard();
-        Log<Point, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+        Space space = new Plane(8, 8);
+        Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
+        Log<Coordinate, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
         // Given
-        Piece piece = board.getPiece(new Point(4, 1)); // e1 pawn
+        Piece piece = board.get(new Point(4, 1)); // e1 pawn
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
         ChessGame game = new ChessGame(board, log);
         game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+        assertTrue(ref.getReferences(board).isEmpty());
     }
 
     @Test
     void pieceRef_getReferences_givenRightOfLocationAndPawnToRight_thenIsPawn() {
-        Board board = new ChessBoard();
-        Log<Point, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board.getPieces(), log);
+        Space space = new Plane(8, 8);
+        Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
+        Log<Coordinate, Piece> log = new ChessLog();
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
         // Given
-        Piece refPiece = board.getPiece(new Point(4, 1)); // e1 pawn
-        Piece rightPiece = board.getPiece(new Point(5, 1)); // f1 pawn
+        Piece refPiece = board.get(new Point(4, 1)); // e1 pawn
+        Piece rightPiece = board.get(new Point(5, 1)); // f1 pawn
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
         ChessGame game = new ChessGame(board, log);
         game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
         game.movePiece(new Point(5, 1), new Point(5, 2), log, threatMap);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).contains(rightPiece));
+        assertTrue(ref.getReferences(board).contains(rightPiece));
     }
 
     @Test
     void pieceRef_getReferences_givenLeftFourOfKingAtStart_thenIsRook() {
         Board board = new ChessBoard();
         // Given
-        Piece refPiece = board.getPiece(new Point(4, 0)); // d0 king
-        Piece expected = board.getPiece(new Point(0, 0)); // a0 rook
+        Piece refPiece = board.get(new Point(4, 0)); // d0 king
+        Piece expected = board.get(new Point(0, 0)); // a0 rook
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.LEFT, 4);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).contains(expected));
+        assertTrue(ref.getReferences(board).contains(expected));
     }
 
     @Test
     void pieceRef_getReferences_givenOutOfBounds_thenIsEmpty() {
         Board board = new ChessBoard();
         // Given
-        Piece refPiece = board.getPiece(new Point(4, 0)); // d0 king
+        Piece refPiece = board.get(new Point(4, 0)); // d0 king
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.BACK, 2);
         // Then
-        assertTrue(ref.getReferences(board.getPieces()).isEmpty());
+        assertTrue(ref.getReferences(board).isEmpty());
     }
 }

@@ -1,33 +1,25 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 
-public class ChessLog implements Log<Point, Piece> {
+public class ChessLog implements Log<Coordinate, Piece> {
 
-    private final Deque<LogEntry<Point, Piece>> logStack;
-    private final Deque<LogEntry<Point, Piece>> undoStack;
+    private final Deque<LogEntry<Coordinate, Piece>> logStack;
+    private final Deque<LogEntry<Coordinate, Piece>> undoStack;
 
     public ChessLog() {
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
     }
 
-    public void addAll(Plane<Piece> board, List<String> logStrings) {
-        for (String s : logStrings) {
-            ChessLogEntry rec = new ChessLogEntry(board, s);
-            this.logStack.push(rec);
-        }
-    }
-
     @Override
-    public boolean addAll(Collection<? extends LogEntry<Point, Piece>> c) {
+    public boolean addAll(Collection<? extends LogEntry<Coordinate, Piece>> c) {
         return this.logStack.addAll(c);
     }
 
@@ -74,7 +66,7 @@ public class ChessLog implements Log<Point, Piece> {
                 return false;
             }
             boolean exists = false;
-            for (LogEntry<Point, Piece> entry : this.logStack) {
+            for (LogEntry<Coordinate, Piece> entry : this.logStack) {
                 if (entry.equals(o)) {
                     exists = true;
                     break;
@@ -103,7 +95,7 @@ public class ChessLog implements Log<Point, Piece> {
     }
 
     @Override
-    public Iterator<LogEntry<Point, Piece>> iterator() {
+    public Iterator<LogEntry<Coordinate, Piece>> iterator() {
         return this.logStack.iterator();
     }
 
@@ -118,24 +110,24 @@ public class ChessLog implements Log<Point, Piece> {
     }
 
     @Override
-    public boolean add(LogEntry<Point, Piece> actionRecord) {
+    public boolean add(LogEntry<Coordinate, Piece> actionRecord) {
         return this.logStack.add(actionRecord);
     }
 
     @Override
-    public LogEntry<Point, Piece> peek() {
+    public LogEntry<Coordinate, Piece> peek() {
         return this.logStack.peek();
     }
 
     @Override
-    public void push(LogEntry<Point, Piece> actionRecord) {
+    public void push(LogEntry<Coordinate, Piece> actionRecord) {
         if (actionRecord != null) {
             this.logStack.push(actionRecord);
         }
     }
 
     @Override
-    public LogEntry<Point, Piece> pop() {
+    public LogEntry<Coordinate, Piece> pop() {
         if (!logStack.isEmpty()) {
             return this.logStack.pop();
         }
@@ -143,9 +135,9 @@ public class ChessLog implements Log<Point, Piece> {
     }
 
     @Override
-    public LogEntry<Point, Piece> undo() {
+    public LogEntry<Coordinate, Piece> undo() {
         if (!this.logStack.isEmpty()) {
-            LogEntry<Point, Piece> logEntry = this.logStack.pop();
+            LogEntry<Coordinate, Piece> logEntry = this.logStack.pop();
             this.undoStack.push(logEntry);
             return logEntry;
         }
@@ -153,9 +145,9 @@ public class ChessLog implements Log<Point, Piece> {
     }
 
     @Override
-    public LogEntry<Point, Piece> redo() {
+    public LogEntry<Coordinate, Piece> redo() {
         if (!this.undoStack.isEmpty()) {
-            LogEntry<Point, Piece> logEntry = this.undoStack.pop();
+            LogEntry<Coordinate, Piece> logEntry = this.undoStack.pop();
             this.logStack.push(logEntry);
             return logEntry;
         }

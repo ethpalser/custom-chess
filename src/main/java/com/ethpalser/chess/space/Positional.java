@@ -2,7 +2,7 @@ package com.ethpalser.chess.space;
 
 public interface Positional {
 
-    Point getPoint();
+    Coordinate getCoordinate();
 
     boolean getHasMoved();
 

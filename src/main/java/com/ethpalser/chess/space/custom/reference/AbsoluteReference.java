@@ -1,5 +1,8 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
@@ -9,9 +12,9 @@ import java.util.List;
 
 public class AbsoluteReference<T extends Positional> implements Reference<T> {
 
-    private final Point point;
+    private final Coordinate point;
 
-    public AbsoluteReference(Point point) {
+    public AbsoluteReference(Coordinate point) {
         this.point = point;
     }
 
@@ -21,8 +24,8 @@ public class AbsoluteReference<T extends Positional> implements Reference<T> {
     }
 
     @Override
-    public List<T> getReferences(Plane<T> plane) {
-        T ref = plane.get(this.point);
+    public List<T> getReferences(Board<Coordinate> plane) {
+        T ref = (T) plane.get(this.point);
         if (ref == null) {
             return List.of();
         }
@@ -31,6 +34,6 @@ public class AbsoluteReference<T extends Positional> implements Reference<T> {
 
     @Override
     public ReferenceView toView() {
-        return new ReferenceView(Location.POINT, this.point, 0, 0);
+        return new ReferenceView(Location.POINT, (Point) this.point, 0, 0);
     }
 }

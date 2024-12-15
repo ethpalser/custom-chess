@@ -1,8 +1,10 @@
 package com.ethpalser.chess.log;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.view.ActionView;
 
-public interface LogEntry<T extends Comparable<T>, U> {
+public interface LogEntry<T extends Coordinate, U> {
 
     T getStart();
 
@@ -22,6 +24,7 @@ public interface LogEntry<T extends Comparable<T>, U> {
      * but it is not standard practice logging that forced situation.
      * <br/>
      * This is not meant for chaining LogEntries to create a primitive LinkedList.
+     *
      * @return LogEntry
      */
     LogEntry<T, U> getSubLogEntry();

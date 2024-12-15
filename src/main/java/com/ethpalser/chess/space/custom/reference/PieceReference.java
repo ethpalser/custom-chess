@@ -1,9 +1,9 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.Location;
 import com.ethpalser.chess.view.ReferenceView;
 import java.util.List;
@@ -76,17 +76,11 @@ public class PieceReference implements Reference<Piece> {
     }
 
     @Override
-    public List<Piece> getReferences(Plane<Piece> plane) {
+    public List<Piece> getReferences(Board<Coordinate> plane) {
         Piece ref = switch (this.direction) {
-            case AT -> plane.get(
-                    new Point(this.piece.getPoint().getX() + shiftX, this.piece.getPoint().getY() + shiftY)
-            );
-            case LEFT, RIGHT -> plane.get(
-                    new Point(this.piece.getPoint().getX() + shiftX, this.piece.getPoint().getY())
-            );
-            case BACK, FRONT -> plane.get(
-                    new Point(this.piece.getPoint().getX(), this.piece.getPoint().getY() + shiftY)
-            );
+            case AT -> plane.get(this.piece.getCoordinate().translate(1, shiftX, shiftY));
+            case LEFT, RIGHT -> plane.get(this.piece.getCoordinate().translate(1, shiftX));
+            case BACK, FRONT -> plane.get(this.piece.getCoordinate().translate(1, 0, shiftY));
         };
         if (ref == null) {
             return List.of();

@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.log.custom.ReferenceLogEntry;
@@ -11,6 +12,7 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -33,7 +35,7 @@ public class CustomMove {
     private final boolean isAttack;
     private final boolean isMove;
     private final List<Conditional<Piece>> conditions;
-    private final LogEntry<Point, Piece> followUp;
+    private final LogEntry<Coordinate, Piece> followUp;
 
     public static class Builder {
         // required
@@ -46,7 +48,7 @@ public class CustomMove {
         private boolean isAttack = true;
         private boolean isMove = true;
         private List<Conditional<Piece>> conditions = List.of();
-        private LogEntry<Point, Piece> followUp = null;
+        private LogEntry<Coordinate, Piece> followUp = null;
 
         public Builder(Path path, CustomMoveType moveType) {
             this.path = Objects.requireNonNullElse(path, new Path(List.of()));
@@ -83,7 +85,7 @@ public class CustomMove {
             return this;
         }
 
-        public Builder followUp(LogEntry<Point, Piece> followUp) {
+        public Builder followUp(LogEntry<Coordinate, Piece> followUp) {
             this.followUp = followUp;
             return this;
         }
@@ -117,7 +119,7 @@ public class CustomMove {
         this.followUp = null;
     }
 
-    public CustomMove(Plane<Piece> board, Log<Point, Piece> log, MoveView view) {
+    public CustomMove(Board<Coordinate> board, Log<Coordinate, Piece> log, MoveView view) {
         if (view == null) {
             this.pathBase = null;
             this.moveType = null;
@@ -151,7 +153,7 @@ public class CustomMove {
         }
     }
 
-    public List<Movement> toMovementList(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+    public List<Movement> toMovementList(Board<Coordinate> board, ThreatMap threatMap, Colour colour, Point offset,
             boolean onlyAttacks, boolean includeDefend) {
         if (colour == null || offset == null) {
             throw new NullPointerException("one or more arguments are null, colour: " + (colour == null)
@@ -187,7 +189,7 @@ public class CustomMove {
 
     // PRIVATE
 
-    private List<Path> getPathsInAllQuadrants(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+    private List<Path> getPathsInAllQuadrants(Board<Coordinate> board, ThreatMap threatMap, Colour colour, Point offset,
             boolean onlyAttacks, boolean includeDefend) {
         List<Path> list = new ArrayList<>();
         if (mirrorXAxis || Colour.WHITE.equals(colour)) {
@@ -225,7 +227,7 @@ public class CustomMove {
         return list;
     }
 
-    private Path getPathInQuadrant(Plane<Piece> board, ThreatMap threatMap, Colour colour, Point offset,
+    private Path getPathInQuadrant(Board<Coordinate> board, ThreatMap threatMap, Colour colour, Point offset,
             boolean isRight, boolean isUp, boolean onlyAttacks, boolean includeDefend) {
         if (!this.passesConditions(board) || colour == null || offset == null) {
             return null;
@@ -236,7 +238,7 @@ public class CustomMove {
             Point next = this.getVectorInQuadrant(p, offset, isRight, isUp);
             boolean isSafe = threatMap != null && threatMap.hasNoThreats(next);
             // Not a valid location, out of bounds, or fails its conditions
-            if (next == null || !board.isInBounds(next) || (Pieces.isKing(board.get(offset)) && !isSafe)) {
+            if (board.rejects(next) || (Pieces.isKing(board.get(offset)) && !isSafe)) {
                 break;
             }
 
@@ -279,7 +281,7 @@ public class CustomMove {
      * @param board {@link Plane} for the Condition to verify with
      * @return true if all Condition pass, otherwise false
      */
-    private boolean passesConditions(Plane<Piece> board) {
+    private boolean passesConditions(Board<Coordinate> board) {
         if (board == null) {
             return false;
         }

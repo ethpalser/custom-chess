@@ -15,28 +15,32 @@ import com.ethpalser.chess.move.custom.condition.ReferenceCondition;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.space.custom.Location;
 import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.space.custom.reference.LogReference;
 import com.ethpalser.chess.space.custom.reference.PathReference;
 import com.ethpalser.chess.space.custom.reference.PieceReference;
 import com.ethpalser.chess.view.MoveView;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CustomPieceFactory implements PieceFactory {
 
     private final Map<String, List<MoveView>> pieceSpecs;
-    private final Plane<Piece> plane;
-    private final Log<Point, Piece> log;
+    private final Space space;
+    private final Log<Coordinate, Piece> log;
 
-    public CustomPieceFactory(Map<String, List<MoveView>> pieceSpecs, Plane<Piece> plane, Log<Point, Piece> log) {
+    public CustomPieceFactory(Map<String, List<MoveView>> pieceSpecs,
+            Log<Coordinate, Piece> log,
+            Space space) {
         this.pieceSpecs = pieceSpecs;
-        this.plane = plane; // Todo: Decouple this from pieces and factory
+        this.space = space; // Todo: Decouple this from pieces and factory
         this.log = log; // Todo: Decouple this from pieces and factory
     }
 
@@ -73,7 +77,7 @@ public class CustomPieceFactory implements PieceFactory {
     }
 
     private Conditional<Piece> emptyPathCondition(Point start, Point end) {
-        return new ReferenceCondition<>(new PathReference<>(Location.PATH, start, end), Comparator.EQUAL,
+        return new ReferenceCondition<>(new PathReference(Location.PATH, start, end), Comparator.EQUAL,
                 null);
     }
 
@@ -94,19 +98,36 @@ public class CustomPieceFactory implements PieceFactory {
     // PATHS
 
     private Path vertical() {
+        List<Point> points = new ArrayList<>();
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
-        return new Path(new Point(plane.getMinX(), plane.getMinY() + 1), new Point(plane.getMinX(), plane.getMaxY()));
+        Point current = new Point(0, 1);
+        while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
+            points.add(current);
+            current = (Point) current.translate(1, 1, 0);
+        }
+        return new Path(points);
     }
 
     private Path horizontal() {
+        List<Point> points = new ArrayList<>();
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
-        return new Path(new Point(plane.getMinX() + 1, plane.getMinY()), new Point(plane.getMaxX(), plane.getMinY()));
+        Point current = new Point(0, 1);
+        while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
+            points.add(current);
+            current = (Point) current.translate(1, 0, 1);
+        }
+        return new Path(points);
     }
 
     private Path diagonal() {
+        List<Point> points = new ArrayList<>();
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
-        return new Path(new Point(plane.getMinX() + 1, plane.getMinY() + 1),
-                new Point(plane.getMaxX(), plane.getMaxY()));
+        Point current = new Point(0, 1);
+        while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
+            points.add(current);
+            current = (Point) current.translate(1, 1, 1);
+        }
+        return new Path(points);
     }
 
     // PIECES
@@ -144,7 +165,7 @@ public class CustomPieceFactory implements PieceFactory {
 
         {
             // Castle - King side
-            Point kingSideRook = new Point(plane.getMaxX(), plane.getMinY()); // Assuming a standard board
+            Point kingSideRook = new Point(7, 0); // Assuming a standard board
             CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
@@ -157,13 +178,13 @@ public class CustomPieceFactory implements PieceFactory {
                             // Todo: Update pieces to have an internal start location, then use this off of its start
                             this.emptyPathCondition(new Point().shift(colour, Direction.RIGHT), kingSideRook)
                     ))
-                    .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), this.plane.get(kingSideRook)))
+                    .followUp(new ChessLogEntry(kingSideRook, new Point(5, 0), null))
                     .build();
             king.addMoveSpec(castleKingSide);
         }
         {
             // Castle - Queen side
-            Point queenSideRook = new Point(plane.getMinX(), plane.getMinY()); // Assuming a standard board
+            Point queenSideRook = new Point(0, 0); // Assuming a standard board
             CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(true)
@@ -176,7 +197,7 @@ public class CustomPieceFactory implements PieceFactory {
                             // Todo: Update pieces to have an internal start location, then use this off of its start
                             this.emptyPathCondition(new Point().shift(colour, Direction.LEFT), queenSideRook)
                     ))
-                    .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), this.plane.get(queenSideRook)))
+                    .followUp(new ChessLogEntry(queenSideRook, new Point(3, 0), null))
                     .build();
             king.addMoveSpec(castleQueenSide);
         }
@@ -216,7 +237,7 @@ public class CustomPieceFactory implements PieceFactory {
         // En Passant is split into two due to limitations with References, as refs don't have CustomPiece's mirroring
         {
             // En Passant front-right
-            LogEntry<Point, Piece> followUpRight = new ReferenceLogEntry<>(this.plane,
+            LogEntry<Coordinate, Piece> followUpRight = new ReferenceLogEntry<>(null, // remove board dependency
                     new PieceReference(pawn, Direction.AT, 1, 0), null);
             CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)
@@ -234,7 +255,7 @@ public class CustomPieceFactory implements PieceFactory {
         }
         {
             // En Passant front-left
-            LogEntry<Point, Piece> followUpLeft = new ReferenceLogEntry<>(this.plane,
+            LogEntry<Coordinate, Piece> followUpLeft = new ReferenceLogEntry<>(null, // remove board dependency
                     new PieceReference(pawn, Direction.AT, -1, 0), null);
             CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
                     .isMirrorXAxis(false)
@@ -256,7 +277,7 @@ public class CustomPieceFactory implements PieceFactory {
     private CustomPiece custom(Colour colour, String code) {
         CustomPiece piece = new CustomPiece(code, colour, Point.ORIGIN, false);
         for (MoveView spec : this.pieceSpecs.get(code)) {
-            piece.addMoveSpec(new CustomMove(this.plane, this.log, spec));
+            // piece.addMoveSpec(new CustomMove(this.board, this.log, spec)); // todo: fix movement to not depend on board
         }
         return piece;
     }

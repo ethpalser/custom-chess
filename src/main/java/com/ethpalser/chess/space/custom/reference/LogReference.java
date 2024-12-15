@@ -1,14 +1,17 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.space.custom.Location;
 import com.ethpalser.chess.view.ReferenceView;
 import java.util.List;
 
-public class LogReference<T extends Comparable<T>, U extends Positional> implements Reference<U> {
+public class LogReference<T extends Coordinate, U extends Positional> implements Reference<U> {
 
     private final Log<T, U> log;
 
@@ -22,7 +25,7 @@ public class LogReference<T extends Comparable<T>, U extends Positional> impleme
     }
 
     @Override
-    public List<U> getReferences(Plane<U> plane) {
+    public List<U> getReferences(Board<Coordinate> plane) {
         if (this.log == null) {
             return List.of();
         }

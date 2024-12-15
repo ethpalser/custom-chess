@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -9,15 +10,16 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import java.util.List;
 
 public class Pawn implements Piece {
 
     private final Colour colour;
-    private Point point;
+    private Coordinate point;
     private boolean hasMoved;
 
     public Pawn(Colour colour, Point point) {
@@ -43,72 +45,72 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public Point getPoint() {
+    public Coordinate getCoordinate() {
         return this.point;
     }
 
     @Override
-    public void setPoint(Point point) {
+    public void setCoordinate(Coordinate point) {
         this.point = point;
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board) {
+    public MoveSet getMoves(Board<Coordinate> board) {
         System.err.println("unsupported method used by pawn: getMoves(Plane<Piece> board)");
         return this.getMoves(board, null, null, false, false);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log) {
         // Threats are not needed
         return this.getMoves(board, log, null, false, false);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
         int yOffset = this.colour == Colour.WHITE ? 1 : -1;
         if (onlyAttacks) {
             // As we want only attacks, include an attack even if there is no capture. Intended to use for threats.
             return new MoveSet(
-                    Point.validOrNull(board, this.point, this.colour, -1, yOffset, includeDefends),
-                    Point.validOrNull(board, this.point, this.colour, 1, yOffset, includeDefends)
+                    Point.validOrNull(board, (Point) this.point, this.colour, -1, yOffset, includeDefends),
+                    Point.validOrNull(board, (Point) this.point, this.colour, 1, yOffset, includeDefends)
             );
         }
         MoveSet moveSet = new MoveSet(
-                Point.notCaptureOrNull(board, this.point, 0, yOffset),
-                Point.captureOrNull(board, this.point, this.colour, -1, yOffset, includeDefends),
-                Point.captureOrNull(board, this.point, this.colour, 1, yOffset, includeDefends)
+                Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset),
+                Point.captureOrNull(board, (Point) this.point, this.colour, -1, yOffset, includeDefends),
+                Point.captureOrNull(board, (Point) this.point, this.colour, 1, yOffset, includeDefends)
         );
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
             moveSet.addMove(new Move(new Path(
-                    Point.notCaptureOrNull(board, this.point, 0, yOffset),
-                    Point.notCaptureOrNull(board, this.point, 0, yOffset * 2)
+                    Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset),
+                    Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset * 2)
             )));
         }
 
         // en passant (there must be at least one move)
         if (log != null && !log.isEmpty()) {
-            LogEntry<Point, Piece> lastMove = log.peek();
-            Point peekStart = lastMove.getStart();
-            Point peekEnd = lastMove.getEnd();
+            LogEntry<Coordinate, Piece> lastMove = log.peek();
+            Point peekStart = (Point) lastMove.getStart();
+            Point peekEnd = (Point) lastMove.getEnd();
             // a pawn moved forward two
             if (lastMove.isFirstOccurrence() && board.get(peekEnd) != null && "P".equals(board.get(peekEnd).getCode())
                     && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
                     || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
             ) {
                 // that pawn is to the left of this pawn
-                Point left = Point.validOrNull(board, this.point, this.colour, -1, 0, false);
+                Point left = Point.validOrNull(board, (Point) this.point, this.colour, -1, 0, false);
                 if (left != null && left.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, -1, yOffset, false);
+                    Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, -1, yOffset, false);
                     moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.get(left))));
                 }
                 // that pawn is to the right of this pawn
-                Point right = Point.validOrNull(board, this.point, this.colour, 1, 0, false);
+                Point right = Point.validOrNull(board, (Point) this.point, this.colour, 1, 0, false);
                 if (right != null && right.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, 1, yOffset, false);
+                    Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, 1, yOffset, false);
                     moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.get(right))));
                 }
             }
@@ -127,9 +129,10 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public boolean canPromote(Plane<Piece> board) {
-        return Colour.WHITE.equals(this.colour) && this.getPoint().getY() == board.getMaxY()
-                || Colour.BLACK.equals(this.colour) && this.getPoint().getY() == board.getMinY();
+    public boolean canPromote(Board<Coordinate> board) {
+        // Assuming standard board, todo: fix this
+        return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == 7
+                || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == 0;
     }
 
     @Override

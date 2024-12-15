@@ -1,5 +1,6 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
@@ -160,12 +161,12 @@ public class Path implements Iterable<Point> {
         }
     }
 
-    public static Path horizontal(Plane<Piece> board, Point start, Colour colour, boolean right,
+    public static Path horizontal(Board<Coordinate> board, Point start, Colour colour, boolean right,
             boolean onlyAttacks, boolean includeDefends) {
         List<Point> list = new LinkedList<>();
         int x = right ? 1 : -1;
         // while within the board's boundaries
-        while (board.isInBounds(start.getX() + x, start.getY())) {
+        while (!board.rejects(start.translate(1, x, 0))) {
             Point pos = new Point(start.getX() + x, start.getY());
             Piece piece = board.get(pos);
             if (piece != null) {
@@ -186,12 +187,12 @@ public class Path implements Iterable<Point> {
         return new Path(list);
     }
 
-    public static Path vertical(Plane<Piece> board, Point start, Colour colour, boolean up,
+    public static Path vertical(Board<Coordinate> board, Point start, Colour colour, boolean up,
             boolean onlyAttacks, boolean includeDefends) {
         List<Point> list = new LinkedList<>();
         int y = up ? 1 : -1;
         // while within the board's boundaries
-        while (board.isInBounds(start.getX(), start.getY() + y)) {
+        while (!board.rejects(start.translate(1, 0, y))) {
             Point pos = new Point(start.getX(), start.getY() + y);
             Piece piece = board.get(pos);
             if (piece != null) {
@@ -212,13 +213,13 @@ public class Path implements Iterable<Point> {
         return new Path(list);
     }
 
-    public static Path diagonal(Plane<Piece> board, Point start, Colour colour, boolean right, boolean up,
+    public static Path diagonal(Board<Coordinate> board, Point start, Colour colour, boolean right, boolean up,
             boolean onlyAttacks, boolean includeDefends) {
         List<Point> list = new LinkedList<>();
         int x = right ? 1 : -1;
         int y = up ? 1 : -1;
         // while within the board's boundaries
-        while (board.isInBounds(start.getX() + x, start.getY() + y)) {
+        while (!board.rejects(start.translate(1, x, y))) {
             Point pos = new Point(start.getX() + x, start.getY() + y);
             Piece piece = board.get(pos);
             if (piece != null) {

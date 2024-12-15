@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece.custom;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
@@ -7,7 +8,7 @@ import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class CustomPiece implements Piece {
     private final String code;
     private final Colour colour;
     private final List<CustomMove> moveSpecifications;
-    private Point position;
+    private Coordinate position;
     private boolean hasMoved;
 
     public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
@@ -61,26 +62,25 @@ public class CustomPiece implements Piece {
     }
 
     @Override
-    public Point getPoint() {
+    public Coordinate getCoordinate() {
         return this.position;
     }
 
-    @Override
-    public void setPoint(Point point) {
+    public void setCoordinate(Coordinate point) {
         this.position = point;
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board) {
+    public MoveSet getMoves(Board<Coordinate> board) {
         return this.getMoves(board, null, null, false, false);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
         Set<Movement> movements = new HashSet<>();
         for (CustomMove spec : this.moveSpecifications) {
-            movements.addAll(spec.toMovementList(board, threats, this.colour, this.position, onlyAttacks,
+            movements.addAll(spec.toMovementList(board, threats, this.colour, (Point) this.position, onlyAttacks,
                     includeDefends));
         }
         return new MoveSet(movements);
@@ -105,11 +105,11 @@ public class CustomPiece implements Piece {
     }
 
     @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         // Temporary work-around. This should be defined on construction by a configuration object/string
         if (PieceType.PAWN.getCode().equals(this.code)) {
-            return Colour.WHITE.equals(this.colour) && this.getPoint().getY() == board.getMaxY()
-                    || Colour.BLACK.equals(this.colour) && this.getPoint().getY() == board.getMinY();
+            return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(2) == 8
+                    || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(2) == 0;
         } else {
             return false;
         }

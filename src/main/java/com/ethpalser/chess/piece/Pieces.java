@@ -45,7 +45,7 @@ public class Pieces {
         StringBuilder sb = new StringBuilder();
         sb.append(piece.getColour().toCode());
         sb.append(code);
-        sb.append(piece.getPoint());
+        sb.append(piece.getCoordinate());
         if (piece.getHasMoved()) {
             sb.append("*");
         }

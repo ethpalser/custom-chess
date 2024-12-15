@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -8,15 +9,16 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import java.util.List;
 
 public class King implements Piece {
 
     private final Colour colour;
-    private Point point;
+    private Coordinate point;
     private boolean hasMoved;
 
     public King(Colour colour, Point point) {
@@ -42,34 +44,34 @@ public class King implements Piece {
     }
 
     @Override
-    public Point getPoint() {
+    public Coordinate getCoordinate() {
         return this.point;
     }
 
     @Override
-    public void setPoint(Point point) {
+    public void setCoordinate(Coordinate point) {
         this.point = point;
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board) {
+    public MoveSet getMoves(Board<Coordinate> board) {
         System.err.println("unsupported method for king used: getMoves(Plane<Piece> board)");
         return this.getMoves(board, null, null);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log) {
         System.err.println("unsupported method for king used: getMoves(Plane<Piece> board, Log<Point, Piece> log)");
         return this.getMoves(board, log, null);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats) {
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats) {
         return this.getMoves(board, log, threats, false, false);
     }
 
     @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap opponentThreats,
+    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap opponentThreats,
             boolean onlyAttacks, boolean includeDefends) {
         MoveSet moveSet = new MoveSet(
                 this.generateSafePointOrNull(board, opponentThreats, -1, 0, includeDefends), // left
@@ -84,40 +86,40 @@ public class King implements Piece {
 
         // castling
         // not moved and not threatened (need to use the correct threat map)
-        if (!this.hasMoved && opponentThreats != null && opponentThreats.hasNoThreats(this.point)) {
-            int startRank = this.colour == Colour.WHITE ? board.getMinY() : board.getMaxY();
+        if (!this.hasMoved && opponentThreats != null && opponentThreats.hasNoThreats((Point) this.point)) {
+            int startRank = this.colour == Colour.WHITE ? 0 : 7; // assuming standard board
 
             // queen side (towards the left)
-            Piece queenSideRook = board.get(new Point(board.getMinX(), startRank));
+            Piece queenSideRook = board.get(new Point(0, startRank)); // assuming standard board
             if (queenSideRook != null && !queenSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y))
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) - 2, this.point.getValue(Space.AXIS.Y))
             ) {
-                LogEntry<Point, Piece> queenSideRookMove = new ChessLogEntry(
-                        new Point(0, startRank),
-                        new Point(this.point.getX() - 1, this.point.getY()),
+                LogEntry<Coordinate, Piece> queenSideRookMove = new ChessLogEntry(
+                        new Point(0, startRank), // assuming standard board
+                        new Point(this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y)),
                         queenSideRook
                 );
                 moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getX() - 1, this.point.getY()),
-                        new Point(this.point.getX() - 2, this.point.getY())
+                        new Point(this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y)),
+                        new Point(this.point.getValue(Space.AXIS.X) - 2, this.point.getValue(Space.AXIS.Y))
                 ), queenSideRookMove));
             }
 
             // king side (towards the right)
-            Piece kingSideRook = board.get(new Point(board.getMaxX(), startRank));
+            Piece kingSideRook = board.get(new Point(7, startRank)); // assuming standard board
             if (kingSideRook != null && !kingSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y))
+                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) + 2, this.point.getValue(Space.AXIS.Y))
             ) {
-                LogEntry<Point, Piece> kingSideRookMove = new ChessLogEntry(
-                        new Point(board.getMaxX(), startRank),
-                        new Point(this.point.getX() + 1, this.point.getY()),
+                LogEntry<Coordinate, Piece> kingSideRookMove = new ChessLogEntry(
+                        new Point(7, startRank), // assuming standard board
+                        new Point(this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y)),
                         kingSideRook
                 );
                 moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getX() + 1, this.point.getY()),
-                        new Point(this.point.getX() + 2, this.point.getY())
+                        new Point(this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y)),
+                        new Point(this.point.getValue(Space.AXIS.X) + 2, this.point.getValue(Space.AXIS.Y))
                 ), kingSideRookMove));
             }
         }
@@ -135,7 +137,7 @@ public class King implements Piece {
     }
 
     @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         return false;
     }
 
@@ -146,16 +148,16 @@ public class King implements Piece {
 
     // PRIVATE METHODS
 
-    private boolean isEmptyAndSafe(Plane<Piece> board, ThreatMap threatMap, int x, int y) {
+    private boolean isEmptyAndSafe(Board<Coordinate> board, ThreatMap threatMap, int x, int y) {
         Point p = new Point(x, y);
         return board.get(p) == null && threatMap != null && threatMap.hasNoThreats(p);
     }
 
-    private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset,
+    private Point generateSafePointOrNull(Board<Coordinate> board, ThreatMap threatMap, int xOffset, int yOffset,
             boolean includeDefends) {
-        Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
+        Point p = (Point) this.point.translate(1, xOffset, yOffset);
         if (threatMap != null && threatMap.hasNoThreats(p)) {
-            return Point.validOrNull(board, this.point, this.colour, -1, 0, includeDefends);
+            return Point.validOrNull(board, (Point) this.point, this.colour, -1, 0, includeDefends);
         }
         return null;
     }

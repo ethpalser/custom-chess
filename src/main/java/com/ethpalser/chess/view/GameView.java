@@ -6,6 +6,7 @@ import com.ethpalser.chess.move.custom.CustomMove;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,12 @@ public class GameView {
         this.turn = game.getTurn();
         this.log = game.getLog().stream().map(LogEntry::toString).collect(Collectors.toList());
         this.board = new BoardView(
-                new ArrayList<>(game.getBoard().getPieces().values()),
-                game.getBoard().getPieces().width(),
-                game.getBoard().getPieces().length()
+                List.of(), // todo: fix
+                8,
+                8
         );
         Map<String, List<MoveView>> specList = new HashMap<>();
-        for (Piece p : game.getBoard().getPieces()) {
+        for (Piece p : game.getBoard()) {
             if (p instanceof CustomPiece && !"PRNBQK".contains(p.getCode()) && specList.get(p.getCode()) == null) {
                 specList.put(
                         p.getCode(),

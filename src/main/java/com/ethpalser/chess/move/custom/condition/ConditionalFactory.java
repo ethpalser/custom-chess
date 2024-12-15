@@ -1,7 +1,9 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.custom.reference.ReferenceFactory;
@@ -10,10 +12,10 @@ import com.ethpalser.chess.view.ReferenceView;
 
 public class ConditionalFactory {
 
-    private final Plane<Piece> board;
-    private final Log<Point, Piece> log;
+    private final Board<Coordinate> board;
+    private final Log<Coordinate, Piece> log;
 
-    public ConditionalFactory(Plane<Piece> board, Log<Point, Piece> log) {
+    public ConditionalFactory(Board<Coordinate> board, Log<Coordinate, Piece> log) {
         this.board = board;
         this.log = log;
     }

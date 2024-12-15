@@ -1,24 +1,26 @@
 package com.ethpalser.chess.log.custom;
 
+import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.reference.Reference;
 import com.ethpalser.chess.view.ActionView;
 
-public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, T> {
+public class ReferenceLogEntry<T extends Positional> implements LogEntry<Coordinate, T> {
 
-    private final Plane<T> space;
+    private final Board<Coordinate> space;
     private final Reference<T> startRef;
     private final Reference<T> endRef;
-    private final LogEntry<Point, T> subLogEntry;
+    private final LogEntry<Coordinate, T> subLogEntry;
 
-    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end) {
+    public ReferenceLogEntry(Board<Coordinate> plane, Reference<T> start, Reference<T> end) {
         this(plane, start, end, null);
     }
 
-    public ReferenceLogEntry(Plane<T> plane, Reference<T> start, Reference<T> end, LogEntry<Point, T> subLogEntry) {
+    public ReferenceLogEntry(Board<Coordinate> plane, Reference<T> start, Reference<T> end, LogEntry<Coordinate, T> subLogEntry) {
         this.space = plane;
         this.startRef = start;
         this.endRef = end;
@@ -26,19 +28,19 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
     }
 
     @Override
-    public Point getStart() {
+    public Coordinate getStart() {
         T ref = this.getStartObject();
         if (ref != null) {
-            return ref.getPoint();
+            return ref.getCoordinate();
         }
         return null;
     }
 
     @Override
-    public Point getEnd() {
+    public Coordinate getEnd() {
         T ref = this.getEndObject();
         if (ref != null) {
-            return ref.getPoint();
+            return ref.getCoordinate();
         }
         return null;
     }
@@ -70,7 +72,7 @@ public class ReferenceLogEntry<T extends Positional> implements LogEntry<Point, 
     }
 
     @Override
-    public LogEntry<Point, T> getSubLogEntry() {
+    public LogEntry<Coordinate, T> getSubLogEntry() {
         return this.subLogEntry;
     }
 

@@ -1,5 +1,7 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.view.ConditionalView;
@@ -10,7 +12,7 @@ import com.ethpalser.chess.view.ConditionalView;
  */
 public interface Conditional<T extends Positional> {
 
-    boolean isExpected(Plane<T> plane);
+    boolean isExpected(Board<Coordinate> plane);
 
     ConditionalView toView();
 

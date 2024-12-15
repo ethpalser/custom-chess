@@ -1,17 +1,20 @@
 package com.ethpalser.chess.board;
 
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Coordinate;
 
-public interface Board {
+public interface Board<K extends Coordinate> extends Iterable<Piece> {
 
-    Plane<Piece> getPieces();
+    Piece get(K point);
 
-    Piece getPiece(Point point);
+    void add(K point, Piece piece);
 
-    void addPiece(Point point, Piece piece);
+    void remove(K point);
 
-    boolean isInBounds(Point point);
+    int count();
+
+    default boolean rejects(K point) {
+        return false;
+    }
 
 }

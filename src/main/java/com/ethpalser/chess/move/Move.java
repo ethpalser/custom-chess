@@ -2,6 +2,7 @@ package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.Objects;
@@ -9,21 +10,21 @@ import java.util.Objects;
 public class Move implements Movement {
 
     private final Path path;
-    private final LogEntry<Point, Piece> followUpMove;
+    private final LogEntry<Coordinate, Piece> followUpMove;
 
-    public Move(Point point) {
-        this(new Path(point), null);
+    public Move(Coordinate point) {
+        this(new Path((Point) point), null);
     }
 
-    public Move(Point point, LogEntry<Point, Piece> followUpMove) {
-        this(new Path(point), followUpMove);
+    public Move(Coordinate point, LogEntry<Coordinate, Piece> followUpMove) {
+        this(new Path((Point) point), followUpMove);
     }
 
     public Move(Path path) {
         this(path, null);
     }
 
-    public Move(Path path, LogEntry<Point, Piece> followUpMove) {
+    public Move(Path path, LogEntry<Coordinate, Piece> followUpMove) {
         this.path = path;
         this.followUpMove = followUpMove;
     }
@@ -34,7 +35,7 @@ public class Move implements Movement {
     }
 
     @Override
-    public LogEntry<Point, Piece> getFollowUpMove() {
+    public LogEntry<Coordinate, Piece> getFollowUpMove() {
         return this.followUpMove;
     }
 

@@ -18,9 +18,11 @@ import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.view.GameView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,12 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ChessGame implements Game {
 
-    private final Board board;
-    private final Log<Point, Piece> log;
+    private final Space space; // temporary
+    private final Board<Coordinate> board;
+    private final Log<Coordinate, Piece> log;
     private final ThreatMap whiteThreats;
     private final ThreatMap blackThreats;
 
@@ -44,24 +46,25 @@ public class ChessGame implements Game {
     private int turn;
     private Point promotePoint;
 
-    public ChessGame(Board board, Log<Point, Piece> log) {
+    public ChessGame(Board<Coordinate> board, Log<Coordinate, Piece> log) {
         if (board == null) {
             throw new NullPointerException("board cannot be null");
         }
+        this.space = new Plane(8, 8);
         this.board = board;
         this.log = log;
         this.status = GameStatus.PENDING;
-        for (Piece p : this.board.getPieces()) {
+        for (Piece p : this.board) {
             if (PieceType.KING.getCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
-                    this.whiteKing = p.getPoint();
+                    this.whiteKing = (Point) p.getCoordinate();
                 } else {
-                    this.blackKing = p.getPoint();
+                    this.blackKing = (Point) p.getCoordinate();
                 }
             }
         }
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.space);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.space);
         this.turn = log.size() + 1;
         this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
     }
@@ -70,32 +73,32 @@ public class ChessGame implements Game {
         this.turn = Math.max(view.getTurn(), 1);
         this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
         this.log = new ChessLog();
-        Plane<Piece> plane = new Plane<>(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
+        this.space = new Plane(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
         // Todo: Remove views
-        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), plane, this.log);
-        this.board = new ChessBoard(factory, view.getBoard().getPieces());
-        for (Piece p : this.board.getPieces()) {
+        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), this.log, null);
+        this.board = new ChessBoard(this.space, factory, view.getBoard().getPieces());
+        for (Piece p : this.board) {
             if (PieceType.KING.getCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
-                    this.whiteKing = p.getPoint();
+                    this.whiteKing = (Point) p.getCoordinate();
                 } else {
-                    this.blackKing = p.getPoint();
+                    this.blackKing = (Point) p.getCoordinate();
                 }
             }
         }
         // this.log.addAll(this.board.getPieces(), view.getLog()); // todo: refactor log, it is a pain to recreate
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.space);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.space);
         this.status = checkGameStatus();
     }
 
     @Override
-    public Board getBoard() {
+    public Board<Coordinate> getBoard() {
         return this.board;
     }
 
     @Override
-    public Log<Point, Piece> getLog() {
+    public Log<Coordinate, Piece> getLog() {
         return this.log;
     }
 
@@ -109,38 +112,38 @@ public class ChessGame implements Game {
         return this.turn;
     }
 
-    public LogEntry<Point, Piece> movePiece(Point start, Point end,
-            Log<Point, Piece> log, ThreatMap threatMap) {
+    public LogEntry<Coordinate, Piece> movePiece(Point start, Point end,
+            Log<Coordinate, Piece> log, ThreatMap threatMap) {
         if (start == null || end == null) {
             throw new NullPointerException();
         }
-        Piece piece = this.board.getPiece(start);
+        Piece piece = this.board.get(start);
         if (piece == null) {
             throw new IllegalActionException("piece cannot move as it does not exist at " + start);
         }
 
-        Movement move = piece.getMoves(this.board.getPieces(), log, threatMap).getMove(end);
+        Movement move = piece.getMoves(this.board, log, threatMap).getMove(end);
         if (move == null) {
             throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
         }
-        Piece captured = this.board.getPiece(end);
+        Piece captured = this.board.get(end);
 
-        LogEntry<Point, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
+        LogEntry<Coordinate, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
 
-        this.board.getPieces().remove(end);
-        this.board.getPieces().remove(start);
-        this.board.getPieces().put(end, piece);
+        this.board.remove(end);
+        this.board.remove(start);
+        this.board.add(end, piece);
         piece.move(end);
 
-        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
+        LogEntry<Coordinate, Piece> followUp = move.getFollowUpMove();
         if (followUp != null) {
             Piece toForcePush = followUp.getStartObject();
-            this.board.getPieces().remove(followUp.getStart());
+            this.board.remove(followUp.getStart());
             if (followUp.getEnd() != null) {
-                this.board.getPieces().put(followUp.getEnd(), toForcePush);
+                this.board.add(followUp.getEnd(), toForcePush);
             }
         }
-        this.board.getPieces().remove(null);
+        this.board.remove(null);
         return response;
     }
 
@@ -159,28 +162,25 @@ public class ChessGame implements Game {
         if (isNotPlayerAction(player)) {
             return GameStatus.NO_CHANGE;
         }
-        if (isNotInBoardBounds(start, end)) {
-            return GameStatus.NO_CHANGE;
-        }
 
-        Piece movingPiece = this.board.getPiece(start);
+        Piece movingPiece = this.board.get(start);
         if (movingPiece == null) {
             return GameStatus.NO_CHANGE;
         }
         if (isNotAllowedToMove(movingPiece)) {
             return GameStatus.NO_CHANGE;
         }
-        LogEntry<Point, Piece> entry = this.movePiece(start, end, this.log,
+        LogEntry<Coordinate, Piece> entry = this.movePiece(start, end, this.log,
                 this.getThreatMap(Colour.opposite(this.player)));
         this.log.push(entry);
         this.updateKingPosition(movingPiece, end);
 
         // Update opponent's threats with the move performed
-        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, start);
-        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, end);
+        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board, this.log, start);
+        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board, this.log, end);
         // Does moving this piece put turn player in check? (opponent's updated threats now include turn player's king)
         if (this.isKingInCheck(this.player)) {
-            LogEntry<Point, Piece> logEntry = this.log.pop();
+            LogEntry<Coordinate, Piece> logEntry = this.log.pop();
             // soft undo update, which does not alter turn or player nor check game status
             this.undoLogEntryToBoard(logEntry.getSubLogEntry());
             this.undoLogEntryToBoard(logEntry);
@@ -190,19 +190,19 @@ public class ChessGame implements Game {
         }
 
         // Update remaining threats
-        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, start);
-        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, end);
+        this.getThreatMap(this.player).refreshThreats(this.board, this.log, start);
+        this.getThreatMap(this.player).refreshThreats(this.board, this.log, end);
         if (entry.getSubLogEntry() != null) {
             this.applyLogEntryToThreats(entry.getSubLogEntry());
         }
 
-        if (this.board.getPiece(start) != null) {
+        if (this.board.get(start) != null) {
             throw new IllegalActionException("cannot perform move as it cannot move to " + end);
         }
 
         // Promote the piece if it can be promoted
         List<String> promoteOptions = movingPiece.promoteOptions();
-        if (movingPiece.canPromote(this.board.getPieces())) {
+        if (movingPiece.canPromote(this.board)) {
             this.promotePoint = end;
             if (!promoteOptions.isEmpty()) {
                 // TEMPORARY use only the first option for promotion
@@ -223,13 +223,13 @@ public class ChessGame implements Game {
         if (this.promotePoint == null) {
             throw new IllegalActionException("cannot promote a piece when there are none to promote.");
         }
-        Piece promoting = this.board.getPiece(this.promotePoint);
+        Piece promoting = this.board.get(this.promotePoint);
         // Manually modify piece's string then convert it into a piece
         String pieceStr = Pieces.asString(promoting, selection);
         Piece replacement;
         if (PieceType.fromCode(selection) == PieceType.CUSTOM) {
             // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of(), this.board.getPieces(), this.log);
+            PieceFactory factory = new CustomPieceFactory(Map.of(), this.log, this.space);
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
             // colour then code
             replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
@@ -238,14 +238,14 @@ public class ChessGame implements Game {
             replacement = Pieces.fromString(pieceStr);
         }
         // Update the board and latest log with this promotion
-        this.board.addPiece(this.promotePoint, replacement);
+        this.board.add(this.promotePoint, replacement);
         this.log.peek().setPromotion(replacement);
     }
 
     @Override
     public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
         for (int i = 0; i < beforeCurrent; i++) {
-            LogEntry<Point, Piece> logEntry;
+            LogEntry<Coordinate, Piece> logEntry;
             if (saveUndone) {
                 logEntry = this.log.undo();
             } else {
@@ -261,7 +261,7 @@ public class ChessGame implements Game {
             this.undoLogEntryToBoard(logEntry);
             this.applyLogEntryToThreats(logEntry);
 
-            this.updateKingPosition(logEntry.getStartObject(), logEntry.getStart());
+            this.updateKingPosition(logEntry.getStartObject(), (Point) logEntry.getStart());
             this.status = this.checkGameStatus();
             this.player = Colour.opposite(this.player);
             this.turn--;
@@ -269,12 +269,12 @@ public class ChessGame implements Game {
         return this.status;
     }
 
-    private void undoLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
+    private void undoLogEntryToBoard(LogEntry<Coordinate, Piece> logEntry) {
         if (logEntry == null) {
             return;
         }
-        this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
-        this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
+        this.board.add(logEntry.getEnd(), logEntry.getEndObject());
+        this.board.add(logEntry.getStart(), logEntry.getStartObject());
         if (logEntry.isFirstOccurrence()) {
             logEntry.getStartObject().setHasMoved(false);
         }
@@ -284,7 +284,7 @@ public class ChessGame implements Game {
     @Override
     public GameStatus redoUpdate(int afterCurrent) {
         for (int i = 0; i < afterCurrent; i++) {
-            LogEntry<Point, Piece> logEntry = this.log.redo();
+            LogEntry<Coordinate, Piece> logEntry = this.log.redo();
             if (logEntry == null) {
                 break;
             }
@@ -297,10 +297,10 @@ public class ChessGame implements Game {
 
             Piece promoted = logEntry.getPromotion();
             if (promoted != null) {
-                this.board.addPiece(promoted.getPoint(), promoted);
+                this.board.add(promoted.getCoordinate(), promoted);
             }
 
-            this.updateKingPosition(logEntry.getStartObject(), logEntry.getEnd());
+            this.updateKingPosition(logEntry.getStartObject(), (Point) logEntry.getEnd());
             this.status = this.checkGameStatus();
             this.player = Colour.opposite(this.player);
             this.turn++;
@@ -308,29 +308,29 @@ public class ChessGame implements Game {
         return this.status;
     }
 
-    private void redoLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
+    private void redoLogEntryToBoard(LogEntry<Coordinate, Piece> logEntry) {
         if (logEntry == null) {
             return;
         }
-        this.board.addPiece(logEntry.getEnd(), logEntry.getStartObject());
+        this.board.add(logEntry.getEnd(), logEntry.getStartObject());
         if (logEntry.isFirstOccurrence()) {
             logEntry.getStartObject().setHasMoved(true);
         }
         // Remove the piece at the start point
-        this.board.addPiece(logEntry.getStart(), null);
+        this.board.add(logEntry.getStart(), null);
     }
 
-    private void applyLogEntryToThreats(LogEntry<Point, Piece> logEntry) {
+    private void applyLogEntryToThreats(LogEntry<Coordinate, Piece> logEntry) {
         if (logEntry == null) {
             return;
         }
         // End can be null when removing a piece
         if (logEntry.getEnd() != null) {
-            this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
-            this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
+            this.whiteThreats.refreshThreats(this.board, this.log, (Point) logEntry.getEnd());
+            this.blackThreats.refreshThreats(this.board, this.log, (Point) logEntry.getEnd());
         }
-        this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
-        this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
+        this.whiteThreats.refreshThreats(this.board, this.log, (Point) logEntry.getStart());
+        this.blackThreats.refreshThreats(this.board, this.log, (Point) logEntry.getStart());
     }
 
     @Override
@@ -345,19 +345,19 @@ public class ChessGame implements Game {
         } else if (GameStatus.BLACK_IN_CHECK.equals(this.status)) {
             return this.getActionsAgainstCheck(Colour.BLACK);
         } else {
-            for (Piece piece : this.board.getPieces()) {
+            for (Piece piece : this.board) {
                 if (Pieces.isAllied(this.player, piece)) {
-                    MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
+                    MoveSet moves = piece.getMoves(this.board, this.log,
                             this.getThreatMap(Colour.opposite(piece.getColour())));
                     for (Movement m : moves.toSet()) {
                         Path path = m.getPath();
                         if (path != null && path.length() > 0) {
                             // The last point in a path is a potential capture
-                            potentialCaptures.add(new Action(piece.getColour(), piece.getPoint(),
+                            potentialCaptures.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
                                     path.getPoint(path.length() - 1)));
                             // Remaining points are quiet actions (no captures)
                             for (int i = 0; i < path.length() - 1; i++) {
-                                quietActions.add(new Action(piece.getColour(), piece.getPoint(), path.getPoint(i)));
+                                quietActions.add(new Action(piece.getColour(), (Point) piece.getCoordinate(), path.getPoint(i)));
                             }
                         }
                     }
@@ -372,8 +372,8 @@ public class ChessGame implements Game {
     @Override
     public int evaluateState() {
         return this.evaluateBoardState()
-                + this.whiteThreats.evaluate(this.board.getPieces())
-                + this.blackThreats.evaluate(this.board.getPieces());
+                + this.whiteThreats.evaluate(this.board)
+                + this.blackThreats.evaluate(this.board);
     }
 
     public String toJson() {
@@ -395,7 +395,7 @@ public class ChessGame implements Game {
     private int evaluateBoardState() {
         int whiteSum = 0;
         int blackSum = 0;
-        for (Piece p : board.getPieces()) {
+        for (Piece p : this.board) {
             if (Colour.WHITE.equals(p.getColour())) {
                 whiteSum += this.getPieceValue(p);
             } else {
@@ -417,7 +417,7 @@ public class ChessGame implements Game {
             case QUEEN -> value = 9;
             case CUSTOM -> {
                 // Currently, this uses MoveSet, but this would be more accurate to use its blueprint
-                MoveSet moveSet = p.getMoves(this.board.getPieces(), this.log,
+                MoveSet moveSet = p.getMoves(this.board, this.log,
                         this.getThreatMap(Colour.opposite(p.getColour())));
                 int numMoves = moveSet.getPoints().size();
                 int base = (int) Math.ceil(numMoves / 3.0);
@@ -434,10 +434,6 @@ public class ChessGame implements Game {
 
     private boolean isNotPlayerAction(Colour colour) {
         return !this.player.equals(colour);
-    }
-
-    private boolean isNotInBoardBounds(Point start, Point end) {
-        return start == null || end == null || !this.board.isInBounds(start) || !this.board.isInBounds(end);
     }
 
     private boolean isNotAllowedToMove(Piece piece) {
@@ -475,19 +471,6 @@ public class ChessGame implements Game {
         return point;
     }
 
-    private Point actualKingPosition(Colour colour) {
-        System.out.println("King expected: " + this.getKingPosition(colour));
-        for (int y = 0; y < this.board.getPieces().length(); y++) {
-            for (int x = 0; x < this.board.getPieces().width(); x++) {
-                Point p = new Point(x, y);
-                if (Pieces.isKing(this.board.getPiece(p)) && Pieces.isAllied(colour, this.board.getPiece(p))) {
-                    return new Point(x, y);
-                }
-            }
-        }
-        return null;
-    }
-
     private ThreatMap getThreatMap(Colour colour) {
         if (Colour.WHITE.equals(colour)) {
             return whiteThreats;
@@ -497,7 +480,7 @@ public class ChessGame implements Game {
     }
 
     private MoveMap getMoveMap(Colour colour) {
-        return new MoveMap(colour, this.board.getPieces(), this.log, this.getThreatMap(Colour.opposite(colour)));
+        return new MoveMap(colour, this.board, this.log, this.getThreatMap(Colour.opposite(colour)));
     }
 
     private GameStatus checkGameStatus() {
@@ -523,11 +506,11 @@ public class ChessGame implements Game {
     private boolean isCheckmate() {
         Colour oppColour = Colour.opposite(this.player);
         Point oppKingPoint = this.getKingPosition(Colour.opposite(this.player));
-        if (oppKingPoint == null || this.board.getPiece(oppKingPoint) == null) {
+        if (oppKingPoint == null || this.board.get(oppKingPoint) == null) {
         }
         // Assuming King is in check
-        MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
-                .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player));
+        MoveSet oppKingMoveSet = this.board.get(oppKingPoint)
+                .getMoves(this.board, this.log, this.getThreatMap(this.player));
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
             for (Point p : oppKingMoveSet.getPoints()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
@@ -547,17 +530,17 @@ public class ChessGame implements Game {
         // There is only one threatening check
         for (Piece p : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(oppColour).getPieces(p.getPoint());
+            Set<Piece> defenders = this.getThreatMap(oppColour).getPieces((Point) p.getCoordinate());
             if (!defenders.isEmpty()) {
                 // Yes, as this piece can be captured by a non-king, the opponent has a legal move to prevent check
                 return false;
             }
             // Can a piece block its path?
-            Movement causingCheck = p.getMoves(this.board.getPieces(), this.log).getMove(oppKingPoint);
+            Movement causingCheck = p.getMoves(this.board, this.log).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = new MoveMap(oppColour, this.board.getPieces(), this.log, this.getThreatMap(this.player));
+            MoveMap moveMap = new MoveMap(oppColour, this.board, this.log, this.getThreatMap(this.player));
             for (Point c : causingCheck.getPath()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
                 if (!moveMap.hasNoMove(c, true)) {
@@ -570,15 +553,18 @@ public class ChessGame implements Game {
 
     private boolean isStalemate() {
         // Only kings remain, which is a stalemate
-        if (this.board.getPieces().size() <= 2) {
+        if (this.board.count() <= 2) {
             return true;
         }
         // Are there any opponent pieces that can move?
-        List<Piece> opponentPieces = this.board.getPieces().values().stream()
-                .filter(p -> Colour.opposite(this.player).equals(p.getColour()))
-                .collect(Collectors.toList());
+        List<Piece> opponentPieces = new ArrayList<>();
+        for (Piece p : this.board) {
+            if (!Pieces.isAllied(this.player, p)) {
+                opponentPieces.add(p);
+            }
+        }
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player)).isEmpty()) {
+            if (!p.getMoves(this.board, this.log, this.getThreatMap(this.player)).isEmpty()) {
                 return false;
             }
         }
@@ -590,7 +576,7 @@ public class ChessGame implements Game {
         // This method assumes a player is in check
         Colour causingCheck = Colour.opposite(playerInCheck);
         Point inCheckKing = this.getKingPosition(playerInCheck);
-        MoveSet inCheckMoves = this.board.getPiece(inCheckKing).getMoves(this.board.getPieces(), this.log,
+        MoveSet inCheckMoves = this.board.get(inCheckKing).getMoves(this.board, this.log,
                 this.getThreatMap(causingCheck));
 
         if (inCheckMoves != null && !inCheckMoves.isEmpty()) {
@@ -612,19 +598,19 @@ public class ChessGame implements Game {
 
         for (Piece attacker : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(playerInCheck).getPieces(attacker.getPoint());
+            Set<Piece> defenders = this.getThreatMap(playerInCheck).getPieces((Point) attacker.getCoordinate());
             for (Piece defender : defenders) {
-                actions.add(new Action(playerInCheck, defender.getPoint(), attacker.getPoint()));
+                actions.add(new Action(playerInCheck, (Point) defender.getCoordinate(), (Point) attacker.getCoordinate()));
             }
             // Can a piece block its path?
-            Movement moveCausingCheck = attacker.getMoves(this.board.getPieces(), this.log).getMove(inCheckKing);
+            Movement moveCausingCheck = attacker.getMoves(this.board, this.log).getMove(inCheckKing);
             if (moveCausingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             MoveMap moveMap = this.getMoveMap(playerInCheck);
             for (Point pointOnPath : moveCausingCheck.getPath()) {
                 for (Piece blocker : moveMap.getPieces(pointOnPath)) {
-                    actions.add(new Action(playerInCheck, blocker.getPoint(), pointOnPath));
+                    actions.add(new Action(playerInCheck, (Point) blocker.getCoordinate(), pointOnPath));
                 }
             }
         }

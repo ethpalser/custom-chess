@@ -1,16 +1,17 @@
 package com.ethpalser.chess.space.custom.reference;
 
+import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.space.custom.Location;
 import com.ethpalser.chess.view.ReferenceView;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class PathReference<T extends Positional> implements Reference<T> {
+public class PathReference implements Reference<Piece> {
 
     private final Location location;
     private final Point start;
@@ -36,13 +37,13 @@ public class PathReference<T extends Positional> implements Reference<T> {
     }
 
     @Override
-    public List<T> getReferences(Plane<T> plane) {
+    public List<Piece> getReferences(Board<Coordinate> plane) {
         if (plane == null) {
             return List.of();
         }
         switch (this.location) {
             case POINT -> {
-                T ref = plane.get(this.start);
+                Piece ref = plane.get(this.start);
                 if (ref != null) {
                     return List.of(ref);
                 }
