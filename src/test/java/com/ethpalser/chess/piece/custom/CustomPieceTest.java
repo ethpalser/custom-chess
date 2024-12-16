@@ -43,8 +43,8 @@ class CustomPieceTest {
 
         Point next = new Point(nextX, nextY);
         bishop.move(next);
-        assertEquals(x, ((Point) bishop.getCoordinate()).getX());
-        assertEquals(y, ((Point) bishop.getCoordinate()).getY());
+        assertEquals(nextX, ((Point) bishop.getCoordinate()).getX());
+        assertEquals(nextY, ((Point) bishop.getCoordinate()).getY());
         assertTrue(bishop.getHasMoved());
     }
 
@@ -59,8 +59,8 @@ class CustomPieceTest {
         int nextY = 1;
         Point next = new Point(nextX, nextY);
         bishop.move(next);
-        assertEquals(x, ((Point) bishop.getCoordinate()).getX());
-        assertEquals(y, ((Point) bishop.getCoordinate()).getY());
+        assertEquals(nextX, ((Point) bishop.getCoordinate()).getX());
+        assertEquals(nextY, ((Point) bishop.getCoordinate()).getY());
         assertTrue(bishop.getHasMoved());
     }
 }

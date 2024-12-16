@@ -75,7 +75,7 @@ public class ChessGame implements Game {
         this.log = new ChessLog();
         this.space = new Plane(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
         // Todo: Remove views
-        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), this.log, null);
+        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), this.log, this.space);
         this.board = new ChessBoard(this.space, factory, view.getBoard().getPieces());
         for (Piece p : this.board) {
             if (PieceType.KING.getCode().equals(p.getCode())) {
@@ -160,6 +160,9 @@ public class ChessGame implements Game {
             return this.status;
         }
         if (isNotPlayerAction(player)) {
+            return GameStatus.NO_CHANGE;
+        }
+        if (this.board.rejects(start) || this.board.rejects(end)) {
             return GameStatus.NO_CHANGE;
         }
 

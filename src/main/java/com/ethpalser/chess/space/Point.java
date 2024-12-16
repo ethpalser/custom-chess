@@ -158,7 +158,7 @@ public class Point implements Coordinate, Comparable<Point> {
 
     public static Point validOrNull(Board<Coordinate> board, Point start, Colour colour,
             int xOffset, int yOffset, boolean includeDefends) {
-        Point point = (Point) start.translate(xOffset, yOffset);
+        Point point = (Point) start.translate(1, xOffset, yOffset);
         // In general, valid spaces are empty or an opponent's piece
         boolean isEmpty = board.get(point) == null;
         boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);
@@ -170,7 +170,7 @@ public class Point implements Coordinate, Comparable<Point> {
     }
 
     public static Point notCaptureOrNull(Board<Coordinate> board, Point start, int xOffset, int yOffset) {
-        Point point = (Point) start.translate(xOffset, yOffset);
+        Point point = (Point) start.translate(1, xOffset, yOffset);
         // Non-capture points are always empty
         if (!board.rejects(point) && board.get(point) == null) {
             return point;
@@ -180,7 +180,7 @@ public class Point implements Coordinate, Comparable<Point> {
 
     public static Point captureOrNull(Board<Coordinate> board, Point start, Colour colour,
             int xOffset, int yOffset, boolean includeDefends) {
-        Point point = (Point) start.translate(xOffset, yOffset);
+        Point point = (Point) start.translate(1, xOffset, yOffset);
         // Capture points are all valid spaces that are not empty
         boolean isEmpty = board.get(point) == null;
         boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);

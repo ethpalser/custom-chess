@@ -23,7 +23,7 @@ public class GameView {
         this.turn = game.getTurn();
         this.log = game.getLog().stream().map(LogEntry::toString).collect(Collectors.toList());
         this.board = new BoardView(
-                List.of(), // todo: fix
+                game.getBoard(),
                 8,
                 8
         );
