@@ -69,7 +69,7 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
                 pieceY = 0;
                 pieceColour = Colour.WHITE;
             } else {
-                pieceY = 0;
+                pieceY = 7;
                 pieceColour = Colour.BLACK;
             }
             // King

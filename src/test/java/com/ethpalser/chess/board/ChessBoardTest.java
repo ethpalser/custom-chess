@@ -66,7 +66,7 @@ class ChessBoardTest {
         Board<Coordinate> board = new ChessBoard(); // This is setting up a default
         for (int y : new int[]{1, 6}) {
             for (int x = 0; x < 8; x++) {
-                board.add(new Point(x, y), null);
+                board.remove(new Point(x, y));
             }
         }
         assertEquals(16, board.count());

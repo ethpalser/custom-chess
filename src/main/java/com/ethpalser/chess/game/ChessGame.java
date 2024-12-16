@@ -63,8 +63,8 @@ public class ChessGame implements Game {
                 }
             }
         }
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.space);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.space);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board, this.log, this.space);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log, this.space);
         this.turn = log.size() + 1;
         this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
     }
@@ -87,8 +87,8 @@ public class ChessGame implements Game {
             }
         }
         // this.log.addAll(this.board.getPieces(), view.getLog()); // todo: refactor log, it is a pain to recreate
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.space);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.space);
+        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board, this.log, this.space);
+        this.blackThreats = new ThreatMap(Colour.BLACK, this.board, this.log, this.space);
         this.status = checkGameStatus();
     }
 

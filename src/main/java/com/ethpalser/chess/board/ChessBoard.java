@@ -87,9 +87,9 @@ public class ChessBoard implements Board<Coordinate> {
     }
 
     @Override
-    public Piece get(Coordinate point) throws IndexOutOfBoundsException {
+    public Piece get(Coordinate point) {
         if (this.space.isOutOfBounds(point)) {
-            throw new IndexOutOfBoundsException(String.format(OUT_OF_BOUNDS_MESSAGE, point));
+            return null;
         }
         return this.pieces.get(point);
     }
@@ -119,7 +119,7 @@ public class ChessBoard implements Board<Coordinate> {
 
     @Override
     public void remove(Coordinate point) throws IndexOutOfBoundsException {
-        if (this.space.isOutOfBounds(point)) {
+        if (point != null && this.space.isOutOfBounds(point)) {
             throw new IndexOutOfBoundsException(String.format(OUT_OF_BOUNDS_MESSAGE, point));
         }
         this.pieces.remove(point);

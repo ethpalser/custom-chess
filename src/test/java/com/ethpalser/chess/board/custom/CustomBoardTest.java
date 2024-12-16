@@ -8,6 +8,7 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
@@ -67,7 +68,7 @@ class CustomBoardTest {
         int height = 8;
         Space space = new Plane(width, height);
         PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board board = new ChessBoard(space, factory);
+        Board<Coordinate> board = new ChessBoard(space, factory);
         assertEquals(32, board.count());
     }
 
@@ -77,10 +78,10 @@ class CustomBoardTest {
         int height = 8;
         Space space = new Plane(width, height);
         PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board board = new ChessBoard(space, factory);
+        Board<Coordinate> board = new ChessBoard(space, factory);
         for (int y : new int[]{1, 6}) {
             for (int x = 0; x < space.length(Space.AXIS.X); x++) {
-                board.add(new Point(x, y), null);
+                board.remove(new Point(x, y));
             }
         }
         assertEquals(16, board.count());

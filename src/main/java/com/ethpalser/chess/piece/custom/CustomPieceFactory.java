@@ -103,7 +103,7 @@ public class CustomPieceFactory implements PieceFactory {
         Point current = new Point(0, 1);
         while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
             points.add(current);
-            current = (Point) current.translate(1, 1, 0);
+            current = (Point) current.translate(1, 0, 1);
         }
         return new Path(points);
     }
@@ -111,10 +111,10 @@ public class CustomPieceFactory implements PieceFactory {
     private Path horizontal() {
         List<Point> points = new ArrayList<>();
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
-        Point current = new Point(0, 1);
+        Point current = new Point(1, 0);
         while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
             points.add(current);
-            current = (Point) current.translate(1, 0, 1);
+            current = (Point) current.translate(1, 1, 0);
         }
         return new Path(points);
     }
@@ -122,7 +122,7 @@ public class CustomPieceFactory implements PieceFactory {
     private Path diagonal() {
         List<Point> points = new ArrayList<>();
         // Assuming origin (minX, minY) is occupied by piece, and the piece cannot move to its own location
-        Point current = new Point(0, 1);
+        Point current = new Point(1, 1);
         while (!this.space.isOutOfBounds(current) && !this.space.isUnavailable(current)) {
             points.add(current);
             current = (Point) current.translate(1, 1, 1);

@@ -108,7 +108,8 @@ public class CustomPiece implements Piece {
     public boolean canPromote(Board<Coordinate> board) {
         // Temporary work-around. This should be defined on construction by a configuration object/string
         if (PieceType.PAWN.getCode().equals(this.code)) {
-            return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(2) == 8
+            // temp promote condition
+            return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(2) == 7
                     || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(2) == 0;
         } else {
             return false;

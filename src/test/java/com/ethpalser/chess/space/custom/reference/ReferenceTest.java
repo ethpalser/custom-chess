@@ -48,7 +48,7 @@ class ReferenceTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
 
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
 
@@ -136,7 +136,7 @@ class ReferenceTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
         // Given
         Piece piece = board.get(new Point(4, 1)); // e1 pawn
         // When
@@ -152,7 +152,7 @@ class ReferenceTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
         // Given
         Piece piece = board.get(new Point(4, 1)); // e1 pawn
         // When
@@ -168,7 +168,7 @@ class ReferenceTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
         // Given
         Piece refPiece = board.get(new Point(4, 1)); // e1 pawn
         Piece rightPiece = board.get(new Point(5, 1)); // f1 pawn

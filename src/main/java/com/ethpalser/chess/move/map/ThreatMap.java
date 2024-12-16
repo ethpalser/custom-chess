@@ -27,7 +27,7 @@ public class ThreatMap {
     private final int width;
     private final int length;
 
-    public ThreatMap(Colour colour, Space space) {
+    public ThreatMap(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log, Space space) {
         if (colour == null || space == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
@@ -35,7 +35,7 @@ public class ThreatMap {
             throw new IllegalArgumentException("Space must be have 2 dimensions or greater");
         }
         this.colour = colour;
-        this.map = new HashMap<>();
+        this.map = this.setup(colour, board, log);
         this.width = space.length(1);
         this.length = space.length(2);
     }

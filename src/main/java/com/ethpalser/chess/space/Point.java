@@ -74,7 +74,7 @@ public class Point implements Coordinate, Comparable<Point> {
     public Coordinate translate(int magnitude, int... values) {
         int[] newValues = new int[this.getDimension()];
         for (int i = 0; i < newValues.length; i++) {
-            newValues[i] += this.getValue(i);
+            newValues[i] += this.getValue(i + 1);
             if (i < values.length) {
                 newValues[i] += magnitude * values[i];
             }
@@ -96,6 +96,11 @@ public class Point implements Coordinate, Comparable<Point> {
                 return valDiff;
         }
         return 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getY() * 31 + this.getX();
     }
 
     public int getX() {

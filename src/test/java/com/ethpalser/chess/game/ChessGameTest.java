@@ -57,7 +57,8 @@ class ChessGameTest {
     @Test
     void testToJson_givenNewCustomBoard_thenHas32PiecesAndEmptyLogAndNoCustomPieces() {
         // given
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -83,8 +84,9 @@ class ChessGameTest {
 
     @Test
     void testFromJsonConstructor_givenSaveGameView_thenMatchesOriginal() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
+        Board<Coordinate> board = new ChessBoard(space, factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
 
@@ -104,7 +106,8 @@ class ChessGameTest {
 
     @Test
     void testFromJson_givenSaveGameView_thenMatchesOriginal() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -126,8 +129,8 @@ class ChessGameTest {
 
     @Test
     void testPotentialUpdates_givenPieceCaptured_thenCapturedNotInUpdates() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
         Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(space, factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -144,7 +147,7 @@ class ChessGameTest {
         assertEquals(GameStatus.ONGOING, s5);
 
         Iterable<Action> blackActions = game.potentialUpdates();
-        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, space);
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board, log, space);
         MoveMap blackMoves = new MoveMap(Colour.BLACK, board, log, whiteThreats);
 
         for (Action action : blackActions) {
@@ -160,7 +163,7 @@ class ChessGameTest {
         game.undoUpdate(2, false);
 
         Iterable<Action> blackActions2 = game.potentialUpdates();
-        ThreatMap whiteThreats2 = new ThreatMap(Colour.WHITE, space);
+        ThreatMap whiteThreats2 = new ThreatMap(Colour.WHITE, board, log, space);
         MoveMap blackMoves2 = new MoveMap(Colour.BLACK, board, log, whiteThreats);
 
         for (Action action : blackActions2) {
@@ -174,8 +177,8 @@ class ChessGameTest {
 
     @Test
     void testPotentialUpdates_givenProgressedQueens_thenKingCannotMoveToThreatenedSpace() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
         Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(space, factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -188,7 +191,7 @@ class ChessGameTest {
 
         Iterable<Action> blackActions = game.potentialUpdates();
         // These actions are for black, so only the white threat map is needed
-        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, space);
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board, log, space);
         MoveMap blackMoves = new MoveMap(Colour.BLACK, board, log, whiteThreats);
 
         for (Action action : blackActions) {
@@ -201,7 +204,8 @@ class ChessGameTest {
 
     @Test
     void testPotentialUpdates_givenKingInCheck_thenNonBlockingMovesCauseNoChange() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -227,8 +231,8 @@ class ChessGameTest {
 
     @Test
     void testPotentialUpdates_givenKingInCheckmate_thenNoPotentialMoves() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
         Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(space, factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -248,7 +252,7 @@ class ChessGameTest {
 
         Iterable<Action> blackActions = game.potentialUpdates();
         // These actions are for black, so only the white threat map is needed
-        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, space);
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board, log, space);
         MoveMap blackMoves = new MoveMap(Colour.BLACK, board, log, whiteThreats);
 
         for (Action action : blackActions) {
@@ -258,7 +262,8 @@ class ChessGameTest {
 
     @Test
     void testPotentialUpdates_givenKingInCheckFromAdjacentPiece_thenKingCanCapture() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -294,7 +299,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenStartingBoard_thenZeroForBothPlayers() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -305,7 +311,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenEdgePawnMovedForBothPlayers_thenZeroForBothPlayers() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -319,7 +326,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenCentrePawnMovedForBothPlayers_thenZeroForBothPlayers() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -333,7 +341,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenCentrePawnThreatenCenterForBothPlayers_thenZeroForBothPlayers() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -347,7 +356,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenWhiteCapturePawn_thenPositiveState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -362,7 +372,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenBlackCapturePawn_thenNegativeState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -379,7 +390,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenWhiteControlCenter_thenPositiveState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -396,7 +408,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenBlackControlCenter_thenNegativeState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -412,7 +425,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenWhitePawnChain_thenPositiveState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -429,7 +443,8 @@ class ChessGameTest {
 
     @Test
     void testEvaluateState_givenBlackPawnChain_thenNegativeState() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -445,7 +460,8 @@ class ChessGameTest {
 
     @Test
     void testBotMovement_givenStartingBoard_thenBoardChanges() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -464,7 +480,8 @@ class ChessGameTest {
 
     @Test
     void updateGame_pawnPromotion_changesToQueen() {
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory);
         Log<Coordinate, Piece> log = new ChessLog();
         Game game = new ChessGame(board, log);
@@ -580,7 +597,7 @@ class ChessGameTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
 
         ChessGame game = new ChessGame(board, log);
         game.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
@@ -752,7 +769,7 @@ class ChessGameTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
 
         ChessGame game = new ChessGame(board, log);
         // White move
@@ -788,7 +805,7 @@ class ChessGameTest {
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
-        ThreatMap threatMap = new ThreatMap(Colour.BLACK, space);
+        ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
 
         ChessGame game = new ChessGame(board, log);
         // White move
@@ -820,7 +837,8 @@ class ChessGameTest {
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.inProgressPieceCanMove);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -834,7 +852,8 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.inProgressPieceCanCapture);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -848,7 +867,8 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.inProgressNotOnlyKings);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -865,7 +885,8 @@ class ChessGameTest {
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.stalematePieceCannotMove);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -879,7 +900,8 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.stalematePieceCannotCapture);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -893,7 +915,8 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.stalemateOnlyKings);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -909,7 +932,8 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
         Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkPieceCanCapture);
         ChessGame game = new ChessGame(board, log);
         // When
@@ -923,8 +947,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkPieceCanBlock);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
+        Board<Coordinate> board = new ChessBoard(space, factory, BoardTestCases.checkPieceCanBlock);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -937,8 +962,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkKingCanMove);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
+        Board<Coordinate> board = new ChessBoard(space, factory, BoardTestCases.checkKingCanMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -953,8 +979,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkmatePieceCannotCapture);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
+        Board<Coordinate> board = new ChessBoard(space, factory, BoardTestCases.checkmatePieceCannotCapture);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
@@ -967,8 +994,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkmatePieceCannotBlock);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
+        Board<Coordinate> board = new ChessBoard(space, factory, BoardTestCases.checkmatePieceCannotBlock);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '8'));
@@ -981,8 +1009,9 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
         Log<Coordinate, Piece> log = new ChessLog();
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, null);
-        Board<Coordinate> board = new ChessBoard(new Plane(8, 8), factory, BoardTestCases.checkmateKingCannotMove);
+        Space space = new Plane(8, 8);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
+        Board<Coordinate> board = new ChessBoard(space, factory, BoardTestCases.checkmateKingCannotMove);
         ChessGame game = new ChessGame(board, log);
         // When
         Action action = new Action(Colour.WHITE, new Point('d', '1'), new Point('d', '7'));
