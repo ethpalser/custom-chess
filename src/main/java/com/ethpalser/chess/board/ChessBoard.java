@@ -28,6 +28,11 @@ public class ChessBoard implements Board<Coordinate> {
         this(new Plane(8, 8), new StandardPieceFactory());
     }
 
+    public ChessBoard(ChessBoard original) {
+        this.space = original.space;
+        this.pieces = new HashMap<>(original.pieces);
+    }
+
     public ChessBoard(Space space, PieceFactory factory) {
         this.space = space;
         Map<Coordinate, Piece> plane = new HashMap<>();
