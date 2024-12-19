@@ -27,6 +27,14 @@ public class ThreatMap {
     private final int width;
     private final int length;
 
+    public ThreatMap(ThreatMap original) {
+        this.colour = original.colour;
+        this.map = new HashMap<>(original.map);
+        // Todo: remove these from this class, as drawing should only be done by the game or wherever the space is known
+        this.width = original.width;
+        this.length = original.length;
+    }
+
     public ThreatMap(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log, Space space) {
         if (colour == null || space == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
