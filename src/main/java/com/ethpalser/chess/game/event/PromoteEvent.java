@@ -34,29 +34,12 @@ public class PromoteEvent implements GameEvent {
 
     @Override
     public void execute(GameContext context) {
-        if (context.getBoard().rejects(this.source)) {
-            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
-        }
-        if (context.getBoard().get(this.source) == null) {
-            throw new IllegalActionException("The piece to move does not exist");
-        }
+        this.verifyPieceExists(context, this.source);
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         Board<Coordinate> board = context.getBoard();
         Log<Coordinate, Piece> log = context.getLog();
 
-        // Manually modify piece's string then convert it into a piece
-        String pieceStr = Pieces.asString(board.get(this.source), this.promoteCode);
-        Piece replacement;
-        if (PieceType.fromCode(this.promoteCode) == PieceType.CUSTOM) {
-            // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
-            PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
-            // colour then code
-            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
-        } else {
-            // Build a standard piece using information from the piece string
-            replacement = Pieces.fromString(pieceStr);
-        }
+        Piece replacement = this.updatePieceType(this.promoteCode, board, log);
         // Update the board and latest log with this promotion
         board.add(this.source, replacement);
         log.peek().setPromotion(replacement);
@@ -66,6 +49,51 @@ public class PromoteEvent implements GameEvent {
 
     @Override
     public void unExecute(GameContext context) {
+        this.verifyPieceExists(context, this.source);
+        // Shallow copying context data for reference and to lazily discard changes if any exception occurs
+        Board<Coordinate> board = context.getBoard();
+        Log<Coordinate, Piece> log = context.getLog();
 
+        String code;
+        if (log.peek().getEndObject() != null) {
+            code = log.peek().getEndObject().getCode();
+        } else if (log.peek().getStartObject() != null) {
+            code = log.peek().getStartObject().getCode();
+        } else {
+            throw new IllegalStateException("Log does not have a piece to demote.");
+        }
+
+        Piece replacement = this.updatePieceType(code, board, log);
+        board.add(this.source, replacement);
+        log.peek().setPromotion(null);
+        // Commit this change to the game
+        context.update(replacement.getColour(), board, log);
+    }
+
+    private void verifyPieceExists(GameContext context, Coordinate coordinate)
+            throws IllegalActionException, IndexOutOfBoundsException {
+        if (context.getBoard().rejects(coordinate)) {
+            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
+        }
+        if (context.getBoard().get(coordinate) == null) {
+            throw new IllegalActionException("The piece to move does not exist");
+        }
+    }
+
+    private Piece updatePieceType(String code, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+        // Manually modify piece's string then convert it into a piece
+        String pieceStr = Pieces.asString(board.get(this.source), code);
+        Piece replacement;
+        if (PieceType.fromCode(code) == PieceType.CUSTOM) {
+            // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
+            PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
+            PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
+            // colour then code
+            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
+        } else {
+            // Build a standard piece using information from the piece string
+            replacement = Pieces.fromString(pieceStr);
+        }
+        return replacement;
     }
 }
