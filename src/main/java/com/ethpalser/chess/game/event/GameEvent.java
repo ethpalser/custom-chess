@@ -4,6 +4,8 @@ import com.ethpalser.chess.game.GameContext;
 
 public interface GameEvent {
 
+    String choice();
+
     EventType type();
 
     void execute(GameContext context);

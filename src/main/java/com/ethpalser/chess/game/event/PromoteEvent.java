@@ -28,6 +28,11 @@ public class PromoteEvent implements GameEvent {
     }
 
     @Override
+    public String choice() {
+        return this.promoteCode;
+    }
+
+    @Override
     public EventType type() {
         return EventType.PROMOTE;
     }

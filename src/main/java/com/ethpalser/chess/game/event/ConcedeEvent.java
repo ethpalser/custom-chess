@@ -15,6 +15,11 @@ public class ConcedeEvent implements GameEvent {
     }
 
     @Override
+    public String choice() {
+        return this.player.toString();
+    }
+
+    @Override
     public EventType type() {
         return EventType.CONCEDE;
     }

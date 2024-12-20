@@ -27,6 +27,11 @@ public class MoveEvent implements GameEvent {
     }
 
     @Override
+    public String choice() {
+        return this.target.toString();
+    }
+
+    @Override
     public EventType type() {
         return EventType.MOVE;
     }
