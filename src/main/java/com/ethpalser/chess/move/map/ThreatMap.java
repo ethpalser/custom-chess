@@ -1,6 +1,7 @@
 package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.Heuristics;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
@@ -43,7 +44,17 @@ public class ThreatMap {
             throw new IllegalArgumentException("Space must be have 2 dimensions or greater");
         }
         this.colour = colour;
-        this.map = this.setup(colour, board, log);
+        // setup threat map
+        Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
+        for (Piece piece : board) {
+            if (piece != null && Pieces.isAllied(colour, piece)) {
+                MoveSet moveSet = piece.getMoves(board, log, null, true, true);
+                for (Point point : moveSet.getPoints()) {
+                    piecesThreateningPoint.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
+                }
+            }
+        }
+        this.map = piecesThreateningPoint;
         this.width = space.length(1);
         this.length = space.length(2);
     }
@@ -159,9 +170,9 @@ public class ThreatMap {
             }
         }
 
-        return direction * (this.calculatePawnWall(pawnThreats, pawns)
-                + this.calculatePawnCenterControl(pawnThreats, this.width / 2, this.length / 2)
-                + this.calculateDoubleFilePawns(pawns));
+        return direction * (Heuristics.pawnWall(pawnThreats, pawns)
+                + Heuristics.pawnCenterControl(pawnThreats, this.width / 2, this.length / 2)
+                + Heuristics.doubleFilePawns(pawns));
     }
 
     @Override
@@ -181,72 +192,4 @@ public class ThreatMap {
         return sb.toString();
     }
 
-    // PRIVATE METHODS
-
-    private Map<Point, Set<Piece>> setup(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
-        for (Piece piece : board) {
-            if (piece != null && Pieces.isAllied(colour, piece)) {
-                MoveSet moveSet = piece.getMoves(board, log, null, true, true);
-                for (Point point : moveSet.getPoints()) {
-                    piecesThreateningPoint.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
-                }
-            }
-        }
-        return piecesThreateningPoint;
-    }
-
-    private int calculatePawnWall(List<Point> pawnThreats, List<Piece> pawns) {
-        int sum = 0;
-        // Pawn defends
-        for (Piece piece : pawns) {
-            for (Point p : pawnThreats) {
-                // This is a pawn that is defended by at least one other pawn. Doubled-up defends count for one each.
-                if (PieceType.PAWN.getCode().equals(piece.getCode()) && piece.getCoordinate().equals(p)) {
-                    sum++; // Currently, an arbitrarily set amount
-                }
-            }
-        }
-        return sum;
-    }
-
-    private int calculatePawnCenterControl(List<Point> pawnThreats, int midX, int midY) {
-        int midX2;
-        int midY2;
-        if (midX % 2 == 0) {
-            midX2 = midX - 1;
-        } else {
-            midX2 = midX;
-        }
-        if (midY % 2 == 0) {
-            midY2 = midY - 1;
-        } else {
-            midY2 = midY;
-        }
-
-        Point midPoint1 = new Point(midX, midY);
-        Point midPoint2 = new Point(midX, midY2);
-        Point midPoint3 = new Point(midX2, midY);
-        Point midPoint4 = new Point(midX2, midY2);
-        int sum = 0;
-        for (Point p : pawnThreats) {
-            // A pawn has threat over a centre position on the board, which is often valuable
-            if (p.equals(midPoint1) || p.equals(midPoint2) || p.equals(midPoint3) || p.equals(midPoint4)) {
-                sum++;  // Currently, an arbitrarily set amount
-            }
-        }
-        return sum;
-    }
-
-    private int calculateDoubleFilePawns(List<Piece> pawns) {
-        Set<Integer> seen = new HashSet<>();
-        int sum = 0;
-        for (Piece p : pawns) {
-            if (seen.contains(p.getCoordinate().getValue(1))) {
-                sum -= 1;
-            }
-            seen.add(p.getCoordinate().getValue(1));
-        }
-        return sum;
-    }
 }
