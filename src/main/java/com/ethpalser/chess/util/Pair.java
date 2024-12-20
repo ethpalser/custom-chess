@@ -1,11 +1,11 @@
 package com.ethpalser.chess.util;
 
-public class Tuple<T, U> {
+public class Pair<T, U> {
 
     private final T first;
     private final U second;
 
-    public Tuple(T first, U second) {
+    public Pair(T first, U second) {
         this.first = first;
         this.second = second;
     }

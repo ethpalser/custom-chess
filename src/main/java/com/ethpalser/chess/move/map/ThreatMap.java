@@ -12,7 +12,7 @@ import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.util.Tuple;
+import com.ethpalser.chess.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,7 +89,7 @@ public class ThreatMap {
             throw new NullPointerException(str);
         }
         Piece change = board.get(point);
-        List<Tuple<Piece, Path>> tupleList = new ArrayList<>();
+        List<Pair<Piece, Path>> pairList = new ArrayList<>();
         // Remove the impacting piece temporarily
         board.remove(point);
         if (change != null && this.colour.equals(change.getColour())) {
@@ -102,15 +102,15 @@ public class ThreatMap {
                 MoveSet moves = piece.getMoves(board, log, this, true, true);
                 Movement moveWithPoint = moves.getMove(point);
                 if (moveWithPoint != null) {
-                    tupleList.add(new Tuple<>(piece, moveWithPoint.getPath()));
+                    pairList.add(new Pair<>(piece, moveWithPoint.getPath()));
                 }
             }
         }
 
         // Clear these paths
-        for (Tuple<Piece, Path> tuple : tupleList) {
-            for (Point p : tuple.getSecond()) {
-                this.clearMoves(tuple.getFirst(), p);
+        for (Pair<Piece, Path> pair : pairList) {
+            for (Point p : pair.getSecond()) {
+                this.clearMoves(pair.getFirst(), p);
             }
         }
         // Add the piece back, so we can reapply threats with this piece present
@@ -119,15 +119,15 @@ public class ThreatMap {
         }
 
         boolean changeIsPresent = board.get(point) != null;
-        for (Tuple<Piece, Path> tuple : tupleList) {
+        for (Pair<Piece, Path> pair : pairList) {
             // The only change from before and after are the paths that contain the impacted point
             boolean seenChange = false;
-            for (Point p : tuple.getSecond()) {
+            for (Point p : pair.getSecond()) {
                 if (seenChange && changeIsPresent)
                     break;
                 if (p.equals(point))
                     seenChange = true;
-                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(tuple.getFirst());
+                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(pair.getFirst());
             }
         }
         if (change != null && this.colour.equals(change.getColour())) {
