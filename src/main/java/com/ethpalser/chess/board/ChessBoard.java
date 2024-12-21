@@ -10,6 +10,8 @@ import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -136,8 +138,24 @@ public class ChessBoard implements Board<Coordinate> {
     }
 
     @Override
+    public Space space() {
+        return this.space;
+    }
+
+    @Override
     public boolean rejects(Coordinate point) {
         return point == null || this.space.isOutOfBounds(point) || this.space.isUnavailable(point);
+    }
+
+    @Override
+    public Collection<Coordinate> occupied() {
+        List<Coordinate> occupiedList = new ArrayList<>();
+        for (Map.Entry<Coordinate, Piece> e : this.pieces.entrySet()) {
+            if (e.getValue() != null) {
+                occupiedList.add(e.getKey());
+            }
+        }
+        return occupiedList;
     }
 
     @Override
