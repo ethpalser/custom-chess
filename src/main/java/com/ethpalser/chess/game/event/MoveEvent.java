@@ -3,6 +3,7 @@ package com.ethpalser.chess.game.event;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
@@ -10,8 +11,15 @@ import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.piece.PieceStringTokenizer;
+import com.ethpalser.chess.piece.Pieces;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
+import java.util.List;
+import java.util.Map;
 
 public class MoveEvent implements GameEvent {
 
@@ -82,8 +90,34 @@ public class MoveEvent implements GameEvent {
         board.remove(null);
 
         log.push(logEntry);
+        if (piece.canPromote(board)) {
+            this.promotePiece(piece, board, log);
+        } else {
+            context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, piece.promoteOptions()));
+        }
         // Commit this change to the game
         context.update(turnPlayer, board, log);
+    }
+
+    private void promotePiece(Piece piece, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+        List<String> promoteOptions = piece.promoteOptions();
+        // Temporary, always have pawns promote to queen to simplify running simulations
+        if (PieceType.PAWN.getCode().equals(piece.getCode())) {
+            // Manually modify piece's string then convert it into a piece
+            String pieceStr = Pieces.asString(piece, promoteOptions.get(0));
+            Piece replacement;
+            if (PieceType.fromCode(promoteOptions.get(0)) == PieceType.CUSTOM) {
+                // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
+                PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
+                PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
+                // colour then code
+                replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
+            } else {
+                // Build a standard piece using information from the piece string
+                replacement = Pieces.fromString(pieceStr);
+            }
+            board.add(this.target, replacement);
+        }
     }
 
     @Override
