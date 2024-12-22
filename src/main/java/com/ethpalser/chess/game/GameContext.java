@@ -111,7 +111,16 @@ public class GameContext {
         this.prompt = null;
     }
 
-    public final void update(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog) {
+    public void update(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog) {
+        this.update(turn, updatedBoard, updatedLog, false);
+    }
+
+    public void undo(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog) {
+        this.update(turn, updatedBoard, updatedLog, true);
+    }
+
+    private void update(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog,
+            boolean isUndo) {
         if (turn == null || updatedBoard == null) {
             throw new IllegalArgumentException("Cannot update game as one or more arguments are null.");
         }
@@ -133,7 +142,7 @@ public class GameContext {
             bThreatsRef.refreshThreats(updatedBoard, updatedLog, (Point) coordinate);
         }
         // After all changes, did the turn player put itself into check?
-        if (!this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
+        if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
             throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
         }
 
@@ -157,9 +166,14 @@ public class GameContext {
             // Coordinate hashCode is its ordinal value, with some limitation (see Coordinate.hashCode for specifics)
             int originalVal = original.get(ptrO).hashCode();
             int updatedVal = updated.get(ptrU).hashCode();
-            // Both exist, so no change occurred
+            // Both exist, so no change in coordinate occurred
             if (originalVal == updatedVal) {
-                // todo: check if piece type or piece id changed
+                // Did the piece change its type (promotion) or colour (capture)?
+                Coordinate match = original.get(ptrO);
+                if (!board.get(match).getColour().equals(this.board.get(match).getColour()) ||
+                        !board.get(match).getCode().equals(this.board.get(match).getCode())) {
+                    changes.add(match);
+                }
                 ptrO++;
                 ptrU++;
             }
