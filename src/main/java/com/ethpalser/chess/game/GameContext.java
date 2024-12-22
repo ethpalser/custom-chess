@@ -60,6 +60,26 @@ public class GameContext {
         }
     }
 
+    public GameContext(GameOptions config, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+        // This will eventually need to check each piece id maps correctly to piece starts for "has moved" checks
+        this.log = log;
+        this.board = board;
+
+        Space space = board.space();
+        this.wThreats = new ThreatMap(Colour.WHITE, this.board, this.log, space);
+        this.bThreats = new ThreatMap(Colour.BLACK, this.board, this.log, space);
+        for (Coordinate c : this.board.occupied()) {
+            Piece p = this.board.get(c);
+            if (p != null && PieceType.KING.getCode().equals(p.getCode())) {
+                if (Colour.WHITE.equals(p.getColour())) {
+                    this.wKing = c;
+                } else {
+                    this.bKing = c;
+                }
+            }
+        }
+    }
+
     public Board<Coordinate> getBoard() {
         return new ChessBoard((ChessBoard) this.board);
     }
