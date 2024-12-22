@@ -53,7 +53,7 @@ public class MoveEvent implements GameEvent {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
         if (context.getBoard().get(this.source) == null) {
-            throw new IllegalActionException("The piece to move does not exist");
+            throw new IllegalActionException("piece to move from " + this.source + " to "+ this.target + " is null");
         }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         Board<Coordinate> board = context.getBoard();
