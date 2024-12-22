@@ -9,6 +9,7 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
@@ -39,6 +40,24 @@ public class GameContext {
         this.wKing = new Point("e1");
         this.bKing = new Point("e8");
         this.prompt = null;
+    }
+
+    public GameContext(GameOptions config) {
+        this.log = new ChessLog();
+        Space space = new Plane(config.width(), config.length(), config.unavailable());
+        this.board = new ChessBoard(space, new CustomPieceFactory(config.pieceSpecs(), this.log, space));
+        this.wThreats = new ThreatMap(Colour.WHITE, this.board, this.log, space);
+        this.bThreats = new ThreatMap(Colour.BLACK, this.board, this.log, space);
+        for (Coordinate c : this.board.occupied()) {
+            Piece p = this.board.get(c);
+            if (PieceType.KING.getCode().equals(p.getCode())) {
+                if (Colour.WHITE.equals(p.getColour())) {
+                    this.wKing = c;
+                } else {
+                    this.bKing = c;
+                }
+            }
+        }
     }
 
     public Board<Coordinate> getBoard() {
@@ -97,7 +116,6 @@ public class GameContext {
         if (!this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
             throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
         }
-        // todo: check if there are any expected choices, and then if there is only one apply that event
 
         // Update the board state after all changes have been made and no exception has occurred
         this.board = updatedBoard;
