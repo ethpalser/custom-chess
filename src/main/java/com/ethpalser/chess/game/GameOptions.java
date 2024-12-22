@@ -1,0 +1,125 @@
+package com.ethpalser.chess.game;
+
+import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.view.MoveView;
+import java.util.List;
+import java.util.Map;
+
+public record GameOptions(
+        int width,
+        int length,
+        List<Coordinate> unavailable,
+        Map<Coordinate, String> pieceStarts,
+        Map<String, List<MoveView>> pieceSpecs
+) {
+    // Keeping GameOptions limited to a 2D ChessGame
+    public GameOptions() {
+        this(8, 8, List.of(), Map.of(), Map.of());
+        // Add all piece starts for a standard chess board
+        for (int y : new int[]{0, length - 1}) {
+            this.pieceStarts.putAll(Map.of(
+                    new Point(0, y), PieceType.ROOK.getCode(),
+                    new Point(1, y), PieceType.KNIGHT.getCode(),
+                    new Point(2, y), PieceType.BISHOP.getCode(),
+                    new Point(3, y), PieceType.QUEEN.getCode(),
+                    new Point(4, y), PieceType.KING.getCode(),
+                    new Point(5, y), PieceType.BISHOP.getCode(),
+                    new Point(6, y), PieceType.KNIGHT.getCode(),
+                    new Point(7, y), PieceType.ROOK.getCode()
+            ));
+        }
+        for (int y : new int[]{1, length - 2}) {
+            for (int x = 0; x < width; x++) {
+                this.pieceStarts.put(new Point(x, y), PieceType.PAWN.getCode());
+            }
+        }
+    }
+
+    private GameOptions(GameOptionsBuilder builder) {
+        this(builder.width, builder.length, builder.unavailable, builder.pieceStarts, builder.pieceSpecs);
+    }
+
+    public static GameOptionsBuilder Builder() {
+        return new GameOptionsBuilder();
+    }
+
+    private static class GameOptionsBuilder {
+
+        private int width;
+        private int length;
+        private List<Coordinate> unavailable;
+        private Map<Coordinate, String> pieceStarts;
+        private Map<String, List<MoveView>> pieceSpecs;
+
+        private GameOptionsBuilder() {
+            this.width = 8;
+            this.length = 8;
+            this.unavailable = List.of();
+            this.pieceStarts = Map.of();
+            this.pieceSpecs = Map.of();
+        }
+
+        public GameOptionsBuilder width(int width) {
+            this.width = width;
+            return this;
+        }
+
+
+        public GameOptionsBuilder length(int length) {
+            this.length = length;
+            return this;
+        }
+
+        public GameOptionsBuilder unavailable(List<Coordinate> coordinates) {
+            if (coordinates == null) {
+                throw new IllegalArgumentException();
+            }
+            this.unavailable = coordinates;
+            return this;
+        }
+
+        public GameOptionsBuilder addUnavailable(Coordinate coordinate) {
+            this.unavailable.add(coordinate);
+            return this;
+        }
+
+        public GameOptionsBuilder pieceStarts(Map<Coordinate, String> pieceStarts) {
+            if (pieceStarts == null) {
+                throw new IllegalArgumentException();
+            }
+            this.pieceStarts = pieceStarts;
+            return this;
+        }
+
+        public GameOptionsBuilder addPieceStart(Coordinate coordinate, String pieceCode) {
+            this.pieceStarts.put(coordinate, pieceCode);
+            return this;
+        }
+
+        public GameOptionsBuilder pieceSpecs(Map<String, List<MoveView>> pieceSpecs) {
+            if (pieceSpecs == null) {
+                throw new IllegalArgumentException();
+            }
+            this.pieceSpecs = pieceSpecs;
+            return this;
+        }
+
+        public GameOptionsBuilder addPieceSpec(String pieceCode, MoveView specification) {
+            if (this.pieceSpecs.get(pieceCode) == null) {
+                this.pieceSpecs.put(pieceCode, List.of(specification));
+            } else {
+                this.pieceSpecs.get(pieceCode).add(specification);
+            }
+            return this;
+        }
+
+        public GameOptions build() {
+            return new GameOptions(this);
+        }
+
+    }
+
+
+}
