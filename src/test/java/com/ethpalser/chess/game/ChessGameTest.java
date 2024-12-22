@@ -147,14 +147,18 @@ class ChessGameTest {
         assertEquals(GameStatus.ONGOING, s5);
 
         Iterable<Action> blackActions = game.potentialUpdates();
-        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board, log, space);
-        MoveMap blackMoves = new MoveMap(Colour.BLACK, board, log, whiteThreats);
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+        Log<Coordinate, Piece> updatedLog = info.context().getLog();
+
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, updatedBoard, updatedLog, updatedBoard.space());
+        MoveMap blackMoves = new MoveMap(Colour.BLACK, updatedBoard, updatedLog, whiteThreats);
 
         for (Action action : blackActions) {
-            Piece piece = board.get(action.getStart());
+            Piece piece = updatedBoard.get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(board, log, whiteThreats, action.getEnd()));
+            assertTrue(piece.canMove(updatedBoard, updatedLog, whiteThreats, action.getEnd()));
         }
 
         // Checking that a bug does not occur
@@ -163,14 +167,18 @@ class ChessGameTest {
         game.undoUpdate(2, false);
 
         Iterable<Action> blackActions2 = game.potentialUpdates();
-        ThreatMap whiteThreats2 = new ThreatMap(Colour.WHITE, board, log, space);
-        MoveMap blackMoves2 = new MoveMap(Colour.BLACK, board, log, whiteThreats);
+        info = game.info();
+        updatedBoard = info.context().getBoard();
+        updatedLog = info.context().getLog();
+
+        ThreatMap whiteThreats2 = new ThreatMap(Colour.WHITE, updatedBoard, updatedLog, space);
+        MoveMap blackMoves2 = new MoveMap(Colour.BLACK, updatedBoard, updatedLog, whiteThreats);
 
         for (Action action : blackActions2) {
-            Piece piece = board.get(action.getStart());
+            Piece piece = updatedBoard.get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves2.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(board, log, whiteThreats2, action.getEnd()));
+            assertTrue(piece.canMove(updatedBoard, updatedLog, whiteThreats2, action.getEnd()));
         }
         game.undoUpdate(1, false);
     }
@@ -190,15 +198,19 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("e5")));
 
         Iterable<Action> blackActions = game.potentialUpdates();
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+        Log<Coordinate, Piece> updatedLog = info.context().getLog();
+
         // These actions are for black, so only the white threat map is needed
-        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, board, log, space);
-        MoveMap blackMoves = new MoveMap(Colour.BLACK, board, log, whiteThreats);
+        ThreatMap whiteThreats = new ThreatMap(Colour.WHITE, updatedBoard, updatedLog, updatedBoard.space());
+        MoveMap blackMoves = new MoveMap(Colour.BLACK, updatedBoard, updatedLog, whiteThreats);
 
         for (Action action : blackActions) {
-            Piece piece = board.get(action.getStart());
+            Piece piece = updatedBoard.get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(board, log, whiteThreats, action.getEnd()));
+            assertTrue(piece.canMove(updatedBoard, updatedLog, whiteThreats, action.getEnd()));
         }
     }
 
@@ -474,8 +486,11 @@ class ChessGameTest {
         game.updateGame(botBest);
 
         // Then
-        assertNull(game.getBoard().get(botBest.getStart()));
-        assertNotNull(game.getBoard().get(botBest.getEnd()));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(botBest.getStart()));
+        assertNotNull(updatedBoard.get(botBest.getEnd()));
     }
 
     @Test
@@ -501,23 +516,27 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, start, end));
 
         // Then
-        assertNotNull(board.get(end));
-        assertNotNull(log.peek().getPromotion());
-        assertEquals("Q", board.get(end).getCode());
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+        assertNotNull(updatedBoard.get(end));
+        assertNotNull(info.context().getLog().peek().getPromotion());
+        assertEquals("Q", updatedBoard.get(end).getCode());
 
         // Testing Undo and Redo as well
         game.undoUpdate();
-        assertNotNull(board.get(start));
-        assertEquals("P", board.get(start).getCode());
+        updatedBoard = info.context().getBoard();
+        assertNotNull(updatedBoard.get(start));
+        assertEquals("P", updatedBoard.get(start).getCode());
 
         game.redoUpdate();
-        assertNotNull(board.get(end));
-        assertEquals("Q", board.get(end).getCode());
+        updatedBoard = info.context().getBoard();
+        assertNotNull(updatedBoard.get(end));
+        assertEquals("Q", updatedBoard.get(end).getCode());
     }
 
     // region Piece Movement
     @Test
-    void executeAction_noPieceAtCoordinate_throwsIllegalActionException() {
+    void executeAction_noPieceAtCoordinate_hasNoChange() {
         // Given
         int x = 2;
         int y = 2;
@@ -533,15 +552,19 @@ class ChessGameTest {
 
         // When
         GameStatus status = game.updateGame(action);
-        assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
-        assertNull(board.get(start));
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(start));
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
-    void executeAction_toSameCoordinate_throwsIllegalActionException() {
+    void executeAction_toSameCoordinate_hasNoChange() {
         // Given
         int x = 1;
         int y = 0;
@@ -555,11 +578,16 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, start, next);
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
 
         // Then
-        assertEquals(Colour.WHITE, board.get(start).getColour());
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertEquals(Colour.WHITE, updatedBoard.get(start).getColour());
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
@@ -578,15 +606,19 @@ class ChessGameTest {
         // When
         Action action = new Action(Colour.WHITE, start, invalid);
         GameStatus status = game.updateGame(action);
-        assertEquals(GameStatus.NO_CHANGE, status);
 
         // Then
-        assertEquals(Colour.WHITE, board.get(start).getColour());
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertEquals(Colour.WHITE, updatedBoard.get(start).getColour());
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
-    void executeAction_toValidSameColourOccupiedCoordinate_throwsIllegalActionException() {
+    void executeAction_toValidSameColourOccupiedCoordinate_hasNoChange() {
         // Given
         int x = 1;
         int y = 0;
@@ -605,18 +637,23 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
 
         // Then
-        assertNotNull(board.get(source));
-        assertNotNull(board.get(target));
-        assertEquals(Colour.WHITE, board.get(source).getColour());
-        assertEquals(Colour.WHITE, board.get(target).getColour());
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNotNull(updatedBoard.get(source));
+        assertNotNull(updatedBoard.get(target));
+        assertEquals(Colour.WHITE, updatedBoard.get(source).getColour());
+        assertEquals(Colour.WHITE, updatedBoard.get(target).getColour());
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
-    void executeAction_toValidOppositeColourOccupiedCoordinatePathBlocked_throwsIllegalActionException() {
+    void executeAction_toValidOppositeColourOccupiedCoordinatePathBlocked_hasNoChange() {
         // Given
         int pieceX = 0;
         int pieceY = 0;
@@ -630,14 +667,19 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
 
         // Then
-        assertNotNull(board.get(source));
-        assertNotNull(board.get(target));
-        assertEquals(Colour.WHITE, board.get(source).getColour());
-        assertEquals(Colour.BLACK, board.get(target).getColour());
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNotNull(updatedBoard.get(source));
+        assertNotNull(updatedBoard.get(target));
+        assertEquals(Colour.WHITE, updatedBoard.get(source).getColour());
+        assertEquals(Colour.BLACK, updatedBoard.get(target).getColour());
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
@@ -659,14 +701,17 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.get(source));
-        assertNotNull(board.get(target));
-        assertEquals(Colour.WHITE, board.get(target).getColour());
-        assertEquals(30, board.count()); // Two fewer pieces due to forced removal and capture
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(source));
+        assertNotNull(updatedBoard.get(target));
+        assertEquals(Colour.WHITE, updatedBoard.get(target).getColour());
+        assertEquals(30, updatedBoard.count()); // Two fewer pieces due to forced removal and capture
     }
 
     @Test
-    void executeAction_toValidEmptyCoordinatePathBlocked_throwsIllegalActionException() {
+    void executeAction_toValidEmptyCoordinatePathBlocked_hasNoChange() {
         // Given
         int pieceX = 2;
         int pieceY = 0;
@@ -680,13 +725,18 @@ class ChessGameTest {
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
-        assertThrows(IllegalActionException.class, () -> game.updateGame(action));
+        GameStatus status = game.updateGame(action);
 
         // Then
-        assertNotNull(board.get(source));
-        assertEquals(Colour.WHITE, board.get(source).getColour());
-        assertNull(board.get(target));
-        assertEquals(32, board.count());
+        assertEquals(GameStatus.NO_CHANGE, status);
+
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNotNull(updatedBoard.get(source));
+        assertEquals(Colour.WHITE, updatedBoard.get(source).getColour());
+        assertNull(updatedBoard.get(target));
+        assertEquals(32, updatedBoard.count());
     }
 
     @Test
@@ -708,10 +758,13 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.get(source));
-        assertNotNull(board.get(target));
-        assertEquals(Colour.WHITE, board.get(target).getColour());
-        assertEquals(31, board.count()); // One fewer piece from forced removal
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(source));
+        assertNotNull(updatedBoard.get(target));
+        assertEquals(Colour.WHITE, updatedBoard.get(target).getColour());
+        assertEquals(31, updatedBoard.count()); // One fewer piece from forced removal
     }
 
     @Test
@@ -730,10 +783,13 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.get(source));
-        assertNull(board.get(target.shift(Colour.WHITE, Direction.RIGHT)));
-        assertNotNull(board.get(target));
-        assertNotNull(board.get(target.shift(Colour.WHITE, Direction.LEFT)));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(source));
+        assertNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.RIGHT)));
+        assertNotNull(updatedBoard.get(target));
+        assertNotNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.LEFT)));
     }
 
 
@@ -755,10 +811,13 @@ class ChessGameTest {
         game.updateGame(action);
 
         // Then
-        assertNull(board.get(source));
-        assertNull(board.get(target.shift(Colour.WHITE, Direction.LEFT).shift(Colour.WHITE, Direction.LEFT)));
-        assertNotNull(board.get(target));
-        assertNotNull(board.get(target.shift(Colour.WHITE, Direction.RIGHT)));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(source));
+        assertNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.LEFT).shift(Colour.WHITE, Direction.LEFT)));
+        assertNotNull(updatedBoard.get(target));
+        assertNotNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.RIGHT)));
     }
 
     @Test
@@ -792,9 +851,12 @@ class ChessGameTest {
         game.updateGame(action); // En Passant
 
         // Then
-        assertNull(board.get(target.shift(Colour.WHITE, Direction.LEFT)));
-        assertNotNull(board.get(target.shift(Colour.WHITE, Direction.FRONT)));
-        assertNull(board.get(target));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.LEFT)));
+        assertNotNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.FRONT)));
+        assertNull(updatedBoard.get(target));
     }
 
     @Test
@@ -827,9 +889,12 @@ class ChessGameTest {
         game.updateGame(action); // En Passant
 
         // Then
-        assertNull(board.get(target.shift(Colour.WHITE, Direction.LEFT)));
-        assertNotNull(board.get(target.shift(Colour.WHITE, Direction.FRONT)));
-        assertNull(board.get(target));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.LEFT)));
+        assertNotNull(updatedBoard.get(target.shift(Colour.WHITE, Direction.FRONT)));
+        assertNull(updatedBoard.get(target));
     }
 
     // endregion
