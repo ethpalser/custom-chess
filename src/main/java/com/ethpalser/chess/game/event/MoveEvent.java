@@ -91,33 +91,39 @@ public class MoveEvent implements GameEvent {
 
         log.push(logEntry);
         if (piece.canPromote(board)) {
-            this.promotePiece(piece, board, log);
-        } else {
-            context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, piece.promoteOptions()));
+            boolean promoted = this.promotePiece(piece, board, log);
+            if (!promoted) {
+                context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, piece.promoteOptions()));
+            }
         }
         // Commit this change to the game
         context.update(turnPlayer, board, log);
     }
 
-    private void promotePiece(Piece piece, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+    private boolean promotePiece(Piece piece, Board<Coordinate> board, Log<Coordinate, Piece> log) {
         List<String> promoteOptions = piece.promoteOptions();
         // Temporary, always have pawns promote to queen to simplify running simulations
-        if (PieceType.PAWN.getCode().equals(piece.getCode())) {
-            // Manually modify piece's string then convert it into a piece
-            String pieceStr = Pieces.asString(piece, promoteOptions.get(0));
-            Piece replacement;
-            if (PieceType.fromCode(promoteOptions.get(0)) == PieceType.CUSTOM) {
-                // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-                PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
-                PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
-                // colour then code
-                replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
-            } else {
-                // Build a standard piece using information from the piece string
-                replacement = Pieces.fromString(pieceStr);
-            }
-            board.add(this.target, replacement);
+        String pieceStr;
+        if (promoteOptions.size() == 1 || PieceType.PAWN.getCode().equals(piece.getCode())) {
+            pieceStr = Pieces.asString(piece, promoteOptions.get(0));
+        } else {
+            return false;
         }
+        // Manually modify piece's string then convert it into a piece
+        Piece replacement;
+        if (PieceType.fromCode(promoteOptions.get(0)) == PieceType.CUSTOM) {
+            // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
+            PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
+            PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
+            // colour then code
+            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
+        } else {
+            // Build a standard piece using information from the piece string
+            replacement = Pieces.fromString(pieceStr);
+        }
+        board.add(this.target, replacement);
+        log.peek().setPromotion(replacement);
+        return true;
     }
 
     @Override
