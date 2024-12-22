@@ -1,10 +1,11 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.board.ChessBoard;
+import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -16,11 +17,14 @@ public class MockGame implements Game {
     private final Deque<MockNode> logStack;
     private final Deque<MockNode> undoStack;
 
+    private GameContext context;
+
     public MockGame(MockNode root) {
         this.root = root;
         this.current = root;
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
+        this.context = new GameContext(new GameOptions(), new ChessBoard(), new ChessLog());
     }
 
     @Override
@@ -103,5 +107,10 @@ public class MockGame implements Game {
 
     public String toJson() {
         return "";
+    }
+
+    @Override
+    public GameInfo info() {
+        return new GameInfo(this.getTurn(), this.evaluateState(), this.getStatus(), this.context);
     }
 }
