@@ -46,4 +46,36 @@ public interface Coordinate {
      */
     Coordinate translate(int magnitude, int... values);
 
+    private static Coordinate at(int... points) {
+        return new Coordinate() {
+            @Override
+            public int getDimension() {
+                return points.length;
+            }
+
+            @Override
+            public int getValue(int dimension) {
+                return points[dimension];
+            }
+
+            @Override
+            public int[] getValues() {
+                return points;
+            }
+
+            @Override
+            public Coordinate translate(int magnitude, int... values) {
+                int[] newValues = new int[points.length];
+                for (int i = 0; i < newValues.length; i++) {
+                    if (i >= values.length) {
+                        newValues[i] = 0;
+                    } else {
+                        newValues[i] = magnitude * values[i];
+                    }
+                }
+                return Coordinate.at(newValues);
+            }
+        };
+    }
+
 }
