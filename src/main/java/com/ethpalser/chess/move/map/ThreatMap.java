@@ -170,9 +170,9 @@ public class ThreatMap {
             }
         }
 
-        return direction * (Heuristics.pawnWall(pawnThreats, pawns)
+        return Heuristics.pawnWall(pawnThreats, pawns)
                 + Heuristics.pawnCenterControl(pawnThreats, this.width / 2, this.length / 2)
-                + Heuristics.doubleFilePawns(pawns));
+                + Heuristics.doubleFilePawns(pawns);
     }
 
     @Override
