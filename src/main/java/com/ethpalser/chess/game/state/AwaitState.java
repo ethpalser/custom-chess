@@ -4,7 +4,6 @@ import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.game.event.GameEvent;
-import com.ethpalser.chess.game.event.PromoteEvent;
 import java.util.List;
 
 public class AwaitState implements GameState {
