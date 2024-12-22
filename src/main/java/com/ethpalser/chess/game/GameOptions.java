@@ -4,6 +4,8 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.view.MoveView;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public record GameOptions(
 ) {
     // Keeping GameOptions limited to a 2D ChessGame
     public GameOptions() {
-        this(8, 8, List.of(), Map.of(), Map.of());
+        this(8, 8, new ArrayList<>(), new HashMap<>(), new HashMap<>());
         // Add all piece starts for a standard chess board
         for (int y : new int[]{0, length - 1}) {
             this.pieceStarts.putAll(Map.of(
