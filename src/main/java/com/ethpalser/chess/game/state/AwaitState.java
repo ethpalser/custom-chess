@@ -49,14 +49,4 @@ public class AwaitState implements GameState {
     public Iterable<GameEvent> updates() {
         return null;
     }
-
-    @Override
-    public GameState undo() {
-        return null;
-    }
-
-    @Override
-    public GameState redo() {
-        return null;
-    }
 }

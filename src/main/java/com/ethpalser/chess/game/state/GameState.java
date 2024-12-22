@@ -8,8 +8,4 @@ public interface GameState {
 
     Iterable<GameEvent> updates();
 
-    GameState undo();
-
-    GameState redo();
-
 }

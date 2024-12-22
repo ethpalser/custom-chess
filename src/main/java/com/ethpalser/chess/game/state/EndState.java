@@ -25,15 +25,4 @@ public class EndState implements GameState {
     public Iterable<GameEvent> updates() {
         return List.of();
     }
-
-    @Override
-    public GameState undo() {
-        this.context.getLog().undo();
-        return new ReadyState(this.context);
-    }
-
-    @Override
-    public GameState redo() {
-        throw new IllegalActionException();
-    }
 }
