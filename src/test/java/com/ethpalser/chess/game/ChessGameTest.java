@@ -82,7 +82,8 @@ class ChessGameTest {
         assertTrue(root.getLog().isEmpty());
     }
 
-    @Test
+    // Depreciated as fields were moved into GameContext and view will be replaced by GameOptions, Board and Log
+    @Deprecated(since = "2024-12-23", forRemoval = true)
     void testFromJsonConstructor_givenSaveGameView_thenMatchesOriginal() {
         Space space = new Plane(8, 8);
         PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
@@ -98,13 +99,15 @@ class ChessGameTest {
 
         // then
         Game copy = new ChessGame(root);
-        for (Piece p : copy.getBoard()) {
-            assertNotNull(game.getBoard().get(p.getCoordinate()));
-            assertEquals(game.getBoard().get(p.getCoordinate()).getCode(), p.getCode());
+        Board<Coordinate> updatedBoard = copy.info().context().getBoard();
+        for (Piece p : updatedBoard) {
+            assertNotNull(updatedBoard.get(p.getCoordinate()));
+            assertEquals(updatedBoard.get(p.getCoordinate()).getCode(), p.getCode());
         }
     }
 
-    @Test
+    // Depreciated as fields were moved into GameContext and view will be replaced by GameOptions, Board and Log
+    @Deprecated(since = "2024-12-23", forRemoval = true)
     void testFromJson_givenSaveGameView_thenMatchesOriginal() {
         Space space = new Plane(8, 8);
         PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
@@ -120,9 +123,10 @@ class ChessGameTest {
         Game copy = ChessGame.fromJson(json);
 
         // then
-        for (Piece p : copy.getBoard()) {
-            assertNotNull(game.getBoard().get(p.getCoordinate()));
-            assertEquals(game.getBoard().get(p.getCoordinate()).getCode(), p.getCode());
+        Board<Coordinate> updatedBoard = copy.info().context().getBoard();
+        for (Piece p : updatedBoard) {
+            assertNotNull(updatedBoard.get(p.getCoordinate()));
+            assertEquals(updatedBoard.get(p.getCoordinate()).getCode(), p.getCode());
         }
         assertEquals(game.getTurn(), copy.getTurn());
     }
@@ -632,8 +636,9 @@ class ChessGameTest {
         ThreatMap threatMap = new ThreatMap(Colour.BLACK, board, log, space);
 
         ChessGame game = new ChessGame(board, log);
-        game.movePiece(new Point(nextX, 1), new Point(nextX, nextY), log, threatMap); // Filler
-        game.movePiece(new Point(0, 6), new Point(0, 5), log, threatMap); // Filler
+        game.updateGame(new Point(nextX, 1), new Point(nextX, nextY), Colour.WHITE); // Filler
+        game.updateGame(new Point("e7"), new Point("e6"), Colour.WHITE); // Filler
+        game.updateGame(new Point("a5"), new Point("a4"), Colour.WHITE); // Filler
 
         // When
         Action action = new Action(Colour.WHITE, source, target);
@@ -823,8 +828,8 @@ class ChessGameTest {
     @Test
     void executeAction_pawnEnPassantRightAndValid_pawnMovedAndOtherRemoved() {
         // Given
-        Point source = new Point(4, 6);
-        Point target = new Point(4, 4);
+        Point source = new Point("e7");
+        Point target = new Point("e5");
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
@@ -832,21 +837,21 @@ class ChessGameTest {
 
         ChessGame game = new ChessGame(board, log);
         // White move
-        game.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
+        game.updateGame(new Point("d2"), new Point("d4"), Colour.WHITE);
         // Black move (filler)
-        game.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
+        game.updateGame(new Point("b7"), new Point("b5"), Colour.BLACK);
         // White move
-        LogEntry<Coordinate, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
-                board.get(new Point(3, 3)));
-        game.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        LogEntry<Coordinate, Piece> entry1 = new ChessLogEntry(new Point("d4"), new Point("d5"),
+                board.get(new Point("d4")));
+        game.updateGame(new Point("d4"), new Point("d5"), Colour.WHITE);
         log.push(entry1);
         // Black move (with log updated for piece to check)
         LogEntry<Coordinate, Piece> entry2 = new ChessLogEntry(source, target, board.get(source));
-        game.movePiece(source, target, log, threatMap);
+        game.updateGame(source, target, Colour.BLACK);
         log.push(entry2);
 
         // When (White move)
-        Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(4, 5));
+        Action action = new Action(Colour.WHITE, new Point("d5"), new Point("e6"));
 
         game.updateGame(action); // En Passant
 
@@ -862,8 +867,8 @@ class ChessGameTest {
     @Test
     void executeAction_pawnEnPassantLeftAndValid_pawnMovedAndOtherRemoved() {
         // Given
-        Point source = new Point(2, 6);
-        Point target = new Point(2, 4);
+        Point source = new Point("c7");
+        Point target = new Point("c5");
         Space space = new Plane(8, 8);
         Board<Coordinate> board = new ChessBoard(space, new StandardPieceFactory());
         Log<Coordinate, Piece> log = new ChessLog();
@@ -871,21 +876,21 @@ class ChessGameTest {
 
         ChessGame game = new ChessGame(board, log);
         // White move
-        game.movePiece(new Point(3, 1), new Point(3, 3), log, threatMap);
+        game.updateGame(new Point("d2"), new Point("d4"), Colour.WHITE);
         // Black move (filler)
-        game.movePiece(new Point(1, 6), new Point(1, 5), log, threatMap);
+        game.updateGame(new Point("b7"), new Point("b6"), Colour.BLACK);
         // White move
-        LogEntry<Coordinate, Piece> entry1 = new ChessLogEntry(new Point(3, 3), new Point(3, 4),
-                board.get(new Point(3, 3)));
-        game.movePiece(new Point(3, 3), new Point(3, 4), log, threatMap);
+        LogEntry<Coordinate, Piece> entry1 = new ChessLogEntry(new Point("d4"), new Point("d5"),
+                board.get(new Point("d4")));
+        game.updateGame(new Point("d4"), new Point("d5"), Colour.WHITE);
         log.push(entry1);
-        // Black move
+        // Black move (with log updated for piece to check)
         LogEntry<Coordinate, Piece> entry2 = new ChessLogEntry(source, target, board.get(source));
-        game.movePiece(source, target, log, threatMap);
+        game.updateGame(source, target, Colour.BLACK);
         log.push(entry2);
 
         // When (White move)
-        Action action = new Action(Colour.WHITE, new Point(3, 4), new Point(2, 5));
+        Action action = new Action(Colour.WHITE, new Point("d5"), new Point("c6"));
         game.updateGame(action); // En Passant
 
         // Then

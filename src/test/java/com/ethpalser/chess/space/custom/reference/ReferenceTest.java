@@ -3,6 +3,7 @@ package com.ethpalser.chess.space.custom.reference;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.game.ChessGame;
+import com.ethpalser.chess.game.GameInfo;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
@@ -53,12 +54,15 @@ class ReferenceTest {
         Reference<Piece> reference = new AbsoluteReference<>(new Point(4, 3));
 
         ChessGame game = new ChessGame(board, log);
-        game.movePiece(new Point(4, 1), new Point(4, 3), log, threatMap);
+        game.updateGame(new Point(4, 1), new Point(4, 3), Colour.WHITE);
 
 
         // Then
-        assertFalse(reference.getReferences(board).isEmpty());
-        assertTrue(reference.getReferences(board).contains(board.get(new Point(4, 3))));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoad = info.context().getBoard();
+
+        assertFalse(reference.getReferences(updatedBoad).isEmpty());
+        assertTrue(reference.getReferences(updatedBoad).contains(updatedBoad.get(new Point(4, 3))));
     }
 
     @Test
@@ -142,9 +146,9 @@ class ReferenceTest {
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.AT);
         ChessGame game = new ChessGame(board, log);
-        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        game.updateGame(new Point(4, 1), new Point(4, 2), Colour.WHITE);
         // Then
-        assertTrue(ref.getReferences(board).contains(piece));
+        assertTrue(ref.getReferences(game.info().context().getBoard()).contains(piece));
     }
 
     @Test
@@ -158,9 +162,9 @@ class ReferenceTest {
         // When
         Reference<Piece> ref = new PieceReference(piece, Direction.BACK);
         ChessGame game = new ChessGame(board, log);
-        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
+        game.updateGame(new Point(4, 1), new Point(4, 2), Colour.WHITE);
         // Then
-        assertTrue(ref.getReferences(board).isEmpty());
+        assertTrue(ref.getReferences(game.info().context().getBoard()).isEmpty());
     }
 
     @Test
@@ -174,11 +178,17 @@ class ReferenceTest {
         Piece rightPiece = board.get(new Point(5, 1)); // f1 pawn
         // When
         Reference<Piece> ref = new PieceReference(refPiece, Direction.RIGHT);
+
         ChessGame game = new ChessGame(board, log);
-        game.movePiece(new Point(4, 1), new Point(4, 2), log, threatMap);
-        game.movePiece(new Point(5, 1), new Point(5, 2), log, threatMap);
+        game.updateGame(new Point(4, 1), new Point(4, 2), Colour.WHITE);
+        game.updateGame(new Point(0, 6), new Point(0, 5), Colour.BLACK); // Filler
+        game.updateGame(new Point(5, 1), new Point(5, 2),  Colour.WHITE);
         // Then
-        assertTrue(ref.getReferences(board).contains(rightPiece));
+        GameInfo info = game.info();
+        Board<Coordinate> updatedBoard = info.context().getBoard();
+
+        assertFalse(ref.getReferences(updatedBoard).isEmpty());
+        assertTrue(ref.getReferences(updatedBoard).contains(updatedBoard.get(new Point(5, 2))));
     }
 
     @Test
