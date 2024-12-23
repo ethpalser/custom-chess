@@ -31,7 +31,7 @@ public class AwaitState implements GameState {
         }
         switch (event.type()) {
             case MOVE, PROMOTE -> {
-                // We no longer need the prompt use to start this wait state
+                // We no longer need the prompt used to start this wait state
                 this.context.clearPrompt();
                 event.execute(this.context);
                 // Check if there is a new prompt to follow-up on, and then create another AwaitState if there is one
