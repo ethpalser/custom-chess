@@ -1,16 +1,8 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.event.GameEvent;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Coordinate;
-
 public interface Game {
 
-    Board<Coordinate> getBoard();
-
-    Log<Coordinate, Piece> getLog();
+    GameInfo info();
 
     GameStatus getStatus();
 
@@ -35,8 +27,4 @@ public interface Game {
     int evaluateState();
 
     String toJson();
-
-    // #### NEW METHODS ####
-
-    GameInfo info();
 }

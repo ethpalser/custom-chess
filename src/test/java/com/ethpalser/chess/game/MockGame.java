@@ -41,16 +41,6 @@ public class MockGame implements Game {
     }
 
     @Override
-    public Board getBoard() {
-        return null;
-    }
-
-    @Override
-    public Log<Coordinate, Piece> getLog() {
-        return null;
-    }
-
-    @Override
     public GameStatus getStatus() {
         return GameStatus.ONGOING;
     }
