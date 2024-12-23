@@ -21,14 +21,14 @@ public class GameView {
 
     public GameView(Game game) {
         this.turn = game.getTurn();
-        this.log = game.getLog().stream().map(LogEntry::toString).collect(Collectors.toList());
+        this.log = game.info().context().getLog().stream().map(LogEntry::toString).collect(Collectors.toList());
         this.board = new BoardView(
-                game.getBoard(),
+                game.info().context().getBoard(),
                 8,
                 8
         );
         Map<String, List<MoveView>> specList = new HashMap<>();
-        for (Piece p : game.getBoard()) {
+        for (Piece p : game.info().context().getBoard()) {
             if (p instanceof CustomPiece && !"PRNBQK".contains(p.getCode()) && specList.get(p.getCode()) == null) {
                 specList.put(
                         p.getCode(),
