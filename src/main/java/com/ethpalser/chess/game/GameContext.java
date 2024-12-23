@@ -143,6 +143,8 @@ public class GameContext {
         }
         // After all changes, did the turn player put itself into check?
         if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
+            // This may have been raised by an event
+            this.clearPrompt();
             throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
         }
 
