@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.game.logic.GameTree;
 import com.ethpalser.chess.piece.Colour;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;

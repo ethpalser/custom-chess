@@ -4,6 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.event.MoveEvent;
+import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.game.state.EndState;
 import com.ethpalser.chess.game.state.GameState;
 import com.ethpalser.chess.game.state.ReadyState;

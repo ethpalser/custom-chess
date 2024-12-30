@@ -3,7 +3,7 @@ package com.ethpalser.chess.game;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardTestCases;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.game.logic.GameTree;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;

@@ -1,7 +1,7 @@
 package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.Heuristics;
+import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.Movement;
