@@ -2,13 +2,16 @@ package com.ethpalser.chess.piece;
 
 public enum Colour {
     WHITE,
-    BLACK;
+    BLACK,
+    NO_COLOUR;
 
     public String toCode() {
         if (WHITE.equals(this)) {
             return "w";
-        } else {
+        } else if (BLACK.equals(this)) {
             return "b";
+        } else {
+            return "";
         }
     }
 
@@ -20,7 +23,7 @@ public enum Colour {
         }
     }
 
-    public static Colour fromCode(String string) {
+    public static Colour fromCode(String string) throws IllegalArgumentException {
         if (string == null || string.length() != 1) {
             throw new IllegalArgumentException();
         }
