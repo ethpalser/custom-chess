@@ -164,6 +164,6 @@ public class MoveEvent implements GameEvent {
         piece.move(this.source);
         log.pop();
         // Commit this change to the game
-        context.update(turnPlayer, board, log);
+        context.undo(turnPlayer, board, log);
     }
 }

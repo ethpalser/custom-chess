@@ -72,7 +72,7 @@ public class PromoteEvent implements GameEvent {
         board.add(this.source, replacement);
         log.peek().setPromotion(null);
         // Commit this change to the game
-        context.update(replacement.getColour(), board, log);
+        context.undo(replacement.getColour(), board, log);
     }
 
     private void verifyPieceExists(GameContext context, Coordinate coordinate)
