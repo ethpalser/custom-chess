@@ -1,12 +1,11 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PieceStringTokenizer {
 
-    private static final String REGEX = "^[wb](?:[PRNBQK]|(?:\\~[a-z0-9]{1,24}\\~))[a-z](?:(?:2[0-6])|" +
-            "(?:1\\d)|[1-9])\\*?$";
     private final List<String> tokens;
     private int index;
 
@@ -49,14 +48,15 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
+        final String defaultCase = "w";
         if (piece == null || "".equals(piece)) {
-            tokens.add("w"); // default colour
+            tokens.add(defaultCase); // default colour
             return null;
         }
         if (piece.charAt(0) == 'w' || piece.charAt(0) == 'b') {
             tokens.add(piece.substring(0, 1));
         } else {
-            tokens.add("w"); // default colour
+            tokens.add(defaultCase); // default colour
         }
         // Removed one character
         return piece.substring(1);
@@ -67,8 +67,9 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
+        final String defaultCase = PieceType.INVALID.getCode();
         if (piece == null || "".equals(piece)) {
-            tokens.add("P"); // default piece
+            tokens.add(defaultCase); // no piece
             return null;
         }
 
@@ -78,30 +79,30 @@ public class PieceStringTokenizer {
             return piece.substring(1);
         }
 
-        if (piece.charAt(0) != '~' && piece.length() < 5) {
+        if (piece.charAt(0) != '(' && piece.length() < 5) {
             // When the string is has a short length we can expect the following cases:
             // 1. Aa1* or Aa1 (A is not a standard code)
             // 2. f~a1 (malformed custom code missing a starting ~)
             // 3. rat~ (malformed custom code and missing other piece info)
             // 4. a26* (code is missing)
-            tokens.add("P"); // default piece type
+            tokens.add(defaultCase); // no piece
             return this.substringWithoutCode(piece);
         } else {
-            if (piece.charAt(0) != '~') {
-                System.err.println("custom-piece string is invalid, missing starting '~' at index 1. string: " + piece);
-                tokens.add("P");
+            if (piece.charAt(0) != '(') {
+                System.err.println("custom-piece string is invalid, missing starting '(' at index 1. string: " + piece);
+                tokens.add(defaultCase);
                 return this.substringWithoutCode(piece);
             }
             int end = 0;
             for (int i = 1; i < piece.length(); i++) {
-                if (piece.charAt(i) == '~') {
+                if (piece.charAt(i) == ')') {
                     end = i;
                     break;
                 }
             }
             if (end == 0) {
-                System.err.println("custom-piece string is invalid, missing enclosing '~'. string: " + piece);
-                tokens.add("P");
+                System.err.println("custom-piece string is invalid, missing enclosing ')'. string: " + piece);
+                tokens.add(defaultCase);
                 return this.substringWithoutCode(piece);
             }
             tokens.add(piece.substring(1, end));
@@ -128,7 +129,7 @@ public class PieceStringTokenizer {
             if (original.substring(substringEnd).matches("[a-z]")) {
                 substringEnd--;
             }
-            if (original.charAt(substringEnd - 1) == '~') {
+            if (original.charAt(substringEnd - 1) == ')') {
                 return original.substring(substringEnd);
             }
         } catch (IndexOutOfBoundsException ex) {
@@ -142,8 +143,9 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
+        final String defaultCase = "a";
         if (piece == null || "".equals(piece)) {
-            tokens.add("a"); // default file (y-axis)
+            tokens.add(defaultCase); // default file (y-axis)
             return null;
         }
 
@@ -151,7 +153,7 @@ public class PieceStringTokenizer {
             tokens.add(piece.substring(0, 1));
             return piece.substring(1);
         } else {
-            tokens.add("a"); // default file
+            tokens.add(defaultCase); // default file
             if (piece.substring(0, 1).matches("\\d") || piece.charAt(0) == '*') {
                 return piece;
             } else {
@@ -165,8 +167,9 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
+        final String defaultCase = "1";
         if (piece == null || "".equals(piece)) {
-            tokens.add("1"); // default rank (x-axis)
+            tokens.add(defaultCase); // default rank (x-axis)
             return null;
         }
 
@@ -180,7 +183,7 @@ public class PieceStringTokenizer {
         if (rank.matches("(?:(2[0-6])|(1\\d)|[1-9])\\*?$")) {
             tokens.add(rank);
         } else {
-            tokens.add("1"); // default rank
+            tokens.add(defaultCase); // default rank
             if (rank.charAt(0) == '*') {
                 return piece;
             }
@@ -193,9 +196,10 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
+        final String defaultCase = "";
         // Note: Empty string is okay in this case
         if (piece == null || "".equals(piece)) {
-            tokens.add(""); // default is moved
+            tokens.add(defaultCase); // default is moved
             return null;
         }
 
