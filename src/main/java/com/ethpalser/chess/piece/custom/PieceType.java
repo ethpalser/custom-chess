@@ -7,7 +7,8 @@ public enum PieceType {
     BISHOP("B"),
     QUEEN("Q"),
     KING("K"),
-    CUSTOM("~custom~");
+    CUSTOM("(custom)"),
+    INVALID("_");
 
     private final String code;
 
@@ -21,6 +22,7 @@ public enum PieceType {
 
     public static PieceType fromCode(String code) {
         return switch (code) {
+            case "_" -> INVALID;
             case "P", "" -> PAWN;
             case "R" -> ROOK;
             case "N" -> KNIGHT;
