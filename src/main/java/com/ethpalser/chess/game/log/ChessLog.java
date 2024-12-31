@@ -4,7 +4,6 @@ import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ChessLog extends GameLog<ChessLog.Entry> {
@@ -21,15 +20,6 @@ public class ChessLog extends GameLog<ChessLog.Entry> {
             list.add(new GameEventProxy(notation));
             this.push(new Entry(notation, list));
         }
-    }
-
-    public List<ChessNotation> getChessNotationList() {
-        List<ChessNotation> notationList = new ArrayList<>();
-        Iterator<ChessLog.Entry> it = this.iterator();
-        while (it.hasNext()) {
-            notationList.add(it.next().notation());
-        }
-        return notationList;
     }
 
     public record Entry(ChessNotation notation, List<GameEvent> eventList) {

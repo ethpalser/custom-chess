@@ -2,7 +2,6 @@ package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Point;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
