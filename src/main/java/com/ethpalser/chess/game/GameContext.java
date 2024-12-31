@@ -201,4 +201,47 @@ public class GameContext {
         return changes;
     }
 
+    public GameContext.Record toRecord() {
+        return new Record(new ChessBoard((ChessBoard) this.board),
+                this.getLog(),
+                this.getThreats(Colour.WHITE),
+                this.getThreats(Colour.BLACK));
+    }
+
+    /**
+     * A container for GameContext information that is copied from the original context to distribute. This
+     * is intended to prevent unintended changes to the GameContext, but it will not prevent modifying the Record's
+     * data and then using the modified record for methods - irrespective of intent.
+     */
+    public class Record {
+
+        private final Board<Coordinate> board;
+        private final Log<Coordinate, Piece> log;
+        private final ThreatMap whiteThreats;
+        private final ThreatMap blackThreats;
+
+        private Record(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap whiteThreats,
+                ThreatMap blackThreats) {
+            this.board = board;
+            this.log = log;
+            this.whiteThreats = whiteThreats;
+            this.blackThreats = blackThreats;
+        }
+
+        public Board<Coordinate> getBoard() {
+            return this.board;
+        }
+
+        public Log<Coordinate, Piece> getLog() {
+            return this.log;
+        }
+
+        public ThreatMap getThreats(Colour colour) {
+            if (colour == null) {
+                return null;
+            }
+            return Colour.WHITE.equals(colour) ? this.whiteThreats : this.blackThreats;
+        }
+    }
+
 }
