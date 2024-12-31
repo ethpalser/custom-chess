@@ -71,6 +71,8 @@ public class Path implements Iterable<Point> {
         return this.pointList.size();
     }
 
+    public boolean isEmpty() { return this.pointList.isEmpty(); }
+
     public Point getPoint(int index) {
         return this.pointList.get(index);
     }
