@@ -5,58 +5,27 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import java.util.Objects;
+import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
+import com.ethpalser.chess.space.custom.reference.Reference;
 
-public class Move implements Movement {
-
-    private final Path path;
-    private final LogEntry<Coordinate, Piece> followUpMove;
+public record Move(Path path, FollowUp followUp) {
 
     public Move(Coordinate point) {
-        this(new Path((Point) point), null);
-    }
-
-    public Move(Coordinate point, LogEntry<Coordinate, Piece> followUpMove) {
-        this(new Path((Point) point), followUpMove);
+        this(new Path((Point) point), (FollowUp) null);
     }
 
     public Move(Path path) {
-        this(path, null);
+        this(path, (FollowUp) null);
     }
 
+    @Deprecated(since = "2025-01-01")
     public Move(Path path, LogEntry<Coordinate, Piece> followUpMove) {
-        this.path = path;
-        this.followUpMove = followUpMove;
+        this(path, followUpMove == null ? null : new FollowUp(
+                new AbsoluteReference<>(followUpMove.getStart()),
+                new Path((Point) followUpMove.getEnd())
+        ));
     }
 
-    @Override
-    public Path getPath() {
-        return this.path;
-    }
-
-    @Override
-    public LogEntry<Coordinate, Piece> getFollowUpMove() {
-        return this.followUpMove;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Move move = (Move) o;
-        return Objects.equals(this.path, move.path) && Objects.equals(this.followUpMove, move.followUpMove);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.path, this.followUpMove);
-    }
-
-    @Override
-    public String toString() {
-        return "Move{" +
-                "path=" + path +
-                ", followUpMove=" + followUpMove +
-                '}';
+    public record FollowUp(Reference<Piece> reference, Path path) {
     }
 }
