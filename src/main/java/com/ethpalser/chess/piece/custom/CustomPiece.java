@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.custom.MovementSpec;
+import com.ethpalser.chess.move.MovementSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;

@@ -2,7 +2,7 @@ package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.custom.MovementSpec;
+import com.ethpalser.chess.move.MovementSpec;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.custom.MovementType;
+import com.ethpalser.chess.move.MovementType;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
