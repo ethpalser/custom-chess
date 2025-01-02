@@ -4,8 +4,8 @@ import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.log.custom.ReferenceLogEntry;
-import com.ethpalser.chess.move.custom.CustomMove;
-import com.ethpalser.chess.move.custom.CustomMoveType;
+import com.ethpalser.chess.move.custom.MovementSpec;
+import com.ethpalser.chess.move.custom.MovementType;
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.move.custom.condition.LogCondition;
@@ -133,40 +133,40 @@ public class CustomPieceFactory implements PieceFactory {
     // PIECES
 
     private CustomPiece knight(Colour colour) {
-        CustomMove baseMoveL1 = new CustomMove(new Path(new Point(1, 2)), CustomMoveType.JUMP, true, true);
-        CustomMove baseMoveL2 = new CustomMove(new Path(new Point(2, 1)), CustomMoveType.JUMP, true, true);
+        MovementSpec baseMoveL1 = new MovementSpec(new Path(new Point(1, 2)), MovementType.JUMP, true, true);
+        MovementSpec baseMoveL2 = new MovementSpec(new Path(new Point(2, 1)), MovementType.JUMP, true, true);
         return new CustomPiece(PieceType.KNIGHT.getCode(), colour, Point.ORIGIN, false, baseMoveL1, baseMoveL2);
     }
 
     private CustomPiece rook(Colour colour) {
-        CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
-        CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
+        MovementSpec baseMoveV = new MovementSpec(this.vertical(), MovementType.ADVANCE, true, false);
+        MovementSpec baseMoveH = new MovementSpec(this.horizontal(), MovementType.ADVANCE, false, true);
         return new CustomPiece(PieceType.ROOK.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH);
     }
 
     private CustomPiece bishop(Colour colour) {
-        CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
+        MovementSpec baseMoveD = new MovementSpec(this.diagonal(), MovementType.ADVANCE, true, true);
         return new CustomPiece(PieceType.BISHOP.getCode(), colour, Point.ORIGIN, false, baseMoveD);
     }
 
     private CustomPiece queen(Colour colour) {
-        CustomMove baseMoveV = new CustomMove(this.vertical(), CustomMoveType.ADVANCE, true, false);
-        CustomMove baseMoveH = new CustomMove(this.horizontal(), CustomMoveType.ADVANCE, false, true);
-        CustomMove baseMoveD = new CustomMove(this.diagonal(), CustomMoveType.ADVANCE, true, true);
+        MovementSpec baseMoveV = new MovementSpec(this.vertical(), MovementType.ADVANCE, true, false);
+        MovementSpec baseMoveH = new MovementSpec(this.horizontal(), MovementType.ADVANCE, false, true);
+        MovementSpec baseMoveD = new MovementSpec(this.diagonal(), MovementType.ADVANCE, true, true);
         return new CustomPiece(PieceType.QUEEN.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH, baseMoveD);
     }
 
     private CustomPiece king(Colour colour) {
-        CustomMove baseMoveV = new CustomMove(new Path(new Point(0, 1)), CustomMoveType.ADVANCE, true, false);
-        CustomMove baseMoveH = new CustomMove(new Path(new Point(1, 0)), CustomMoveType.ADVANCE, false, true);
-        CustomMove baseMoveD = new CustomMove(new Path(new Point(1, 1)), CustomMoveType.ADVANCE, true, true);
+        MovementSpec baseMoveV = new MovementSpec(new Path(new Point(0, 1)), MovementType.ADVANCE, true, false);
+        MovementSpec baseMoveH = new MovementSpec(new Path(new Point(1, 0)), MovementType.ADVANCE, false, true);
+        MovementSpec baseMoveD = new MovementSpec(new Path(new Point(1, 1)), MovementType.ADVANCE, true, true);
         CustomPiece king = new CustomPiece(PieceType.KING.getCode(), colour, Point.ORIGIN, false, baseMoveV, baseMoveH,
                 baseMoveD);
 
         {
             // Castle - King side
             Point kingSideRook = new Point(7, 0); // Assuming a standard board
-            CustomMove castleKingSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
+            MovementSpec castleKingSide = new MovementSpec.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
@@ -185,7 +185,7 @@ public class CustomPieceFactory implements PieceFactory {
         {
             // Castle - Queen side
             Point queenSideRook = new Point(0, 0); // Assuming a standard board
-            CustomMove castleQueenSide = new CustomMove.Builder(new Path(new Point(2, 0)), CustomMoveType.CHARGE)
+            MovementSpec castleQueenSide = new MovementSpec.Builder(new Path(new Point(2, 0)), MovementType.CHARGE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(true)
                     .isSpecificQuadrant(false)
@@ -205,7 +205,7 @@ public class CustomPieceFactory implements PieceFactory {
     }
 
     private CustomPiece pawn(Colour colour) {
-        CustomMove baseMove = new CustomMove.Builder(new Path(new Point(0, 1)), CustomMoveType.ADVANCE)
+        MovementSpec baseMove = new MovementSpec.Builder(new Path(new Point(0, 1)), MovementType.ADVANCE)
                 .isMirrorXAxis(false)
                 .isMirrorYAxis(false)
                 .isSpecificQuadrant(true)
@@ -215,7 +215,7 @@ public class CustomPieceFactory implements PieceFactory {
 
         {
             // Pawns can only capture one space diagonal from their front
-            CustomMove pawnCapture = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+            MovementSpec pawnCapture = new MovementSpec.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMove(false)
                     .build();
@@ -223,8 +223,8 @@ public class CustomPieceFactory implements PieceFactory {
         }
         {
             // Pawns can move forward two spaces if they have not moved
-            CustomMove pawnCharge = new CustomMove.Builder(new Path(new Point(0, 1), new Point(0, 2)),
-                    CustomMoveType.ADVANCE)
+            MovementSpec pawnCharge = new MovementSpec.Builder(new Path(new Point(0, 1), new Point(0, 2)),
+                    MovementType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
@@ -239,7 +239,7 @@ public class CustomPieceFactory implements PieceFactory {
             // En Passant front-right
             LogEntry<Coordinate, Piece> followUpRight = new ReferenceLogEntry<>(null, // remove board dependency
                     new PieceReference(pawn, Direction.AT, 1, 0), null);
-            CustomMove enPassantRight = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+            MovementSpec enPassantRight = new MovementSpec.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
@@ -257,7 +257,7 @@ public class CustomPieceFactory implements PieceFactory {
             // En Passant front-left
             LogEntry<Coordinate, Piece> followUpLeft = new ReferenceLogEntry<>(null, // remove board dependency
                     new PieceReference(pawn, Direction.AT, -1, 0), null);
-            CustomMove enPassantLeft = new CustomMove.Builder(new Path(new Point(1, 1)), CustomMoveType.ADVANCE)
+            MovementSpec enPassantLeft = new MovementSpec.Builder(new Path(new Point(1, 1)), MovementType.ADVANCE)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(true)
                     .isSpecificQuadrant(true)

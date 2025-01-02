@@ -1,13 +1,13 @@
 package com.ethpalser.chess.move.custom;
 
-public enum CustomMoveType {
+public enum MovementType {
     JUMP("jump"),
     ADVANCE("advance"),
     CHARGE("charge");
 
     private final String display;
 
-    CustomMoveType(String display) {
+    MovementType(String display) {
         this.display = display;
     }
 
@@ -16,8 +16,8 @@ public enum CustomMoveType {
         return this.display;
     }
 
-    public static CustomMoveType fromString(String string) {
-        for (CustomMoveType e : CustomMoveType.values()) {
+    public static MovementType fromString(String string) {
+        for (MovementType e : MovementType.values()) {
             if (e.display.equalsIgnoreCase(string)) {
                 return e;
             }

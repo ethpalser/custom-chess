@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CustomMove {
+public class MovementSpec {
 
     private final Path pathBase;
-    private final CustomMoveType moveType;
+    private final MovementType moveType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
@@ -40,7 +40,7 @@ public class CustomMove {
     public static class Builder {
         // required
         private final Path path;
-        private final CustomMoveType moveType;
+        private final MovementType moveType;
         // optional
         private boolean mirrorXAxis = true;
         private boolean mirrorYAxis = true;
@@ -50,9 +50,9 @@ public class CustomMove {
         private List<Conditional<Piece>> conditions = List.of();
         private LogEntry<Coordinate, Piece> followUp = null;
 
-        public Builder(Path path, CustomMoveType moveType) {
+        public Builder(Path path, MovementType moveType) {
             this.path = Objects.requireNonNullElse(path, new Path(List.of()));
-            this.moveType = Objects.requireNonNullElse(moveType, CustomMoveType.ADVANCE);
+            this.moveType = Objects.requireNonNullElse(moveType, MovementType.ADVANCE);
         }
 
         public Builder isMirrorXAxis(Boolean bool) {
@@ -90,12 +90,12 @@ public class CustomMove {
             return this;
         }
 
-        public CustomMove build() {
-            return new CustomMove(this);
+        public MovementSpec build() {
+            return new MovementSpec(this);
         }
     }
 
-    CustomMove(Builder builder) {
+    MovementSpec(Builder builder) {
         this.pathBase = builder.path;
         this.moveType = builder.moveType;
         this.mirrorXAxis = builder.mirrorXAxis;
@@ -107,7 +107,7 @@ public class CustomMove {
         this.followUp = builder.followUp;
     }
 
-    public CustomMove(Path path, CustomMoveType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
+    public MovementSpec(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
         this.pathBase = path;
         this.moveType = moveType;
         this.mirrorXAxis = mirrorXAxis;
@@ -119,7 +119,7 @@ public class CustomMove {
         this.followUp = null;
     }
 
-    public CustomMove(Board<Coordinate> board, Log<Coordinate, Piece> log, MoveView view) {
+    public MovementSpec(Board<Coordinate> board, Log<Coordinate, Piece> log, MoveView view) {
         if (view == null) {
             this.pathBase = null;
             this.moveType = null;
@@ -249,7 +249,7 @@ public class CustomMove {
                     points.add(next);
                 }
 
-                boolean passAnyPiece = CustomMoveType.JUMP.equals(this.moveType);
+                boolean passAnyPiece = MovementType.JUMP.equals(this.moveType);
                 boolean passOppKing = onlyAttacks && canCapture && Pieces.isKing(nPiece);
                 if (!passAnyPiece && !passOppKing) {
                     break; // A piece was encountered and this piece cannot move beyond it, so the path ends here
