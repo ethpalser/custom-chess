@@ -4,7 +4,6 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.Movement;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
