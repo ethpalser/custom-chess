@@ -4,7 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.MovementSpec;
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -21,15 +21,15 @@ public class CustomPiece implements Piece {
     private final PieceType type;
     private final String code;
     private final Colour colour;
-    private final List<MovementSpec> moveSpecifications;
+    private final List<MoveSpec> moveSpecifications;
     private Coordinate position;
     private boolean hasMoved;
 
     public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
-        this(pieceType, colour, vector, (MovementSpec) null);
+        this(pieceType, colour, vector, (MoveSpec) null);
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, MovementSpec... specifications) {
+    public CustomPiece(PieceType pieceType, Colour colour, Point vector, MoveSpec... specifications) {
         this.type = pieceType;
         this.colour = colour;
         this.position = vector;
@@ -38,13 +38,13 @@ public class CustomPiece implements Piece {
         this.code = pieceType.getCode();
     }
 
-    public CustomPiece(String code, Colour colour, Point vector, boolean hasMoved, MovementSpec... movementSpecs) {
+    public CustomPiece(String code, Colour colour, Point vector, boolean hasMoved, MoveSpec... moveSpecs) {
         this.type = PieceType.fromCode(code);
         this.code = code;
         this.colour = colour;
         this.position = vector;
         this.hasMoved = hasMoved;
-        this.moveSpecifications = new ArrayList<>(Arrays.asList(movementSpecs));
+        this.moveSpecifications = new ArrayList<>(Arrays.asList(moveSpecs));
     }
 
     @Override
@@ -79,18 +79,18 @@ public class CustomPiece implements Piece {
     public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
         Set<Move> movements = new HashSet<>();
-        for (MovementSpec spec : this.moveSpecifications) {
+        for (MoveSpec spec : this.moveSpecifications) {
             movements.addAll(spec.toMovementList(board, threats, this.colour, (Point) this.position, onlyAttacks,
                     includeDefends));
         }
         return new MoveSet(movements);
     }
 
-    public List<MovementSpec> getMoveSpecs() {
+    public List<MoveSpec> getMoveSpecs() {
         return this.moveSpecifications;
     }
 
-    public void addMoveSpec(MovementSpec move) {
+    public void addMoveSpec(MoveSpec move) {
         this.moveSpecifications.add(move);
     }
 

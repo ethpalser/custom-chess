@@ -2,7 +2,7 @@ package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.MovementSpec;
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class GameView {
             if (p instanceof CustomPiece && !"PRNBQK".contains(p.getCode()) && specList.get(p.getCode()) == null) {
                 specList.put(
                         p.getCode(),
-                        ((CustomPiece) p).getMoveSpecs().stream().map(MovementSpec::toView).collect(Collectors.toList())
+                        ((CustomPiece) p).getMoveSpecs().stream().map(MoveSpec::toView).collect(Collectors.toList())
                 );
             }
         }

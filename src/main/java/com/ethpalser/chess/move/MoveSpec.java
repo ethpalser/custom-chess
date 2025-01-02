@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MovementSpec {
+public class MoveSpec {
 
     private final Path pathBase;
-    private final MovementType moveType;
+    private final MoveType moveType;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
@@ -30,7 +30,7 @@ public class MovementSpec {
     private final List<Conditional<Piece>> conditions;
     private final LogEntry<Coordinate, Piece> followUp;
 
-    public MovementSpec(Path path, MovementType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
+    public MoveSpec(Path path, MoveType moveType, boolean mirrorXAxis, boolean mirrorYAxis) {
         this.pathBase = path;
         this.moveType = moveType;
         this.mirrorXAxis = mirrorXAxis;
@@ -42,7 +42,7 @@ public class MovementSpec {
         this.followUp = null;
     }
 
-    private MovementSpec(Builder builder) {
+    private MoveSpec(Builder builder) {
         this.pathBase = builder.path;
         this.moveType = builder.moveType;
         this.mirrorXAxis = builder.mirrorXAxis;
@@ -150,7 +150,7 @@ public class MovementSpec {
                     points.add(next);
                 }
 
-                boolean passAnyPiece = MovementType.JUMP.equals(this.moveType);
+                boolean passAnyPiece = MoveType.JUMP.equals(this.moveType);
                 boolean passOppKing = onlyAttacks && canCapture && Pieces.isKing(nPiece);
                 if (!passAnyPiece && !passOppKing) {
                     break; // A piece was encountered and this piece cannot move beyond it, so the path ends here
@@ -200,7 +200,7 @@ public class MovementSpec {
     public static class Builder {
         // required
         private final Path path;
-        private final MovementType moveType;
+        private final MoveType moveType;
         // optional
         private boolean mirrorXAxis = true;
         private boolean mirrorYAxis = true;
@@ -210,9 +210,9 @@ public class MovementSpec {
         private List<Conditional<Piece>> conditions = List.of();
         private LogEntry<Coordinate, Piece> followUp = null;
 
-        public Builder(Path path, MovementType moveType) {
+        public Builder(Path path, MoveType moveType) {
             this.path = Objects.requireNonNullElse(path, new Path(List.of()));
-            this.moveType = Objects.requireNonNullElse(moveType, MovementType.ADVANCE);
+            this.moveType = Objects.requireNonNullElse(moveType, MoveType.ADVANCE);
         }
 
         public Builder isMirrorXAxis(Boolean bool) {
@@ -250,8 +250,8 @@ public class MovementSpec {
             return this;
         }
 
-        public MovementSpec build() {
-            return new MovementSpec(this);
+        public MoveSpec build() {
+            return new MoveSpec(this);
         }
     }
 }
