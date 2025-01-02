@@ -3,6 +3,7 @@ package com.ethpalser.chess.move.map;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -110,9 +111,9 @@ public class ThreatMap {
         for (Piece piece : this.getPieces(point)) {
             if (!piece.equals(change)) {
                 MoveSet moves = piece.getMoves(board, log, this, true, true);
-                Movement moveWithPoint = moves.getMove(point);
+                Move moveWithPoint = moves.getMove(point);
                 if (moveWithPoint != null) {
-                    pairList.add(new Pair<>(piece, moveWithPoint.getPath()));
+                    pairList.add(new Pair<>(piece, moveWithPoint.path()));
                 }
             }
         }

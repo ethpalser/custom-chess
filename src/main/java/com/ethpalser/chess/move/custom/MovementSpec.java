@@ -55,7 +55,7 @@ public class MovementSpec {
         this.followUp = builder.followUp;
     }
 
-    public List<Movement> toMovementList(Board<Coordinate> board, ThreatMap threatMap, Colour colour, Point offset,
+    public List<Move> toMovementList(Board<Coordinate> board, ThreatMap threatMap, Colour colour, Point offset,
             boolean onlyAttacks, boolean includeDefend) {
         if (colour == null || offset == null) {
             throw new NullPointerException("one or more arguments are null, colour: " + (colour == null)

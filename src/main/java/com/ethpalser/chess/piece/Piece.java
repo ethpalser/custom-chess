@@ -36,21 +36,21 @@ public interface Piece extends Positional {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+        return this.getMoves(board).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
     }
 
     default boolean canMove(Board<Coordinate> board, Log<Coordinate, Piece> log, Point destination) {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board, log).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+        return this.getMoves(board, log).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
     }
 
     default boolean canMove(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats, Point destination) {
         if (board == null || destination == null) {
             return false;
         }
-        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
     }
 
     boolean getHasMoved();

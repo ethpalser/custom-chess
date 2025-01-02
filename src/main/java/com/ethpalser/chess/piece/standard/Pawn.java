@@ -105,13 +105,13 @@ public class Pawn implements Piece {
                 Point left = Point.validOrNull(board, (Point) this.point, this.colour, -1, 0, false);
                 if (left != null && left.equals(peekEnd)) {
                     Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, -1, yOffset, false);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.get(left))));
+                    moveSet.addMove(new Move(new Path(enPassPoint), new ChessLogEntry(left, null, board.get(left))));
                 }
                 // that pawn is to the right of this pawn
                 Point right = Point.validOrNull(board, (Point) this.point, this.colour, 1, 0, false);
                 if (right != null && right.equals(peekEnd)) {
                     Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, 1, yOffset, false);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.get(right))));
+                    moveSet.addMove(new Move(new Path(enPassPoint), new ChessLogEntry(right, null, board.get(right))));
                 }
             }
         }

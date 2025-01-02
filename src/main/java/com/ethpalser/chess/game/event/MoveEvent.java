@@ -7,6 +7,7 @@ import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -16,6 +17,7 @@ import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class MoveEvent implements GameEvent {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
         if (context.getBoard().get(this.source) == null) {
-            throw new IllegalActionException("piece to move from " + this.source + " to "+ this.target + " is null");
+            throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
         }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         Board<Coordinate> board = context.getBoard();
@@ -65,25 +67,36 @@ public class MoveEvent implements GameEvent {
                 context.getThreats(Colour.WHITE);
 
         // Todo: simplify getting moves and change followUp to be another Movement
-        Movement move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
+        Move move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
         if (!piece.canMove(board, log, oppThreats, (Point) this.target)) {
             throw new IllegalActionException("piece (" + piece + ") cannot move to " + target);
         }
+
+        Move.FollowUp followUp = move.followUp();
+        // Todo: depreciate using LogEntry for followUp
+        LogEntry<Coordinate, Piece> followUpLog;
+        if (followUp != null) {
+            Path followUpPath = followUp.path();
+            followUpLog = new ChessLogEntry(followUpPath.getPoint(0),
+                    followUpPath.getPoint(followUpPath.length() - 1),
+                    board.get(followUpPath.getPoint(followUpPath.length() - 1)));
+        } else {
+            followUpLog = null;
+        }
         ChessLogEntry logEntry = new ChessLogEntry((Point) this.source, (Point) this.target, piece,
                 board.get(this.target),
-                move.getFollowUpMove());
+                followUpLog);
         // Update the board reference with all movements, which should not modify the context yet
         board.remove(this.target);
         board.remove(this.source);
         board.add(this.target, piece);
         piece.move(this.target);
 
-        LogEntry<Coordinate, Piece> followUp = move.getFollowUpMove();
-        if (followUp != null) {
-            Piece toForcePush = followUp.getStartObject();
-            board.remove(followUp.getStart());
-            if (followUp.getEnd() != null) {
-                board.add(followUp.getEnd(), toForcePush);
+        if (followUpLog != null) {
+            Piece toForcePush = followUpLog.getStartObject();
+            board.remove(followUpLog.getStart());
+            if (followUpLog.getEnd() != null) {
+                board.add(followUpLog.getEnd(), toForcePush);
             }
         }
         board.remove(null);
@@ -147,12 +160,18 @@ public class MoveEvent implements GameEvent {
                 context.getThreats(Colour.WHITE);
 
         // Reverse the followup first
-        Movement move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
-        LogEntry<Coordinate, Piece> followUp = move.getFollowUpMove();
+        Move move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
+
+        Move.FollowUp followUp = move.followUp();
         if (followUp != null) {
-            Piece toForcePush = followUp.getEndObject();
-            board.remove(followUp.getEnd());
-            board.add(followUp.getStart(), toForcePush);
+            Path followUpPath = followUp.path();
+            // Todo: depreciate using LogEntry for followUp
+            LogEntry<Coordinate, Piece> followUpLog = new ChessLogEntry(followUpPath.getPoint(0),
+                    followUpPath.getPoint(followUpPath.length() - 1),
+                    board.get(followUpPath.getPoint(followUpPath.length() - 1)));
+            Piece toForcePush = followUpLog.getEndObject();
+            board.remove(followUpLog.getEnd());
+            board.add(followUpLog.getStart(), toForcePush);
         }
         board.remove(null);
 

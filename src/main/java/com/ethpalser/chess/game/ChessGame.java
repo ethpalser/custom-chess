@@ -11,6 +11,7 @@ import com.ethpalser.chess.game.state.ReadyState;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.move.map.ThreatMap;
@@ -226,8 +227,8 @@ public class ChessGame implements Game {
                 if (Pieces.isAllied(this.currentPlayer(), piece)) {
                     MoveSet moves = piece.getMoves(board, log,
                             this.getThreatMap(Colour.opposite(piece.getColour())));
-                    for (Movement m : moves.toSet()) {
-                        Path path = m.getPath();
+                    for (Move m : moves.toSet()) {
+                        Path path = m.path();
                         if (path != null && path.length() > 0) {
                             // The last point in a path is a potential capture
                             potentialCaptures.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
@@ -357,12 +358,12 @@ public class ChessGame implements Game {
                 return false;
             }
             // Can a piece block its path?
-            Movement causingCheck = p.getMoves(boardRef, logRef).getMove(oppKingPoint);
+            Move causingCheck = p.getMoves(boardRef, logRef).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             MoveMap moveMap = new MoveMap(oppColour, boardRef, logRef, this.getThreatMap(this.currentPlayer()));
-            for (Point c : causingCheck.getPath()) {
+            for (Point c : causingCheck.path()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
                 if (!moveMap.hasNoMove(c, true)) {
                     return false;
@@ -430,12 +431,12 @@ public class ChessGame implements Game {
                         (Point) attacker.getCoordinate()));
             }
             // Can a piece block its path?
-            Movement moveCausingCheck = attacker.getMoves(boardRef, logRef).getMove(inCheckKing);
+            Move moveCausingCheck = attacker.getMoves(boardRef, logRef).getMove(inCheckKing);
             if (moveCausingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             MoveMap moveMap = this.getMoveMap(playerInCheck);
-            for (Point pointOnPath : moveCausingCheck.getPath()) {
+            for (Point pointOnPath : moveCausingCheck.path()) {
                 for (Piece blocker : moveMap.getPieces(pointOnPath)) {
                     actions.add(new Action(playerInCheck, (Point) blocker.getCoordinate(), pointOnPath));
                 }

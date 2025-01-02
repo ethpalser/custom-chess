@@ -213,7 +213,7 @@ public class GameContext {
      * is intended to prevent unintended changes to the GameContext, but it will not prevent modifying the Record's
      * data and then using the modified record for methods - irrespective of intent.
      */
-    public class Record {
+    public static class Record {
 
         private final Board<Coordinate> board;
         private final Log<Coordinate, Piece> log;

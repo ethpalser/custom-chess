@@ -14,11 +14,11 @@ import java.util.Set;
 
 public class MoveSet {
 
-    private final Set<Movement> set;
+    private final Set<Move> set;
     private final Collection<Coordinate> attacks;
     private final Collection<Coordinate> defends;
 
-    public MoveSet(Set<Movement> moves) {
+    public MoveSet(Set<Move> moves) {
         this.set = moves;
         // Legacy code handles these differently and is not supported by this constructor
         this.attacks = List.of();
@@ -26,10 +26,10 @@ public class MoveSet {
     }
 
     public MoveSet(Point... points) {
-        Set<Movement> moves = new HashSet<>();
+        Set<Move> moves = new HashSet<>();
         for (Point p : points) {
             if (p != null) {
-                moves.add(new Move(p));
+                moves.add(new Move(new Path(p), (Move.FollowUp) null));
             }
         }
         moves.remove(null);
@@ -40,10 +40,10 @@ public class MoveSet {
     }
 
     public MoveSet(Path... paths) {
-        Set<Movement> moves = new HashSet<>();
+        Set<Move> moves = new HashSet<>();
         for (Path path : paths) {
             if (!path.toSet().isEmpty()) {
-                moves.add(new Move(path));
+                moves.add(new Move(path, (Move.FollowUp) null));
             }
         }
         moves.remove(null);
@@ -53,7 +53,7 @@ public class MoveSet {
         this.defends = List.of();
     }
 
-    public MoveSet(Movement... moves) {
+    public MoveSet(Move... moves) {
         this.set = new HashSet<>(Arrays.asList(moves));
         // Legacy code handles these differently and is not supported by this constructor
         this.attacks = List.of();
@@ -61,12 +61,12 @@ public class MoveSet {
     }
 
     public MoveSet(PathReport... pathReports) {
-        Set<Movement> movements = new HashSet<>();
+        Set<Move> movements = new HashSet<>();
         Collection<Coordinate> attackList = new ArrayList<>();
         Collection<Coordinate> defendList = new ArrayList<>();
         for (PathReport report : pathReports) {
             if (!report.path().isEmpty()) {
-                movements.add(new Move(report.path()));
+                movements.add(new Move(report.path(), (Move.FollowUp) null));
             }
             if (report.status().equals(PathReport.Status.BLOCKED_BY_OPPONENT)) {
                 attackList.add(report.lastChecked());
@@ -79,22 +79,22 @@ public class MoveSet {
         this.defends = defendList;
     }
 
-    public Set<Movement> toSet() {
+    public Set<Move> toSet() {
         return this.set;
     }
 
-    public Movement getMove(Point point) {
-        return this.set.stream().filter(m -> m.getPath().hasPoint(point)).findFirst().orElse(null);
+    public Move getMove(Point point) {
+        return this.set.stream().filter(m -> m.path().hasPoint(point)).findFirst().orElse(null);
     }
 
-    public void addMove(Movement move) {
+    public void addMove(Move move) {
         this.set.add(move);
     }
 
     public Set<Point> getPoints() {
         Set<Point> points = new HashSet<>();
-        for (Movement m : this.set) {
-            points.addAll(m.getPath().toSet());
+        for (Move m : this.set) {
+            points.addAll(m.path().toSet());
         }
         return points;
     }
@@ -107,7 +107,7 @@ public class MoveSet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("MoveSet: [");
-        Iterator<Movement> iterator = this.set.iterator();
+        Iterator<Move> iterator = this.set.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
             if (iterator.hasNext()) {

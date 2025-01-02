@@ -2,6 +2,7 @@ package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.custom.MovementSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
@@ -77,7 +78,7 @@ public class CustomPiece implements Piece {
     @Override
     public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
             boolean onlyAttacks, boolean includeDefends) {
-        Set<Movement> movements = new HashSet<>();
+        Set<Move> movements = new HashSet<>();
         for (MovementSpec spec : this.moveSpecifications) {
             movements.addAll(spec.toMovementList(board, threats, this.colour, (Point) this.position, onlyAttacks,
                     includeDefends));

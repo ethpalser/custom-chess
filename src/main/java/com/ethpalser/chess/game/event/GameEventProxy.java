@@ -9,7 +9,7 @@ public class GameEventProxy implements GameEvent {
     private final ChessNotation eventNotation;
 
     private GameEvent event;
-    private GameEvent next; // A notation can be an aggregate of many events, so there may be another
+    private final GameEvent next; // A notation can be an aggregate of many events, so there may be another
 
     public GameEventProxy(ChessNotation chessNotation) {
         if (chessNotation == null) {
@@ -69,23 +69,26 @@ public class GameEventProxy implements GameEvent {
         if (this.event != null) {
             return this.event;
         }
+        // Notation is only null when this class is constructed with a null event
         ChessRecord chessRecord = this.eventNotation.toRecord();
         if (chessRecord.source() == null) {
             throw new IllegalStateException("Failed to determine initial piece coordinate from chess notation.");
         }
 
-        GameEvent gameEvent = null;
+        GameEvent promoteEvent;
+        // Promotions are always last to execute, first to un-execute for all Chess Notations
+        if (chessRecord.promoteCode() != null) {
+            promoteEvent = new GameEventProxy(new PromoteEvent(chessRecord.source(), chessRecord.promoteCode()), null);
+        } else {
+            promoteEvent = null;
+        }
+
         // Movements are always first to execute, last to un-execute
         if (chessRecord.target() != null) {
-            gameEvent = new GameEventProxy(new MoveEvent(chessRecord.source(), chessRecord.target()), gameEvent);
+            // This event is a primitive LinkedList of GameEventProxy, and uses the inner event for execute/un-execute
+            return new GameEventProxy(new MoveEvent(chessRecord.source(), chessRecord.target()), promoteEvent);
         } else {
             throw new IllegalStateException("Failed to create an event from chess notation.");
         }
-        // Promotions are always last to execute, first to un-execute for all Chess Notations
-        if (chessRecord.promoteCode() != null) {
-            gameEvent = new GameEventProxy(new PromoteEvent(chessRecord.source(), chessRecord.promoteCode()), null);
-        }
-        // This GameEvent is a primitive LinkedList of GameEventProxy, and uses the inner event for execute/un-execute
-        return gameEvent;
     }
 }
