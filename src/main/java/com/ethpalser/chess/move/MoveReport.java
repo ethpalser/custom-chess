@@ -1,9 +1,11 @@
-package com.ethpalser.chess.space;
+package com.ethpalser.chess.move;
 
-public record PathReport(Path path, Coordinate lastChecked, PathReport.Status status) {
+import com.ethpalser.chess.space.Coordinate;
 
-    public PathReport {
-        if (path == null || lastChecked == null || status == null) {
+public record MoveReport(Move move, Coordinate lastChecked, MoveReport.Status status) {
+
+    public MoveReport {
+        if (move == null || lastChecked == null || status == null) {
             throw new IllegalArgumentException("One or more constructor arguments are null");
         }
     }
