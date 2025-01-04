@@ -42,7 +42,7 @@ public class MoveView {
         if (followup == null || followup.reference() == null || followup.path() == null || followup.path().isEmpty()) {
             this.followUp = null;
         } else {
-            this.followUp = new ActionView(followup.reference(), new Reference(Direction.AT, Location.POINT,
+            this.followUp = new ActionView(followup.reference(), new Reference(Location.POINT, Direction.AT,
                     followup.path().getPoint(followup.path().length() - 1)));
         }
     }

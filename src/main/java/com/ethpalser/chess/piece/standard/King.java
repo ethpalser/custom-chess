@@ -101,7 +101,7 @@ public class King implements Piece {
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Direction.AT, Location.POINT, qsrStart),
+                            new Reference(Location.POINT, Direction.AT, qsrStart),
                             new Path(qsrStart.translate(1, Direction.RIGHT.vector()),
                                     qskEnd.translate(1, Direction.RIGHT.vector())))
                     .build();
@@ -128,7 +128,7 @@ public class King implements Piece {
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Direction.AT, Location.POINT, ksrStart),
+                            new Reference(Location.POINT, Direction.AT, ksrStart),
                             new Path(ksrStart.translate(1, Direction.LEFT.vector()),
                                     kskEnd.translate(1, Direction.LEFT.vector())))
                     .build();

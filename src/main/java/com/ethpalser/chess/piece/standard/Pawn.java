@@ -98,13 +98,13 @@ public class Pawn implements Piece {
                 Coordinate enPassantLeft = this.point.translate(1, Direction.LEFT.vector());
                 if (enPassantLeft.equals(peekEnd)) {
                     epSpec.isMirrorYAxis(true)
-                            .followUp(new Reference(Direction.AT, Location.POINT, enPassantLeft), null);
+                            .followUp(new Reference(Location.POINT, Direction.AT, enPassantLeft), null);
                     results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
                 // that pawn is to the right of this pawn
                 Coordinate enPassantRight = this.point.translate(1, Direction.RIGHT.vector(this.colour));
                 if (enPassantRight.equals(peekEnd)) {
-                    epSpec.followUp(new Reference(Direction.AT, Location.POINT, enPassantRight), null);
+                    epSpec.followUp(new Reference(Location.POINT, Direction.AT, enPassantRight), null);
                     results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
             }

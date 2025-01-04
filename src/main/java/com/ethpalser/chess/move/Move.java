@@ -22,7 +22,7 @@ public record Move(Path path, FollowUp followUp) {
     @Deprecated(since = "2025-01-01")
     public Move(Path path, LogEntry<Coordinate, Piece> followUpMove) {
         this(path, followUpMove == null ? null : new FollowUp(
-                new Reference(Direction.AT, Location.POINT, followUpMove.getStart()),
+                new Reference(Location.POINT, Direction.AT, followUpMove.getStart()),
                 new Path((Point) followUpMove.getEnd())
         ));
     }

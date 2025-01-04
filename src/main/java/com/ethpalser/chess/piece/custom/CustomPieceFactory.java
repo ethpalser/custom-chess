@@ -52,33 +52,33 @@ public class CustomPieceFactory implements PieceFactory {
     // CONDITIONS
 
     private Conditional selfNotMovedCondition() {
-        return new PropertyCondition(new Reference(Direction.AT, Location.POINT), Comparator.FALSE,
+        return new PropertyCondition(new Reference(Location.POINT, Direction.AT), Comparator.FALSE,
                 PropertyType.HAS_MOVED, false);
     }
 
     private Conditional targetNotMovedCondition(Coordinate point) {
-        return new PropertyCondition(new Reference(Direction.AT, Location.POINT, point),
+        return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
                 Comparator.FALSE, PropertyType.HAS_MOVED, false);
     }
 
     private Conditional targetIsPieceTypeCondition(Coordinate point, PieceType type) {
-        return new PropertyCondition(new Reference(Direction.AT, Location.POINT, point),
+        return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
                 Comparator.EQUAL, PropertyType.TYPE, type);
     }
 
     private Conditional emptyPathCondition(Coordinate start, Coordinate end) {
-        return new ReferenceCondition(new Reference(Direction.AT, Location.PATH, new Path(start, end)),
+        return new ReferenceCondition(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
                 Comparator.EQUAL, null);
     }
 
     private Conditional lastMovedIsPieceTypeCondition(PieceType type) {
-        return new PropertyCondition(new Reference(Direction.AT, Location.LAST_MOVED), Comparator.EQUAL,
+        return new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
                 PropertyType.TYPE, type);
     }
 
     private Conditional lastMovedIsNearbyPieceCondition(Direction direction) {
-        return new ReferenceCondition(new Reference(Direction.AT, Location.LAST_MOVED), Comparator.EQUAL,
-                new Reference(direction, Location.POINT));
+        return new ReferenceCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
+                new Reference(Location.POINT, direction));
     }
 
     private Conditional lastMovedTravelledDistanceCondition(int distance) {
@@ -118,7 +118,7 @@ public class CustomPieceFactory implements PieceFactory {
                         )
                 ))
                 .followUp(
-                        new Reference(Direction.AT, Location.POINT, qsrStart),
+                        new Reference(Location.POINT, Direction.AT, qsrStart),
                         new Path(qsrStart.translate(1, Direction.RIGHT.vector()),
                                 qskEnd.translate(1, Direction.RIGHT.vector())))
                 .build();
@@ -146,7 +146,7 @@ public class CustomPieceFactory implements PieceFactory {
                                 ksrStart.translate(1, Direction.LEFT.vector()))
                 ))
                 .followUp(
-                        new Reference(Direction.AT, Location.POINT, ksrStart),
+                        new Reference(Location.POINT, Direction.AT, ksrStart),
                         new Path(ksrStart.translate(1, Direction.LEFT.vector()),
                                 kskEnd.translate(1, Direction.LEFT.vector())))
                 .build();
@@ -189,7 +189,7 @@ public class CustomPieceFactory implements PieceFactory {
                         this.lastMovedTravelledDistanceCondition(2)
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the right.
-                .followUp(new Reference(Direction.RIGHT, Location.POINT), null)
+                .followUp(new Reference(Location.POINT, Direction.RIGHT), null)
                 .build();
         // En Passant front-left
         MoveSpec epLeft = new MoveSpec.Builder(new Path(new Point(1, 1)))
@@ -203,7 +203,7 @@ public class CustomPieceFactory implements PieceFactory {
                         this.lastMovedTravelledDistanceCondition(2)
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the left.
-                .followUp(new Reference(Direction.LEFT, Location.POINT), null)
+                .followUp(new Reference(Location.POINT, Direction.LEFT), null)
                 .build();
 
         return new CustomPiece(PieceType.PAWN.getCode(), colour, coordinate, false,

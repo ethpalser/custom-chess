@@ -224,7 +224,7 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
 
     @Override
     public ActionView toView() {
-        return new ActionView(new Reference(Direction.AT, Location.POINT, this.start),
-                new Reference(Direction.AT, Location.POINT, this.end));
+        return new ActionView(new Reference(Location.POINT, Direction.AT, this.start),
+                new Reference(Location.POINT, Direction.AT, this.end));
     }
 }

@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Reference {
 
     private final Direction direction;
+    private final int distance;
     private final Location location;
     private final Coordinate[] fixedCoordinates;
 
@@ -19,32 +20,42 @@ public class Reference {
      * you want, such as a Piece's own location.
      */
     public Reference() {
-        this(Direction.AT, Location.POINT, (Coordinate[]) null);
+        this( Location.POINT, Direction.AT, 0, (Coordinate[]) null);
     }
 
-    public Reference(Direction direction, Location location) {
-        this(direction, location, (Coordinate[]) null);
+    public Reference(Location location, Direction direction) {
+        this(location, direction, 1, (Coordinate[]) null);
     }
 
-    public Reference(Direction direction, Location location, Coordinate fixedCoordinate) {
-        this(direction, location, new Coordinate[]{fixedCoordinate});
+    public Reference(Location location, Direction direction, int distance) {
+        this(location, direction, distance, (Coordinate[]) null);
     }
 
-    public Reference(Direction direction, Location location, Coordinate[] fixedCoordinates) {
+    public Reference(Location location, Direction direction, Coordinate fixedCoordinate) {
+        this(location, direction, 1, new Coordinate[]{fixedCoordinate});
+    }
+
+    public Reference(Location location, Direction direction, int distance, Coordinate fixedCoordinate) {
+        this(location, direction, distance, new Coordinate[]{fixedCoordinate});
+    }
+
+    public Reference(Location location, Direction direction, int distance, Coordinate[] fixedCoordinates) {
         if (direction == null || location == null) {
             throw new IllegalArgumentException("Either direction or location are null");
         }
-        this.direction = direction;
         this.location = location;
+        this.direction = direction;
+        this.distance = distance;
         this.fixedCoordinates = fixedCoordinates;
     }
 
-    public Reference(Direction direction, Location location, Path path) {
+    public Reference(Location location, Direction direction, Path path) {
         if (direction == null || location == null) {
             throw new IllegalArgumentException("Either direction or location are null");
         }
-        this.direction = direction;
         this.location = location;
+        this.direction = direction;
+        this.distance = 1;
         if (path == null) {
             this.fixedCoordinates = null;
         } else {
@@ -94,7 +105,7 @@ public class Reference {
                         Coordinate c = relativeCoordinate.translate(1, directionVector);
                         while (!board.rejects(c)) {
                             temp.add(c);
-                            c.translate(1, directionVector);
+                            c.translate(this.distance, directionVector);
                         }
                         coordinates = temp;
                     }
