@@ -1,19 +1,23 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.ChessLogEntry;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Pawn implements Piece {
@@ -22,13 +26,13 @@ public class Pawn implements Piece {
     private Coordinate point;
     private boolean hasMoved;
 
-    public Pawn(Colour colour, Point point) {
+    public Pawn(Colour colour, Coordinate point) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = false;
     }
 
-    public Pawn(Colour colour, Point point, boolean hasMoved) {
+    public Pawn(Colour colour, Coordinate point, boolean hasMoved) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = hasMoved;
@@ -55,42 +59,26 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board<Coordinate> board) {
-        System.err.println("unsupported method used by pawn: getMoves(Plane<Piece> board)");
-        return this.getMoves(board, null, null, false, false);
-    }
+    public MoveSet getMoves(GameContext.Record context) {
+        MoveSpec moveOne = new MoveSpec(new Path(new Point(0, 1)), false, false, true);
+        MoveSpec capture = (new MoveSpec.Builder(new Path(new Point(1, 1))))
+                .isMove(false)
+                .isMirrorXAxis(false)
+                .build();
 
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        // Threats are not needed
-        return this.getMoves(board, log, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        int yOffset = this.colour == Colour.WHITE ? 1 : -1;
-        if (onlyAttacks) {
-            // As we want only attacks, include an attack even if there is no capture. Intended to use for threats.
-            return new MoveSet(
-                    Point.validOrNull(board, (Point) this.point, this.colour, -1, yOffset, includeDefends),
-                    Point.validOrNull(board, (Point) this.point, this.colour, 1, yOffset, includeDefends)
-            );
-        }
-        MoveSet moveSet = new MoveSet(
-                Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset),
-                Point.captureOrNull(board, (Point) this.point, this.colour, -1, yOffset, includeDefends),
-                Point.captureOrNull(board, (Point) this.point, this.colour, 1, yOffset, includeDefends)
-        );
+        List<MoveReport> results = new ArrayList<>();
+        results.addAll(moveOne.toMoveList(context, this.point, this.colour));
+        results.addAll(capture.toMoveList(context, this.point, this.colour));
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
-            moveSet.addMove(new Move(new Path(
-                    Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset),
-                    Point.notCaptureOrNull(board, (Point) this.point, 0, yOffset * 2)
-            )));
+            MoveSpec moveTwo = new MoveSpec(new Path(new Point(0, 1), new Point(0, 2)), false, false, true);
+            results.addAll(moveTwo.toMoveList(context, this.point, this.colour));
         }
 
+        // Special move: En Passant
+        Board<Coordinate> board = context.getBoard();
+        Log<Coordinate, Piece> log = context.getLog(); // Todo: replace old log with new log
         // en passant (there must be at least one move)
         if (log != null && !log.isEmpty()) {
             LogEntry<Coordinate, Piece> lastMove = log.peek();
@@ -101,21 +89,27 @@ public class Pawn implements Piece {
                     && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
                     || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
             ) {
+                // Setup common en passant specifications
+                MoveSpec.Builder epSpec = new MoveSpec.Builder(new Path(new Point(1, 1)))
+                        .isSpecificQuadrant(true)
+                        .isMirrorXAxis(false)
+                        .isAttack(false);
                 // that pawn is to the left of this pawn
-                Point left = Point.validOrNull(board, (Point) this.point, this.colour, -1, 0, false);
-                if (left != null && left.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, -1, yOffset, false);
-                    moveSet.addMove(new Move(new Path(enPassPoint), new ChessLogEntry(left, null, board.get(left))));
+                Coordinate enPassantLeft = this.point.translate(1, Direction.LEFT.vector());
+                if (enPassantLeft.equals(peekEnd)) {
+                    epSpec.isMirrorYAxis(true)
+                            .followUp(new Reference(Direction.AT, Location.POINT, enPassantLeft), null);
+                    results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
                 // that pawn is to the right of this pawn
-                Point right = Point.validOrNull(board, (Point) this.point, this.colour, 1, 0, false);
-                if (right != null && right.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, (Point) this.point, this.colour, 1, yOffset, false);
-                    moveSet.addMove(new Move(new Path(enPassPoint), new ChessLogEntry(right, null, board.get(right))));
+                Coordinate enPassantRight = this.point.translate(1, Direction.RIGHT.vector(this.colour));
+                if (enPassantRight.equals(peekEnd)) {
+                    epSpec.followUp(new Reference(Direction.AT, Location.POINT, enPassantRight), null);
+                    results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
             }
         }
-        return moveSet;
+        return new MoveSet(results);
     }
 
     @Override
@@ -130,9 +124,10 @@ public class Pawn implements Piece {
 
     @Override
     public boolean canPromote(Board<Coordinate> board) {
-        // Assuming standard board, todo: fix this
-        return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == 7
-                || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == 0;
+        int minY = board.space().min(Space.AXIS.Y);
+        int maxY = board.space().max(Space.AXIS.Y);
+        return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == maxY
+                || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(Space.AXIS.Y) == minY;
     }
 
     @Override

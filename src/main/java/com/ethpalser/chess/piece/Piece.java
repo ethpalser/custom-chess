@@ -1,15 +1,14 @@
 package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Positional;
 import java.util.List;
 
-public interface Piece extends Positional {
+public interface Piece {
 
     String getCode();
 
@@ -19,38 +18,13 @@ public interface Piece extends Positional {
 
     void setCoordinate(Coordinate coordinate);
 
-    MoveSet getMoves(Board<Coordinate> board);
+    MoveSet getMoves(GameContext.Record context);
 
-    default MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        return this.getMoves(board, log, null, false, false);
-    }
-
-    default MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats) {
-        return this.getMoves(board, log, threats, false, false);
-    }
-
-    MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats, boolean onlyAttacks,
-            boolean includeDefends);
-
-    default boolean canMove(Board<Coordinate> board, Point destination) {
-        if (board == null || destination == null) {
+    default boolean canMove(Coordinate target, GameContext.Record context) {
+        if (context == null) {
             return false;
         }
-        return this.getMoves(board).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
-    }
-
-    default boolean canMove(Board<Coordinate> board, Log<Coordinate, Piece> log, Point destination) {
-        if (board == null || destination == null) {
-            return false;
-        }
-        return this.getMoves(board, log).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
-    }
-
-    default boolean canMove(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats, Point destination) {
-        if (board == null || destination == null) {
-            return false;
-        }
-        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.path().toSet().contains(destination));
+        return this.getMoves(context).moves().stream().anyMatch(m -> m.path().toSet().contains(target));
     }
 
     boolean getHasMoved();

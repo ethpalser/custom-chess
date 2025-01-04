@@ -1,19 +1,18 @@
 package com.ethpalser.chess.view;
 
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.MoveType;
+import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.custom.condition.Conditional;
-import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Reference;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MoveView {
 
-    private final List<Point> base;
-    private final MoveType type;
+    private final List<Coordinate> base;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean onlySpecificQuadrant;
@@ -22,15 +21,14 @@ public class MoveView {
     private final List<ConditionalView> conditions;
     private final ActionView followUp;
 
-    public MoveView(Path pathBase, MoveType type, boolean mirrorXAxis, boolean mirrorYAxis,
-            boolean onlySpecificQuadrant, boolean isMove, boolean isAttack, List<Conditional<Piece>> conditionals,
-            LogEntry<Coordinate, Piece> followup) {
+    public MoveView(Path pathBase, boolean mirrorXAxis, boolean mirrorYAxis,
+            boolean onlySpecificQuadrant, boolean isMove, boolean isAttack, List<Conditional> conditionals,
+            Move.FollowUp followup) {
         if (pathBase == null) {
             this.base = List.of();
         } else {
             this.base = pathBase.toList();
         }
-        this.type = type;
         this.mirrorXAxis = mirrorXAxis;
         this.mirrorYAxis = mirrorYAxis;
         this.onlySpecificQuadrant = onlySpecificQuadrant;
@@ -41,19 +39,16 @@ public class MoveView {
         } else {
             this.conditions = conditionals.stream().map(Conditional::toView).collect(Collectors.toList());
         }
-        if (followup == null) {
+        if (followup == null || followup.reference() == null || followup.path() == null || followup.path().isEmpty()) {
             this.followUp = null;
         } else {
-            this.followUp = followup.toView();
+            this.followUp = new ActionView(followup.reference(), new Reference(Direction.AT, Location.POINT,
+                    followup.path().getPoint(followup.path().length() - 1)));
         }
     }
 
-    public List<Point> getBase() {
+    public List<Coordinate> getBase() {
         return base;
-    }
-
-    public MoveType getType() {
-        return type;
     }
 
     public boolean isMirrorXAxis() {

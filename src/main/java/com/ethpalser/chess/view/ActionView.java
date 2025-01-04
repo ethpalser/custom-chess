@@ -1,13 +1,13 @@
 package com.ethpalser.chess.view;
 
-import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.space.Reference;
 
 public class ActionView {
 
     private final ReferenceView target;
     private final ReferenceView destination;
 
-    public ActionView(Reference<?> target, Reference<?> destination) {
+    public ActionView(Reference target, Reference destination) {
         if (target == null) {
             this.target = null;
         } else {

@@ -3,7 +3,7 @@ package com.ethpalser.chess.view;
 import com.ethpalser.chess.move.custom.condition.Comparator;
 import com.ethpalser.chess.move.custom.condition.ConditionalType;
 import com.ethpalser.chess.move.custom.condition.PropertyType;
-import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.space.Reference;
 
 public class ConditionalView {
 
@@ -13,7 +13,7 @@ public class ConditionalView {
     private final Comparator assertion;
     private final Object expected;
 
-    public ConditionalView(ConditionalType type, Reference<?> target, PropertyType field, Comparator assertion,
+    public ConditionalView(ConditionalType type, Reference target, PropertyType field, Comparator assertion,
             Object expected) {
         this.type = type;
         if (target == null) {

@@ -132,28 +132,6 @@ public class Point implements Coordinate, Comparable<Point> {
         return "" + xChar + (this.y + 1);
     }
 
-    /**
-     * Creates a new Vector from the current Vector shifted one space in the given direction.
-     *
-     * @param colour    {@link Colour} of the piece which the player is facing.
-     * @param direction {@link Direction} relative to the piece. Left is always White's left side.
-     * @return {@link Point}
-     */
-    public Point shift(Colour colour, Direction direction) {
-        if (colour == null || direction == null) {
-            throw new NullPointerException();
-        }
-        // The direction the piece will shift towards. Black's directions are the opposite of White's
-        int dir = Colour.WHITE.equals(colour) ? 1 : -1;
-        return switch (direction) {
-            case AT -> this;
-            case FRONT -> new Point(this.x, this.y + dir);
-            case BACK -> new Point(this.x, this.y - dir);
-            case RIGHT -> new Point(this.x + dir, this.y);
-            case LEFT -> new Point(this.x - dir, this.y);
-        };
-    }
-
     // STATIC METHODS
 
     public static Point validOrNull(Board<Coordinate> board, Point start, Colour colour,

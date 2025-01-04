@@ -8,7 +8,6 @@ import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -50,25 +49,22 @@ public class MoveEvent implements GameEvent {
         if (context == null) {
             throw new IllegalArgumentException();
         }
-        if (context.getBoard().rejects(this.source) || context.getBoard().rejects(this.target)) {
+        GameContext.Record contextRecord = context.toRecord(); // Copies information
+        if (contextRecord.getBoard().rejects(this.source) || contextRecord.getBoard().rejects(this.target)) {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
-        if (context.getBoard().get(this.source) == null) {
+        if (contextRecord.getBoard().get(this.source) == null) {
             throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
         }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
-        Board<Coordinate> board = context.getBoard();
-        Log<Coordinate, Piece> log = context.getLog();
+        Board<Coordinate> board = contextRecord.getBoard();
+        Log<Coordinate, Piece> log = contextRecord.getLog();
 
         Piece piece = board.get(this.source);
         // The turn player should always match the acting piece, and this piece should always be from the first change
         Colour turnPlayer = piece.getColour();
-        ThreatMap oppThreats = Colour.WHITE.equals(turnPlayer) ? context.getThreats(Colour.BLACK) :
-                context.getThreats(Colour.WHITE);
-
-        // Todo: simplify getting moves and change followUp to be another Movement
-        Move move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
-        if (!piece.canMove(board, log, oppThreats, (Point) this.target)) {
+        Move move = piece.getMoves(contextRecord).getMove(this.target);
+        if (!piece.canMove(this.target, contextRecord)) {
             throw new IllegalActionException("piece (" + piece + ") cannot move to " + target);
         }
 
@@ -77,8 +73,8 @@ public class MoveEvent implements GameEvent {
         LogEntry<Coordinate, Piece> followUpLog;
         if (followUp != null) {
             Path followUpPath = followUp.path();
-            followUpLog = new ChessLogEntry(followUpPath.getPoint(0),
-                    followUpPath.getPoint(followUpPath.length() - 1),
+            followUpLog = new ChessLogEntry((Point) followUpPath.getPoint(0),
+                    (Point) followUpPath.getPoint(followUpPath.length() - 1),
                     board.get(followUpPath.getPoint(followUpPath.length() - 1)));
         } else {
             followUpLog = null;
@@ -125,10 +121,10 @@ public class MoveEvent implements GameEvent {
         Piece replacement;
         if (PieceType.fromCode(promoteOptions.get(0)) == PieceType.CUSTOM) {
             // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
+            PieceFactory factory = new CustomPieceFactory(Map.of());
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
             // colour then code
-            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
+            replacement = factory.create(tokenizer.nextToken(), Colour.fromCode(tokenizer.nextToken()), Point.ORIGIN);
         } else {
             // Build a standard piece using information from the piece string
             replacement = Pieces.fromString(pieceStr);
@@ -143,31 +139,30 @@ public class MoveEvent implements GameEvent {
         if (context == null) {
             throw new IllegalArgumentException();
         }
-        if (context.getBoard().rejects(this.source) || context.getBoard().rejects(this.target)) {
+        GameContext.Record contextRecord = context.toRecord(); // Copies information
+        if (contextRecord.getBoard().rejects(this.source) || contextRecord.getBoard().rejects(this.target)) {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
-        if (context.getBoard().get(this.target) == null) {
+        if (contextRecord.getBoard().get(this.target) == null) {
             throw new IllegalActionException("The piece to move does not exist");
         }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
-        Board<Coordinate> board = context.getBoard();
-        Log<Coordinate, Piece> log = context.getLog();
+        Board<Coordinate> board = contextRecord.getBoard();
+        Log<Coordinate, Piece> log = contextRecord.getLog();
 
         Piece piece = board.get(this.source);
         // The turn player should always match the acting piece, and this piece should always be from the first change
         Colour turnPlayer = piece.getColour();
-        ThreatMap oppThreats = Colour.WHITE.equals(turnPlayer) ? context.getThreats(Colour.BLACK) :
-                context.getThreats(Colour.WHITE);
 
         // Reverse the followup first
-        Move move = piece.getMoves(board, log, oppThreats).getMove((Point) this.target);
+        Move move = piece.getMoves(contextRecord).getMove(this.target);
 
         Move.FollowUp followUp = move.followUp();
         if (followUp != null) {
             Path followUpPath = followUp.path();
             // Todo: depreciate using LogEntry for followUp
-            LogEntry<Coordinate, Piece> followUpLog = new ChessLogEntry(followUpPath.getPoint(0),
-                    followUpPath.getPoint(followUpPath.length() - 1),
+            LogEntry<Coordinate, Piece> followUpLog = new ChessLogEntry((Point) followUpPath.getPoint(0),
+                    (Point) followUpPath.getPoint(followUpPath.length() - 1),
                     board.get(followUpPath.getPoint(followUpPath.length() - 1)));
             Piece toForcePush = followUpLog.getEndObject();
             board.remove(followUpLog.getEnd());

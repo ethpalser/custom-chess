@@ -1,8 +1,10 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
@@ -25,26 +27,21 @@ public class CustomPiece implements Piece {
     private Coordinate position;
     private boolean hasMoved;
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
-        this(pieceType, colour, vector, (MoveSpec) null);
+    public CustomPiece(PieceType pieceType, Colour colour, Coordinate coordinate) {
+        this(pieceType.getCode(), colour, coordinate, false, (MoveSpec) null);
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, MoveSpec... specifications) {
-        this.type = pieceType;
-        this.colour = colour;
-        this.position = vector;
-        this.moveSpecifications = new ArrayList<>(Arrays.asList(specifications));
-        this.hasMoved = false;
-        this.code = pieceType.getCode();
+    public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, MoveSpec... moveSpecs) {
+        this(code, colour, coordinate, hasMoved, List.of(moveSpecs));
     }
 
-    public CustomPiece(String code, Colour colour, Point vector, boolean hasMoved, MoveSpec... moveSpecs) {
+    public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, List<MoveSpec> moveSpecs) {
         this.type = PieceType.fromCode(code);
         this.code = code;
         this.colour = colour;
-        this.position = vector;
+        this.position = coordinate;
         this.hasMoved = hasMoved;
-        this.moveSpecifications = new ArrayList<>(Arrays.asList(moveSpecs));
+        this.moveSpecifications = moveSpecs;
     }
 
     @Override
@@ -66,32 +63,22 @@ public class CustomPiece implements Piece {
         return this.position;
     }
 
+    @Override
     public void setCoordinate(Coordinate point) {
         this.position = point;
     }
 
     @Override
-    public MoveSet getMoves(Board<Coordinate> board) {
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        Set<Move> movements = new HashSet<>();
+    public MoveSet getMoves(GameContext.Record context) {
+        Set<MoveReport> movements = new HashSet<>();
         for (MoveSpec spec : this.moveSpecifications) {
-            movements.addAll(spec.toMovementList(board, threats, this.colour, (Point) this.position, onlyAttacks,
-                    includeDefends));
+            movements.addAll(spec.toMoveList(context, this.position, this.colour));
         }
         return new MoveSet(movements);
     }
 
     public List<MoveSpec> getMoveSpecs() {
         return this.moveSpecifications;
-    }
-
-    public void addMoveSpec(MoveSpec move) {
-        this.moveSpecifications.add(move);
     }
 
     @Override

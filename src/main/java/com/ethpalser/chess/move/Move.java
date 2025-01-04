@@ -3,10 +3,11 @@ package com.ethpalser.chess.move;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
-import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.space.Reference;
 
 public record Move(Path path, FollowUp followUp) {
 
@@ -21,11 +22,11 @@ public record Move(Path path, FollowUp followUp) {
     @Deprecated(since = "2025-01-01")
     public Move(Path path, LogEntry<Coordinate, Piece> followUpMove) {
         this(path, followUpMove == null ? null : new FollowUp(
-                new AbsoluteReference<>(followUpMove.getStart()),
+                new Reference(Direction.AT, Location.POINT, followUpMove.getStart()),
                 new Path((Point) followUpMove.getEnd())
         ));
     }
 
-    public record FollowUp(Reference<Piece> reference, Path path) {
+    public record FollowUp(Reference reference, Path path) {
     }
 }

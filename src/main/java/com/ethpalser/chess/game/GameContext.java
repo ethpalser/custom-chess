@@ -6,6 +6,8 @@ import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -13,9 +15,11 @@ import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
+import com.ethpalser.chess.util.Pair;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,8 +39,8 @@ public class GameContext {
         Space space = new Plane(8, 8);
         this.board = new ChessBoard(space, new StandardPieceFactory());
         this.log = new ChessLog();
-        this.wThreats = new ThreatMap(Colour.WHITE, board, log, space);
-        this.bThreats = new ThreatMap(Colour.BLACK, board, log, space);
+        this.wThreats = new ThreatMap(space, board, log);
+        this.bThreats = new ThreatMap(space, board, log);
         this.wKing = new Point("e1");
         this.bKing = new Point("e8");
         this.prompt = null;
@@ -45,9 +49,9 @@ public class GameContext {
     public GameContext(GameOptions config) {
         this.log = new ChessLog();
         Space space = new Plane(config.width(), config.length(), config.unavailable());
-        this.board = new ChessBoard(space, new CustomPieceFactory(config.pieceSpecs(), this.log, space));
-        this.wThreats = new ThreatMap(Colour.WHITE, this.board, this.log, space);
-        this.bThreats = new ThreatMap(Colour.BLACK, this.board, this.log, space);
+        this.board = new ChessBoard(space, new CustomPieceFactory(config.pieceSpecs(), space));
+        this.wThreats = new ThreatMap(space, this.board, this.log);
+        this.bThreats = new ThreatMap(space, this.board, this.log);
         for (Coordinate c : this.board.occupied()) {
             Piece p = this.board.get(c);
             if (PieceType.KING.getCode().equals(p.getCode())) {
@@ -66,8 +70,8 @@ public class GameContext {
         this.board = board;
 
         Space space = board.space();
-        this.wThreats = new ThreatMap(Colour.WHITE, this.board, this.log, space);
-        this.bThreats = new ThreatMap(Colour.BLACK, this.board, this.log, space);
+        this.wThreats = new ThreatMap(space, this.board, this.log);
+        this.bThreats = new ThreatMap(space, this.board, this.log);
         for (Coordinate c : this.board.occupied()) {
             Piece p = this.board.get(c);
             if (p != null && PieceType.KING.getCode().equals(p.getCode())) {
@@ -127,7 +131,9 @@ public class GameContext {
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         ThreatMap wThreatsRef = new ThreatMap(this.wThreats);
         ThreatMap bThreatsRef = new ThreatMap(this.bThreats);
-
+        // Contain the copied information for it to be passed around and manipulated, without affecting the context
+        GameContext.Record ctxRecord = new Record(new ChessBoard((ChessBoard) this.board), this.log,
+                wThreatsRef, bThreatsRef);
         // Update threats wherever there was a change
         for (Coordinate coordinate : this.getBoardChanges(updatedBoard)) {
             Piece p = updatedBoard.get(coordinate);
@@ -138,8 +144,8 @@ public class GameContext {
                     this.bKing = coordinate;
                 }
             }
-            wThreatsRef.refreshThreats(updatedBoard, updatedLog, (Point) coordinate);
-            bThreatsRef.refreshThreats(updatedBoard, updatedLog, (Point) coordinate);
+            this.refreshThreats(Colour.WHITE, coordinate, ctxRecord);
+            this.refreshThreats(Colour.BLACK, coordinate, ctxRecord);
         }
         // After all changes, did the turn player put itself into check?
         if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
@@ -201,6 +207,73 @@ public class GameContext {
         return changes;
     }
 
+    /**
+     * This updates the context record's threats where the change happened. It follows these steps to update:
+     * <br>
+     * <ol>
+     *     <li>Fetch the piece this change is happening at, then remove its threats</li>
+     *     <li>Remove this piece temporarily</li>
+     *     <li>Fetch all pieces that threaten this change, then remove those threats</li>
+     *     <li>Add the removed piece back</li>
+     *     <li>Update all threats for each piece involved with this change</li>
+     * </ol>
+     */
+    private void refreshThreats(Colour colour, Coordinate change, GameContext.Record ctxRecord) {
+        if (colour == null || change == null || ctxRecord == null) {
+            throw new NullPointerException("one or more arguments are null");
+        }
+        Board<Coordinate> ctxBoard = ctxRecord.getBoard();
+        ThreatMap ctxThreatMap = ctxRecord.getThreats(colour);
+
+        Piece changePiece = ctxBoard.get(change);
+        // Used to process changes separately
+        List<Pair<Coordinate, Path>> pairList = new ArrayList<>();
+        // Remove the impacting piece temporarily
+        ctxBoard.remove(change);
+        if (changePiece != null) {
+            ctxThreatMap.removeThreats(change);
+        }
+
+        // Get all paths that are along this point
+        for (Coordinate threat : ctxThreatMap.getThreats(change)) {
+            if (!threat.equals(change)) {
+                MoveSet moves = ctxBoard.get(threat).getMoves(ctxRecord);
+                Move moveWithPoint = moves.getMove(change);
+                if (moveWithPoint != null) {
+                    pairList.add(new Pair<>(threat, moveWithPoint.path()));
+                }
+            }
+        }
+
+        // Clear these paths
+        for (Pair<Coordinate, Path> pair : pairList) {
+            for (Coordinate p : pair.getSecond()) {
+                ctxThreatMap.removeThreats(pair.getFirst(), p);
+            }
+        }
+        // Add the piece back, so we can reapply threats with this piece present
+        if (changePiece != null) {
+            ctxBoard.add(change, changePiece);
+        }
+
+        boolean changeIsPresent = ctxBoard.get(change) != null;
+        for (Pair<Coordinate, Path> pair : pairList) {
+            // The only change from before and after are the paths that contain the impacted point
+            boolean seenChange = false;
+            for (Coordinate p : pair.getSecond()) {
+                if (seenChange && changeIsPresent)
+                    break;
+                if (p.equals(change))
+                    seenChange = true;
+                ctxThreatMap.addThreat(p, pair.getFirst());
+            }
+        }
+        if (changePiece != null) {
+            // This has had its threats changed, so add back this piece's threats with the change included=
+            ctxThreatMap.addThreats(change, changePiece.getMoves(ctxRecord));
+        }
+    }
+
     public GameContext.Record toRecord() {
         return new Record(new ChessBoard((ChessBoard) this.board),
                 this.getLog(),
@@ -220,7 +293,7 @@ public class GameContext {
         private final ThreatMap whiteThreats;
         private final ThreatMap blackThreats;
 
-        private Record(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap whiteThreats,
+        public Record(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap whiteThreats,
                 ThreatMap blackThreats) {
             this.board = board;
             this.log = log;

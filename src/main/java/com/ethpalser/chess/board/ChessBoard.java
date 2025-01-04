@@ -52,15 +52,15 @@ public class ChessBoard implements Board<Coordinate> {
                 Piece piece;
                 if (rank == minY || rank == maxY) {
                     piece = switch (file) {
-                        case 0, 7 -> factory.create(colour, PieceType.ROOK.getCode());
-                        case 1, 6 -> factory.create(colour, PieceType.KNIGHT.getCode());
-                        case 2, 5 -> factory.create(colour, PieceType.BISHOP.getCode());
-                        case 3 -> factory.create(colour, PieceType.QUEEN.getCode());
-                        case 4 -> factory.create(colour, PieceType.KING.getCode());
+                        case 0, 7 -> factory.create(PieceType.ROOK.getCode(), colour, Point.ORIGIN);
+                        case 1, 6 -> factory.create(PieceType.KNIGHT.getCode(), colour, Point.ORIGIN);
+                        case 2, 5 -> factory.create(PieceType.BISHOP.getCode(), colour, Point.ORIGIN);
+                        case 3 -> factory.create(PieceType.QUEEN.getCode(), colour, Point.ORIGIN);
+                        case 4 -> factory.create(PieceType.KING.getCode(), colour, Point.ORIGIN);
                         default -> null; // Default boards do not have custom pieces
                     };
                 } else {
-                    piece = factory.create(colour, PieceType.PAWN.getCode());
+                    piece = factory.create(PieceType.PAWN.getCode(), colour, Point.ORIGIN);
                 }
 
                 if (piece != null) {
@@ -85,7 +85,7 @@ public class ChessBoard implements Board<Coordinate> {
             Point point = new Point(tokenizer.nextToken() + tokenizer.nextToken());
             boolean hasMoved = Boolean.parseBoolean(tokenizer.nextToken());
 
-            Piece piece = factory.create(colour, code);
+            Piece piece = factory.create(code, colour, Point.ORIGIN);
             piece.setCoordinate(point);
             piece.setHasMoved(hasMoved);
             plane.put(point, piece);

@@ -1,27 +1,28 @@
 package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Positional;
-import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.view.ConditionalView;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ReferenceCondition<T extends Positional> implements Conditional<T> {
+public class ReferenceCondition implements Conditional {
 
-    private final Reference<T> target;
+    private final Reference target;
     private final Comparator comparator;
-    private final Reference<T> expected;
+    private final Reference expected;
 
-    public ReferenceCondition(Reference<T> target, Comparator comparator, Reference<T> expected) {
+    public ReferenceCondition(Reference target, Comparator comparator, Reference expected) {
         this.target = target;
         this.comparator = comparator;
         this.expected = expected;
     }
 
     @Override
-    public boolean isExpected(Board<Coordinate> plane) {
+    public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
         if (comparator == null) {
             return false;
         }
@@ -29,22 +30,21 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
             return expected == null;
         }
 
-        List<T> tRefs = this.target.getReferences(plane);
-
+        List<Piece> tRefs = this.getReferences(this.target, context, appliedTo);
         switch (this.comparator) {
             case FALSE -> {
-                return tRefs == null || tRefs.isEmpty();
+                return tRefs.isEmpty();
             }
             case TRUE -> {
-                return tRefs != null && !tRefs.isEmpty();
+                return !tRefs.isEmpty();
             }
             case EQUAL -> {
                 if (this.expected == null) {
                     return tRefs.isEmpty();
                 }
 
-                List<T> xRefs = this.expected.getReferences(plane);
-                for (T ref : tRefs) {
+                List<Piece> xRefs = this.getReferences(this.expected, context, appliedTo);
+                for (Piece ref : tRefs) {
                     if (!xRefs.contains(ref))
                         return false;
                 }
@@ -55,9 +55,9 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
                     return !tRefs.isEmpty();
                 }
 
-                List<T> xPieces = this.expected.getReferences(plane);
-                for (T ref : tRefs) {
-                    if (!xPieces.contains(ref))
+                List<Piece> xRefs = this.getReferences(this.expected, context, appliedTo);
+                for (Piece ref : tRefs) {
+                    if (!xRefs.contains(ref))
                         return true;
                 }
                 return false;
@@ -80,5 +80,17 @@ public class ReferenceCondition<T extends Positional> implements Conditional<T> 
     @Override
     public ConditionalView toView() {
         return new ConditionalView(ConditionalType.PIECE, this.target, null, this.comparator, this.expected);
+    }
+
+    private List<Piece> getReferences(Reference reference, GameContext.Record context, Coordinate appliedTo) {
+        Board<Coordinate> board = context.getBoard();
+        List<Piece> refs = new ArrayList<>();
+        for (Coordinate c : reference.coordinates(context, appliedTo)) {
+            Piece p = board.get(c);
+            if (p != null) {
+                refs.add(p);
+            }
+        }
+        return refs;
     }
 }

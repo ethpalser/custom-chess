@@ -1,9 +1,5 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -11,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Path implements Iterable<Point> {
+public class Path implements Iterable<Coordinate> {
 
-    private final List<Point> pointList;
+    private final List<Coordinate> pointList;
 
     public Path(Point end) {
         this.pointList = new LinkedList<>();
@@ -22,7 +18,7 @@ public class Path implements Iterable<Point> {
         }
     }
 
-    public Path(List<Point> points) {
+    public Path(List<Coordinate> points) {
         this.pointList = points;
     }
 
@@ -33,8 +29,8 @@ public class Path implements Iterable<Point> {
      * @param start {@link Point} representing the first vector of the path
      * @param end   {@link Point} representing the last vector of the path
      */
-    public Path(Point start, Point end) {
-        List<Point> list;
+    public Path(Coordinate start, Coordinate end) {
+        List<Coordinate> list;
         switch (PathType.fromPoints(start, end)) {
             case POINT, CUSTOM -> {
                 list = new LinkedList<>();
@@ -44,20 +40,18 @@ public class Path implements Iterable<Point> {
                     list.add(end);
             }
             case VERTICAL, HORIZONTAL, DIAGONAL -> {
-                int x = start.getX();
-                int y = start.getY();
-                int diffX = end.getX() - x;
-                int diffY = end.getY() - y;
-                int dirX = diffX == 0 ? 0 : diffX / Math.abs(diffX); // 0 for Vertical
-                int dirY = diffY == 0 ? 0 : diffY / Math.abs(diffY); // 0 for Horizontal
+                int x = start.getValue(Space.AXIS.X);
+                int y = start.getValue(Space.AXIS.Y);
+                int diffX = end.getValue(Space.AXIS.X) - x;
+                int diffY = end.getValue(Space.AXIS.Y) - y;
 
                 list = new LinkedList<>();
+                Coordinate point = new Point(x, y);
                 // Build the path along the line until an edge is exceeded
                 do {
-                    list.add(new Point(x, y));
-                    x = x + dirX;
-                    y = y + dirY;
-                } while ((x != end.getX() || y != end.getY()));
+                    list.add(point);
+                    point.translate(1, diffX, diffY);
+                } while ((x != end.getValue(Space.AXIS.X) || y != end.getValue(Space.AXIS.Y)));
                 // Loop only continues until the end point is reached, so this is added after
                 list.add(end);
             }
@@ -67,30 +61,45 @@ public class Path implements Iterable<Point> {
         this.pointList = list;
     }
 
+    public Path(Space space, Coordinate start, int[] shiftVector) {
+        if (space == null || start == null || shiftVector == null) {
+            throw new IllegalArgumentException("one ore more arguments are null");
+        }
+        List<Coordinate> list = new LinkedList<>();
+        Coordinate pos = start;
+        while (!space.isOutOfBounds(pos)) {
+            list.add(pos);
+            pos = pos.translate(1, shiftVector);
+        }
+        this.pointList = list;
+    }
+
     public int length() {
         return this.pointList.size();
     }
 
-    public boolean isEmpty() { return this.pointList.isEmpty(); }
+    public boolean isEmpty() {
+        return this.pointList.isEmpty();
+    }
 
-    public Point getPoint(int index) {
+    public Coordinate getPoint(int index) {
         return this.pointList.get(index);
     }
 
-    public boolean hasPoint(Point point) {
+    public boolean hasPoint(Coordinate point) {
         return this.pointList.contains(point);
     }
 
-    public List<Point> toList() {
+    public List<Coordinate> toList() {
         return new ArrayList<>(this.pointList);
     }
 
-    public Set<Point> toSet() {
+    public Set<Coordinate> toSet() {
         return new LinkedHashSet<>(this.pointList);
     }
 
     @Override
-    public Iterator<Point> iterator() {
+    public Iterator<Coordinate> iterator() {
         return this.pointList.iterator();
     }
 
@@ -108,7 +117,7 @@ public class Path implements Iterable<Point> {
         // This hash has little value. It is possible for path hashes to overlap
         // ex. Path A: [(1, 0), (4, 0)] and Path B: [(2, 0), (3, 0)] are equal
         int result = 0;
-        for (Point vector : this) {
+        for (Coordinate vector : this) {
             if (vector != null) {
                 result += vector.hashCode();
             }
@@ -120,7 +129,7 @@ public class Path implements Iterable<Point> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        Iterator<Point> iterator = this.iterator();
+        Iterator<Coordinate> iterator = this.iterator();
         while (iterator.hasNext()) {
             sb.append(iterator.next().toString());
             if (iterator.hasNext()) {
@@ -139,7 +148,7 @@ public class Path implements Iterable<Point> {
         DIAGONAL,
         CUSTOM;
 
-        public static Path.PathType fromPoints(Point start, Point end) {
+        public static Path.PathType fromPoints(Coordinate start, Coordinate end) {
             if (start == null && end == null) {
                 return EMPTY;
             }
@@ -147,8 +156,8 @@ public class Path implements Iterable<Point> {
                 return POINT;
             }
 
-            int diffX = Math.abs(end.getX() - start.getX());
-            int diffY = Math.abs(end.getY() - start.getY());
+            int diffX = Math.abs(end.getValue(Space.AXIS.X) - start.getValue(Space.AXIS.X));
+            int diffY = Math.abs(end.getValue(Space.AXIS.Y) - start.getValue(Space.AXIS.Y));
             if (diffX == 0 && diffY == 0) {
                 return POINT;
             } else if (diffX == 0) {
@@ -161,86 +170,6 @@ public class Path implements Iterable<Point> {
                 return CUSTOM;
             }
         }
-    }
-
-    public static Path horizontal(Board<Coordinate> board, Point start, Colour colour, boolean right,
-            boolean onlyAttacks, boolean includeDefends) {
-        List<Point> list = new LinkedList<>();
-        int x = right ? 1 : -1;
-        // while within the board's boundaries
-        while (!board.rejects(start.translate(1, x, 0))) {
-            Point pos = new Point(start.getX() + x, start.getY());
-            Piece piece = board.get(pos);
-            if (piece != null) {
-                boolean canCapture = !board.get(pos).getColour().equals(colour);
-                if (canCapture || includeDefends) {
-                    list.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
-                if (!passOppKing) {
-                    break;
-                }
-            } else {
-                list.add(pos);
-            }
-            x = right ? x + 1 : x - 1;
-        }
-        return new Path(list);
-    }
-
-    public static Path vertical(Board<Coordinate> board, Point start, Colour colour, boolean up,
-            boolean onlyAttacks, boolean includeDefends) {
-        List<Point> list = new LinkedList<>();
-        int y = up ? 1 : -1;
-        // while within the board's boundaries
-        while (!board.rejects(start.translate(1, 0, y))) {
-            Point pos = new Point(start.getX(), start.getY() + y);
-            Piece piece = board.get(pos);
-            if (piece != null) {
-                boolean canCapture = !board.get(pos).getColour().equals(colour);
-                if (canCapture || includeDefends) {
-                    list.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
-                if (!passOppKing) {
-                    break;
-                }
-            } else {
-                list.add(pos);
-            }
-            y = up ? y + 1 : y - 1;
-        }
-        return new Path(list);
-    }
-
-    public static Path diagonal(Board<Coordinate> board, Point start, Colour colour, boolean right, boolean up,
-            boolean onlyAttacks, boolean includeDefends) {
-        List<Point> list = new LinkedList<>();
-        int x = right ? 1 : -1;
-        int y = up ? 1 : -1;
-        // while within the board's boundaries
-        while (!board.rejects(start.translate(1, x, y))) {
-            Point pos = new Point(start.getX() + x, start.getY() + y);
-            Piece piece = board.get(pos);
-            if (piece != null) {
-                boolean canCapture = !board.get(pos).getColour().equals(colour);
-                if (canCapture || includeDefends) {
-                    list.add(pos);
-                }
-                // a piece was encountered, so the path ends at or just before this
-                boolean passOppKing = onlyAttacks && canCapture && PieceType.KING.getCode().equals(piece.getCode());
-                if (!passOppKing) {
-                    break;
-                }
-            } else {
-                list.add(pos);
-            }
-            x = right ? x + 1 : x - 1;
-            y = up ? y + 1 : y - 1;
-        }
-        return new Path(list);
     }
 
 }

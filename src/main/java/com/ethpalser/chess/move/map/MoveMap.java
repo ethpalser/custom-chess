@@ -1,13 +1,11 @@
 package com.ethpalser.chess.move.map;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,21 +14,30 @@ import java.util.Set;
 
 public class MoveMap {
 
-    private final Map<Point, Set<Piece>> map;
+    private final Map<Coordinate, Set<Piece>> map;
     private final int length;
     private final int width;
 
-    public MoveMap(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threatMap) {
-        this.map = this.setup(colour, board, log, threatMap);
+    public MoveMap(Colour colour, GameContext.Record ctxRecord) {
+        Map<Coordinate, Set<Piece>> moves = new HashMap<>();
+        for (Piece piece : ctxRecord.getBoard()) {
+            if (piece != null && Pieces.isAllied(colour, piece)) {
+                MoveSet moveSet = piece.getMoves(ctxRecord);
+                for (Coordinate point : moveSet.coordinates()) {
+                    moves.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
+                }
+            }
+        }
+        this.map = moves;
         this.length = 8; // temp
         this.width = 8; // temp
     }
 
-    public Set<Point> getPoints() {
+    public Set<Coordinate> getPoints() {
         return this.map.keySet();
     }
 
-    public Set<Piece> getPieces(Point point) {
+    public Set<Piece> getPieces(Coordinate point) {
         if (point == null) {
             return Set.of();
         }
@@ -41,11 +48,7 @@ public class MoveMap {
         return piecesThreateningPoint;
     }
 
-    public boolean hasNoMove(Point point) {
-        return this.getPieces(point).isEmpty();
-    }
-
-    public boolean hasNoMove(Point point, boolean ignoreKing) {
+    public boolean hasNoMove(Coordinate point, boolean ignoreKing) {
         Set<Piece> set = this.getPieces(point);
         for (Piece p : set) {
             if (!ignoreKing || !Pieces.isKing(p)) {
@@ -73,19 +76,4 @@ public class MoveMap {
         return sb.toString();
     }
 
-    // PRIVATE METHODS
-
-    private Map<Point, Set<Piece>> setup(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log,
-            ThreatMap threatMap) {
-        Map<Point, Set<Piece>> moves = new HashMap<>();
-        for (Piece piece : board) {
-            if (piece != null && Pieces.isAllied(colour, piece)) {
-                MoveSet moveSet = piece.getMoves(board, log, threatMap);
-                for (Point point : moveSet.getPoints()) {
-                    moves.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
-                }
-            }
-        }
-        return moves;
-    }
 }

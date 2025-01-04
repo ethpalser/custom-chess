@@ -5,16 +5,20 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Heuristics {
 
-    private Heuristics(){}
+    private Heuristics() {
+    }
 
-    public static int pieceValue(GameContext context, Piece piece) {
+    public static int pieceValue(GameContext.Record context, Piece piece) {
         if (piece == null) {
             return 0;
         }
@@ -26,12 +30,8 @@ public class Heuristics {
             case QUEEN -> value = 9;
             case CUSTOM -> {
                 // Currently, this uses MoveSet, but this would be more accurate to use its blueprint
-                MoveSet moveSet = piece.getMoves(
-                        context.getBoard(),
-                        context.getLog(),
-                        context.getThreats(Colour.opposite(piece.getColour()))
-                );
-                int numMoves = moveSet.getPoints().size();
+                MoveSet moveSet = piece.getMoves(context);
+                int numMoves = moveSet.coordinates().size();
                 int base = (int) Math.ceil(numMoves / 3.0);
                 value = base + base / 3;
             }
@@ -40,11 +40,29 @@ public class Heuristics {
         return value;
     }
 
-    public static int pawnWall(List<Point> pawnThreats, List<Piece> pawns) {
+    public static int pawnValue(GameContext.Record context, Colour colour) {
+        List<Piece> pawns = new ArrayList<>();
+        List<Coordinate> pawnAttacks = new ArrayList<>();
+        List<Coordinate> pawnDefends = new ArrayList<>();
+        for (Piece p : context.getBoard()) {
+            if (PieceType.PAWN.getCode().equals(p.getCode()) && colour.equals(p.getColour())) {
+                pawns.add(p);
+                MoveSet moveSet = p.getMoves(context);
+                pawnAttacks.addAll(moveSet.attacks());
+                pawnDefends.addAll(moveSet.defends());
+            }
+        }
+        Space space = context.getBoard().space();
+        int midX = (space.max(Space.AXIS.X) + space.min(Space.AXIS.X)) / 2;
+        int midY = (space.max(Space.AXIS.Y) + space.min(Space.AXIS.Y)) / 2;
+        return pawnCenterControl(pawnAttacks, midX, midY) + pawnWall(pawnDefends, pawns) + doubleFilePawns(pawns);
+    }
+
+    private static int pawnWall(List<Coordinate> pawnThreats, List<Piece> pawns) {
         int sum = 0;
         // Pawn defends
         for (Piece piece : pawns) {
-            for (Point p : pawnThreats) {
+            for (Coordinate p : pawnThreats) {
                 // This is a pawn that is defended by at least one other pawn. Doubled-up defends count for one each.
                 if (PieceType.PAWN.getCode().equals(piece.getCode()) && piece.getCoordinate().equals(p)) {
                     sum++; // Currently, an arbitrarily set amount
@@ -54,7 +72,7 @@ public class Heuristics {
         return sum;
     }
 
-    public static int pawnCenterControl(List<Point> pawnThreats, int midX, int midY) {
+    private static int pawnCenterControl(List<Coordinate> pawnThreats, int midX, int midY) {
         int midX2;
         int midY2;
         if (midX % 2 == 0) {
@@ -73,7 +91,7 @@ public class Heuristics {
         Point midPoint3 = new Point(midX2, midY);
         Point midPoint4 = new Point(midX2, midY2);
         int sum = 0;
-        for (Point p : pawnThreats) {
+        for (Coordinate p : pawnThreats) {
             // A pawn has threat over a centre position on the board, which is often valuable
             if (p.equals(midPoint1) || p.equals(midPoint2) || p.equals(midPoint3) || p.equals(midPoint4)) {
                 sum++;  // Currently, an arbitrarily set amount
@@ -82,7 +100,7 @@ public class Heuristics {
         return sum;
     }
 
-    public static int doubleFilePawns(List<Piece> pawns) {
+    private static int doubleFilePawns(List<Piece> pawns) {
         Set<Integer> seen = new HashSet<>();
         int sum = 0;
         for (Piece p : pawns) {

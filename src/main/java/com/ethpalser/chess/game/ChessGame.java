@@ -14,7 +14,6 @@ import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.MoveMap;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -46,6 +45,13 @@ public class ChessGame implements Game {
         this.status = GameStatus.ONGOING;
     }
 
+    public ChessGame(GameOptions options) {
+        this.context = new GameContext(options);
+        this.turn = 1;
+        this.state = new ReadyState(this.context);
+        this.status = GameStatus.ONGOING;
+    }
+
     // Use default options
     @Deprecated
     public ChessGame(Board<Coordinate> board, Log<Coordinate, Piece> log) {
@@ -61,26 +67,6 @@ public class ChessGame implements Game {
         }
         this.status = statusCheck;
         this.turn = log.size() + 1;
-    }
-
-    // Use GameOptions
-    @Deprecated
-    public ChessGame(GameView view) {
-        Log<Coordinate, Piece> newLog = new ChessLog();
-        // Todo: Remove views
-        Space space = new Plane(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
-        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), newLog, space);
-        Board<Coordinate> newBoard = new ChessBoard(space, factory, view.getBoard().getPieces());
-
-        this.context = new GameContext(new GameOptions(), newBoard, newLog); // GameOptions currently not supported
-        GameStatus statusCheck = checkGameStatus();
-        if (GameStatus.isCompletedGameStatus(statusCheck)) {
-            this.state = new EndState(this.context);
-        } else {
-            this.state = new ReadyState(this.context);
-        }
-        this.status = statusCheck;
-        this.turn = Math.max(view.getTurn(), 1);
     }
 
     @Override
@@ -217,26 +203,24 @@ public class ChessGame implements Game {
         } else if (GameStatus.BLACK_IN_CHECK.equals(this.status)) {
             return this.getActionsAgainstCheck(Colour.BLACK);
         } else {
-            Board<Coordinate> board = this.context.getBoard();
-            Log<Coordinate, Piece> log = this.context.getLog();
+            GameContext.Record ctxRecord = this.context.toRecord();
 
-            for (Piece piece : board) {
+            for (Piece piece : ctxRecord.getBoard()) {
                 if (piece == null) {
                     continue;
                 }
                 if (Pieces.isAllied(this.currentPlayer(), piece)) {
-                    MoveSet moves = piece.getMoves(board, log,
-                            this.getThreatMap(Colour.opposite(piece.getColour())));
-                    for (Move m : moves.toSet()) {
+                    MoveSet moves = piece.getMoves(ctxRecord);
+                    for (Move m : moves.moves()) {
                         Path path = m.path();
                         if (path != null && path.length() > 0) {
                             // The last point in a path is a potential capture
                             potentialCaptures.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
-                                    path.getPoint(path.length() - 1)));
+                                    (Point) path.getPoint(path.length() - 1)));
                             // Remaining points are quiet actions (no captures)
                             for (int i = 0; i < path.length() - 1; i++) {
                                 quietActions.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
-                                        path.getPoint(i)));
+                                        (Point) path.getPoint(i)));
                             }
                         }
                     }
@@ -250,36 +234,19 @@ public class ChessGame implements Game {
 
     @Override
     public int evaluateState() {
-        Board<Coordinate> board = this.context.getBoard();
-
+        // Using Record here to avoid redundant copying downstream
+        GameContext.Record ctxRecord = this.context.toRecord();
         int whiteSum = 0;
         int blackSum = 0;
-        for (Piece p : board) {
+        for (Piece p : ctxRecord.getBoard()) {
             if (Colour.WHITE.equals(p.getColour())) {
-                whiteSum += Heuristics.pieceValue(this.context, p);
+                whiteSum += Heuristics.pieceValue(ctxRecord, p);
             } else {
-                blackSum += Heuristics.pieceValue(this.context, p);
+                blackSum += Heuristics.pieceValue(ctxRecord, p);
             }
         }
-        // blackThreats should be a negative value
-        return whiteSum + this.context.getThreats(Colour.WHITE).evaluate(board) -
-                (blackSum + this.context.getThreats(Colour.BLACK).evaluate(board));
-    }
-
-    @Deprecated
-    public String toJson() {
-        GameView info = new GameView(this);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(info);
-    }
-
-    @Deprecated
-    public static Game fromJson(String json) {
-        if (json == null) {
-            return null;
-        }
-        GameView info = new Gson().fromJson(json, GameView.class);
-        return new ChessGame(info);
+        return whiteSum + Heuristics.pawnValue(ctxRecord, Colour.WHITE) -
+                (blackSum + Heuristics.pawnValue(ctxRecord, Colour.BLACK));
     }
 
     // PRIVATE METHODS
@@ -288,24 +255,12 @@ public class ChessGame implements Game {
         return this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
     }
 
-    private Point getKingPosition(Colour colour) {
-        return (Point) this.context.getKingCoordinate(colour);
-    }
-
-    private ThreatMap getThreatMap(Colour colour) {
-        return this.context.getThreats(colour);
-    }
-
-    private MoveMap getMoveMap(Colour colour) {
-        return new MoveMap(colour, this.context.getBoard(), this.context.getLog(),
-                this.getThreatMap(Colour.opposite(colour)));
-    }
-
     private GameStatus checkGameStatus() {
         Colour opponent = Colour.opposite(this.currentPlayer());
         // Is there a check, checkmate or stalemate?
         GameStatus nextStatus;
-        boolean opponentInCheck = !this.getThreatMap(Colour.opposite(opponent)).hasNoThreats(getKingPosition(opponent));
+        boolean opponentInCheck = !this.context.getThreats(Colour.opposite(opponent))
+                .hasNoThreats(this.context.getKingCoordinate(opponent));
         if (opponentInCheck) {
             if (this.isCheckmate()) {
                 nextStatus = GameStatus.colourWinStatus(this.currentPlayer());
@@ -323,20 +278,19 @@ public class ChessGame implements Game {
     }
 
     private boolean isCheckmate() {
-        Board<Coordinate> boardRef = this.context.getBoard();
-        Log<Coordinate, Piece> logRef = this.context.getLog();
+        GameContext.Record ctxRecord = this.context.toRecord();
 
         Colour oppColour = Colour.opposite(this.currentPlayer());
-        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.currentPlayer()));
-        if (oppKingPoint == null || boardRef.get(oppKingPoint) == null) {
+        Coordinate oppKingPoint = this.context.getKingCoordinate(Colour.opposite(this.currentPlayer()));
+        if (oppKingPoint == null || ctxRecord.getBoard().get(oppKingPoint) == null) {
+            throw new IllegalStateException("opponent king is missing");
         }
         // Assuming King is in check
-        MoveSet oppKingMoveSet = boardRef.get(oppKingPoint)
-                .getMoves(boardRef, logRef, this.getThreatMap(this.currentPlayer()));
+        MoveSet oppKingMoveSet = ctxRecord.getBoard().get(oppKingPoint).getMoves(ctxRecord);
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
-            for (Point p : oppKingMoveSet.getPoints()) {
+            for (Coordinate moveCoordinate : oppKingMoveSet.coordinates()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.getThreatMap(this.currentPlayer()).hasNoThreats(p)) {
+                if (ctxRecord.getThreats(this.currentPlayer()).hasNoThreats(moveCoordinate)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -344,26 +298,26 @@ public class ChessGame implements Game {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Piece> sourcesOfCheck = this.getThreatMap(this.currentPlayer()).getPieces(oppKingPoint);
+        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(this.currentPlayer()).getThreats(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
         }
         // There is only one threatening check
-        for (Piece p : sourcesOfCheck) {
+        for (Coordinate defendCoordinate : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(oppColour).getPieces((Point) p.getCoordinate());
+            Set<Coordinate> defenders = ctxRecord.getThreats(oppColour).getThreats(defendCoordinate);
             if (!defenders.isEmpty()) {
                 // Yes, as this piece can be captured by a non-king, the opponent has a legal move to prevent check
                 return false;
             }
             // Can a piece block its path?
-            Move causingCheck = p.getMoves(boardRef, logRef).getMove(oppKingPoint);
+            Move causingCheck = ctxRecord.getBoard().get(defendCoordinate).getMoves(ctxRecord).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = new MoveMap(oppColour, boardRef, logRef, this.getThreatMap(this.currentPlayer()));
-            for (Point c : causingCheck.path()) {
+            MoveMap moveMap = new MoveMap(oppColour, this.context.toRecord());
+            for (Coordinate c : causingCheck.path()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
                 if (!moveMap.hasNoMove(c, true)) {
                     return false;
@@ -374,21 +328,20 @@ public class ChessGame implements Game {
     }
 
     private boolean isStalemate() {
-        Board<Coordinate> boardRef = this.context.getBoard();
-        Log<Coordinate, Piece> logRef = this.context.getLog();
+        GameContext.Record ctxRecord = this.context.toRecord();
         // Only kings remain, which is a stalemate
-        if (boardRef.count() <= 2) {
+        if (ctxRecord.getBoard().count() <= 2) {
             return true;
         }
         // Are there any opponent pieces that can move?
         List<Piece> opponentPieces = new ArrayList<>();
-        for (Piece p : boardRef) {
+        for (Piece p : ctxRecord.getBoard()) {
             if (!Pieces.isAllied(this.currentPlayer(), p)) {
                 opponentPieces.add(p);
             }
         }
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(boardRef, logRef, this.getThreatMap(this.currentPlayer())).isEmpty()) {
+            if (!p.getMoves(ctxRecord).isEmpty()) {
                 return false;
             }
         }
@@ -396,49 +349,47 @@ public class ChessGame implements Game {
     }
 
     private List<Action> getActionsAgainstCheck(Colour playerInCheck) {
-        Board<Coordinate> boardRef = this.context.getBoard();
-        Log<Coordinate, Piece> logRef = this.context.getLog();
+        GameContext.Record ctxRecord = this.context.toRecord();
 
         List<Action> actions = new ArrayList<>();
         // This method assumes a player is in check
         Colour causingCheck = Colour.opposite(playerInCheck);
-        Point inCheckKing = this.getKingPosition(playerInCheck);
-        MoveSet inCheckMoves = boardRef.get(inCheckKing).getMoves(boardRef, logRef,
-                this.getThreatMap(causingCheck));
+        Coordinate inCheckKing = this.context.getKingCoordinate(playerInCheck);
+        MoveSet inCheckMoves = ctxRecord.getBoard().get(inCheckKing).getMoves(this.context.toRecord());
 
         if (inCheckMoves != null && !inCheckMoves.isEmpty()) {
-            for (Point p : inCheckMoves.getPoints()) {
+            for (Coordinate p : inCheckMoves.coordinates()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.getThreatMap(this.currentPlayer()).hasNoThreats(p)) {
+                if (ctxRecord.getThreats(this.currentPlayer()).hasNoThreats(p)) {
                     // Yes, so the king is not in checkmate
-                    actions.add(new Action(playerInCheck, inCheckKing, p));
+                    actions.add(new Action(playerInCheck, (Point) inCheckKing, (Point) p));
                 }
             }
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Piece> sourcesOfCheck = this.getThreatMap(causingCheck).getPieces(inCheckKing);
+        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(causingCheck).getThreats(inCheckKing);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return List.of();
         }
 
-        for (Piece attacker : sourcesOfCheck) {
+        for (Coordinate attacker : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(playerInCheck).getPieces((Point) attacker.getCoordinate());
-            for (Piece defender : defenders) {
-                actions.add(new Action(playerInCheck, (Point) defender.getCoordinate(),
-                        (Point) attacker.getCoordinate()));
+            Set<Coordinate> defenders = ctxRecord.getThreats(playerInCheck).getThreats(attacker);
+            for (Coordinate defender : defenders) {
+                actions.add(new Action(playerInCheck, (Point) defender, (Point) attacker));
             }
             // Can a piece block its path?
-            Move moveCausingCheck = attacker.getMoves(boardRef, logRef).getMove(inCheckKing);
+            Piece attackerPiece = ctxRecord.getBoard().get(attacker);
+            Move moveCausingCheck = attackerPiece.getMoves(this.context.toRecord()).getMove(inCheckKing);
             if (moveCausingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = this.getMoveMap(playerInCheck);
-            for (Point pointOnPath : moveCausingCheck.path()) {
-                for (Piece blocker : moveMap.getPieces(pointOnPath)) {
-                    actions.add(new Action(playerInCheck, (Point) blocker.getCoordinate(), pointOnPath));
+            MoveMap moveMap = new MoveMap(playerInCheck, this.context.toRecord());
+            for (Coordinate pathCoordinate : moveCausingCheck.path()) {
+                for (Piece blocker : moveMap.getPieces(pathCoordinate)) {
+                    actions.add(new Action(playerInCheck, (Point) blocker.getCoordinate(), (Point) pathCoordinate));
                 }
             }
         }

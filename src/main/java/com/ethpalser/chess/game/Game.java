@@ -26,5 +26,4 @@ public interface Game {
 
     int evaluateState();
 
-    String toJson();
 }

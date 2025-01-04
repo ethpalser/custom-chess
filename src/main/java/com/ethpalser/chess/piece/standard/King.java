@@ -1,18 +1,21 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
+import java.util.ArrayList;
 import java.util.List;
 
 public class King implements Piece {
@@ -21,13 +24,13 @@ public class King implements Piece {
     private Coordinate point;
     private boolean hasMoved;
 
-    public King(Colour colour, Point point) {
+    public King(Colour colour, Coordinate point) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = false;
     }
 
-    public King(Colour colour, Point point, boolean hasMoved) {
+    public King(Colour colour, Coordinate point, boolean hasMoved) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = hasMoved;
@@ -54,76 +57,84 @@ public class King implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board<Coordinate> board) {
-        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board)");
-        return this.getMoves(board, null, null);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board, Log<Point, Piece> log)");
-        return this.getMoves(board, log, null);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats) {
-        return this.getMoves(board, log, threats, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap opponentThreats,
-            boolean onlyAttacks, boolean includeDefends) {
-        MoveSet moveSet = new MoveSet(
-                this.generateSafePointOrNull(board, opponentThreats, -1, 0, includeDefends), // left
-                this.generateSafePointOrNull(board, opponentThreats, -1, 1, includeDefends), // top left
-                this.generateSafePointOrNull(board, opponentThreats, 0, 1, includeDefends), // top
-                this.generateSafePointOrNull(board, opponentThreats, 1, 1, includeDefends), // top right
-                this.generateSafePointOrNull(board, opponentThreats, 1, 0, includeDefends), // right
-                this.generateSafePointOrNull(board, opponentThreats, 1, -1, includeDefends), // bot right
-                this.generateSafePointOrNull(board, opponentThreats, 0, -1, includeDefends), // bottom
-                this.generateSafePointOrNull(board, opponentThreats, -1, -1, includeDefends) // bot left
-        );
-
-        // castling
-        // not moved and not threatened (need to use the correct threat map)
-        if (!this.hasMoved && opponentThreats != null && opponentThreats.hasNoThreats((Point) this.point)) {
-            int startRank = this.colour == Colour.WHITE ? 0 : 7; // assuming standard board
-
-            // queen side (towards the left)
-            Piece queenSideRook = board.get(new Point(0, startRank)); // assuming standard board
-            if (queenSideRook != null && !queenSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y))
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) - 2, this.point.getValue(Space.AXIS.Y))
-            ) {
-                LogEntry<Coordinate, Piece> queenSideRookMove = new ChessLogEntry(
-                        new Point(0, startRank), // assuming standard board
-                        new Point(this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y)),
-                        queenSideRook
-                );
-                moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getValue(Space.AXIS.X) - 1, this.point.getValue(Space.AXIS.Y)),
-                        new Point(this.point.getValue(Space.AXIS.X) - 2, this.point.getValue(Space.AXIS.Y))
-                ), queenSideRookMove));
-            }
-
-            // king side (towards the right)
-            Piece kingSideRook = board.get(new Point(7, startRank)); // assuming standard board
-            if (kingSideRook != null && !kingSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y))
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getValue(Space.AXIS.X) + 2, this.point.getValue(Space.AXIS.Y))
-            ) {
-                LogEntry<Coordinate, Piece> kingSideRookMove = new ChessLogEntry(
-                        new Point(7, startRank), // assuming standard board
-                        new Point(this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y)),
-                        kingSideRook
-                );
-                moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getValue(Space.AXIS.X) + 1, this.point.getValue(Space.AXIS.Y)),
-                        new Point(this.point.getValue(Space.AXIS.X) + 2, this.point.getValue(Space.AXIS.Y))
-                ), kingSideRookMove));
-            }
+    public MoveSet getMoves(GameContext.Record context) {
+        if (context == null) {
+            throw new IllegalArgumentException("context cannot be null");
         }
-        return moveSet;
+        MoveSpec vSpec = new MoveSpec(new Path(new Point(0, 1)), true, false);
+        MoveSpec hSpec = new MoveSpec(new Path(new Point(1, 0)), false, true);
+        MoveSpec dSpec = new MoveSpec(new Path(new Point(1, 1)), true, true);
+
+        List<MoveReport> results = new ArrayList<>(8);
+        results.addAll(vSpec.toMoveList(context, this.point, this.colour));
+        results.addAll(hSpec.toMoveList(context, this.point, this.colour));
+        results.addAll(dSpec.toMoveList(context, this.point, this.colour));
+
+        Board<Coordinate> board = context.getBoard();
+        ThreatMap opponentThreats = context.getThreats(Colour.opposite(this.colour));
+        // King conditions, defined in if-statement instead of in MoveSpec
+        if (this.hasMoved || opponentThreats == null || !opponentThreats.hasNoThreats((Point) this.point)) {
+            return new MoveSet(results);
+        }
+
+        // Special Move: Castle
+        int startRank = Colour.WHITE.equals(this.colour) ? board.space().min(Space.AXIS.Y) :
+                board.space().max(Space.AXIS.Y);
+        // Queen-side Castle
+        Path castleQueenPath = new Path(
+                this.point.translate(1, Direction.LEFT.vector()),
+                this.point.translate(2, Direction.LEFT.vector()));
+        // Cannot move along this path if threatened or blocked
+        boolean isQueenSideSafe = true;
+        for (int i = 0; i < castleQueenPath.length() && isQueenSideSafe; i++) {
+            isQueenSideSafe = isEmptyAndSafe(board, opponentThreats, castleQueenPath.getPoint(i));
+        }
+        // Queen-side rook is moved to the right of the king's destination
+        Coordinate qskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
+        // Queen-side rook starts at the left-most edge of the board
+        Coordinate qsrStart = new Point(board.space().min(Space.AXIS.X), startRank);
+        Piece queenSideRook = board.get(qsrStart);
+        if (queenSideRook != null && !queenSideRook.getHasMoved() && isQueenSideSafe) {
+            MoveSpec castleQueen = (new MoveSpec.Builder(castleQueenPath))
+                    .isAttack(false)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .followUp(
+                            new Reference(Direction.AT, Location.POINT, qsrStart),
+                            new Path(qsrStart.translate(1, Direction.RIGHT.vector()),
+                                    qskEnd.translate(1, Direction.RIGHT.vector())))
+                    .build();
+            results.addAll(castleQueen.toMoveList(context, this.point, this.colour));
+        }
+        // King-side castle
+        Path castleKingPath = new Path(
+                this.point.translate(1, Direction.RIGHT.vector()),
+                this.point.translate(2, Direction.RIGHT.vector()));
+        // Cannot move along this path if threatened or blocked
+        boolean isKingSideSafe = true;
+        for (int i = 0; i < castleQueenPath.length() && isKingSideSafe; i++) {
+            isKingSideSafe = isEmptyAndSafe(board, opponentThreats, castleQueenPath.getPoint(i));
+        }
+        // King-side rook is moved to the left of the king's destination
+        Coordinate kskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
+        // King-side rook starts at the right-most edge of the board
+        Point ksrStart = new Point(board.space().max(Space.AXIS.X), startRank);
+        Piece kingSideRook = board.get(ksrStart);
+        if (kingSideRook != null && !kingSideRook.getHasMoved() && isKingSideSafe) {
+            MoveSpec castleKing = (new MoveSpec.Builder(castleKingPath))
+                    .isAttack(false)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .followUp(
+                            new Reference(Direction.AT, Location.POINT, ksrStart),
+                            new Path(ksrStart.translate(1, Direction.LEFT.vector()),
+                                    kskEnd.translate(1, Direction.LEFT.vector())))
+                    .build();
+            results.addAll(castleKing.toMoveList(context, this.point, this.colour));
+        }
+        return new MoveSet(results);
     }
 
     @Override
@@ -148,18 +159,8 @@ public class King implements Piece {
 
     // PRIVATE METHODS
 
-    private boolean isEmptyAndSafe(Board<Coordinate> board, ThreatMap threatMap, int x, int y) {
-        Point p = new Point(x, y);
-        return board.get(p) == null && threatMap != null && threatMap.hasNoThreats(p);
-    }
-
-    private Point generateSafePointOrNull(Board<Coordinate> board, ThreatMap threatMap, int xOffset, int yOffset,
-            boolean includeDefends) {
-        Point p = (Point) this.point.translate(1, xOffset, yOffset);
-        if (threatMap != null && threatMap.hasNoThreats(p)) {
-            return Point.validOrNull(board, (Point) this.point, this.colour, -1, 0, includeDefends);
-        }
-        return null;
+    private boolean isEmptyAndSafe(Board<Coordinate> board, ThreatMap threatMap, Coordinate coordinate) {
+        return board.get(coordinate) == null && threatMap != null && threatMap.hasNoThreats((Point) coordinate);
     }
 
     @Override

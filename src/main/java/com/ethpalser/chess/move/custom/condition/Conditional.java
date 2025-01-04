@@ -1,18 +1,17 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.view.ConditionalView;
 
 /**
- * Conditional describes an object that has conditions, rule or criteria, that it contains. The criteria will take
- * the current state of the board to determine if the expected criteria is met.
+ * Conditional classes are functional objects that describe the rules that are expected to pass, using the GameContext
+ * for information and the coordinate this condition is being applied to. Often, this coordinate this condition will
+ * apply to is a piece's coordinate.
  */
-public interface Conditional<T extends Positional> {
+public interface Conditional {
 
-    boolean isExpected(Board<Coordinate> plane);
+    boolean isExpected(GameContext.Record context, Coordinate appliedTo);
 
     ConditionalView toView();
 

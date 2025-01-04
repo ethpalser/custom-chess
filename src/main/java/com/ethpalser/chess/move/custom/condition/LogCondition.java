@@ -1,43 +1,43 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Positional;
 import com.ethpalser.chess.view.ConditionalView;
 
-public class LogCondition<T extends Positional> implements Conditional<T> {
+public class LogCondition implements Conditional {
 
-    private final Log<Coordinate, T> log;
     private final Comparator comparator;
     private final PropertyType propType;
     private final Object expected;
 
-    public LogCondition(Log<Coordinate, T> log, Comparator comparator, PropertyType propType, Object expected) {
-        this.log = log;
+    public LogCondition(Comparator comparator, PropertyType propType, Object expected) {
         this.comparator = comparator;
         this.propType = propType;
         this.expected = expected;
     }
 
     @Override
-    public boolean isExpected(Board<Coordinate> plane) {
-        if (this.comparator == null || this.log == null || this.log.peek() == null) {
+    public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
+        // Note: appliedTo is ignored, as this is only checking the context's log
+        if (this.comparator == null || context == null || context.getLog() == null || context.getLog().peek() == null) {
             return false;
         }
+        // Todo: replace with newer log
+        Log<Coordinate, Piece> log = context.getLog();
         switch (this.propType) {
             case HAS_MOVED -> {
                 return switch (this.comparator) {
-                    case TRUE -> this.log.peek().isFirstOccurrence();
-                    case FALSE -> !this.log.peek().isFirstOccurrence();
+                    case TRUE -> log.peek().isFirstOccurrence();
+                    case FALSE -> !log.peek().isFirstOccurrence();
                     default -> false;
                 };
             }
             case DISTANCE_MOVED -> {
-                Point start = (Point) this.log.peek().getStart();
-                Point end = (Point) this.log.peek().getEnd();
+                Point start = (Point) log.peek().getStart();
+                Point end = (Point) log.peek().getEnd();
                 int diff;
                 if (start == null || end == null) {
                     diff = 0;

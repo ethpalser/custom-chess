@@ -1,10 +1,9 @@
 package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
@@ -18,13 +17,13 @@ public class Bishop implements Piece {
     private Coordinate point;
     private boolean hasMoved;
 
-    public Bishop(Colour colour, Point point) {
+    public Bishop(Colour colour, Coordinate point) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = false;
     }
 
-    public Bishop(Colour colour, Point point, boolean hasMoved) {
+    public Bishop(Colour colour, Coordinate point, boolean hasMoved) {
         this.colour = colour;
         this.point = point;
         this.hasMoved = hasMoved;
@@ -51,23 +50,12 @@ public class Bishop implements Piece {
     }
 
     @Override
-    public MoveSet getMoves(Board<Coordinate> board) {
-        // Log and Threats are not needed
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        if (board == null) {
-            throw new IllegalArgumentException("board cannot be null");
+    public MoveSet getMoves(GameContext.Record context) {
+        if (context == null) {
+            throw new IllegalArgumentException("context cannot be null");
         }
-        return new MoveSet(
-                new Move(Path.diagonal(board, (Point) this.point, this.colour, false, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, (Point) this.point, this.colour, false, true, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, (Point) this.point, this.colour, true, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, (Point) this.point, this.colour, true, true, onlyAttacks, includeDefends))
-        );
+        MoveSpec spec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{1, 1}), true, true);
+        return new MoveSet(spec.toMoveList(context, this.point, this.colour));
     }
 
     @Override

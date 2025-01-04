@@ -1,25 +1,26 @@
 package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Positional;
-import com.ethpalser.chess.space.custom.reference.Reference;
+import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.view.ConditionalView;
+import java.util.ArrayList;
 import java.util.List;
 
-public class PropertyCondition<T extends Positional> implements Conditional<T> {
+public class PropertyCondition implements Conditional {
 
-    private final Reference<T> reference;
+    private final Reference reference;
     private final PropertyType property;
     private final Comparator comparator;
     private final Object expected;
 
-    public PropertyCondition(Reference<T> reference, Comparator comparator) {
+    public PropertyCondition(Reference reference, Comparator comparator) {
         this(reference, comparator, null, null);
     }
 
-    public PropertyCondition(Reference<T> reference, Comparator comparator, PropertyType property, Object expected) {
+    public PropertyCondition(Reference reference, Comparator comparator, PropertyType property, Object expected) {
         this.reference = reference;
         this.comparator = comparator;
         this.property = property;
@@ -27,7 +28,7 @@ public class PropertyCondition<T extends Positional> implements Conditional<T> {
     }
 
     @Override
-    public boolean isExpected(Board<Coordinate> plane) {
+    public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
         if (this.comparator == null) {
             return false;
         }
@@ -35,14 +36,22 @@ public class PropertyCondition<T extends Positional> implements Conditional<T> {
             return this.expected == null;
         }
 
-        List<T> refList = this.reference.getReferences(plane);
+        Board<Coordinate> board = context.getBoard();
+        List<Piece> refList = new ArrayList<>();
+        for (Coordinate c : this.reference.coordinates(context, appliedTo)) {
+            // This condition requires pieces, and will verify the state of its properties
+            Piece p = board.get(c);
+            if (p != null) {
+                refList.add(p);
+            }
+        }
         if (refList.isEmpty()) {
             return Comparator.EQUAL.equals(this.comparator) && this.expected == null;
         }
 
-        Property<T> prop = this.property != null ? new Property<>(this.property.toString()) : null;
+        Property<Piece> prop = this.property != null ? new Property<>(this.property.toString()) : null;
         boolean refExists = false;
-        for (T ref : refList) {
+        for (Piece ref : refList) {
             if (ref != null) {
                 Object refProp = prop != null ? prop.fetch(ref) : null;
                 if (!isExpectedState(refProp)) {

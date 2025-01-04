@@ -1,21 +1,20 @@
 package com.ethpalser.chess.view;
 
+import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.custom.Location;
+import com.ethpalser.chess.space.Location;
 import java.util.Objects;
 
 public class ReferenceView {
 
     private final Location location;
     private final Point point;
-    private final int xOffset;
-    private final int yOffset;
+    private final Direction direction;
 
-    public ReferenceView(Location location, Point point, int xOffset, int yOffset) {
+    public ReferenceView(Location location, Point point, Direction direction) {
         this.location = Objects.requireNonNullElse(location, Location.POINT);
         this.point = point;
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+        this.direction = direction;
     }
 
     public Location getLocation() {
@@ -26,11 +25,5 @@ public class ReferenceView {
         return point;
     }
 
-    public int getXOffset() {
-        return xOffset;
-    }
-
-    public int getYOffset() {
-        return yOffset;
-    }
+    public Direction getDirection() {return direction;}
 }

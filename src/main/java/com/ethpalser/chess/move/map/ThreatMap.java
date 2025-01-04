@@ -1,57 +1,41 @@
 package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.logic.Heuristics;
+import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.Pieces;
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.util.Pair;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ThreatMap {
 
-    private final Colour colour;
-    private final Map<Point, Set<Piece>> map;
+    private final Map<Coordinate, Set<Coordinate>> map;
     private final int width;
     private final int length;
 
     public ThreatMap(ThreatMap original) {
-        this.colour = original.colour;
         this.map = new HashMap<>(original.map);
-        // Todo: remove these from this class, as drawing should only be done by the game or wherever the space is known
         this.width = original.width;
         this.length = original.length;
     }
 
-    public ThreatMap(Colour colour, Board<Coordinate> board, Log<Coordinate, Piece> log, Space space) {
-        if (colour == null || space == null) {
+    public ThreatMap(Space space, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+        if (space == null || board == null || log == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
-        if (space.getDimension() < 2) {
-            throw new IllegalArgumentException("Space must be have 2 dimensions or greater");
-        }
-        this.colour = colour;
-        // setup threat map
-        Map<Point, Set<Piece>> piecesThreateningPoint = new HashMap<>();
+        Map<Coordinate, Set<Coordinate>> piecesThreateningPoint = new HashMap<>();
+        // Create a snapshot of the GameContext without any threats, so this must be refreshed after for pieces affected
+        GameContext.Record ctxRecord = new GameContext.Record(board, log, null, null);
         for (Piece piece : board) {
-            if (piece != null && Pieces.isAllied(colour, piece)) {
-                MoveSet moveSet = piece.getMoves(board, log, null, true, true);
-                for (Point point : moveSet.getPoints()) {
-                    piecesThreateningPoint.computeIfAbsent(point, k -> new HashSet<>()).add(piece);
-                }
+            MoveSet set = piece.getMoves(ctxRecord);
+            for (Coordinate threatened : set.attacks()) {
+                piecesThreateningPoint.computeIfAbsent(threatened, k -> new HashSet<>()).add(piece.getCoordinate());
             }
         }
         this.map = piecesThreateningPoint;
@@ -59,120 +43,43 @@ public class ThreatMap {
         this.length = space.length(2);
     }
 
-    public boolean hasNoThreats(Point point) {
-        return this.getPieces(point).isEmpty();
+    public boolean hasNoThreats(Coordinate point) {
+        return this.getThreats(point).isEmpty();
     }
 
-    public Colour getColour() {
-        return this.colour;
+    public void addThreat(Coordinate attacker, Coordinate threatened) {
+        this.map.computeIfAbsent(threatened, k -> new HashSet<>()).add(attacker);
     }
 
-    public Set<Piece> getPieces(Point point) {
+    public void addThreats(Coordinate attacker, MoveSet moveSet) {
+        for (Coordinate threatened : moveSet.attacks()) {
+            this.addThreat(attacker, threatened);
+        }
+    }
+
+    public Set<Coordinate> getThreats(Coordinate point) {
         if (point == null) {
             return Set.of();
         }
-        Set<Piece> piecesThreateningPoint = this.map.get(point);
-        if (piecesThreateningPoint == null) {
+        Set<Coordinate> threatenedPoints = this.map.get(point);
+        if (threatenedPoints == null) {
             return Set.of();
         }
-        return piecesThreateningPoint;
+        return threatenedPoints;
     }
 
-    private void clearMoves(Piece piece) {
-        for (Point p : this.map.keySet()) {
-            this.clearMoves(piece, p);
+    public void removeThreats(Coordinate attacker) {
+        for (Coordinate p : this.map.keySet()) {
+            this.removeThreats(attacker, p);
         }
     }
 
-    private void clearMoves(Piece piece, Point point) {
-        Set<Piece> set = this.map.get(point);
+    public void removeThreats(Coordinate attacker, Coordinate threatened) {
+        Set<Coordinate> set = this.map.get(threatened);
         if (set != null) {
-            set.remove(piece);
+            // All attackers are located in a set for each coordinate
+            set.remove(attacker);
         }
-    }
-
-    public void refreshThreats(Board<Coordinate> board, Log<Coordinate, Piece> log, Point point) {
-        if (board == null || log == null || point == null) {
-            String str = "one or more arguments are null" +
-                    " board: " + (board == null) +
-                    ", log: " + (log == null) +
-                    ", point: " + (point == null);
-            throw new NullPointerException(str);
-        }
-        Piece change = board.get(point);
-        List<Pair<Piece, Path>> pairList = new ArrayList<>();
-        // Remove the impacting piece temporarily
-        board.remove(point);
-        if (change != null && this.colour.equals(change.getColour())) {
-            this.clearMoves(change);
-        }
-
-        // Get all paths that are along this point
-        for (Piece piece : this.getPieces(point)) {
-            if (!piece.equals(change)) {
-                MoveSet moves = piece.getMoves(board, log, this, true, true);
-                Move moveWithPoint = moves.getMove(point);
-                if (moveWithPoint != null) {
-                    pairList.add(new Pair<>(piece, moveWithPoint.path()));
-                }
-            }
-        }
-
-        // Clear these paths
-        for (Pair<Piece, Path> pair : pairList) {
-            for (Point p : pair.getSecond()) {
-                this.clearMoves(pair.getFirst(), p);
-            }
-        }
-        // Add the piece back, so we can reapply threats with this piece present
-        if (change != null) {
-            board.add(point, change);
-        }
-
-        boolean changeIsPresent = board.get(point) != null;
-        for (Pair<Piece, Path> pair : pairList) {
-            // The only change from before and after are the paths that contain the impacted point
-            boolean seenChange = false;
-            for (Point p : pair.getSecond()) {
-                if (seenChange && changeIsPresent)
-                    break;
-                if (p.equals(point))
-                    seenChange = true;
-                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(pair.getFirst());
-            }
-        }
-        if (change != null && this.colour.equals(change.getColour())) {
-            MoveSet moves = change.getMoves(board, log, this, true, true);
-            for (Point p : moves.getPoints()) {
-                this.map.computeIfAbsent(p, k -> new HashSet<>()).add(change);
-            }
-        }
-    }
-
-    public Integer evaluate(Board<Coordinate> board) {
-        int direction = Colour.WHITE.equals(this.colour) ? 1 : -1;
-
-        List<Piece> pawns = new ArrayList<>();
-        List<Point> pawnThreats = new ArrayList<>();
-        for (Piece p : board) {
-            if (PieceType.PAWN.getCode().equals(p.getCode()) && this.colour.equals(p.getColour())) {
-                pawns.add(p);
-
-                Point left = Point.validOrNull(board, (Point) p.getCoordinate(), this.colour, -1, direction, true);
-                if (left != null) {
-                    pawnThreats.add(left);
-                }
-
-                Point right = Point.validOrNull(board, (Point) p.getCoordinate(), this.colour, 1, direction, true);
-                if (right != null) {
-                    pawnThreats.add(right);
-                }
-            }
-        }
-
-        return Heuristics.pawnWall(pawnThreats, pawns)
-                + Heuristics.pawnCenterControl(pawnThreats, this.width / 2, this.length / 2)
-                + Heuristics.doubleFilePawns(pawns);
     }
 
     @Override

@@ -7,9 +7,11 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Pawn;
 import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
 import com.ethpalser.chess.view.ActionView;
 
 public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
@@ -37,7 +39,8 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
         this.promoted = null;
     }
 
-    public ChessLogEntry(Point start, Point end, Piece moved, Piece captured, LogEntry<Coordinate, Piece> followUpMove) {
+    public ChessLogEntry(Point start, Point end, Piece moved, Piece captured,
+            LogEntry<Coordinate, Piece> followUpMove) {
         this.start = start;
         this.end = end;
         this.moved = moved;
@@ -221,6 +224,7 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
 
     @Override
     public ActionView toView() {
-        return new ActionView(new AbsoluteReference<>(this.start), new AbsoluteReference<>(this.end));
+        return new ActionView(new Reference(Direction.AT, Location.POINT, this.start),
+                new Reference(Direction.AT, Location.POINT, this.end));
     }
 }

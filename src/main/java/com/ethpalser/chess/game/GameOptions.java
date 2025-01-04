@@ -1,9 +1,9 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +14,7 @@ public record GameOptions(
         int length,
         List<Coordinate> unavailable,
         Map<Coordinate, String> pieceStarts,
-        Map<String, List<MoveView>> pieceSpecs
+        Map<String, List<MoveSpec>> pieceSpecs
 ) {
     // Keeping GameOptions limited to a 2D ChessGame
     public GameOptions() {
@@ -53,7 +53,7 @@ public record GameOptions(
         private int length;
         private List<Coordinate> unavailable;
         private Map<Coordinate, String> pieceStarts;
-        private Map<String, List<MoveView>> pieceSpecs;
+        private Map<String, List<MoveSpec>> pieceSpecs;
 
         private GameOptionsBuilder() {
             this.width = 8;
@@ -100,7 +100,7 @@ public record GameOptions(
             return this;
         }
 
-        public GameOptionsBuilder pieceSpecs(Map<String, List<MoveView>> pieceSpecs) {
+        public GameOptionsBuilder pieceSpecs(Map<String, List<MoveSpec>> pieceSpecs) {
             if (pieceSpecs == null) {
                 throw new IllegalArgumentException();
             }
@@ -108,7 +108,7 @@ public record GameOptions(
             return this;
         }
 
-        public GameOptionsBuilder addPieceSpec(String pieceCode, MoveView specification) {
+        public GameOptionsBuilder addPieceSpec(String pieceCode, MoveSpec specification) {
             if (this.pieceSpecs.get(pieceCode) == null) {
                 this.pieceSpecs.put(pieceCode, List.of(specification));
             } else {

@@ -12,6 +12,7 @@ import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Point;
 import java.util.Map;
 
 public class PromoteEvent implements GameEvent {
@@ -91,10 +92,10 @@ public class PromoteEvent implements GameEvent {
         Piece replacement;
         if (PieceType.fromCode(code) == PieceType.CUSTOM) {
             // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of(), log, board.space());
+            PieceFactory factory = new CustomPieceFactory(Map.of());
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
             // colour then code
-            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
+            replacement = factory.create(tokenizer.nextToken(), Colour.fromCode(tokenizer.nextToken()), Point.ORIGIN);
         } else {
             // Build a standard piece using information from the piece string
             replacement = Pieces.fromString(pieceStr);

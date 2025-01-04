@@ -1,10 +1,7 @@
 package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.PathReport;
 import com.ethpalser.chess.space.Point;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,86 +14,86 @@ public class MoveSet {
     private final Set<Move> set;
     private final Collection<Coordinate> attacks;
     private final Collection<Coordinate> defends;
-
-    public MoveSet(Set<Move> moves) {
-        this.set = moves;
-        // Legacy code handles these differently and is not supported by this constructor
-        this.attacks = List.of();
-        this.defends = List.of();
-    }
-
-    public MoveSet(Point... points) {
-        Set<Move> moves = new HashSet<>();
-        for (Point p : points) {
-            if (p != null) {
-                moves.add(new Move(new Path(p), (Move.FollowUp) null));
-            }
-        }
-        moves.remove(null);
-        this.set = moves;
-        // Legacy code handles these differently and is not supported by this constructor
-        this.attacks = List.of();
-        this.defends = List.of();
-    }
-
-    public MoveSet(Path... paths) {
-        Set<Move> moves = new HashSet<>();
-        for (Path path : paths) {
-            if (!path.toSet().isEmpty()) {
-                moves.add(new Move(path, (Move.FollowUp) null));
-            }
-        }
-        moves.remove(null);
-        this.set = moves;
-        // Legacy code handles these differently and is not supported by this constructor
-        this.attacks = List.of();
-        this.defends = List.of();
-    }
+    private final Collection<Coordinate> checks;
 
     public MoveSet(Move... moves) {
         this.set = new HashSet<>(Arrays.asList(moves));
         // Legacy code handles these differently and is not supported by this constructor
         this.attacks = List.of();
         this.defends = List.of();
+        this.checks = List.of();
     }
 
-    public MoveSet(PathReport... pathReports) {
-        Set<Move> movements = new HashSet<>();
-        Collection<Coordinate> attackList = new ArrayList<>();
-        Collection<Coordinate> defendList = new ArrayList<>();
-        for (PathReport report : pathReports) {
-            if (!report.path().isEmpty()) {
-                movements.add(new Move(report.path(), (Move.FollowUp) null));
+    public MoveSet(MoveReport... reports) {
+        this(List.of(reports));
+    }
+
+    public MoveSet(Iterable<MoveReport> reports) {
+        Set<Move> moves = new HashSet<>();
+        Collection<Coordinate> attackList = new HashSet<>();
+        Collection<Coordinate> defendList = new HashSet<>();
+        Collection<Coordinate> checkList = new HashSet<>();
+        for (MoveReport report : reports) {
+            if (report.move().path().isEmpty()) {
+                // This piece could not move, but it can threaten this location if it were occupied (ex. pawn)
+                if (report.isAttack() && report.lastChecked() != null
+                        && !report.status().equals(MoveReport.Status.OUT_OF_BOUNDS)) {
+                    attackList.add(report.lastChecked());
+                }
+                continue;
             }
-            if (report.status().equals(PathReport.Status.BLOCKED_BY_OPPONENT)) {
-                attackList.add(report.lastChecked());
-            } else if (report.status().equals(PathReport.Status.BLOCKED_BY_ALLY)) {
-                defendList.add(report.lastChecked());
+            moves.add(report.move());
+            if (report.isAttack()) {
+                // These are all threats that could lead to a capture
+                for (Coordinate c : report.move().path()) {
+                    attackList.add(c);
+                }
+                if (MoveReport.Status.BLOCKED_BY_OPPONENT.equals(report.status())) {
+                    attackList.add(report.lastChecked());
+                } else if (MoveReport.Status.BLOCKED_BY_ALLY.equals(report.status())) {
+                    defendList.add(report.lastChecked());
+                }
+            }
+            if (report.threatenKingAt() != null) {
+                checkList.add(report.threatenKingAt());
             }
         }
-        this.set = movements;
+        this.set = moves;
         this.attacks = attackList;
         this.defends = defendList;
+        this.checks = checkList;
     }
 
-    public Set<Move> toSet() {
+    public Set<Move> moves() {
         return this.set;
     }
 
-    public Move getMove(Point point) {
-        return this.set.stream().filter(m -> m.path().hasPoint(point)).findFirst().orElse(null);
+    public Move getMove(Coordinate point) {
+        return this.set.stream().filter(m -> m.path().hasPoint((Point) point)).findFirst().orElse(null);
     }
 
     public void addMove(Move move) {
         this.set.add(move);
     }
 
-    public Set<Point> getPoints() {
-        Set<Point> points = new HashSet<>();
+    public Collection<Coordinate> coordinates() {
+        Set<Coordinate> coordinates = new HashSet<>();
         for (Move m : this.set) {
-            points.addAll(m.path().toSet());
+            coordinates.addAll(m.path().toSet());
         }
-        return points;
+        return coordinates;
+    }
+
+    public Collection<Coordinate> attacks() {
+        return this.attacks;
+    }
+
+    public Collection<Coordinate> defends() {
+        return this.defends;
+    }
+
+    public Collection<Coordinate> checks() {
+        return this.checks;
     }
 
     public boolean isEmpty() {
