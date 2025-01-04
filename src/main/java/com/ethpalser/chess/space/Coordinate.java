@@ -46,7 +46,21 @@ public interface Coordinate {
      */
     Coordinate translate(int magnitude, int... values);
 
-    private static Coordinate at(int... points) {
+    default Coordinate translate(int magnitude, Direction direction) {
+        if (direction == null) {
+            return this.translate(magnitude, 0);
+        }
+        return this.translate(magnitude, direction.vector());
+    }
+    
+    default Coordinate translate(int magnitude, Coordinate coordinate) {
+        if (coordinate == null) {
+            return this.translate(magnitude, 0);
+        }
+        return this.translate(magnitude, coordinate.getValues());
+    }
+
+    static Coordinate at(int... points) {
         return new Coordinate() {
             @Override
             public int getDimension() {
