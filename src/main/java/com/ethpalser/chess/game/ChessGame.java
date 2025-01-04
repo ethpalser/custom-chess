@@ -93,7 +93,7 @@ public class ChessGame implements Game {
         return this.updateGame(action.getStart(), action.getEnd(), action.getColour());
     }
 
-    public GameStatus updateGame(Point start, Point end, Colour player) {
+    public GameStatus updateGame(Coordinate start, Coordinate end, Colour player) {
         Colour expectedPlayer = this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
         if (!expectedPlayer.equals(player)) {
             return GameStatus.NO_CHANGE;

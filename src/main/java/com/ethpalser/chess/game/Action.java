@@ -1,6 +1,7 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 
 /**
@@ -9,8 +10,8 @@ import com.ethpalser.chess.space.Point;
 public class Action {
 
     private final Colour colour;
-    private final Point start;
-    private final Point end;
+    private final Coordinate start;
+    private final Coordinate end;
 
     private Action() {
         colour = Colour.WHITE;
@@ -18,7 +19,7 @@ public class Action {
         end = new Point();
     }
 
-    public Action(Colour colour, Point start, Point end) {
+    public Action(Colour colour, Coordinate start, Coordinate end) {
         this.colour = colour;
         this.start = start;
         this.end = end;
@@ -28,11 +29,11 @@ public class Action {
         return colour;
     }
 
-    public Point getStart() {
+    public Coordinate getStart() {
         return start;
     }
 
-    public Point getEnd() {
+    public Coordinate getEnd() {
         return end;
     }
 

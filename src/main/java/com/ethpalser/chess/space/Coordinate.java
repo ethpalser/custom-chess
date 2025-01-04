@@ -52,7 +52,7 @@ public interface Coordinate {
         }
         return this.translate(magnitude, direction.vector());
     }
-    
+
     default Coordinate translate(int magnitude, Coordinate coordinate) {
         if (coordinate == null) {
             return this.translate(magnitude, 0);
