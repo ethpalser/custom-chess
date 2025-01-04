@@ -92,7 +92,7 @@ public class PromoteEvent implements GameEvent {
         Piece replacement;
         if (PieceType.fromCode(code) == PieceType.CUSTOM) {
             // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of());
+            PieceFactory factory = new CustomPieceFactory(Map.of(), board.space());
             PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
             // colour then code
             replacement = factory.create(tokenizer.nextToken(), Colour.fromCode(tokenizer.nextToken()), Point.ORIGIN);
