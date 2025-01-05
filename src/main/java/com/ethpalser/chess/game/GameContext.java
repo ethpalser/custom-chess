@@ -56,8 +56,8 @@ public class GameContext {
             this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs(), space),
                     Arrays.asList(pieceNotations));
         }
-        this.wThreats = new ThreatMap(space, this.board, this.log);
-        this.bThreats = new ThreatMap(space, this.board, this.log);
+        this.wThreats = new ThreatMap(Colour.WHITE, space, this.board, this.log);
+        this.bThreats = new ThreatMap(Colour.BLACK, space, this.board, this.log);
         for (Coordinate c : this.board.occupied()) {
             Piece p = this.board.get(c);
             if (PieceType.KING.toCode().equals(p.getCode())) {
@@ -224,10 +224,13 @@ public class GameContext {
         // Get all paths that are along this point
         for (Coordinate threat : ctxThreatMap.getThreats(change)) {
             if (!threat.equals(change)) {
-                MoveSet moves = ctxBoard.get(threat).getMoves(ctxRecord);
-                Move moveWithPoint = moves.getMove(change);
-                if (moveWithPoint != null) {
-                    pairList.add(new Pair<>(threat, moveWithPoint.path()));
+                Piece piece = ctxBoard.get(threat);
+                if (piece != null) {
+                    MoveSet moves = piece.getMoves(ctxRecord);
+                    Move moveWithPoint = moves.getMove(change);
+                    if (moveWithPoint != null) {
+                        pairList.add(new Pair<>(threat, moveWithPoint.path()));
+                    }
                 }
             }
         }
