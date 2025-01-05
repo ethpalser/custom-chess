@@ -56,9 +56,9 @@ public class Queen implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec vSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{0, 1}), true, false);
-        MoveSpec hSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{1, 0}), false, true);
-        MoveSpec dSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{1, 1}), true, true);
+        MoveSpec vSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(0, 1), new int[]{0, 1}), true, false);
+        MoveSpec hSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 0), new int[]{1, 0}), false, true);
+        MoveSpec dSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 1), new int[]{1, 1}), true, true);
 
         List<MoveReport> results = new ArrayList<>(24);
         results.addAll(vSpec.toMoveList(context, this.point, this.colour));

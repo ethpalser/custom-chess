@@ -56,8 +56,8 @@ public class Rook implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec vSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{0, 1}), true, false);
-        MoveSpec hSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{1, 0}), false, true);
+        MoveSpec vSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(0, 1), new int[]{0, 1}), true, false);
+        MoveSpec hSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 0), new int[]{1, 0}), false, true);
 
         List<MoveReport> results = new ArrayList<>(16);
         results.addAll(vSpec.toMoveList(context, this.point, this.colour));

@@ -54,7 +54,7 @@ public class Bishop implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec spec = new MoveSpec(new Path(context.getBoard().space(), new Point(), new int[]{1, 1}), true, true);
+        MoveSpec spec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 1), new int[]{1, 1}), true, true);
         return new MoveSet(spec.toMoveList(context, this.point, this.colour));
     }
 
