@@ -73,7 +73,7 @@ public class King implements Piece {
         Board<Coordinate> board = context.getBoard();
         ThreatMap opponentThreats = context.getThreats(Colour.opposite(this.colour));
         // King conditions, defined in if-statement instead of in MoveSpec
-        if (this.hasMoved || opponentThreats == null || !opponentThreats.hasNoThreats((Point) this.point)) {
+        if (this.hasMoved || opponentThreats == null || !opponentThreats.hasNoThreats(this.point)) {
             return new MoveSet(results);
         }
 
@@ -98,12 +98,11 @@ public class King implements Piece {
             MoveSpec castleQueen = (new MoveSpec.Builder(castleQueenPath))
                     .isAttack(false)
                     .isMirrorXAxis(false)
-                    .isMirrorYAxis(false)
+                    .isMirrorYAxis(true)
                     .isSpecificQuadrant(true)
                     .followUp(
                             new Reference(Location.POINT, Direction.AT, qsrStart),
-                            new Path(qsrStart.translate(1, Direction.RIGHT.vector()),
-                                    qskEnd.translate(1, Direction.RIGHT.vector())))
+                            new Path(qskEnd.translate(1, Direction.RIGHT.vector())))
                     .build();
             results.addAll(castleQueen.toMoveList(context, this.point, this.colour));
         }
@@ -129,8 +128,7 @@ public class King implements Piece {
                     .isSpecificQuadrant(true)
                     .followUp(
                             new Reference(Location.POINT, Direction.AT, ksrStart),
-                            new Path(ksrStart.translate(1, Direction.LEFT.vector()),
-                                    kskEnd.translate(1, Direction.LEFT.vector())))
+                            new Path(kskEnd.translate(1, Direction.LEFT.vector())))
                     .build();
             results.addAll(castleKing.toMoveList(context, this.point, this.colour));
         }
@@ -160,7 +158,7 @@ public class King implements Piece {
     // PRIVATE METHODS
 
     private boolean isEmptyAndSafe(Board<Coordinate> board, ThreatMap threatMap, Coordinate coordinate) {
-        return board.get(coordinate) == null && threatMap != null && threatMap.hasNoThreats((Point) coordinate);
+        return board.get(coordinate) == null && threatMap != null && threatMap.hasNoThreats(coordinate);
     }
 
     @Override

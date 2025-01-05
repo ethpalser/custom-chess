@@ -51,38 +51,38 @@ public class CustomPieceFactory implements PieceFactory {
 
     // CONDITIONS
 
-    private Conditional selfNotMovedCondition() {
+    private Conditional conditionSelfNotMoved() {
         return new PropertyCondition(new Reference(Location.POINT, Direction.AT), Comparator.FALSE,
                 PropertyType.HAS_MOVED, false);
     }
 
-    private Conditional targetNotMovedCondition(Coordinate point) {
+    private Conditional conditionTargetNotMoved(Coordinate point) {
         return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
                 Comparator.FALSE, PropertyType.HAS_MOVED, false);
     }
 
-    private Conditional targetIsPieceTypeCondition(Coordinate point, PieceType type) {
+    private Conditional conditionTargetIsRook(Coordinate point) {
         return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
-                Comparator.EQUAL, PropertyType.TYPE, type);
+                Comparator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
     }
 
-    private Conditional emptyPathCondition(Coordinate start, Coordinate end) {
+    private Conditional conditionPathIsEmpty(Coordinate start, Coordinate end) {
         return new ReferenceCondition(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
                 Comparator.EQUAL, null);
     }
 
-    private Conditional lastMovedIsPieceTypeCondition(String code) {
+    private Conditional conditionLastMovedIsPawn() {
         return new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
-                PropertyType.CODE, code);
+                PropertyType.CODE, PieceType.PAWN.toCode());
     }
 
-    private Conditional lastMovedIsNearbyPieceCondition(Direction direction) {
+    private Conditional conditionLastMovedIsAtDirection(Direction direction) {
         return new ReferenceCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
                 new Reference(Location.POINT, direction));
     }
 
-    private Conditional lastMovedTravelledDistanceCondition(int distance) {
-        return new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, distance);
+    private Conditional conditionLastMovedTwo() {
+        return new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
     }
 
     // PIECES
@@ -94,61 +94,58 @@ public class CustomPieceFactory implements PieceFactory {
 
         // Special Move: Castle
         int startRank = Colour.WHITE.equals(colour) ? this.space.min(Space.AXIS.Y) : this.space.max(Space.AXIS.Y);
+        // todo: replace with king's relative location when creating coordinates
+        Coordinate kingStart = new Point(4, startRank);
+
         // region Queen-side Castle
-        Path castleQueenPath = new Path(
-                coordinate.translate(1, Direction.LEFT.vector()),
-                coordinate.translate(2, Direction.LEFT.vector()));
         // Queen-side rook is moved to the right of the king's destination
-        Coordinate qskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
+        Coordinate qskEnd = kingStart.translate(2, Direction.LEFT);
         // Queen-side rook starts at the left-most edge of the board
         Coordinate qsrStart = new Point(this.space.min(Space.AXIS.X), startRank);
-
-        MoveSpec castleQueen = (new MoveSpec.Builder(castleQueenPath))
+        // This move is expected to move two along the x-axis, and to the left (mirror y-axis is true)
+        MoveSpec castleQueen = (new MoveSpec.Builder(new Path(new Point(2, 0))))
                 .isAttack(false)
                 .isMirrorXAxis(false)
-                .isMirrorYAxis(false)
+                .isMirrorYAxis(true)
                 .isSpecificQuadrant(true)
+                // todo: add condition options to verify them more dynamically. These only use fixed coordinates.
                 .conditions(List.of(
-                        this.selfNotMovedCondition(),
-                        this.targetNotMovedCondition(qsrStart),
-                        this.targetIsPieceTypeCondition(qsrStart, PieceType.ROOK),
-                        this.emptyPathCondition(
-                                coordinate.translate(1, Direction.LEFT.vector()),
-                                qsrStart.translate(1, Direction.RIGHT.vector())
+                        this.conditionSelfNotMoved(),
+                        this.conditionTargetNotMoved(qsrStart),
+                        this.conditionTargetIsRook(qsrStart),
+                        this.conditionPathIsEmpty(
+                                kingStart.translate(1, Direction.LEFT),
+                                qsrStart.translate(1, Direction.RIGHT)
                         )
                 ))
                 .followUp(
                         new Reference(Location.POINT, Direction.AT, qsrStart),
-                        new Path(qsrStart.translate(1, Direction.RIGHT.vector()),
-                                qskEnd.translate(1, Direction.RIGHT.vector())))
+                        new Path(qskEnd.translate(1, Direction.RIGHT)))
                 .build();
         // endregion
         // region King-side castle
-        Path castleKingPath = new Path(
-                coordinate.translate(1, Direction.RIGHT.vector()),
-                coordinate.translate(2, Direction.RIGHT.vector()));
         // King-side rook is moved to the left of the king's destination
-        Coordinate kskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
+        Coordinate kskEnd = kingStart.translate(2, Direction.RIGHT);
         // King-side rook starts at the right-most edge of the board
         Point ksrStart = new Point(this.space.max(Space.AXIS.X), startRank);
-
-        MoveSpec castleKing = (new MoveSpec.Builder(castleKingPath))
+        // This move is expected to move two along the x-axis, and to the right (mirror y-axis is false)
+        MoveSpec castleKing = (new MoveSpec.Builder(new Path(new Point(2, 0))))
                 .isAttack(false)
                 .isMirrorXAxis(false)
                 .isMirrorYAxis(false)
                 .isSpecificQuadrant(true)
+                // todo: add condition options to verify them more dynamically. These only use fixed coordinates.
                 .conditions(List.of(
-                        this.selfNotMovedCondition(),
-                        this.targetNotMovedCondition(ksrStart),
-                        this.targetIsPieceTypeCondition(ksrStart, PieceType.ROOK),
-                        this.emptyPathCondition(
-                                coordinate.translate(1, Direction.RIGHT.vector()),
-                                ksrStart.translate(1, Direction.LEFT.vector()))
+                        this.conditionSelfNotMoved(),
+                        this.conditionTargetNotMoved(ksrStart),
+                        this.conditionTargetIsRook(ksrStart),
+                        this.conditionPathIsEmpty(
+                                kingStart.translate(1, Direction.RIGHT),
+                                ksrStart.translate(1, Direction.LEFT))
                 ))
                 .followUp(
                         new Reference(Location.POINT, Direction.AT, ksrStart),
-                        new Path(ksrStart.translate(1, Direction.LEFT.vector()),
-                                kskEnd.translate(1, Direction.LEFT.vector())))
+                        new Path(kskEnd.translate(1, Direction.LEFT)))
                 .build();
         // endregion
         return new CustomPiece(PieceType.KING.toCode(), colour, coordinate, false,
@@ -173,7 +170,7 @@ public class CustomPieceFactory implements PieceFactory {
                 .isMirrorYAxis(false)
                 .isSpecificQuadrant(true)
                 .isAttack(false)
-                .conditions(List.of(this.selfNotMovedCondition()))
+                .conditions(List.of(this.conditionSelfNotMoved()))
                 .build();
 
         // En Passant is split into two due to limitations with References, as they don't have MoveSpec's mirroring
@@ -184,9 +181,9 @@ public class CustomPieceFactory implements PieceFactory {
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .conditions(List.of(
-                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN.toCode()),
-                        this.lastMovedIsNearbyPieceCondition(Direction.RIGHT),
-                        this.lastMovedTravelledDistanceCondition(2)
+                        this.conditionLastMovedIsPawn(),
+                        this.conditionLastMovedIsAtDirection(Direction.RIGHT),
+                        this.conditionLastMovedTwo()
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the right.
                 .followUp(new Reference(Location.POINT, Direction.RIGHT), null)
@@ -198,9 +195,9 @@ public class CustomPieceFactory implements PieceFactory {
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .conditions(List.of(
-                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN.toCode()),
-                        this.lastMovedIsNearbyPieceCondition(Direction.LEFT),
-                        this.lastMovedTravelledDistanceCondition(2)
+                        this.conditionLastMovedIsPawn(),
+                        this.conditionLastMovedIsAtDirection(Direction.LEFT),
+                        this.conditionLastMovedTwo()
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the left.
                 .followUp(new Reference(Location.POINT, Direction.LEFT), null)
