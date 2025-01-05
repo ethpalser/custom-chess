@@ -12,9 +12,7 @@ class ChessLogTest {
 
     @Test
     void testPeek_givenEmpty_thenNull() {
-        ChessLog log = new ChessLog();
-
-        LogEntry<Coordinate, Piece> entry = log.peek();
+        LogEntry<Coordinate, Piece> entry = new ChessLog().peek();
         Assertions.assertNull(entry);
     }
 
@@ -61,7 +59,8 @@ class ChessLogTest {
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 3);
-        LogEntry<Coordinate, Piece> move = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
+        LogEntry<Coordinate, Piece> move = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1),
+                new Pawn(Colour.WHITE, p2));
         log.push(move);
 
         LogEntry<Coordinate, Piece> entry = log.undo();
@@ -77,8 +76,10 @@ class ChessLogTest {
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 2);
         Point p3 = new Point(3, 3);
-        LogEntry<Coordinate, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
-        LogEntry<Coordinate, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2), new Pawn(Colour.WHITE, p3));
+        LogEntry<Coordinate, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1),
+                new Pawn(Colour.WHITE, p2));
+        LogEntry<Coordinate, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2),
+                new Pawn(Colour.WHITE, p3));
         log.push(move1);
         log.push(move2);
 
@@ -107,8 +108,10 @@ class ChessLogTest {
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 2);
         Point p3 = new Point(3, 3);
-        LogEntry<Coordinate, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
-        LogEntry<Coordinate, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2), new Pawn(Colour.WHITE, p3));
+        LogEntry<Coordinate, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1),
+                new Pawn(Colour.WHITE, p2));
+        LogEntry<Coordinate, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2),
+                new Pawn(Colour.WHITE, p3));
         log.push(move1);
         log.push(move2);
 
