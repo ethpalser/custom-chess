@@ -68,6 +68,9 @@ public class GameContext {
                 }
             }
         }
+        // Creating ThreatMap may not have had the king threatened, as the threats were just being made
+        this.refreshThreats(Colour.WHITE, this.wKing, this.toRecord());
+        this.refreshThreats(Colour.WHITE, this.wKing, this.toRecord());
     }
 
 
@@ -135,7 +138,7 @@ public class GameContext {
             this.refreshThreats(Colour.BLACK, coordinate, ctxRecord);
         }
         // After all changes, did the turn player put itself into check?
-        if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats((Point) this.getKingCoordinate(turn))) {
+        if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats(this.getKingCoordinate(turn))) {
             // This may have been raised by an event
             this.clearPrompt();
             throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
@@ -217,7 +220,7 @@ public class GameContext {
         List<Pair<Coordinate, Path>> pairList = new ArrayList<>();
         // Remove the impacting piece temporarily
         ctxBoard.remove(change);
-        if (changePiece != null) {
+        if (changePiece != null && colour.equals(changePiece.getColour())) {
             ctxThreatMap.removeThreats(change);
         }
 
@@ -258,7 +261,7 @@ public class GameContext {
                 ctxThreatMap.addThreat(p, pair.getFirst());
             }
         }
-        if (changePiece != null) {
+        if (changePiece != null && colour.equals(changePiece.getColour())) {
             // This has had its threats changed, so add back this piece's threats with the change included=
             ctxThreatMap.addThreats(change, changePiece.getMoves(ctxRecord));
         }
