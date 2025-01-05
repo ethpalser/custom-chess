@@ -90,13 +90,17 @@ public class ChessGame implements Game {
         MoveEvent event = new MoveEvent(start, end);
         try {
             this.state.update(event);
-        } catch (Exception ex) {
+        } catch (IllegalActionException | IndexOutOfBoundsException ex) {
             System.err.println(ex.getMessage());
             if (GameStatus.isCompletedGameStatus(this.status)) {
                 return this.status;
             } else {
                 return GameStatus.NO_CHANGE;
             }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            System.err.println(this.context.getBoard());
+            throw ex;
         }
         this.status = this.checkGameStatus();
         this.turn++;
@@ -319,6 +323,7 @@ public class ChessGame implements Game {
                 return false;
             }
             // Can a piece block its path?
+
             Move causingCheck = ctxRecord.getBoard().get(defendCoordinate).getMoves(ctxRecord).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
@@ -382,13 +387,16 @@ public class ChessGame implements Game {
         }
 
         for (Coordinate attacker : sourcesOfCheck) {
+            Piece attackerPiece = ctxRecord.getBoard().get(attacker);
+            if (attackerPiece == null) {
+                throw new IllegalStateException("attacker that is causing check cannot be null");
+            }
             // Can this piece be captured by the opponent?
             Set<Coordinate> defenders = ctxRecord.getThreats(playerInCheck).getThreats(attacker);
             for (Coordinate defender : defenders) {
                 actions.add(new Action(playerInCheck, defender, attacker));
             }
             // Can a piece block its path?
-            Piece attackerPiece = ctxRecord.getBoard().get(attacker);
             Move moveCausingCheck = attackerPiece.getMoves(this.context.toRecord()).getMove(inCheckKing);
             if (moveCausingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
