@@ -22,19 +22,19 @@ public record GameOptions(
         // Add all piece starts for a standard chess board
         for (int y : new int[]{0, length - 1}) {
             this.pieceStarts.putAll(Map.of(
-                    new Point(0, y), PieceType.ROOK.getCode(),
-                    new Point(1, y), PieceType.KNIGHT.getCode(),
-                    new Point(2, y), PieceType.BISHOP.getCode(),
-                    new Point(3, y), PieceType.QUEEN.getCode(),
-                    new Point(4, y), PieceType.KING.getCode(),
-                    new Point(5, y), PieceType.BISHOP.getCode(),
-                    new Point(6, y), PieceType.KNIGHT.getCode(),
-                    new Point(7, y), PieceType.ROOK.getCode()
+                    new Point(0, y), PieceType.ROOK.toCode(),
+                    new Point(1, y), PieceType.KNIGHT.toCode(),
+                    new Point(2, y), PieceType.BISHOP.toCode(),
+                    new Point(3, y), PieceType.QUEEN.toCode(),
+                    new Point(4, y), PieceType.KING.toCode(),
+                    new Point(5, y), PieceType.BISHOP.toCode(),
+                    new Point(6, y), PieceType.KNIGHT.toCode(),
+                    new Point(7, y), PieceType.ROOK.toCode()
             ));
         }
         for (int y : new int[]{1, length - 2}) {
             for (int x = 0; x < width; x++) {
-                this.pieceStarts.put(new Point(x, y), PieceType.PAWN.getCode());
+                this.pieceStarts.put(new Point(x, y), PieceType.PAWN.toCode());
             }
         }
     }

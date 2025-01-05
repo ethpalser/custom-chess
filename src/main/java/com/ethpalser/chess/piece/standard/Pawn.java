@@ -132,8 +132,8 @@ public class Pawn implements Piece {
 
     @Override
     public List<String> promoteOptions() {
-        return List.of(PieceType.QUEEN.getCode(), PieceType.KNIGHT.getCode(), PieceType.ROOK.getCode(),
-                PieceType.BISHOP.getCode());
+        return List.of(PieceType.QUEEN.toCode(), PieceType.KNIGHT.toCode(), PieceType.ROOK.toCode(),
+                PieceType.BISHOP.toCode());
     }
 
     @Override

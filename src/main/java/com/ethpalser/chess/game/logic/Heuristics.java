@@ -45,7 +45,7 @@ public class Heuristics {
         List<Coordinate> pawnAttacks = new ArrayList<>();
         List<Coordinate> pawnDefends = new ArrayList<>();
         for (Piece p : context.getBoard()) {
-            if (PieceType.PAWN.getCode().equals(p.getCode()) && colour.equals(p.getColour())) {
+            if (PieceType.PAWN.toCode().equals(p.getCode()) && colour.equals(p.getColour())) {
                 pawns.add(p);
                 MoveSet moveSet = p.getMoves(context);
                 pawnAttacks.addAll(moveSet.attacks());
@@ -64,7 +64,7 @@ public class Heuristics {
         for (Piece piece : pawns) {
             for (Coordinate p : pawnThreats) {
                 // This is a pawn that is defended by at least one other pawn. Doubled-up defends count for one each.
-                if (PieceType.PAWN.getCode().equals(piece.getCode()) && piece.getCoordinate().equals(p)) {
+                if (PieceType.PAWN.toCode().equals(piece.getCode()) && piece.getCoordinate().equals(p)) {
                     sum++; // Currently, an arbitrarily set amount
                 }
             }

@@ -80,7 +80,7 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
             // Finding the king
             Piece found = null;
             for (Piece piece : board) {
-                if (PieceType.KING.getCode().equals(piece.getCode()) && pieceColour.equals(piece.getColour())) {
+                if (PieceType.KING.toCode().equals(piece.getCode()) && pieceColour.equals(piece.getColour())) {
                     found = piece;
                     break;
                 }

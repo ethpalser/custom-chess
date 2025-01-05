@@ -40,14 +40,14 @@ class ChessBoardTest {
                 }
 
                 if (vector.getY() == 1 || vector.getY() == 6) {
-                    assertEquals(PieceType.PAWN.getCode(), piece.getCode());
+                    assertEquals(PieceType.PAWN.toCode(), piece.getCode());
                 } else {
                     switch (vector.getX()) {
-                        case 0, 7 -> assertEquals(PieceType.ROOK.getCode(), piece.getCode());
-                        case 1, 6 -> assertEquals(PieceType.KNIGHT.getCode(), piece.getCode());
-                        case 2, 5 -> assertEquals(PieceType.BISHOP.getCode(), piece.getCode());
-                        case 3 -> assertEquals(PieceType.QUEEN.getCode(), piece.getCode());
-                        case 4 -> assertEquals(PieceType.KING.getCode(), piece.getCode());
+                        case 0, 7 -> assertEquals(PieceType.ROOK.toCode(), piece.getCode());
+                        case 1, 6 -> assertEquals(PieceType.KNIGHT.toCode(), piece.getCode());
+                        case 2, 5 -> assertEquals(PieceType.BISHOP.toCode(), piece.getCode());
+                        case 3 -> assertEquals(PieceType.QUEEN.toCode(), piece.getCode());
+                        case 4 -> assertEquals(PieceType.KING.toCode(), piece.getCode());
                         default -> fail("Board size is invalid, or test coordinate is outside board bounds");
                     }
                 }

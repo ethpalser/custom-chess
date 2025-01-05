@@ -12,7 +12,7 @@ public record PieceRecord(Colour colour, String code, Coordinate coordinate, boo
         // Order is defined by tokenizer
         Colour colour = Colour.fromCode(tokenizer.nextToken());
         String code = tokenizer.nextToken();
-        boolean hasPiece = !PieceType.INVALID.getCode().equals(code);
+        boolean hasPiece = !PieceType.INVALID.toCode().equals(code);
         String x = tokenizer.nextToken();
         String y = tokenizer.nextToken();
         Coordinate coordinate = new Point(x + y);

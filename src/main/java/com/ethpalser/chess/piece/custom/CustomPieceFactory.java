@@ -151,7 +151,7 @@ public class CustomPieceFactory implements PieceFactory {
                                 kskEnd.translate(1, Direction.LEFT.vector())))
                 .build();
         // endregion
-        return new CustomPiece(PieceType.KING.getCode(), colour, coordinate, false,
+        return new CustomPiece(PieceType.KING.toCode(), colour, coordinate, false,
                 vSpec, hSpec, dSpec, castleKing, castleQueen);
     }
 
@@ -206,7 +206,7 @@ public class CustomPieceFactory implements PieceFactory {
                 .followUp(new Reference(Location.POINT, Direction.LEFT), null)
                 .build();
 
-        return new CustomPiece(PieceType.PAWN.getCode(), colour, coordinate, false,
+        return new CustomPiece(PieceType.PAWN.toCode(), colour, coordinate, false,
                 moveOne, capture, moveTwo, epRight, epLeft);
     }
 

@@ -112,7 +112,7 @@ public class MoveEvent implements GameEvent {
         List<String> promoteOptions = piece.promoteOptions();
         // Temporary, always have pawns promote to queen to simplify running simulations
         String pieceStr;
-        if (promoteOptions.size() == 1 || PieceType.PAWN.getCode().equals(piece.getCode())) {
+        if (promoteOptions.size() == 1 || PieceType.PAWN.toCode().equals(piece.getCode())) {
             pieceStr = Pieces.asString(piece, promoteOptions.get(0));
         } else {
             return false;

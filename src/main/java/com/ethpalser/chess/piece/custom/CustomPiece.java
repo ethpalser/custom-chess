@@ -2,18 +2,12 @@ package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Point;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +22,7 @@ public class CustomPiece implements Piece {
     private boolean hasMoved;
 
     public CustomPiece(PieceType pieceType, Colour colour, Coordinate coordinate) {
-        this(pieceType.getCode(), colour, coordinate, false, (MoveSpec) null);
+        this(pieceType.toCode(), colour, coordinate, false, (MoveSpec) null);
     }
 
     public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, MoveSpec... moveSpecs) {
@@ -47,7 +41,7 @@ public class CustomPiece implements Piece {
     @Override
     public String getCode() {
         if (this.type != PieceType.CUSTOM) {
-            return type.getCode();
+            return type.toCode();
         } else {
             return code;
         }
@@ -94,7 +88,7 @@ public class CustomPiece implements Piece {
     @Override
     public boolean canPromote(Board<Coordinate> board) {
         // Temporary work-around. This should be defined on construction by a configuration object/string
-        if (PieceType.PAWN.getCode().equals(this.code)) {
+        if (PieceType.PAWN.toCode().equals(this.code)) {
             // temp promote condition
             return Colour.WHITE.equals(this.colour) && this.getCoordinate().getValue(2) == 7
                     || Colour.BLACK.equals(this.colour) && this.getCoordinate().getValue(2) == 0;
@@ -106,9 +100,9 @@ public class CustomPiece implements Piece {
     @Override
     public List<String> promoteOptions() {
         // Temporary work-around. This should be defined on construction
-        if (PieceType.PAWN.getCode().equals(this.code)) {
-            return List.of(PieceType.QUEEN.getCode(), PieceType.KNIGHT.getCode(), PieceType.ROOK.getCode(),
-                    PieceType.BISHOP.getCode());
+        if (PieceType.PAWN.toCode().equals(this.code)) {
+            return List.of(PieceType.QUEEN.toCode(), PieceType.KNIGHT.toCode(), PieceType.ROOK.toCode(),
+                    PieceType.BISHOP.toCode());
         } else {
             return List.of();
         }

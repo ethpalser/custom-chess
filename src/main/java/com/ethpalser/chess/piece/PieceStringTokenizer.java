@@ -67,7 +67,7 @@ public class PieceStringTokenizer {
         if (tokens == null) {
             return null;
         }
-        final String defaultCase = PieceType.INVALID.getCode();
+        final String defaultCase = PieceType.INVALID.toCode();
         if (piece == null || "".equals(piece)) {
             tokens.add(defaultCase); // no piece
             return null;

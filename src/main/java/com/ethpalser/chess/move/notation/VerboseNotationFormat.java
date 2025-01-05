@@ -125,13 +125,13 @@ public class VerboseNotationFormat implements ChessNotationFormat {
                 // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
                 builder.sourceCoordinate(new Point(4, y))
                         .sourceColour(Colour.WHITE)
-                        .sourceCode(PieceType.KING.getCode())
+                        .sourceCode(PieceType.KING.toCode())
                         .targetCoordinate(new Point(2, y))
                         .followingRecord(
                                 (new ChessRecord.Builder())
                                         .sourceCoordinate(new Point(minX, y))
                                         .sourceColour(Colour.WHITE)
-                                        .sourceCode(PieceType.ROOK.getCode())
+                                        .sourceCode(PieceType.ROOK.toCode())
                                         .targetCoordinate(new Point(3, y))
                                         .build()
                         );
@@ -142,13 +142,13 @@ public class VerboseNotationFormat implements ChessNotationFormat {
                 // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
                 builder.sourceCoordinate(new Point(4, y))
                         .sourceColour(Colour.WHITE)
-                        .sourceCode(PieceType.KING.getCode())
+                        .sourceCode(PieceType.KING.toCode())
                         .targetCoordinate(new Point(6, y))
                         .followingRecord(
                                 (new ChessRecord.Builder())
                                         .sourceCoordinate(new Point(maxX, y))
                                         .sourceColour(Colour.WHITE)
-                                        .sourceCode(PieceType.ROOK.getCode())
+                                        .sourceCode(PieceType.ROOK.toCode())
                                         .targetCoordinate(new Point(5, y))
                                         .build()
                         );

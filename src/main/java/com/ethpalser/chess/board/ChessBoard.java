@@ -52,15 +52,15 @@ public class ChessBoard implements Board<Coordinate> {
                 Piece piece;
                 if (rank == minY || rank == maxY) {
                     piece = switch (file) {
-                        case 0, 7 -> factory.create(PieceType.ROOK.getCode(), colour, Point.ORIGIN);
-                        case 1, 6 -> factory.create(PieceType.KNIGHT.getCode(), colour, Point.ORIGIN);
-                        case 2, 5 -> factory.create(PieceType.BISHOP.getCode(), colour, Point.ORIGIN);
-                        case 3 -> factory.create(PieceType.QUEEN.getCode(), colour, Point.ORIGIN);
-                        case 4 -> factory.create(PieceType.KING.getCode(), colour, Point.ORIGIN);
+                        case 0, 7 -> factory.create(PieceType.ROOK.toCode(), colour, Point.ORIGIN);
+                        case 1, 6 -> factory.create(PieceType.KNIGHT.toCode(), colour, Point.ORIGIN);
+                        case 2, 5 -> factory.create(PieceType.BISHOP.toCode(), colour, Point.ORIGIN);
+                        case 3 -> factory.create(PieceType.QUEEN.toCode(), colour, Point.ORIGIN);
+                        case 4 -> factory.create(PieceType.KING.toCode(), colour, Point.ORIGIN);
                         default -> null; // Default boards do not have custom pieces
                     };
                 } else {
-                    piece = factory.create(PieceType.PAWN.getCode(), colour, Point.ORIGIN);
+                    piece = factory.create(PieceType.PAWN.toCode(), colour, Point.ORIGIN);
                 }
 
                 if (piece != null) {

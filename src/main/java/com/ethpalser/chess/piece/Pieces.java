@@ -16,7 +16,7 @@ import com.ethpalser.chess.space.Point;
 public class Pieces {
 
     public static boolean isKing(Piece piece) {
-        return piece != null && PieceType.KING.getCode().equals(piece.getCode());
+        return piece != null && PieceType.KING.toCode().equals(piece.getCode());
     }
 
     public static boolean isAllied(Colour player, Piece piece) {

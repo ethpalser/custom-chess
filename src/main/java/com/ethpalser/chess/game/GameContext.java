@@ -74,7 +74,7 @@ public class GameContext {
         this.bThreats = new ThreatMap(space, this.board, this.log);
         for (Coordinate c : this.board.occupied()) {
             Piece p = this.board.get(c);
-            if (p != null && PieceType.KING.getCode().equals(p.getCode())) {
+            if (PieceType.KING.toCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
                     this.wKing = c;
                 } else {

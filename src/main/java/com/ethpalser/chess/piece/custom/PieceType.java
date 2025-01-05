@@ -16,7 +16,7 @@ public enum PieceType {
         this.code = code;
     }
 
-    public String getCode() {
+    public String toCode() {
         return code;
     }
 
