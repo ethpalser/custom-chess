@@ -2,7 +2,6 @@ package com.ethpalser.chess.board.custom;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -24,8 +23,8 @@ class CustomBoardTest {
         int width = 8;
         int height = 8;
         Space space = new Plane(width, height);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board board = new ChessBoard(space, factory);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), space);
+        Board<Coordinate> board = new ChessBoard(space, factory);
 
         assertEquals(8, space.length(Space.AXIS.X));
         assertEquals(8, space.length(Space.AXIS.X));
@@ -47,14 +46,14 @@ class CustomBoardTest {
                 }
 
                 if (vector.getY() == 1 || vector.getY() == 6) {
-                    assertEquals(PieceType.PAWN.getCode(), customPiece.getCode());
+                    assertEquals(PieceType.PAWN.toCode(), customPiece.getCode());
                 } else {
                     switch (vector.getX()) {
-                        case 0, 7 -> assertEquals(PieceType.ROOK.getCode(), customPiece.getCode());
-                        case 1, 6 -> assertEquals(PieceType.KNIGHT.getCode(), customPiece.getCode());
-                        case 2, 5 -> assertEquals(PieceType.BISHOP.getCode(), customPiece.getCode());
-                        case 3 -> assertEquals(PieceType.QUEEN.getCode(), customPiece.getCode());
-                        case 4 -> assertEquals(PieceType.KING.getCode(), customPiece.getCode());
+                        case 0, 7 -> assertEquals(PieceType.ROOK.toCode(), customPiece.getCode());
+                        case 1, 6 -> assertEquals(PieceType.KNIGHT.toCode(), customPiece.getCode());
+                        case 2, 5 -> assertEquals(PieceType.BISHOP.toCode(), customPiece.getCode());
+                        case 3 -> assertEquals(PieceType.QUEEN.toCode(), customPiece.getCode());
+                        case 4 -> assertEquals(PieceType.KING.toCode(), customPiece.getCode());
                         default -> fail("Board size is invalid, or test coordinate is outside board bounds");
                     }
                 }
@@ -67,7 +66,7 @@ class CustomBoardTest {
         int width = 8;
         int height = 8;
         Space space = new Plane(width, height);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), space);
         Board<Coordinate> board = new ChessBoard(space, factory);
         assertEquals(32, board.count());
     }
@@ -77,7 +76,7 @@ class CustomBoardTest {
         int width = 8;
         int height = 8;
         Space space = new Plane(width, height);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
+        PieceFactory factory = new CustomPieceFactory(Map.of(), space);
         Board<Coordinate> board = new ChessBoard(space, factory);
         for (int y : new int[]{1, 6}) {
             for (int x = 0; x < space.length(Space.AXIS.X); x++) {
