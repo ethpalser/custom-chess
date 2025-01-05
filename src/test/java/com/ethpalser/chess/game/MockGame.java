@@ -8,18 +8,17 @@ import java.util.List;
 public class MockGame implements Game {
 
     private final MockNode root;
+    private int turn;
     private MockNode current;
     private final Deque<MockNode> logStack;
     private final Deque<MockNode> undoStack;
 
-    private GameContext context;
-
     public MockGame(MockNode root) {
         this.root = root;
+        this.turn = 1;
         this.current = root;
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
-        this.context = new GameContext(new GameOptions());
     }
 
     @Override
@@ -32,17 +31,18 @@ public class MockGame implements Game {
                 return GameStatus.ONGOING;
             }
         }
+        this.turn++;
         return GameStatus.ONGOING;
     }
 
     @Override
     public GameStatus getStatus() {
-        return GameStatus.ONGOING;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getTurn() {
-        return 1;
+        return this.turn;
     }
 
     @Override
@@ -56,8 +56,10 @@ public class MockGame implements Game {
                 this.undoStack.push(this.current);
             }
             this.current = prev;
+            this.turn--;
         } else {
             this.current = this.root;
+            this.turn = 1;
         }
         return GameStatus.ONGOING;
     }
@@ -71,8 +73,10 @@ public class MockGame implements Game {
         if (next != null) {
             this.logStack.push(next);
             this.current = next;
+            this.turn++;
         } else {
             this.current = this.root;
+            this.turn = 1;
         }
         return GameStatus.ONGOING;
     }
@@ -92,15 +96,11 @@ public class MockGame implements Game {
 
     @Override
     public GameSaveData createSaveData() {
-        return new GameSaveData(null, null, null);
-    }
-
-    public String toJson() {
-        return "";
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public GameInfo info() {
-        return new GameInfo(this.getTurn(), this.evaluateState(), this.getStatus(), this.context);
+        throw new UnsupportedOperationException();
     }
 }
