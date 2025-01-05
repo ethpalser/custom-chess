@@ -1,11 +1,6 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Space;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -24,13 +19,13 @@ public class MockGame implements Game {
         this.current = root;
         this.logStack = new ArrayDeque<>();
         this.undoStack = new ArrayDeque<>();
-        this.context = new GameContext(new GameOptions(), new ChessBoard(), new ChessLog());
+        this.context = new GameContext(new GameOptions());
     }
 
     @Override
     public GameStatus updateGame(Action action) {
         for (MockNode node : current.getNext()) {
-            int val = action.getEnd().getX();
+            int val = action.getEnd().getValue(Space.AXIS.X);
             if (node.getValue() == val) {
                 this.logStack.push(this.current);
                 this.current = node;
@@ -93,6 +88,11 @@ public class MockGame implements Game {
     @Override
     public int evaluateState() {
         return this.current.getValue();
+    }
+
+    @Override
+    public GameSaveData createSaveData() {
+        return new GameSaveData(null, null, null);
     }
 
     public String toJson() {
