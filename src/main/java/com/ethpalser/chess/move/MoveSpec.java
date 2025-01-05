@@ -133,42 +133,57 @@ public class MoveSpec {
         Board<Coordinate> board = context.getBoard();
         ThreatMap threatMap = context.getThreats(Colour.opposite(colour));
         List<Coordinate> moveCoords = new LinkedList<>();
+        List<Coordinate> threatCoords = new LinkedList<>();
+        boolean kingEncountered = false;
         // Add coordinates that can be moved to, and additional information on the result to help with other move checks
         for (Coordinate p : this.pathBase) {
             Coordinate next = this.getVectorInQuadrant(p, offset, isRight, isUp);
             // Out of bounds
             if (board.rejects(next)) {
                 return new MoveReport(this.createMove(moveCoords), MoveReport.Status.OUT_OF_BOUNDS,
-                        next, this.isAttack, null);
+                        next, this.isAttack, threatCoords);
             }
             // Kings cannot move to threatened spaces
             boolean isSafe = threatMap != null && threatMap.hasNoThreats(next);
             if (Pieces.isKing(board.get(offset)) && !isSafe) {
                 return new MoveReport(this.createMove(moveCoords), MoveReport.Status.FAILED_CONDITIONS,
-                        next, this.isAttack, null);
+                        next, this.isAttack, threatCoords);
             }
 
             Piece nPiece = board.get(next);
             if (nPiece == null) {
                 if (!this.isMove) {
                     return new MoveReport(this.createMove(moveCoords), MoveReport.Status.END_OF_PATH,
-                            next, this.isAttack, null);
+                            next, this.isAttack, threatCoords);
                 }
-                moveCoords.add(next);
+                // Update moves or threats
+                if (kingEncountered) {
+                    threatCoords.add(next);
+                } else {
+                    moveCoords.add(next);
+                }
             } else {
                 if (!this.isAttack) {
                     return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_OBSTACLE,
-                            next, false, null);
+                            next, false, threatCoords);
                 }
                 if (Pieces.isAllied(colour, nPiece)) {
                     return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_ALLY,
-                            next, true, null);
+                            next, true, threatCoords);
                 }
-                // This is the final point of the path, which the piece can "defend" or capture
-                moveCoords.add(next);
-                Coordinate king = Pieces.isKing(nPiece) ? next : null;
-                return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_OPPONENT,
-                        next, true, king);
+                // Update moves or threats
+                if (kingEncountered) {
+                    threatCoords.add(next);
+                } else {
+                    moveCoords.add(next);
+                }
+                if (!Pieces.isKing(nPiece)) {
+                    // This is the final point of the path, which the piece can "defend" or capture
+                    return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_OPPONENT,
+                            next, true, threatCoords);
+                }
+                // The king is ignored when gathering attacks, but this point is considered when build moves
+                kingEncountered = true;
             }
         }
         return new MoveReport(this.createMove(moveCoords), MoveReport.Status.END_OF_PATH,

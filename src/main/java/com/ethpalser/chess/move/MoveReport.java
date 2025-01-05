@@ -1,8 +1,9 @@
 package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.space.Coordinate;
+import java.util.List;
 
-public record MoveReport(Move move, Status status, Coordinate lastChecked, boolean isAttack, Coordinate threatenKingAt) {
+public record MoveReport(Move move, Status status, Coordinate lastChecked, boolean isAttack, List<Coordinate> threatsSinceKing) {
 
     public MoveReport {
         if (move == null || status == null) {
