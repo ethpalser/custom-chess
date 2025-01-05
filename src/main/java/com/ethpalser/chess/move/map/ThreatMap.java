@@ -42,6 +42,9 @@ public class ThreatMap {
                 for (Coordinate threatened : set.attacks()) {
                     piecesThreateningPoint.computeIfAbsent(threatened, k -> new HashSet<>()).add(piece.getCoordinate());
                 }
+                for (Coordinate defended : set.defends()) {
+                    piecesThreateningPoint.computeIfAbsent(defended, k -> new HashSet<>()).add(piece.getCoordinate());
+                }
             }
         }
         this.colour = colour;
@@ -62,6 +65,9 @@ public class ThreatMap {
         for (Coordinate threatened : moveSet.attacks()) {
             this.addThreat(attacker, threatened);
         }
+        for (Coordinate defended : moveSet.defends()) {
+            this.addThreat(attacker, defended);
+        }
     }
 
     public Set<Coordinate> getThreats(Coordinate point) {
@@ -76,8 +82,8 @@ public class ThreatMap {
     }
 
     public void removeThreats(Coordinate attacker) {
-        for (Coordinate p : this.map.keySet()) {
-            this.removeThreats(attacker, p);
+        for (Coordinate threatened : this.map.keySet()) {
+            this.removeThreats(attacker, threatened);
         }
     }
 
