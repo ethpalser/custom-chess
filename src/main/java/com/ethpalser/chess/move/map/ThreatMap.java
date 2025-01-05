@@ -4,6 +4,7 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
@@ -15,17 +16,20 @@ import java.util.Set;
 
 public class ThreatMap {
 
+    private final Colour colour;
     private final Map<Coordinate, Set<Coordinate>> map;
     private final int width;
     private final int length;
 
     public ThreatMap(ThreatMap original) {
+        this.colour = original.colour;
         this.map = new HashMap<>(original.map);
         this.width = original.width;
         this.length = original.length;
     }
 
-    public ThreatMap(Space space, Board<Coordinate> board, Log<Coordinate, Piece> log) {
+    public ThreatMap(Colour colour, Space space, Board<Coordinate> board,
+            Log<Coordinate, Piece> log) {
         if (space == null || board == null || log == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
@@ -33,11 +37,14 @@ public class ThreatMap {
         // Create a snapshot of the GameContext without any threats, so this must be refreshed after for pieces affected
         GameContext.Record ctxRecord = new GameContext.Record(board, log, null, null);
         for (Piece piece : board) {
-            MoveSet set = piece.getMoves(ctxRecord);
-            for (Coordinate threatened : set.attacks()) {
-                piecesThreateningPoint.computeIfAbsent(threatened, k -> new HashSet<>()).add(piece.getCoordinate());
+            if (colour.equals(piece.getColour())) {
+                MoveSet set = piece.getMoves(ctxRecord);
+                for (Coordinate threatened : set.attacks()) {
+                    piecesThreateningPoint.computeIfAbsent(threatened, k -> new HashSet<>()).add(piece.getCoordinate());
+                }
             }
         }
+        this.colour = colour;
         this.map = piecesThreateningPoint;
         this.width = space.length(1);
         this.length = space.length(2);
