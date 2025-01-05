@@ -68,6 +68,16 @@ public class Path implements Iterable<Coordinate> {
         if (space == null || start == null || shiftVector == null) {
             throw new IllegalArgumentException("one ore more arguments are null");
         }
+        boolean hasNonZero = false;
+        for (int i = 0; i < shiftVector.length && !hasNonZero; i++) {
+            if (shiftVector[i] != 0) {
+                hasNonZero = true;
+            }
+        }
+        if (!hasNonZero) {
+            throw new IllegalArgumentException("shift vector cannot have all zeroes");
+        }
+
         List<Coordinate> list = new LinkedList<>();
         Coordinate pos = start;
         while (!space.isOutOfBounds(pos)) {
