@@ -45,7 +45,7 @@ public class ChessGame implements Game {
             this.state = new ReadyState(this.context);
         } else {
             this.context = new GameContext(options, saveData.pieceNotations(), saveData.logNotations());
-            this.turn = saveData.logNotations().length;
+            this.turn = saveData.logNotations() == null ? 1 : saveData.logNotations().length;
             this.status = checkGameStatus();
             GamePrompt prompt = this.context.getPrompt();
             if (GameStatus.isCompletedGameStatus(this.status)) {
