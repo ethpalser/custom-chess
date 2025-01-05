@@ -495,7 +495,7 @@ class ChessGameTest {
         assertNull(updatedBoard.get(bishop));
         assertNotNull(updatedBoard.get(target));
         assertEquals(Colour.WHITE, updatedBoard.get(target).getColour());
-        assertEquals(31, updatedBoard.count()); // One fewer piece from forced removal
+        assertEquals(32, updatedBoard.count()); // One fewer piece from forced removal
     }
 
     @Test
@@ -514,10 +514,12 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, king, target));
         // Then
         Board<Coordinate> updatedBoard = game.info().context().getBoard();
-        assertNull(updatedBoard.get(king));
-        assertNull(updatedBoard.get(new Point("h1"))); // Rook at h1 should be at f1
+        // Did these pieces move?
         assertNotNull(updatedBoard.get(target));
         assertNotNull(updatedBoard.get(target.translate(1, Direction.LEFT))); // Rook at f1 exists
+        // Were these pieces removed from their original location
+        assertNull(updatedBoard.get(king));
+        assertNull(updatedBoard.get(new Point("h1"))); // Rook at h1 should be at f1
     }
 
 
@@ -539,10 +541,12 @@ class ChessGameTest {
         game.updateGame(new Action(Colour.WHITE, king, target));
         // Then
         Board<Coordinate> updatedBoard = game.info().context().getBoard();
-        assertNull(updatedBoard.get(king));
-        assertNull(updatedBoard.get(new Point("a1"))); // Rook at a1 should be at d1
+        // Did these pieces move?
         assertNotNull(updatedBoard.get(target));
         assertNotNull(updatedBoard.get(target.translate(1, Direction.RIGHT))); // Rook at d1 exists
+        // Were these pieces removed from their original location
+        assertNull(updatedBoard.get(king));
+        assertNull(updatedBoard.get(new Point("a1"))); // Rook at a1 should be at d1
     }
 
     @Test
