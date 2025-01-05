@@ -1,25 +1,17 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.PieceFactory;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
+import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.ChessGame;
+import com.ethpalser.chess.game.Game;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.space.Location;
+import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.space.custom.Location;
-import com.ethpalser.chess.space.custom.reference.AbsoluteReference;
-import com.ethpalser.chess.space.custom.reference.LogReference;
-import com.ethpalser.chess.space.custom.reference.PathReference;
-import com.ethpalser.chess.space.custom.reference.PieceReference;
-import java.util.Map;
+import com.ethpalser.chess.space.Reference;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -28,250 +20,201 @@ class ConditionTest {
     @Test
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
-        Log<Coordinate, Piece> log = new ChessLog();
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference(Location.PATH),
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
+
+        Conditional condition = new PropertyCondition(
+                new Reference(Location.LAST_MOVED, Direction.AT),
                 Comparator.EQUAL,
-                PropertyType.TYPE, PieceType.PAWN);
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-
-        // When
-        Point selected = new Point(4, 4);
-        Point destination = new Point(5, 5);
-        Piece black = board.get(selected);
-        board.add(destination, black);
-        log.add(new ChessLogEntry(selected, destination, black, null));
-        boolean result = condition.isExpected(board);
+                PropertyType.TYPE,
+                PieceType.PAWN
+        );
         // Then
-        assertFalse(result);
+        Coordinate enPassantPawn = new Point("d2"); // Not moved
+        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantPawn));
     }
 
     @Test
     void evaluate_enPassantLastMovedIsNotPawn_isFalse() {
         // Given
-        Log<Coordinate, Piece> log = new ChessLog();
-        Conditional<Piece> condition = new LogCondition<>(log, Comparator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
+        Conditional condition = new LogCondition(Comparator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
 
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-
-        // When
-        Point selected = new Point(4, 4);
-        Point destination = new Point(5, 5);
-        Piece black = board.get(selected);
-        board.add(destination, black);
-        log.add(new ChessLogEntry(selected, destination, black, null));
-
-        boolean result = condition.isExpected(board);
         // Then
-        assertFalse(result);
+        Coordinate enPassantPawn = new Point("d2"); // Not moved
+        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantPawn));
     }
 
     @Test
     void evaluate_enPassantLastMovedAdvancedOneSpace_isFalse() {
         // Given
-        // En Passant condition requires moving 2
-        Log<Coordinate, Piece> log = new ChessLog();
-        Conditional<Piece> condition = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Game game = new ChessGame();
+        Coordinate enPassantReady = new Point("d5");
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Only moved one
 
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        Piece customPiece = board.get(new Point(2, 1));
-        board.add(new Point(2, 2), customPiece);
-
-        // When
-        Point selected = new Point(4, 1);
-        Point destination = new Point(5, 2);
-        Piece black = board.get(selected);
-        board.add(destination, black);
-        log.add(new ChessLogEntry(selected, destination, black, null));
-
-        boolean result = condition.isExpected(board);
+        Conditional condition = new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
-        assertFalse(result);
+        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
 
     @Test
     void evaluate_enPassantLastMovedAdvancedTwoSpaces_isTrue() {
         // Given
-        Log<Coordinate, Piece> log = new ChessLog();
-        Conditional<Piece> condition = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Game game = new ChessGame();
+        Coordinate enPassantReady = new Point("d5");
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5"))); // Can get en passant
 
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        Piece customPiece = board.get(new Point(2, 1));
-        board.add(new Point(2, 3), customPiece);
-
-        // When
-        Point selected = new Point(4, 1);
-        Point destination = new Point(4, 3);
-        Piece white = board.get(selected);
-        board.add(destination, white);
-        log.add(new ChessLogEntry(selected, destination, white, null));
-
-        boolean result = condition.isExpected(board);
+        Conditional condition = new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
-        assertTrue(result);
+        assertTrue(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
 
     @Test
     void evaluate_enPassantLastMovedAndAdjacentIsSameColour_isFalse() {
         // Given
-        Log<Coordinate, Piece> log = new ChessLog();
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        Piece customPiece = board.get(new Point(2, 1));
-        board.add(new Point(2, 3), customPiece);
-
-        Conditional<Piece> condition = new LogCondition<>(log, Comparator.NOT_EQUAL, PropertyType.COLOUR,
-                customPiece.getColour());
-
-        // When
-        Point selected = new Point(4, 1);
-        Point destination = new Point(4, 3);
-        Piece white = board.get(selected);
-        board.add(destination, white);
-        log.add(new ChessLogEntry(selected, destination, white, null));
-
-        boolean result = condition.isExpected(board);
+        Game game = new ChessGame();
+        Coordinate enPassantReady = new Point("d5");
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Ignored
+        game.updateGame(new Action(Colour.BLACK, new Point("e2"), new Point("e4"))); // Matches distance moved
+        // Note: Each piece will provide its own colour when setting up this condition, and in this case it is WHITE
+        Conditional condition = new LogCondition(Comparator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
         // Then
-        assertFalse(result);
+        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
 
     @Test
     void evaluate_enPassantLastMovedIsPawnAndMovedTwoAndIsAdjacentAndIsOppositeColour_isTrue() {
         // Given
-        Log<Coordinate, Piece> log = new ChessLog();
+        Game game = new ChessGame();
+        Coordinate enPassantReady = new Point("d5");
+        Coordinate enPassantVictim = new Point("e5");
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), enPassantVictim));
 
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), log, space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        Piece white = board.get(new Point(4, 1));
-        board.add(new Point(4, 4), white);
-
-        Conditional<Piece> conditionA = new PropertyCondition<>(new LogReference<>(log), Comparator.EQUAL,
-                PropertyType.CODE, PieceType.PAWN.getCode());
-        Conditional<Piece> conditionB = new LogCondition<>(log, Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
-        Conditional<Piece> conditionC = new ReferenceCondition<>(new LogReference<>(log), Comparator.EQUAL,
-                new PieceReference(white, Direction.AT, 1, 0)); // Testing en passant to right
+        Conditional condLastMovedIsPawn = new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT),
+                Comparator.EQUAL, PropertyType.CODE, PieceType.PAWN.toCode());
+        Conditional condLastMovedTwo = new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        // Todo: Update LogCondition to verify Colour and Code
+        Conditional condLastMovedNotAllied = new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT),
+                Comparator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
 
         // When
-        Point enPassantTargetStart = new Point(5, 6);
-        Point enPassantTargetEnd = new Point(5, 4);
-        Piece black = board.get(enPassantTargetStart);
-        board.add(enPassantTargetEnd, black);
-        log.add(new ChessLogEntry(enPassantTargetStart, enPassantTargetEnd, black, null));
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        assertTrue(condLastMovedIsPawn.isExpected(ctxRecord, enPassantReady));
+        assertTrue(condLastMovedTwo.isExpected(ctxRecord, enPassantReady));
+        assertTrue(condLastMovedNotAllied.isExpected(ctxRecord, enPassantReady));
+
+        Coordinate enPassantDestination = new Point("e6");
+        game.updateGame(new Action(Colour.WHITE, enPassantReady, enPassantDestination)); // EN PASSANT !!!
 
         // Then
-        assertNotNull(board.get(new Point(4, 4)));
-        assertNotNull(board.get(enPassantTargetEnd));
-        assertNotNull(log.peek().getStartObject());
-        assertEquals(log.peek().getStartObject().getCode(), PieceType.PAWN.getCode());
-
-        assertTrue(conditionA.isExpected(board));
-        assertTrue(conditionB.isExpected(board));
-        assertTrue(conditionC.isExpected(board));
+        GameContext.Record ctxRecordAfter = game.info().context().toRecord();
+        assertNotNull(ctxRecordAfter.getBoard().get(enPassantDestination));
+        assertNull(ctxRecordAfter.getBoard().get(enPassantVictim)); // Piece should be captured by en passant
+        assertNotNull(ctxRecordAfter.getLog().peek().getStartObject());
+        assertEquals(ctxRecordAfter.getLog().peek().getStartObject().getCode(), PieceType.PAWN.toCode());
     }
 
     @Test
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference(Location.PATH),
+        Game game = new ChessGame();
+        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
                 Comparator.EQUAL, PropertyType.TYPE, PieceType.KING);
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
         // Then
-        boolean result = condition.isExpected(board);
-        assertFalse(result);
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        assertFalse(condition.isExpected(ctxRecord, new Point("e2"))); // Pawn is at e2, not a king!
     }
 
     @Test
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference(Location.PATH),
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e3"))); // Opening space for king
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
+        Coordinate kingDestination = new Point("e2");
+        game.updateGame(new Action(Colour.WHITE, new Point("e1"), kingDestination)); // Condition now fails
+
+        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
                 Comparator.FALSE, PropertyType.HAS_MOVED, null);
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        board.add(new Point(4, 1), null);
-        Piece king = board.get(new Point(4, 0));
-        board.add(new Point(4, 1), king);
-
         // Then
-        boolean result = condition.isExpected(board);
-        assertFalse(result);
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        assertFalse(condition.isExpected(ctxRecord, kingDestination));
     }
 
     @Test
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
-        Conditional<Piece> condition = new PropertyCondition<>(new PathReference(Location.POINT, new Point(0, 0)),
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a3"))); // Opening space for rook
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
+        Coordinate queenSideRook = new Point("a1");
+        Coordinate rookDestination = new Point("a2");
+        game.updateGame(new Action(Colour.WHITE, queenSideRook, rookDestination)); // Condition now fails
+        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, rookDestination, queenSideRook)); // Reposition back to a1
+        // This uses an absolute reference, so only the provided coordinate is used
+        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT, queenSideRook),
                 Comparator.FALSE, PropertyType.HAS_MOVED, false);
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        Piece rook = board.get(new Point(0, 0));
-        // Forcing an illegal move, so it is marked as having moved
-        board.add(new Point(0, 2), rook);
-        board.get(new Point(0, 2)).setHasMoved(true);
-        board.add(new Point(0, 0), rook);
-        board.get(new Point(0, 0)).setHasMoved(true);
-
         // Then
-        boolean result = condition.isExpected(board);
-        assertFalse(result);
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        assertFalse(condition.isExpected(ctxRecord, new Point("e1"))); // This is the king's condition
     }
 
     @Test
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
-        Conditional<Piece> condition = new ReferenceCondition<>(new PathReference(Location.POINT, new Point(1, 0)),
+        Game game = new ChessGame();
+        Conditional condition = new ReferenceCondition(new Reference(Location.POINT, Direction.AT, new Point("b1")),
                 Comparator.EQUAL, null);
-
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-
         // Then
-        boolean result = condition.isExpected(board);
-        assertFalse(result);
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        assertFalse(condition.isExpected(ctxRecord, new Point("e1"))); // This is the king's condition
     }
 
     @Test
     void evaluate_castleAtStartAndAtCoordinateA0NotMovedAndPathToCoordinateA0Empty_isTrue() {
         // Given
-        Space space = new Plane(8, 8);
-        PieceFactory factory = new CustomPieceFactory(Map.of(), new ChessLog(), space);
-        Board<Coordinate> board = new ChessBoard(space, factory);
-        board.add(new Point(1, 0), null);
-        board.add(new Point(2, 0), null);
-        board.add(new Point(3, 0), null);
+        Game game = new ChessGame();
+        // Simulate all moves to setup a queen-side castle
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
+        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
+        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
 
-        Conditional<Piece> conditionA = new PropertyCondition<>(new PieceReference(board.get(new Point(4, 0))),
-                Comparator.FALSE, PropertyType.HAS_MOVED, false);
-        Conditional<Piece> conditionB = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
-                Comparator.FALSE, PropertyType.HAS_MOVED, false);
-        Conditional<Piece> conditionC = new PropertyCondition<>(new AbsoluteReference<>(new Point(0, 0)),
-                Comparator.EQUAL, PropertyType.CODE, PieceType.ROOK.getCode());
-        Conditional<Piece> conditionD = new ReferenceCondition<>(new PathReference(Location.PATH,
-                new Point(3, 0), new Point(2, 0)), Comparator.EQUAL, null);
+        Conditional conditionA = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
+                Comparator.FALSE, PropertyType.HAS_MOVED, null);
+        Conditional conditionB = new PropertyCondition(new Reference(Location.POINT, Direction.AT, new Point("a1")),
+                Comparator.FALSE, PropertyType.HAS_MOVED, null);
+        Conditional conditionC = new PropertyCondition(new Reference(Location.POINT, Direction.AT, new Point("a1")),
+                Comparator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
+        Conditional conditionD = new ReferenceCondition(
+                new Reference(Location.PATH, Direction.AT, new Path(new Point("b1"), new Point("c1"))),
+                Comparator.EQUAL, null);
 
         // Then
-        assertTrue(conditionA.isExpected(board));
-        assertTrue(conditionB.isExpected(board));
-        assertTrue(conditionC.isExpected(board));
-        assertTrue(conditionD.isExpected(board));
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        Coordinate king = new Point("e1");
+        // These are all the king's conditions. It provides its own point wherever this is checked
+        assertTrue(conditionA.isExpected(ctxRecord, king));
+        assertTrue(conditionB.isExpected(ctxRecord, king));
+        assertTrue(conditionC.isExpected(ctxRecord, king));
+        assertTrue(conditionD.isExpected(ctxRecord, king));
     }
 
 
