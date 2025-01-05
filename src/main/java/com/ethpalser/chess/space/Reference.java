@@ -2,6 +2,8 @@ package com.ethpalser.chess.space;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.view.ReferenceView;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,19 +74,24 @@ public class Reference {
             throw new IllegalArgumentException("null context");
         }
         if (this.fixedCoordinates == null && relativeCoordinate == null) {
-            throw new IllegalArgumentException("null relative coordinate and reference does not use fixed coordinates");
+            throw new IllegalArgumentException("both fixed and relative coordinates are null, one should not be null");
         }
 
         int[] directionVector = this.direction.vector();
         List<Coordinate> coordinates;
         switch (this.location) {
-            case LAST_MOVED -> coordinates = List.of(context.getLog().peek().getEnd());
+            case LAST_MOVED -> {
+                Log<Coordinate, Piece> log = context.getLog();
+                if (log != null && log.peek() != null) {
+                    return List.of(context.getLog().peek().getEnd());
+                }
+                return List.of();
+            }
             case POINT -> {
                 // Only one coordinate is expected in this case, and all others are ignored
                 if (this.fixedCoordinates != null && this.fixedCoordinates.length > 0) {
                     coordinates = List.of(this.fixedCoordinates[0]);
                 } else if (relativeCoordinate != null) {
-                    // Todo: apply direction vector to all coordinates
                     coordinates = List.of(relativeCoordinate);
                 } else {
                     coordinates = List.of();
@@ -105,7 +112,7 @@ public class Reference {
                         Coordinate c = relativeCoordinate.translate(1, directionVector);
                         while (!board.rejects(c)) {
                             temp.add(c);
-                            c.translate(this.distance, directionVector);
+                            c.translate(1, directionVector);
                         }
                         coordinates = temp;
                     }
@@ -113,7 +120,7 @@ public class Reference {
             }
             default -> coordinates = List.of();
         }
-        return coordinates;
+        return coordinates.stream().map(c -> c.translate(this.distance, this.direction)).toList();
     }
 
     @Override
