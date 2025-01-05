@@ -44,14 +44,17 @@ public class Path implements Iterable<Coordinate> {
                 int y = start.getValue(Space.AXIS.Y);
                 int diffX = end.getValue(Space.AXIS.X) - x;
                 int diffY = end.getValue(Space.AXIS.Y) - y;
+                int dirX = diffX != 0 ? diffX / Math.abs(diffX) : 0;
+                int dirY = diffY != 0 ? diffY / Math.abs(diffY) : 0;
 
                 list = new LinkedList<>();
                 Coordinate point = new Point(x, y);
                 // Build the path along the line until an edge is exceeded
                 do {
                     list.add(point);
-                    point.translate(1, diffX, diffY);
-                } while ((x != end.getValue(Space.AXIS.X) || y != end.getValue(Space.AXIS.Y)));
+                    point = point.translate(1, dirX, dirY);
+                } while (point.getValue(Space.AXIS.X) != end.getValue(Space.AXIS.X)
+                        || point.getValue(Space.AXIS.Y) != end.getValue(Space.AXIS.Y));
                 // Loop only continues until the end point is reached, so this is added after
                 list.add(end);
             }
