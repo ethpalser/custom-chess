@@ -28,7 +28,7 @@ class PathTest {
         Point point2 = new Point(0, 1);
         Path path = new Path(point1, point2);
 
-        Set<Point> set = path.toSet();
+        Set<Coordinate> set = path.toSet();
         Assertions.assertFalse(set.isEmpty());
         Assertions.assertTrue(set.contains(point1));
         Assertions.assertTrue(set.contains(point2));
@@ -40,7 +40,7 @@ class PathTest {
         Point point2 = new Point(7, 0);
         Path path = new Path(point1, point2);
 
-        Set<Point> set = path.toSet();
+        Set<Coordinate> set = path.toSet();
         Assertions.assertFalse(set.isEmpty());
         Assertions.assertTrue(set.contains(point1));
         Assertions.assertTrue(set.contains(point2));
@@ -53,7 +53,7 @@ class PathTest {
         Point point2 = new Point(0, 7);
         Path path = new Path(point1, point2);
 
-        Set<Point> set = path.toSet();
+        Set<Coordinate> set = path.toSet();
         Assertions.assertFalse(set.isEmpty());
         Assertions.assertTrue(set.contains(point1));
         Assertions.assertTrue(set.contains(point2));
@@ -66,7 +66,7 @@ class PathTest {
         Point point2 = new Point(7, 7);
         Path path = new Path(point1, point2);
 
-        Set<Point> set = path.toSet();
+        Set<Coordinate> set = path.toSet();
         Assertions.assertFalse(set.isEmpty());
         Assertions.assertTrue(set.contains(point1));
         Assertions.assertTrue(set.contains(point2));
@@ -79,7 +79,7 @@ class PathTest {
         Point point2 = new Point(1, 3);
         Path path = new Path(point1, point2);
 
-        Set<Point> set = path.toSet();
+        Set<Coordinate> set = path.toSet();
         Assertions.assertFalse(set.isEmpty());
         Assertions.assertTrue(set.contains(point1));
         Assertions.assertTrue(set.contains(point2));
