@@ -8,6 +8,7 @@ import com.ethpalser.chess.log.ChessLogEntry;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -49,21 +50,23 @@ public class MoveEvent implements GameEvent {
         if (context == null) {
             throw new IllegalArgumentException();
         }
-        GameContext.Record contextRecord = context.toRecord(); // Copies information
-        if (contextRecord.getBoard().rejects(this.source) || contextRecord.getBoard().rejects(this.target)) {
-            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
-        }
-        if (contextRecord.getBoard().get(this.source) == null) {
-            throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
-        }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
+        GameContext.Record contextRecord = context.toRecord();
         Board<Coordinate> board = contextRecord.getBoard();
         Log<Coordinate, Piece> log = contextRecord.getLog();
+
+        if (board.rejects(this.source) || board.rejects(this.target)) {
+            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
+        }
+        if (board.get(this.source) == null) {
+            throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
+        }
 
         Piece piece = board.get(this.source);
         // The turn player should always match the acting piece, and this piece should always be from the first change
         Colour turnPlayer = piece.getColour();
-        Move move = piece.getMoves(contextRecord).getMove(this.target);
+        MoveSet moveSet = piece.getMoves(contextRecord);
+        Move move = moveSet.getMove(this.target);
         if (!piece.canMove(this.target, contextRecord)) {
             throw new IllegalActionException("piece (" + piece + ") cannot move to " + target);
         }
@@ -73,9 +76,12 @@ public class MoveEvent implements GameEvent {
         LogEntry<Coordinate, Piece> followUpLog;
         if (followUp != null) {
             Path followUpPath = followUp.path();
-            followUpLog = new ChessLogEntry((Point) followUpPath.getPoint(0),
-                    (Point) followUpPath.getPoint(followUpPath.length() - 1),
-                    board.get(followUpPath.getPoint(followUpPath.length() - 1)));
+            // When the path is null, remove the piece at the
+            Coordinate logStart = followUp.reference().coordinates(contextRecord, piece.getCoordinate()).get(0);
+            Coordinate logEnd = followUpPath == null ? null : followUpPath.getPoint(followUpPath.length() - 1);
+            Piece logEndPiece = log == null ? null : board.get(logEnd);
+
+            followUpLog = new ChessLogEntry((Point) logStart, (Point) logEnd, logEndPiece);
         } else {
             followUpLog = null;
         }
@@ -85,8 +91,8 @@ public class MoveEvent implements GameEvent {
         // Update the board reference with all movements, which should not modify the context yet
         board.remove(this.target);
         board.remove(this.source);
+        piece.move(this.target); // Apparently this change is not being retained by updated context
         board.add(this.target, piece);
-        piece.move(this.target);
 
         if (followUpLog != null) {
             Piece toForcePush = followUpLog.getStartObject();
