@@ -187,7 +187,14 @@ public class MoveSpec {
     }
 
     private Move createMove(List<Coordinate> coordinates) {
-        return new Move(new Path(coordinates), new Move.FollowUp(this.followUpReference, this.followUpPath));
+        Move.FollowUp followUp;
+        if (this.followUpReference == null) {
+            followUp = null;
+        } else {
+            // A null path may mean that the reference should be removed. The reference should always exist
+            followUp = new Move.FollowUp(this.followUpReference, this.followUpPath);
+        }
+        return new Move(new Path(coordinates), followUp);
     }
 
     /**
