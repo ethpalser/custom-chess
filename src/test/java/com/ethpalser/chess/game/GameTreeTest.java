@@ -2,6 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.game.logic.GameTree;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Space;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class GameTreeTest {
 
         // Children from root are -5, 5 and 15 so 15 should be chosen
         assertNotNull(result);
-        assertEquals(15, result.getEnd().getX());
+        assertEquals(15, result.getEnd().getValue(Space.AXIS.X));
     }
 
 
@@ -68,7 +69,7 @@ class GameTreeTest {
 
         // Children from root are -5, 5 and 15 so 15 should be chosen
         assertNotNull(result);
-        assertEquals(-5, result.getEnd().getX());
+        assertEquals(-5, result.getEnd().getValue(Space.AXIS.X));
     }
 
     @Test
@@ -82,7 +83,7 @@ class GameTreeTest {
 
         assertNotNull(result);
         // Expected value was manually determined
-        assertEquals(5, result.getEnd().getX());
+        assertEquals(5, result.getEnd().getValue(Space.AXIS.X));
     }
 
     @Test
