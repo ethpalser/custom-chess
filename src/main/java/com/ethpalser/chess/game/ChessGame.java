@@ -1,14 +1,14 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.event.MoveEvent;
 import com.ethpalser.chess.game.logic.Heuristics;
+import com.ethpalser.chess.game.state.AwaitState;
 import com.ethpalser.chess.game.state.EndState;
+import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.game.state.GameState;
 import com.ethpalser.chess.game.state.ReadyState;
-import com.ethpalser.chess.log.ChessLog;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
@@ -16,17 +16,9 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.Pieces;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.view.GameView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,34 +31,31 @@ public class ChessGame implements Game {
     private GameStatus status; // Describes the most recent result
 
     public ChessGame() {
-        this.context = new GameContext(new GameOptions());
-        this.turn = 1;
-        this.state = new ReadyState(this.context);
-        this.status = GameStatus.ONGOING;
+        this(new GameOptions(), null);
     }
 
-    public ChessGame(GameOptions options) {
-        this.context = new GameContext(options);
-        this.turn = 1;
-        this.state = new ReadyState(this.context);
-        this.status = GameStatus.ONGOING;
-    }
-
-    // Use default options
-    @Deprecated
-    public ChessGame(Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        if (board == null || log == null) {
-            throw new NullPointerException("arguments cannot be null");
+    public ChessGame(GameOptions options, GameSaveData saveData) {
+        if (options == null) {
+            throw new IllegalArgumentException("game options cannot be null");
         }
-        this.context = new GameContext(new GameOptions(), board, log);
-        GameStatus statusCheck = checkGameStatus();
-        if (GameStatus.isCompletedGameStatus(statusCheck)) {
-            this.state = new EndState(this.context);
-        } else {
+        if (saveData == null) {
+            this.context = new GameContext(options);
+            this.turn = 1;
+            this.status = GameStatus.ONGOING;
             this.state = new ReadyState(this.context);
+        } else {
+            this.context = new GameContext(options, saveData.pieceNotations(), saveData.logNotations());
+            this.turn = saveData.logNotations().length;
+            this.status = checkGameStatus();
+            GamePrompt prompt = this.context.getPrompt();
+            if (GameStatus.isCompletedGameStatus(this.status)) {
+                this.state = new EndState(this.context);
+            } else if (prompt != null) {
+                this.state = new AwaitState(this.context, prompt.eventType(), prompt.choices());
+            } else {
+                this.state = new ReadyState(this.context);
+            }
         }
-        this.status = statusCheck;
-        this.turn = log.size() + 1;
     }
 
     @Override
@@ -215,12 +204,12 @@ public class ChessGame implements Game {
                         Path path = m.path();
                         if (path != null && path.length() > 0) {
                             // The last point in a path is a potential capture
-                            potentialCaptures.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
-                                    (Point) path.getPoint(path.length() - 1)));
+                            potentialCaptures.add(new Action(piece.getColour(), piece.getCoordinate(),
+                                    path.getPoint(path.length() - 1)));
                             // Remaining points are quiet actions (no captures)
                             for (int i = 0; i < path.length() - 1; i++) {
-                                quietActions.add(new Action(piece.getColour(), (Point) piece.getCoordinate(),
-                                        (Point) path.getPoint(i)));
+                                quietActions.add(new Action(piece.getColour(), piece.getCoordinate(),
+                                        path.getPoint(i)));
                             }
                         }
                     }
@@ -247,6 +236,24 @@ public class ChessGame implements Game {
         }
         return whiteSum + Heuristics.pawnValue(ctxRecord, Colour.WHITE) -
                 (blackSum + Heuristics.pawnValue(ctxRecord, Colour.BLACK));
+    }
+
+    @Override
+    public GameSaveData createSaveData() {
+        Board<Coordinate> board = this.context.getBoard();
+        String[] pieces = new String[board.count()];
+        int i = 0;
+        for (Piece piece : board) {
+            pieces[i] = Pieces.asString(piece);
+            i++;
+        }
+
+        Log<Coordinate, Piece> log = this.context.getLog();
+        String[] notations = new String[log.size()];
+        // Todo: Use newer log with chess notation
+
+        GamePrompt prompt = this.context.getPrompt();
+        return new GameSaveData(pieces, notations, prompt);
     }
 
     // PRIVATE METHODS
@@ -362,7 +369,7 @@ public class ChessGame implements Game {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
                 if (ctxRecord.getThreats(this.currentPlayer()).hasNoThreats(p)) {
                     // Yes, so the king is not in checkmate
-                    actions.add(new Action(playerInCheck, (Point) inCheckKing, (Point) p));
+                    actions.add(new Action(playerInCheck, inCheckKing, p));
                 }
             }
         }
@@ -378,7 +385,7 @@ public class ChessGame implements Game {
             // Can this piece be captured by the opponent?
             Set<Coordinate> defenders = ctxRecord.getThreats(playerInCheck).getThreats(attacker);
             for (Coordinate defender : defenders) {
-                actions.add(new Action(playerInCheck, (Point) defender, (Point) attacker));
+                actions.add(new Action(playerInCheck, defender, attacker));
             }
             // Can a piece block its path?
             Piece attackerPiece = ctxRecord.getBoard().get(attacker);
@@ -389,7 +396,7 @@ public class ChessGame implements Game {
             MoveMap moveMap = new MoveMap(playerInCheck, this.context.toRecord());
             for (Coordinate pathCoordinate : moveCausingCheck.path()) {
                 for (Piece blocker : moveMap.getPieces(pathCoordinate)) {
-                    actions.add(new Action(playerInCheck, (Point) blocker.getCoordinate(), (Point) pathCoordinate));
+                    actions.add(new Action(playerInCheck, blocker.getCoordinate(), pathCoordinate));
                 }
             }
         }

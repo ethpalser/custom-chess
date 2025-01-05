@@ -26,4 +26,6 @@ public interface Game {
 
     int evaluateState();
 
+    GameSaveData createSaveData();
+
 }

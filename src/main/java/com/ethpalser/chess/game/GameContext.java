@@ -13,7 +13,6 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
@@ -21,6 +20,7 @@ import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;
 import com.ethpalser.chess.util.Pair;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,40 +36,26 @@ public class GameContext {
     private GamePrompt prompt; // Nullable
 
     public GameContext() {
-        Space space = new Plane(8, 8);
-        this.board = new ChessBoard(space, new StandardPieceFactory());
-        this.log = new ChessLog();
-        this.wThreats = new ThreatMap(space, board, log);
-        this.bThreats = new ThreatMap(space, board, log);
-        this.wKing = new Point("e1");
-        this.bKing = new Point("e8");
-        this.prompt = null;
+        this(new GameOptions(), null, null);
     }
 
-    public GameContext(GameOptions config) {
-        this.log = new ChessLog();
-        Space space = new Plane(config.width(), config.length(), config.unavailable());
-        this.board = new ChessBoard(space, new CustomPieceFactory(config.pieceSpecs(), space));
-        this.wThreats = new ThreatMap(space, this.board, this.log);
-        this.bThreats = new ThreatMap(space, this.board, this.log);
-        for (Coordinate c : this.board.occupied()) {
-            Piece p = this.board.get(c);
-            if (PieceType.KING.getCode().equals(p.getCode())) {
-                if (Colour.WHITE.equals(p.getColour())) {
-                    this.wKing = c;
-                } else {
-                    this.bKing = c;
-                }
-            }
+    public GameContext(GameOptions options) {
+        this(options, null, null);
+    }
+
+    public GameContext(GameOptions options, String[] pieceNotations, String[] logNotations) {
+        if (logNotations == null) {
+            this.log = new ChessLog();
+        } else {
+            this.log = new ChessLog(); // Todo: replace with new log that uses chess notation
         }
-    }
-
-    public GameContext(GameOptions config, Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        // This will eventually need to check each piece id maps correctly to piece starts for "has moved" checks
-        this.log = log;
-        this.board = board;
-
-        Space space = board.space();
+        Space space = new Plane(options.width(), options.length(), options.unavailable());
+        if (pieceNotations == null) {
+            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs(), space));
+        } else {
+            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs(), space),
+                    Arrays.asList(pieceNotations));
+        }
         this.wThreats = new ThreatMap(space, this.board, this.log);
         this.bThreats = new ThreatMap(space, this.board, this.log);
         for (Coordinate c : this.board.occupied()) {
@@ -83,6 +69,7 @@ public class GameContext {
             }
         }
     }
+
 
     public Board<Coordinate> getBoard() {
         return new ChessBoard((ChessBoard) this.board);
