@@ -11,7 +11,7 @@ public class Path implements Iterable<Coordinate> {
 
     private final List<Coordinate> pointList;
 
-    public Path(Point end) {
+    public Path(Coordinate end) {
         this.pointList = new LinkedList<>();
         if (end != null) {
             this.pointList.add(end);
