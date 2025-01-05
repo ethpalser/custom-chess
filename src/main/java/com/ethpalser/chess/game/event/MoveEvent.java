@@ -79,9 +79,9 @@ public class MoveEvent implements GameEvent {
             // When the path is null, remove the piece at the
             Coordinate logStart = followUp.reference().coordinates(contextRecord, piece.getCoordinate()).get(0);
             Coordinate logEnd = followUpPath == null ? null : followUpPath.getPoint(followUpPath.length() - 1);
-            Piece logEndPiece = log == null ? null : board.get(logEnd);
+            Piece logStartPiece = board.get(logStart);
 
-            followUpLog = new ChessLogEntry((Point) logStart, (Point) logEnd, logEndPiece);
+            followUpLog = new ChessLogEntry((Point) logStart, (Point) logEnd, logStartPiece);
         } else {
             followUpLog = null;
         }
