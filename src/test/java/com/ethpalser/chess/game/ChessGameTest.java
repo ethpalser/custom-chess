@@ -446,7 +446,7 @@ class ChessGameTest {
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d3"))); // Bishop can move to e3
         game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("e3"))); // Bishop ready to capture a7
+        game.updateGame(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Bishop ready to capture a7
         game.updateGame(new Action(Colour.BLACK, new Point("f6"), new Point("f5"))); // filler
         // When
         Point bishop = new Point("e3"); // White Bishop
