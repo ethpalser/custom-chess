@@ -1,0 +1,122 @@
+package com.ethpalser.chess.space.reference;
+
+import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.ChessGame;
+import com.ethpalser.chess.game.Game;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.space.Location;
+import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Reference;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+class RelativeReferenceTest {
+    @Test
+    void pieceRef_getReferences_givenAtLocationAndNotMoved_thenIsItself() {
+        // Given
+        Point pawn = new Point("e2");
+        Reference pieceRef = new Reference(Location.POINT, Direction.AT);
+        // Then
+        GameContext context = new GameContext();
+        List<Coordinate> coordinates = pieceRef.coordinates(context.toRecord(), pawn);
+
+        assertFalse(coordinates.isEmpty());
+        assertTrue(coordinates.contains(pawn));
+        assertNotNull(context.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void pieceRef_getReferences_givenAtLocationAndMoved_thenIsItself() {
+        // Given
+        Point pawn = new Point("e2");
+        Point target = new Point("e4"); // Mimic moving pawn to target
+        Reference pieceRef = new Reference(Location.POINT, Direction.AT);
+        // When
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, pawn, target));
+        // Then
+        // Note: ref.coordinates used by a piece would provide its own coordinate, which moved from "point" to "target"
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, target);
+
+        assertFalse(coordinates.isEmpty());
+        assertTrue(coordinates.contains(target));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void pieceRef_getReferences_givenBackOfLocationAndMovedUpOne_thenIsEmpty() {
+        // Given
+        Point pawn = new Point("e2");
+        Reference pieceRef = new Reference(Location.POINT, Direction.BACK);
+        // When
+        Game game = new ChessGame();
+        Coordinate destination = new Point("e3");
+        game.updateGame(new Action(Colour.WHITE, pawn, destination));
+        // Then
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, destination);
+
+        assertFalse(coordinates.isEmpty());
+        assertTrue(coordinates.contains(destination.translate(1, Direction.BACK)));
+        assertNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void pieceRef_getReferences_givenRightOfLocationAndPawnToRight_thenIsPawn() {
+        // Given
+        Point pawnE = new Point("e2");
+        Point pawnF = new Point("f2");
+        Reference pieceRef = new Reference(Location.POINT, Direction.RIGHT);
+        // When
+        Game game = new ChessGame();
+        game.updateGame(new Action(Colour.WHITE, pawnE, pawnE.translate(1, Direction.NORTH)));
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Filler
+        game.updateGame(new Action(Colour.WHITE, pawnF, pawnF.translate(1, Direction.NORTH)));
+        // Then
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        Coordinate piece = pawnE.translate(1, Direction.NORTH);
+        List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, piece);
+
+        assertFalse(coordinates.isEmpty());
+        assertTrue(coordinates.contains(pawnF.translate(1, Direction.NORTH)));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+        // Note: References previously tracked context information, including pieces, which were sensitive to changes.
+        // Now, references only involve coordinates and determine what coordinates are desired by its specification.
+        // As a result, references are not affected by moving a piece. A piece will provide its location.
+    }
+
+    @Test
+    void pieceRef_getReferences_givenLeftFourOfKingAtStart_thenIsRook() {
+        // Given
+        Point king = new Point("e1");
+        Point rook = new Point("a1");
+        Reference pieceRef = new Reference(Location.POINT, Direction.LEFT, 4);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, king);
+
+        assertFalse(coordinates.isEmpty());
+        assertTrue(coordinates.contains(rook));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void pieceRef_getReferences_givenOutOfBounds_thenIsEmpty() {
+        // Given
+        Point king = new Point("e1");
+        Reference pieceRef = new Reference(Location.POINT, Direction.BACK, 2);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, king);
+
+        assertFalse(coordinates.isEmpty());
+        assertNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+}
