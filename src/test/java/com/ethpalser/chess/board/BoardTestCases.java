@@ -32,7 +32,7 @@ public class BoardTestCases {
     // endregion
     // region Checkmate
     // Move QD1->D7
-    public static String[] checkmatePieceCannotCapture = new String[]{"wQd1", "wKe1*", "bKd8", "wQe7", "wRh7"};
+    public static String[] checkmatePieceCannotCapture = new String[]{"wQd1", "wKe1*", "bKd8", "bRd7", "wRh7"};
     // Move QD1->D8
     public static String[] checkmatePieceCannotBlock = new String[]{"wQd1", "wKe1*", "bKg8", "bPf7", "bPg7", "bPh7"};
     // Move QD1->D7
