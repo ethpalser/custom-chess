@@ -69,11 +69,7 @@ public class MoveSet {
     }
 
     public Move getMove(Coordinate point) {
-        return this.set.stream().filter(m -> m.path().hasPoint((Point) point)).findFirst().orElse(null);
-    }
-
-    public void addMove(Move move) {
-        this.set.add(move);
+        return this.set.stream().filter(m -> m.path().hasPoint(point)).findFirst().orElse(null);
     }
 
     public Collection<Coordinate> coordinates() {
