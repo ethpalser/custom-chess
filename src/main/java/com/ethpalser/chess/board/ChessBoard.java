@@ -119,7 +119,7 @@ public class ChessBoard implements Board<Coordinate> {
             // Replaces the piece at the new point
             this.pieces.put(point, piece);
             // Update the position of the piece, but not that it has moved. This insertion is not treated as a move.
-            piece.setCoordinate(point);
+            // piece.setCoordinate(point); // Todo: Is this necessary? It is breaking updates
         }
         this.pieces.remove(null);
     }
