@@ -22,7 +22,7 @@ public class CustomPiece implements Piece {
     private boolean hasMoved;
 
     public CustomPiece(PieceType pieceType, Colour colour, Coordinate coordinate) {
-        this(pieceType.toCode(), colour, coordinate, false, (MoveSpec) null);
+        this(pieceType.toCode(), colour, coordinate, false, List.of());
     }
 
     public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, MoveSpec... moveSpecs) {
