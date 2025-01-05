@@ -71,9 +71,9 @@ public class CustomPieceFactory implements PieceFactory {
                 Comparator.EQUAL, null);
     }
 
-    private Conditional lastMovedIsPieceTypeCondition(PieceType type) {
+    private Conditional lastMovedIsPieceTypeCondition(String code) {
         return new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
-                PropertyType.TYPE, type);
+                PropertyType.CODE, code);
     }
 
     private Conditional lastMovedIsNearbyPieceCondition(Direction direction) {
@@ -184,7 +184,7 @@ public class CustomPieceFactory implements PieceFactory {
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .conditions(List.of(
-                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN),
+                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN.toCode()),
                         this.lastMovedIsNearbyPieceCondition(Direction.RIGHT),
                         this.lastMovedTravelledDistanceCondition(2)
                 ))
@@ -198,7 +198,7 @@ public class CustomPieceFactory implements PieceFactory {
                 .isSpecificQuadrant(true)
                 .isAttack(false)
                 .conditions(List.of(
-                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN),
+                        this.lastMovedIsPieceTypeCondition(PieceType.PAWN.toCode()),
                         this.lastMovedIsNearbyPieceCondition(Direction.LEFT),
                         this.lastMovedTravelledDistanceCondition(2)
                 ))
