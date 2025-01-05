@@ -65,7 +65,7 @@ public class MoveSpec {
         }
         if (this.pathBase == null || this.pathBase.length() == 0) {
             System.err.println("path base is not defined");
-            return null;
+            return List.of();
         }
         if (this.isSpecificQuadrant) {
             boolean isWhite = Colour.WHITE.equals(colour);
@@ -142,7 +142,7 @@ public class MoveSpec {
                         next, this.isAttack, null);
             }
             // Kings cannot move to threatened spaces
-            boolean isSafe = threatMap != null && threatMap.hasNoThreats((Point) next);
+            boolean isSafe = threatMap != null && threatMap.hasNoThreats(next);
             if (Pieces.isKing(board.get(offset)) && !isSafe) {
                 return new MoveReport(this.createMove(moveCoords), MoveReport.Status.FAILED_CONDITIONS,
                         next, this.isAttack, null);
@@ -160,12 +160,12 @@ public class MoveSpec {
                     return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_OBSTACLE,
                             next, false, null);
                 }
-                // This is the final point of the path, which the piece can "defend" or capture
-                moveCoords.add(next);
                 if (Pieces.isAllied(colour, nPiece)) {
                     return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_ALLY,
                             next, true, null);
                 }
+                // This is the final point of the path, which the piece can "defend" or capture
+                moveCoords.add(next);
                 Coordinate king = Pieces.isKing(nPiece) ? next : null;
                 return new MoveReport(this.createMove(moveCoords), MoveReport.Status.BLOCKED_BY_OPPONENT,
                         next, true, king);
