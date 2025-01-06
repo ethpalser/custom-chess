@@ -238,8 +238,9 @@ public class ChessGame implements Game {
                 blackSum += Heuristics.pieceValue(ctxRecord, p);
             }
         }
-        return whiteSum + Heuristics.pawnValue(ctxRecord, Colour.WHITE) -
-                (blackSum + Heuristics.pawnValue(ctxRecord, Colour.BLACK));
+        int whitePawn = Heuristics.pawnValue(ctxRecord, Colour.WHITE);
+        int blackPawn = Heuristics.pawnValue(ctxRecord, Colour.BLACK);
+        return whiteSum + whitePawn - (blackSum + blackPawn);
     }
 
     @Override

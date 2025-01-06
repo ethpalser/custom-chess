@@ -55,7 +55,10 @@ public class Heuristics {
         Space space = context.getBoard().space();
         int midX = (space.max(Space.AXIS.X) + space.min(Space.AXIS.X)) / 2;
         int midY = (space.max(Space.AXIS.Y) + space.min(Space.AXIS.Y)) / 2;
-        return pawnCenterControl(pawnAttacks, midX, midY) + pawnWall(pawnDefends, pawns) + doubleFilePawns(pawns);
+        int pawnCenter = pawnCenterControl(pawnAttacks, midX, midY);
+        int pawnWall = pawnWall(pawnDefends, pawns);
+        int pawnDoubled = doubleFilePawns(pawns);
+        return pawnCenter + pawnWall + pawnDoubled;
     }
 
     private static int pawnWall(List<Coordinate> pawnThreats, List<Piece> pawns) {
@@ -73,23 +76,12 @@ public class Heuristics {
     }
 
     private static int pawnCenterControl(List<Coordinate> pawnThreats, int midX, int midY) {
-        int midX2;
-        int midY2;
-        if (midX % 2 == 0) {
-            midX2 = midX - 1;
-        } else {
-            midX2 = midX;
-        }
-        if (midY % 2 == 0) {
-            midY2 = midY - 1;
-        } else {
-            midY2 = midY;
-        }
-
-        Point midPoint1 = new Point(midX, midY);
-        Point midPoint2 = new Point(midX, midY2);
-        Point midPoint3 = new Point(midX2, midY);
-        Point midPoint4 = new Point(midX2, midY2);
+        int midX2 = midX % 2 != 0 ? midX + 1 : midX;
+        int midY2 = midY % 2 != 0 ? midY + 1 : midY;
+        Coordinate midPoint1 = new Point(midX, midY);
+        Coordinate midPoint2 = new Point(midX, midY2);
+        Coordinate midPoint3 = new Point(midX2, midY);
+        Coordinate midPoint4 = new Point(midX2, midY2);
         int sum = 0;
         for (Coordinate p : pawnThreats) {
             // A pawn has threat over a centre position on the board, which is often valuable
