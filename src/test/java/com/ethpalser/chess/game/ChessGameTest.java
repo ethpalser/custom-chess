@@ -194,11 +194,14 @@ class ChessGameTest {
             game.undoUpdate(1, true);
         }
 
+        // Threats should be updated to reflect the king in check
+        assertEquals(GameStatus.BLACK_IN_CHECK, game.getStatus());
         // Checking that a bug does not occur
         GameStatus afterUndoG5F7 = game.undoUpdate(1, true);
         assertEquals(GameStatus.ONGOING, afterUndoG5F7);
         GameStatus afterUndoE7E5 = game.undoUpdate(1, true);
         assertEquals(GameStatus.ONGOING, afterUndoE7E5);
+        // This is illegal, as this black pawn moving will open a path for the white queen to capture the black king
         GameStatus s6 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
         assertEquals(GameStatus.NO_CHANGE, s6);
     }
@@ -226,7 +229,7 @@ class ChessGameTest {
     void testEvaluateState_givenCentrePawnMovedForBothPlayers_thenZeroForBothPlayers() {
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e3")));
-        game.updateGame(new Action(Colour.BLACK, new Point("d7"), new Point("d6")));
+        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6")));
 
         int value = game.evaluateState();
         assertEquals(0, value);
