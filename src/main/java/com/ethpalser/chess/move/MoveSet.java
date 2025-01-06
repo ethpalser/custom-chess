@@ -30,16 +30,20 @@ public class MoveSet {
         Set<Move> moves = new HashSet<>();
         Collection<Coordinate> attackList = new HashSet<>();
         Collection<Coordinate> defendList = new HashSet<>();
-        Collection<Coordinate> checkList = new HashSet<>();
         for (MoveReport report : reports) {
             Move move = report.move();
             Path path = move.path();
             if (path == null || path.isEmpty()) {
                 // There could be a move if the space was occupied (ex. pawn), and it did not fail conditions (ex. king)
-                if (report.isAttack() && report.lastChecked() != null
-                        && !report.status().equals(MoveReport.Status.OUT_OF_BOUNDS)
-                        && !report.status().equals(MoveReport.Status.FAILED_CONDITIONS)) {
-                    attackList.add(report.lastChecked());
+                if (report.isAttack() && report.lastChecked() != null) {
+                    MoveReport.Status status = report.status();
+                    if (status.equals(MoveReport.Status.BLOCKED_BY_ALLY)) {
+                        defendList.add(report.lastChecked());
+                    } else if (!status.equals(MoveReport.Status.OUT_OF_BOUNDS)
+                            && !status.equals(MoveReport.Status.BLOCKED_BY_OBSTACLE)
+                            && !status.equals(MoveReport.Status.FAILED_CONDITIONS)) {
+                        attackList.add(report.lastChecked());
+                    }
                 }
                 continue;
             }
