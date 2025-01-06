@@ -335,7 +335,7 @@ public class ChessGame implements Game {
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = new MoveMap(oppColour, this.context.toRecord());
+            MoveMap moveMap = new MoveMap(oppColour, ctxRecord);
             for (Coordinate c : causingCheck.path()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
                 if (!moveMap.hasNoMove(c, true)) {
@@ -374,7 +374,7 @@ public class ChessGame implements Game {
         // This method assumes a player is in check
         Colour causingCheck = Colour.opposite(playerInCheck);
         Coordinate inCheckKing = this.context.getKingCoordinate(playerInCheck);
-        MoveSet inCheckMoves = ctxRecord.getBoard().get(inCheckKing).getMoves(this.context.toRecord());
+        MoveSet inCheckMoves = ctxRecord.getBoard().get(inCheckKing).getMoves(ctxRecord);
 
         if (inCheckMoves != null && !inCheckMoves.isEmpty()) {
             for (Coordinate p : inCheckMoves.coordinates()) {
@@ -404,11 +404,11 @@ public class ChessGame implements Game {
                 actions.add(new Action(playerInCheck, defender, attacker));
             }
             // Can a piece block its path?
-            Move moveCausingCheck = attackerPiece.getMoves(this.context.toRecord()).getMove(inCheckKing);
+            Move moveCausingCheck = attackerPiece.getMoves(ctxRecord).getMove(inCheckKing);
             if (moveCausingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = new MoveMap(playerInCheck, this.context.toRecord());
+            MoveMap moveMap = new MoveMap(playerInCheck, ctxRecord);
             for (Coordinate pathCoordinate : moveCausingCheck.path()) {
                 for (Piece blocker : moveMap.getPieces(pathCoordinate)) {
                     actions.add(new Action(playerInCheck, blocker.getCoordinate(), pathCoordinate));
