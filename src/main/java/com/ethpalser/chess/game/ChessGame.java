@@ -46,7 +46,7 @@ public class ChessGame implements Game {
         } else {
             this.context = new GameContext(options, saveData.pieceNotations(), saveData.logNotations());
             this.turn = saveData.logNotations() == null ? 1 : saveData.logNotations().length;
-            this.status = checkGameStatus();
+            this.status = checkGameStatus(this.currentPlayer(), false);
             GamePrompt prompt = this.context.getPrompt();
             if (GameStatus.isCompletedGameStatus(this.status)) {
                 this.state = new EndState(this.context);
@@ -102,14 +102,15 @@ public class ChessGame implements Game {
             System.err.println(this.context.getBoard());
             throw ex;
         }
-        this.status = this.checkGameStatus();
+        this.status = this.checkGameStatus(this.currentPlayer(), false);
         this.turn++;
         return this.status;
     }
 
     public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
-        Board<Coordinate> boardCopy = this.context.getBoard();
-        Log<Coordinate, Piece> logCopy = this.context.getLog();
+        GameContext.Record ctxRecord = this.context.toRecord();
+        Board<Coordinate> boardCopy = ctxRecord.getBoard();
+        Log<Coordinate, Piece> logCopy = ctxRecord.getLog();
         for (int i = 0; i < beforeCurrent; i++) {
             LogEntry<Coordinate, Piece> logEntry;
             if (saveUndone) {
@@ -126,8 +127,8 @@ public class ChessGame implements Game {
             this.undoLogEntryToBoard(boardCopy, logEntry);
             // Commit changes to context
             this.context.undo(this.currentPlayer(), boardCopy, logCopy);
-            this.status = this.checkGameStatus();
             this.turn--;
+            this.status = this.checkGameStatus(this.currentPlayer(), true);
         }
         return this.status;
     }
@@ -138,10 +139,12 @@ public class ChessGame implements Game {
         }
         if (logEntry.getEndObject() != null) {
             board.add(logEntry.getEnd(), logEntry.getEndObject());
+            logEntry.getEndObject().move(logEntry.getEnd());
         } else {
             board.remove(logEntry.getEnd());
         }
         board.add(logEntry.getStart(), logEntry.getStartObject());
+        logEntry.getStartObject().move(logEntry.getStart());
         if (logEntry.isFirstOccurrence()) {
             logEntry.getStartObject().setHasMoved(false);
         }
@@ -149,8 +152,9 @@ public class ChessGame implements Game {
 
     @Override
     public GameStatus redoUpdate(int afterCurrent) {
-        Board<Coordinate> boardCopy = this.context.getBoard();
-        Log<Coordinate, Piece> logCopy = this.context.getLog();
+        GameContext.Record ctxRecord = this.context.toRecord();
+        Board<Coordinate> boardCopy = ctxRecord.getBoard();
+        Log<Coordinate, Piece> logCopy = ctxRecord.getLog();
         for (int i = 0; i < afterCurrent; i++) {
             LogEntry<Coordinate, Piece> logEntry = logCopy.redo();
             if (logEntry == null) {
@@ -167,7 +171,7 @@ public class ChessGame implements Game {
             }
 
             this.context.update(this.currentPlayer(), boardCopy, logCopy);
-            this.status = this.checkGameStatus();
+            this.status = this.checkGameStatus(this.currentPlayer(), false);
             this.turn++;
         }
         return this.status;
@@ -178,6 +182,7 @@ public class ChessGame implements Game {
             return;
         }
         board.add(logEntry.getEnd(), logEntry.getStartObject());
+        logEntry.getStartObject().move(logEntry.getEnd());
         if (logEntry.isFirstOccurrence()) {
             logEntry.getStartObject().setHasMoved(true);
         }
@@ -267,20 +272,21 @@ public class ChessGame implements Game {
         return this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
     }
 
-    private GameStatus checkGameStatus() {
-        Colour opponent = Colour.opposite(this.currentPlayer());
+    private GameStatus checkGameStatus(Colour playerColour, boolean isUndo) {
+        Colour lastMovedPlayer = !isUndo ? playerColour : Colour.opposite(playerColour);
+        Colour opponentColour = Colour.opposite(lastMovedPlayer);
         // Is there a check, checkmate or stalemate?
         GameStatus nextStatus;
-        boolean opponentInCheck = !this.context.getThreats(Colour.opposite(opponent))
-                .hasNoThreats(this.context.getKingCoordinate(opponent));
+        boolean opponentInCheck = !this.context.getThreats(lastMovedPlayer)
+                .hasNoThreats(this.context.getKingCoordinate(opponentColour));
         if (opponentInCheck) {
-            if (this.isCheckmate()) {
-                nextStatus = GameStatus.colourWinStatus(this.currentPlayer());
+            if (this.isCheckmate(lastMovedPlayer)) {
+                nextStatus = GameStatus.colourWinStatus(lastMovedPlayer);
             } else {
-                nextStatus = GameStatus.colourInCheckStatus(opponent);
+                nextStatus = GameStatus.colourInCheckStatus(opponentColour);
             }
         } else {
-            if (this.isStalemate()) {
+            if (this.isStalemate(lastMovedPlayer)) {
                 nextStatus = GameStatus.STALEMATE;
             } else {
                 nextStatus = GameStatus.ONGOING;
@@ -289,11 +295,11 @@ public class ChessGame implements Game {
         return nextStatus;
     }
 
-    private boolean isCheckmate() {
+    private boolean isCheckmate(Colour playerColour) {
         GameContext.Record ctxRecord = this.context.toRecord();
 
-        Colour oppColour = Colour.opposite(this.currentPlayer());
-        Coordinate oppKingPoint = this.context.getKingCoordinate(Colour.opposite(this.currentPlayer()));
+        Colour oppColour = Colour.opposite(playerColour);
+        Coordinate oppKingPoint = this.context.getKingCoordinate(Colour.opposite(playerColour));
         if (oppKingPoint == null || ctxRecord.getBoard().get(oppKingPoint) == null) {
             throw new IllegalStateException("opponent king is missing");
         }
@@ -302,7 +308,7 @@ public class ChessGame implements Game {
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
             for (Coordinate moveCoordinate : oppKingMoveSet.coordinates()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (ctxRecord.getThreats(this.currentPlayer()).hasNoThreats(moveCoordinate)) {
+                if (ctxRecord.getThreats(playerColour).hasNoThreats(moveCoordinate)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -310,7 +316,7 @@ public class ChessGame implements Game {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(this.currentPlayer()).getThreats(oppKingPoint);
+        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(playerColour).getThreats(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
@@ -340,7 +346,7 @@ public class ChessGame implements Game {
         return true;
     }
 
-    private boolean isStalemate() {
+    private boolean isStalemate(Colour playerColour) {
         GameContext.Record ctxRecord = this.context.toRecord();
         // Only kings remain, which is a stalemate
         if (ctxRecord.getBoard().count() <= 2) {
@@ -349,7 +355,7 @@ public class ChessGame implements Game {
         // Are there any opponent pieces that can move?
         List<Piece> opponentPieces = new ArrayList<>();
         for (Piece p : ctxRecord.getBoard()) {
-            if (!Pieces.isAllied(this.currentPlayer(), p)) {
+            if (!Pieces.isAllied(playerColour, p)) {
                 opponentPieces.add(p);
             }
         }
