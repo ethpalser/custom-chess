@@ -25,16 +25,7 @@ public class GameView {
                 8,
                 8
         );
-        Map<String, List<MoveView>> specList = new HashMap<>();
-        for (Piece p : game.info().context().getBoard()) {
-            if (p instanceof CustomPiece && !"PRNBQK".contains(p.getCode()) && specList.get(p.getCode()) == null) {
-                specList.put(
-                        p.getCode(),
-                        ((CustomPiece) p).getMoveSpecs().stream().map(MoveSpec::toView).collect(Collectors.toList())
-                );
-            }
-        }
-        this.pieceSpecs = specList;
+        this.pieceSpecs = new HashMap<>();
     }
 
     public int getTurn() {

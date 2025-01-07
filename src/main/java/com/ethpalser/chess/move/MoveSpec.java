@@ -82,11 +82,6 @@ public class MoveSpec {
         }
     }
 
-    public MoveView toView() {
-        return new MoveView(this.pathBase, this.mirrorXAxis, this.mirrorYAxis, this.isSpecificQuadrant,
-                this.isMove, this.isAttack, this.conditions, new Move.FollowUp(this.followUpReference, null));
-    }
-
     // region PRIVATE
 
     private List<MoveReport> getPathsInAllQuadrants(GameContext.Record context, Coordinate offset, Colour colour) {
