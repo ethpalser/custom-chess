@@ -7,7 +7,6 @@ import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 import java.util.List;
@@ -19,7 +18,7 @@ class RelativeReferenceTest {
     void pieceRef_getReferences_givenAtLocationAndNotMoved_thenIsItself() {
         // Given
         Point pawn = new Point("e2");
-        Reference pieceRef = new Reference(Location.POINT, Direction.AT);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.AT);
         // Then
         GameContext context = new GameContext();
         List<Coordinate> coordinates = pieceRef.coordinates(context.toRecord(), pawn);
@@ -34,7 +33,7 @@ class RelativeReferenceTest {
         // Given
         Point pawn = new Point("e2");
         Point target = new Point("e4"); // Mimic moving pawn to target
-        Reference pieceRef = new Reference(Location.POINT, Direction.AT);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.AT);
         // When
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, pawn, target));
@@ -52,7 +51,7 @@ class RelativeReferenceTest {
     void pieceRef_getReferences_givenBackOfLocationAndMovedUpOne_thenIsEmpty() {
         // Given
         Point pawn = new Point("e2");
-        Reference pieceRef = new Reference(Location.POINT, Direction.BACK);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.BACK);
         // When
         Game game = new ChessGame();
         Coordinate destination = new Point("e3");
@@ -71,7 +70,7 @@ class RelativeReferenceTest {
         // Given
         Point pawnE = new Point("e2");
         Point pawnF = new Point("f2");
-        Reference pieceRef = new Reference(Location.POINT, Direction.RIGHT);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.RIGHT);
         // When
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, pawnE, pawnE.translate(1, Direction.NORTH)));
@@ -95,7 +94,7 @@ class RelativeReferenceTest {
         // Given
         Point king = new Point("e1");
         Point rook = new Point("a1");
-        Reference pieceRef = new Reference(Location.POINT, Direction.LEFT, 4);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.LEFT, 4);
         // Then
         Game game = new ChessGame();
         GameContext.Record ctxRecord = game.info().context().toRecord();
@@ -110,7 +109,7 @@ class RelativeReferenceTest {
     void pieceRef_getReferences_givenOutOfBounds_thenIsEmpty() {
         // Given
         Point king = new Point("e1");
-        Reference pieceRef = new Reference(Location.POINT, Direction.BACK, 2);
+        Reference pieceRef = new Reference(Reference.Location.POINT, Direction.BACK, 2);
         // Then
         Game game = new ChessGame();
         GameContext.Record ctxRecord = game.info().context().toRecord();

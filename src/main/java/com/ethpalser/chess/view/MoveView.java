@@ -4,7 +4,6 @@ import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Reference;
 import java.util.List;
@@ -37,7 +36,7 @@ public class MoveView {
         if (followup == null || followup.reference() == null || followup.path() == null || followup.path().isEmpty()) {
             this.followUp = null;
         } else {
-            this.followUp = new ActionView(followup.reference(), new Reference(Location.POINT, Direction.AT,
+            this.followUp = new ActionView(followup.reference(), new Reference(Reference.Location.POINT, Direction.AT,
                     followup.path().getPoint(followup.path().length() - 1)));
         }
     }

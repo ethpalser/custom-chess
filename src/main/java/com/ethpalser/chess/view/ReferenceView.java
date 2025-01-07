@@ -2,22 +2,22 @@ package com.ethpalser.chess.view;
 
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Location;
+import com.ethpalser.chess.space.Reference;
 import java.util.Objects;
 
 public class ReferenceView {
 
-    private final Location location;
+    private final Reference.Location location;
     private final Point point;
     private final Direction direction;
 
-    public ReferenceView(Location location, Point point, Direction direction) {
-        this.location = Objects.requireNonNullElse(location, Location.POINT);
+    public ReferenceView(Reference.Location location, Point point, Direction direction) {
+        this.location = Objects.requireNonNullElse(location, Reference.Location.POINT);
         this.point = point;
         this.direction = direction;
     }
 
-    public Location getLocation() {
+    public Reference.Location getLocation() {
         return location;
     }
 
@@ -25,5 +25,7 @@ public class ReferenceView {
         return point;
     }
 
-    public Direction getDirection() {return direction;}
+    public Direction getDirection() {
+        return direction;
+    }
 }

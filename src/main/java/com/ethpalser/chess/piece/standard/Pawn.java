@@ -12,7 +12,6 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
@@ -98,13 +97,13 @@ public class Pawn implements Piece {
                 Coordinate enPassantLeft = this.point.translate(1, Direction.LEFT.vector());
                 if (enPassantLeft.equals(peekEnd)) {
                     epSpec.isMirrorYAxis(true)
-                            .followUp(new Reference(Location.POINT, Direction.AT, enPassantLeft), null);
+                            .followUp(new Reference(Reference.Location.POINT, Direction.AT, enPassantLeft), null);
                     results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
                 // that pawn is to the right of this pawn
                 Coordinate enPassantRight = this.point.translate(1, Direction.RIGHT.vector(this.colour));
                 if (enPassantRight.equals(peekEnd)) {
-                    epSpec.followUp(new Reference(Location.POINT, Direction.AT, enPassantRight), null);
+                    epSpec.followUp(new Reference(Reference.Location.POINT, Direction.AT, enPassantRight), null);
                     results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
                 }
             }

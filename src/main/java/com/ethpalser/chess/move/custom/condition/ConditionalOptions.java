@@ -2,13 +2,9 @@ package com.ethpalser.chess.move.custom.condition;
 
 import com.ethpalser.chess.space.Reference;
 
-public record ConditionalOptions(ConditionalOptions.Type type, Reference primary, PropertyType property, Operator operator,
-                                 Object expected, Reference optional) {
-    public enum Type {
-        PIECE,
-        BOARD,
-        LOG;
-    }
+public record ConditionalOptions(ConditionalOptions.Type type, Reference primary, PropertyType property,
+                                 Operator operator, Object expected, Reference optional) {
+    public enum Type {PIECE, BOARD, LOG}
 
     public ConditionalOptions {
         if (type == null || primary == null || operator == null) {

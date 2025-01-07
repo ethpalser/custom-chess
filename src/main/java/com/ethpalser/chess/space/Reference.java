@@ -12,9 +12,11 @@ import java.util.Objects;
 
 public class Reference {
 
+    public enum Location {POINT, PATH, EDGE, LAST_MOVED}
+
+    private final Location location;
     private final Direction direction;
     private final int distance;
-    private final Location location;
     private final Coordinate[] fixedCoordinates;
 
     /**
@@ -22,7 +24,7 @@ public class Reference {
      * you want, such as a Piece's own location.
      */
     public Reference() {
-        this( Location.POINT, Direction.AT, 0, (Coordinate[]) null);
+        this(Location.POINT, Direction.AT, 0, (Coordinate[]) null);
     }
 
     public Reference(Location location, Direction direction) {

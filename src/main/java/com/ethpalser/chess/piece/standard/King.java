@@ -10,7 +10,6 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
@@ -101,7 +100,7 @@ public class King implements Piece {
                     .isMirrorYAxis(true)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Location.POINT, Direction.AT, qsrStart),
+                            new Reference(Reference.Location.POINT, Direction.AT, qsrStart),
                             new Path(qskEnd.translate(1, Direction.RIGHT.vector())))
                     .build();
             results.addAll(castleQueen.toMoveList(context, this.point, this.colour));
@@ -127,7 +126,7 @@ public class King implements Piece {
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Location.POINT, Direction.AT, ksrStart),
+                            new Reference(Reference.Location.POINT, Direction.AT, ksrStart),
                             new Path(kskEnd.translate(1, Direction.LEFT.vector())))
                     .build();
             results.addAll(castleKing.toMoveList(context, this.point, this.colour));

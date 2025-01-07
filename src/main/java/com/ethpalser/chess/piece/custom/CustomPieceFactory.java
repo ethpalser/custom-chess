@@ -13,7 +13,6 @@ import com.ethpalser.chess.piece.standard.Queen;
 import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
@@ -49,33 +48,39 @@ public class CustomPieceFactory implements PieceFactory {
     // CONDITIONS
 
     private ConditionalOptions conditionSelfNotMoved() {
-        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT), PropertyType.HAS_MOVED,
+        return ConditionalOptions.pieceState(new Reference(Reference.Location.POINT, Direction.AT),
+                PropertyType.HAS_MOVED,
                 Operator.FALSE, false);
     }
 
     private ConditionalOptions conditionTargetNotMoved(Coordinate point) {
-        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT, point), PropertyType.HAS_MOVED,
+        return ConditionalOptions.pieceState(new Reference(Reference.Location.POINT, Direction.AT, point),
+                PropertyType.HAS_MOVED,
                 Operator.FALSE, false);
     }
 
     private ConditionalOptions conditionTargetIsRook(Coordinate point) {
-        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT, point), PropertyType.CODE,
+        return ConditionalOptions.pieceState(new Reference(Reference.Location.POINT, Direction.AT, point),
+                PropertyType.CODE,
                 Operator.EQUAL, PieceType.ROOK.toCode());
     }
 
     private ConditionalOptions conditionPathIsEmpty(Coordinate start, Coordinate end) {
-        return ConditionalOptions.pieceCompare(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
+        return ConditionalOptions.pieceCompare(new Reference(Reference.Location.PATH, Direction.AT, new Path(start,
+                        end)),
                 Operator.EQUAL, null);
     }
 
     private ConditionalOptions conditionLastMovedIsPawn() {
-        return ConditionalOptions.pieceState(new Reference(Location.LAST_MOVED, Direction.AT), PropertyType.CODE,
+        return ConditionalOptions.pieceState(new Reference(Reference.Location.LAST_MOVED, Direction.AT),
+                PropertyType.CODE,
                 Operator.EQUAL, PieceType.PAWN.toCode());
     }
 
     private ConditionalOptions conditionLastMovedIsAtDirection(Direction direction) {
-        return ConditionalOptions.pieceCompare(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
-                new Reference(Location.POINT, direction));
+        return ConditionalOptions.pieceCompare(new Reference(Reference.Location.LAST_MOVED, Direction.AT),
+                Operator.EQUAL,
+                new Reference(Reference.Location.POINT, direction));
     }
 
     private ConditionalOptions conditionLastMovedTwo() {
@@ -116,7 +121,7 @@ public class CustomPieceFactory implements PieceFactory {
                         )
                 ))
                 .followUp(
-                        new Reference(Location.POINT, Direction.AT, qsrStart),
+                        new Reference(Reference.Location.POINT, Direction.AT, qsrStart),
                         new Path(qskEnd.translate(1, Direction.RIGHT)))
                 .build();
         // endregion
@@ -141,7 +146,7 @@ public class CustomPieceFactory implements PieceFactory {
                                 ksrStart.translate(1, Direction.LEFT))
                 ))
                 .followUp(
-                        new Reference(Location.POINT, Direction.AT, ksrStart),
+                        new Reference(Reference.Location.POINT, Direction.AT, ksrStart),
                         new Path(kskEnd.translate(1, Direction.LEFT)))
                 .build();
         // endregion
@@ -183,7 +188,7 @@ public class CustomPieceFactory implements PieceFactory {
                         this.conditionLastMovedTwo()
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the right.
-                .followUp(new Reference(Location.POINT, Direction.RIGHT), null)
+                .followUp(new Reference(Reference.Location.POINT, Direction.RIGHT), null)
                 .build();
         // En Passant front-left
         MoveSpec epLeft = new MoveSpec.Builder(new Path(new Point(1, 1)))
@@ -197,7 +202,7 @@ public class CustomPieceFactory implements PieceFactory {
                         this.conditionLastMovedTwo()
                 ))
                 // This should use the piece's relative point for reference. The captured pawn is to the left.
-                .followUp(new Reference(Location.POINT, Direction.LEFT), null)
+                .followUp(new Reference(Reference.Location.POINT, Direction.LEFT), null)
                 .build();
 
         return new CustomPiece(PieceType.PAWN.toCode(), colour, coordinate, false,
