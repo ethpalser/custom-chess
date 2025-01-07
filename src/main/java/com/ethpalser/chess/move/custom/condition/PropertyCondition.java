@@ -5,7 +5,6 @@ import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Reference;
-import com.ethpalser.chess.view.ConditionalView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,23 +12,23 @@ public class PropertyCondition implements Conditional {
 
     private final Reference reference;
     private final PropertyType property;
-    private final Comparator comparator;
+    private final Operator operator;
     private final Object expected;
 
-    public PropertyCondition(Reference reference, Comparator comparator) {
-        this(reference, comparator, null, null);
+    public PropertyCondition(Reference reference, Operator operator) {
+        this(reference, operator, null, null);
     }
 
-    public PropertyCondition(Reference reference, Comparator comparator, PropertyType property, Object expected) {
+    public PropertyCondition(Reference reference, Operator operator, PropertyType property, Object expected) {
         this.reference = reference;
-        this.comparator = comparator;
+        this.operator = operator;
         this.property = property;
         this.expected = expected;
     }
 
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
-        if (this.comparator == null) {
+        if (this.operator == null) {
             return false;
         }
         if (this.reference == null) {
@@ -46,7 +45,7 @@ public class PropertyCondition implements Conditional {
             }
         }
         if (refList.isEmpty()) {
-            return Comparator.EQUAL.equals(this.comparator) && this.expected == null;
+            return Operator.EQUAL.equals(this.operator) && this.expected == null;
         }
 
         Property<Piece> prop = this.property != null ? new Property<>(this.property.toString()) : null;
@@ -64,7 +63,7 @@ public class PropertyCondition implements Conditional {
     }
 
     private boolean isExpectedState(Object objProperty) {
-        switch (this.comparator) {
+        switch (this.operator) {
             case FALSE -> {
                 return Boolean.FALSE.equals(objProperty);
             }
@@ -90,7 +89,7 @@ public class PropertyCondition implements Conditional {
         return "PropertyCondition{" +
                 "reference=" + reference +
                 ", property=" + property +
-                ", comparator=" + comparator +
+                ", comparator=" + operator +
                 ", expected=" + expected +
                 '}';
     }

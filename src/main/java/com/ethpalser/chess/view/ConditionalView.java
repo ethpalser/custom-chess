@@ -1,6 +1,6 @@
 package com.ethpalser.chess.view;
 
-import com.ethpalser.chess.move.custom.condition.Comparator;
+import com.ethpalser.chess.move.custom.condition.Operator;
 import com.ethpalser.chess.move.custom.condition.ConditionalType;
 import com.ethpalser.chess.move.custom.condition.PropertyType;
 import com.ethpalser.chess.space.Reference;
@@ -10,10 +10,10 @@ public class ConditionalView {
     private final ConditionalType type;
     private final ReferenceView target;
     private final PropertyType field;
-    private final Comparator assertion;
+    private final Operator assertion;
     private final Object expected;
 
-    public ConditionalView(ConditionalType type, Reference target, PropertyType field, Comparator assertion,
+    public ConditionalView(ConditionalType type, Reference target, PropertyType field, Operator assertion,
             Object expected) {
         this.type = type;
         if (target == null) {
@@ -38,7 +38,7 @@ public class ConditionalView {
         return field;
     }
 
-    public Comparator getAssertion() {
+    public Operator getAssertion() {
         return assertion;
     }
 

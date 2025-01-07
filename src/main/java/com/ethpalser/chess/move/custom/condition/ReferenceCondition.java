@@ -5,25 +5,24 @@ import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Reference;
-import com.ethpalser.chess.view.ConditionalView;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReferenceCondition implements Conditional {
 
     private final Reference target;
-    private final Comparator comparator;
+    private final Operator operator;
     private final Reference expected;
 
-    public ReferenceCondition(Reference target, Comparator comparator, Reference expected) {
+    public ReferenceCondition(Reference target, Operator operator, Reference expected) {
         this.target = target;
-        this.comparator = comparator;
+        this.operator = operator;
         this.expected = expected;
     }
 
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
-        if (comparator == null) {
+        if (operator == null) {
             return false;
         }
         if (target == null) {
@@ -31,7 +30,7 @@ public class ReferenceCondition implements Conditional {
         }
 
         List<Piece> tRefs = this.getReferences(this.target, context, appliedTo);
-        switch (this.comparator) {
+        switch (this.operator) {
             case FALSE -> {
                 return tRefs.isEmpty();
             }
@@ -72,7 +71,7 @@ public class ReferenceCondition implements Conditional {
     public String toString() {
         return "ReferenceCondition{" +
                 "target=" + target +
-                ", comparator=" + comparator +
+                ", comparator=" + operator +
                 ", expected=" + expected +
                 '}';
     }

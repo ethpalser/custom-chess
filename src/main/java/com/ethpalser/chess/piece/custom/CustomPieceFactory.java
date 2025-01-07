@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.move.MoveSpec;
-import com.ethpalser.chess.move.custom.condition.Comparator;
+import com.ethpalser.chess.move.custom.condition.Operator;
 import com.ethpalser.chess.move.custom.condition.Conditional;
 import com.ethpalser.chess.move.custom.condition.LogCondition;
 import com.ethpalser.chess.move.custom.condition.PropertyCondition;
@@ -52,37 +52,37 @@ public class CustomPieceFactory implements PieceFactory {
     // CONDITIONS
 
     private Conditional conditionSelfNotMoved() {
-        return new PropertyCondition(new Reference(Location.POINT, Direction.AT), Comparator.FALSE,
+        return new PropertyCondition(new Reference(Location.POINT, Direction.AT), Operator.FALSE,
                 PropertyType.HAS_MOVED, false);
     }
 
     private Conditional conditionTargetNotMoved(Coordinate point) {
         return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
-                Comparator.FALSE, PropertyType.HAS_MOVED, false);
+                Operator.FALSE, PropertyType.HAS_MOVED, false);
     }
 
     private Conditional conditionTargetIsRook(Coordinate point) {
         return new PropertyCondition(new Reference(Location.POINT, Direction.AT, point),
-                Comparator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
+                Operator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
     }
 
     private Conditional conditionPathIsEmpty(Coordinate start, Coordinate end) {
         return new ReferenceCondition(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
-                Comparator.EQUAL, null);
+                Operator.EQUAL, null);
     }
 
     private Conditional conditionLastMovedIsPawn() {
-        return new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
+        return new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
                 PropertyType.CODE, PieceType.PAWN.toCode());
     }
 
     private Conditional conditionLastMovedIsAtDirection(Direction direction) {
-        return new ReferenceCondition(new Reference(Location.LAST_MOVED, Direction.AT), Comparator.EQUAL,
+        return new ReferenceCondition(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
                 new Reference(Location.POINT, direction));
     }
 
     private Conditional conditionLastMovedTwo() {
-        return new LogCondition(Comparator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        return new LogCondition(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
     }
 
     // PIECES

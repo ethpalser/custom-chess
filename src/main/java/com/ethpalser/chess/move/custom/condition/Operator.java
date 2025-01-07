@@ -1,6 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
-public enum Comparator {
+public enum Operator {
     FALSE,
     TRUE,
     EQUAL,
@@ -16,8 +16,8 @@ public enum Comparator {
         };
     }
 
-    public static Comparator fromString(String string) {
-        for (Comparator c : Comparator.values()) {
+    public static Operator fromString(String string) {
+        for (Operator c : Operator.values()) {
             if (c.toString().equalsIgnoreCase(string)) {
                 return c;
             }

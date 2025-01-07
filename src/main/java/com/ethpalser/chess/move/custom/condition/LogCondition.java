@@ -5,16 +5,15 @@ import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.view.ConditionalView;
 
 public class LogCondition implements Conditional {
 
-    private final Comparator comparator;
+    private final Operator operator;
     private final PropertyType propType;
     private final Object expected;
 
-    public LogCondition(Comparator comparator, PropertyType propType, Object expected) {
-        this.comparator = comparator;
+    public LogCondition(Operator operator, PropertyType propType, Object expected) {
+        this.operator = operator;
         this.propType = propType;
         this.expected = expected;
     }
@@ -22,14 +21,14 @@ public class LogCondition implements Conditional {
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
         // Note: appliedTo is ignored, as this is only checking the context's log
-        if (this.comparator == null || context == null || context.getLog() == null || context.getLog().peek() == null) {
+        if (this.operator == null || context == null || context.getLog() == null || context.getLog().peek() == null) {
             return false;
         }
         // Todo: replace with newer log
         Log<Coordinate, Piece> log = context.getLog();
         switch (this.propType) {
             case HAS_MOVED -> {
-                return switch (this.comparator) {
+                return switch (this.operator) {
                     case TRUE -> log.peek().isFirstOccurrence();
                     case FALSE -> !log.peek().isFirstOccurrence();
                     default -> false;
@@ -48,7 +47,7 @@ public class LogCondition implements Conditional {
                     );
                 }
 
-                return switch (this.comparator) {
+                return switch (this.operator) {
                     case EQUAL -> expected.equals(diff);
                     case NOT_EQUAL -> !expected.equals(diff);
                     default -> false;
