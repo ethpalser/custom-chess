@@ -2,13 +2,12 @@ package com.ethpalser.chess.move;
 
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 
 public record Move(Path path, FollowUp followUp) {
 
     public Move(Coordinate point) {
-        this(new Path((Point) point), null);
+        this(new Path(point), null);
     }
 
     public Move(Path path) {
