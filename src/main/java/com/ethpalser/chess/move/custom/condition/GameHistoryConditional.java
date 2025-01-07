@@ -6,13 +6,16 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 
-public class LogCondition implements Conditional {
+public class GameHistoryConditional implements Conditional {
 
     private final Operator operator;
     private final PropertyType propType;
     private final Object expected;
 
-    public LogCondition(Operator operator, PropertyType propType, Object expected) {
+    public GameHistoryConditional(Operator operator, PropertyType propType, Object expected) {
+        if (propType == null || operator == null) {
+            throw new IllegalArgumentException("at least one argument is null of: property type or operator");
+        }
         this.operator = operator;
         this.propType = propType;
         this.expected = expected;

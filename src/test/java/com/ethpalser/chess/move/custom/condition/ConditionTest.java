@@ -23,7 +23,7 @@ class ConditionTest {
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
 
-        Conditional condition = new PropertyCondition(
+        Conditional condition = new PieceStateConditional(
                 new Reference(Location.LAST_MOVED, Direction.AT),
                 Operator.EQUAL,
                 PropertyType.TYPE,
@@ -39,7 +39,7 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
-        Conditional condition = new LogCondition(Operator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
+        Conditional condition = new GameHistoryConditional(Operator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
 
         // Then
         Coordinate enPassantPawn = new Point("d2"); // Not moved
@@ -56,7 +56,7 @@ class ConditionTest {
         game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Only moved one
 
-        Conditional condition = new LogCondition(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
         assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
@@ -71,7 +71,7 @@ class ConditionTest {
         game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5"))); // Can get en passant
 
-        Conditional condition = new LogCondition(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
         assertTrue(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
@@ -87,7 +87,7 @@ class ConditionTest {
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Ignored
         game.updateGame(new Action(Colour.BLACK, new Point("e2"), new Point("e4"))); // Matches distance moved
         // Note: Each piece will provide its own colour when setting up this condition, and in this case it is WHITE
-        Conditional condition = new LogCondition(Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
+        Conditional condition = new GameHistoryConditional(Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
         // Then
         assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
     }
@@ -103,11 +103,11 @@ class ConditionTest {
         game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), enPassantVictim));
 
-        Conditional condLastMovedIsPawn = new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT),
+        Conditional condLastMovedIsPawn = new PieceStateConditional(new Reference(Location.LAST_MOVED, Direction.AT),
                 Operator.EQUAL, PropertyType.CODE, PieceType.PAWN.toCode());
-        Conditional condLastMovedTwo = new LogCondition(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+        Conditional condLastMovedTwo = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Todo: Update LogCondition to verify Colour and Code
-        Conditional condLastMovedNotAllied = new PropertyCondition(new Reference(Location.LAST_MOVED, Direction.AT),
+        Conditional condLastMovedNotAllied = new PieceStateConditional(new Reference(Location.LAST_MOVED, Direction.AT),
                 Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
 
         // When
@@ -131,7 +131,7 @@ class ConditionTest {
     void evaluate_castleAtStartIsNotKing_isFalse() {
         // Given
         Game game = new ChessGame();
-        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
+        Conditional condition = new PieceStateConditional(new Reference(Location.POINT, Direction.AT),
                 Operator.EQUAL, PropertyType.TYPE, PieceType.KING);
         // Then
         GameContext.Record ctxRecord = game.info().context().toRecord();
@@ -147,7 +147,7 @@ class ConditionTest {
         Coordinate kingDestination = new Point("e2");
         game.updateGame(new Action(Colour.WHITE, new Point("e1"), kingDestination)); // Condition now fails
 
-        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
+        Conditional condition = new PieceStateConditional(new Reference(Location.POINT, Direction.AT),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
         // Then
         GameContext.Record ctxRecord = game.info().context().toRecord();
@@ -166,7 +166,7 @@ class ConditionTest {
         game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
         game.updateGame(new Action(Colour.WHITE, rookDestination, queenSideRook)); // Reposition back to a1
         // This uses an absolute reference, so only the provided coordinate is used
-        Conditional condition = new PropertyCondition(new Reference(Location.POINT, Direction.AT, queenSideRook),
+        Conditional condition = new PieceStateConditional(new Reference(Location.POINT, Direction.AT, queenSideRook),
                 Operator.FALSE, PropertyType.HAS_MOVED, false);
         // Then
         GameContext.Record ctxRecord = game.info().context().toRecord();
@@ -177,7 +177,7 @@ class ConditionTest {
     void evaluate_castleAtCoordinateB0NotNull_isFalse() {
         // Given
         Game game = new ChessGame();
-        Conditional condition = new ReferenceCondition(new Reference(Location.POINT, Direction.AT, new Point("b1")),
+        Conditional condition = new PieceCompareConditional(new Reference(Location.POINT, Direction.AT, new Point("b1")),
                 Operator.EQUAL, null);
         // Then
         GameContext.Record ctxRecord = game.info().context().toRecord();
@@ -197,13 +197,13 @@ class ConditionTest {
         game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
         game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
 
-        Conditional conditionA = new PropertyCondition(new Reference(Location.POINT, Direction.AT),
+        Conditional conditionA = new PieceStateConditional(new Reference(Location.POINT, Direction.AT),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
-        Conditional conditionB = new PropertyCondition(new Reference(Location.POINT, Direction.AT, new Point("a1")),
+        Conditional conditionB = new PieceStateConditional(new Reference(Location.POINT, Direction.AT, new Point("a1")),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
-        Conditional conditionC = new PropertyCondition(new Reference(Location.POINT, Direction.AT, new Point("a1")),
+        Conditional conditionC = new PieceStateConditional(new Reference(Location.POINT, Direction.AT, new Point("a1")),
                 Operator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
-        Conditional conditionD = new ReferenceCondition(
+        Conditional conditionD = new PieceCompareConditional(
                 new Reference(Location.PATH, Direction.AT, new Path(new Point("b1"), new Point("c1"))),
                 Operator.EQUAL, null);
 

@@ -8,27 +8,23 @@ import com.ethpalser.chess.space.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReferenceCondition implements Conditional {
+public class PieceCompareConditional implements Conditional {
 
     private final Reference target;
     private final Operator operator;
     private final Reference expected;
 
-    public ReferenceCondition(Reference target, Operator operator, Reference expected) {
-        this.target = target;
+    public PieceCompareConditional(Reference primary, Operator operator, Reference expected) {
+        if (primary == null || operator == null) {
+            throw new IllegalArgumentException("at least one argument is null of: primary reference or operator");
+        }
+        this.target = primary;
         this.operator = operator;
         this.expected = expected;
     }
 
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
-        if (operator == null) {
-            return false;
-        }
-        if (target == null) {
-            return expected == null;
-        }
-
         List<Piece> tRefs = this.getReferences(this.target, context, appliedTo);
         switch (this.operator) {
             case FALSE -> {

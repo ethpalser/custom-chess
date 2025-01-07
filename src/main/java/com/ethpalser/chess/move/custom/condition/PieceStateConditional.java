@@ -8,19 +8,18 @@ import com.ethpalser.chess.space.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropertyCondition implements Conditional {
+public class PieceStateConditional implements Conditional {
 
     private final Reference reference;
     private final PropertyType property;
     private final Operator operator;
     private final Object expected;
 
-    public PropertyCondition(Reference reference, Operator operator) {
-        this(reference, operator, null, null);
-    }
-
-    public PropertyCondition(Reference reference, Operator operator, PropertyType property, Object expected) {
-        this.reference = reference;
+    public PieceStateConditional(Reference primary, Operator operator, PropertyType property, Object expected) {
+        if (primary == null || operator == null) {
+            throw new IllegalArgumentException("at least one argument is null of: primary reference or operator");
+        }
+        this.reference = primary;
         this.operator = operator;
         this.property = property;
         this.expected = expected;
@@ -28,13 +27,6 @@ public class PropertyCondition implements Conditional {
 
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
-        if (this.operator == null) {
-            return false;
-        }
-        if (this.reference == null) {
-            return this.expected == null;
-        }
-
         Board<Coordinate> board = context.getBoard();
         List<Piece> refList = new ArrayList<>();
         for (Coordinate c : this.reference.coordinates(context, appliedTo)) {
@@ -63,34 +55,15 @@ public class PropertyCondition implements Conditional {
     }
 
     private boolean isExpectedState(Object objProperty) {
-        switch (this.operator) {
-            case FALSE -> {
-                return Boolean.FALSE.equals(objProperty);
-            }
-            case TRUE -> {
-                return Boolean.TRUE.equals(objProperty);
-            }
-            case EQUAL -> {
-                return (this.expected == null && objProperty == null) || (this.expected != null && objProperty != null
-                        && objProperty.getClass().equals(this.expected.getClass()) && objProperty.equals(this.expected));
-            }
-            case NOT_EQUAL -> {
-                return (this.expected == null && objProperty != null) || (objProperty != null
-                        && !objProperty.equals(this.expected));
-            }
-            default -> {
-                return false;
-            }
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyCondition{" +
-                "reference=" + reference +
-                ", property=" + property +
-                ", comparator=" + operator +
-                ", expected=" + expected +
-                '}';
+        return switch (this.operator) {
+            case FALSE -> Boolean.FALSE.equals(objProperty);
+            case TRUE -> Boolean.TRUE.equals(objProperty);
+            case EQUAL -> (this.expected == null && objProperty == null)
+                    || (this.expected != null && objProperty != null
+                    && objProperty.getClass().equals(this.expected.getClass())
+                    && objProperty.equals(this.expected));
+            case NOT_EQUAL -> (this.expected == null && objProperty != null)
+                    || (objProperty != null && !objProperty.equals(this.expected));
+        };
     }
 }
