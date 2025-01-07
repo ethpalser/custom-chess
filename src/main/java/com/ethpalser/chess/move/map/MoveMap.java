@@ -7,6 +7,7 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,8 +16,8 @@ import java.util.Set;
 public class MoveMap {
 
     private final Map<Coordinate, Set<Piece>> map;
-    private final int length;
     private final int width;
+    private final int length;
 
     public MoveMap(Colour colour, GameContext.Record ctxRecord) {
         Map<Coordinate, Set<Piece>> moves = new HashMap<>();
@@ -29,8 +30,9 @@ public class MoveMap {
             }
         }
         this.map = moves;
-        this.length = 8; // temp
-        this.width = 8; // temp
+        Space space = ctxRecord.getBoard().space();
+        this.width = space.length(Space.AXIS.X);
+        this.length = space.length(Space.AXIS.Y);
     }
 
     public Set<Coordinate> getPoints() {
