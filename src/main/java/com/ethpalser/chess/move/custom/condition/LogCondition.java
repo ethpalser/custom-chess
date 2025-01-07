@@ -58,9 +58,4 @@ public class LogCondition implements Conditional {
             }
         }
     }
-
-    @Override
-    public ConditionalView toView() {
-        return new ConditionalView(ConditionalType.LOG, null, this.propType, this.comparator, this.expected);
-    }
 }

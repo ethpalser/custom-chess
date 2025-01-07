@@ -13,6 +13,4 @@ public interface Conditional {
 
     boolean isExpected(GameContext.Record context, Coordinate appliedTo);
 
-    ConditionalView toView();
-
 }

@@ -76,11 +76,6 @@ public class ReferenceCondition implements Conditional {
                 '}';
     }
 
-    @Override
-    public ConditionalView toView() {
-        return new ConditionalView(ConditionalType.PIECE, this.target, null, this.comparator, this.expected);
-    }
-
     private List<Piece> getReferences(Reference reference, GameContext.Record context, Coordinate appliedTo) {
         Board<Coordinate> board = context.getBoard();
         List<Piece> refs = new ArrayList<>();

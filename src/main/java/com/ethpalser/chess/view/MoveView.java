@@ -8,7 +8,6 @@ import com.ethpalser.chess.space.Location;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Reference;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MoveView {
 
@@ -34,11 +33,7 @@ public class MoveView {
         this.onlySpecificQuadrant = onlySpecificQuadrant;
         this.isMove = isMove;
         this.isAttack = isAttack;
-        if (conditionals == null) {
-            this.conditions = List.of();
-        } else {
-            this.conditions = conditionals.stream().map(Conditional::toView).collect(Collectors.toList());
-        }
+        this.conditions = List.of();
         if (followup == null || followup.reference() == null || followup.path() == null || followup.path().isEmpty()) {
             this.followUp = null;
         } else {

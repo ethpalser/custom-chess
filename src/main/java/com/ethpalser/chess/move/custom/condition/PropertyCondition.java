@@ -93,9 +93,4 @@ public class PropertyCondition implements Conditional {
                 ", expected=" + expected +
                 '}';
     }
-
-    @Override
-    public ConditionalView toView() {
-        return new ConditionalView(ConditionalType.FIELD, null, this.property, this.comparator, this.expected);
-    }
 }
