@@ -3,6 +3,8 @@ package com.ethpalser.chess.move;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.move.custom.condition.Conditional;
+import com.ethpalser.chess.move.custom.condition.ConditionalFactory;
+import com.ethpalser.chess.move.custom.condition.ConditionalOptions;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -12,7 +14,6 @@ import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.view.MoveView;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class MoveSpec {
     private final boolean isSpecificQuadrant;
     private final boolean isAttack;
     private final boolean isMove;
-    private final List<Conditional> conditions;
+    private final List<ConditionalOptions> conditions;
     private final Reference followUpReference;
     private final Path followUpPath;
 
@@ -221,8 +222,9 @@ public class MoveSpec {
         if (this.conditions == null) {
             return true;
         }
-        for (Conditional condition : this.conditions) {
-            if (!condition.isExpected(context, coordinate)) {
+        ConditionalFactory factory = ConditionalFactory.getInstance();
+        for (ConditionalOptions options : this.conditions) {
+            if (!factory.create(options).isExpected(context, coordinate)) {
                 return false;
             }
         }
@@ -241,7 +243,7 @@ public class MoveSpec {
         private boolean isSpecificQuadrant = false;
         private boolean isAttack = true;
         private boolean isMove = true;
-        private List<Conditional> conditions = List.of();
+        private List<ConditionalOptions> conditions = List.of();
         private Reference followUpReference = null;
         private Path followUpPath = null;
 
@@ -274,7 +276,7 @@ public class MoveSpec {
             return this;
         }
 
-        public Builder conditions(List<Conditional> conditions) {
+        public Builder conditions(List<ConditionalOptions> conditions) {
             this.conditions = conditions;
             return this;
         }

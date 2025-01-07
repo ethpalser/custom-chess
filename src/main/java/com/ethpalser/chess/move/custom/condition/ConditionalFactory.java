@@ -22,11 +22,8 @@ public class ConditionalFactory {
             case PIECE -> {
                 if (spec.optional() != null) {
                     return new PieceCompareConditional(spec.primary(), spec.operator(), spec.optional());
-                } else if (spec.property() != null) {
-                    return new PieceStateConditional(spec.primary(), spec.operator(), spec.property(), spec.expected());
                 }
-                return fail();
-
+                return new PieceStateConditional(spec.primary(), spec.operator(), spec.property(), spec.expected());
             }
             case LOG -> {
                 if (spec.property() != null) {

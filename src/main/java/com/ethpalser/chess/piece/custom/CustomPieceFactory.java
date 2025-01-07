@@ -1,12 +1,9 @@
 package com.ethpalser.chess.piece.custom;
 
 import com.ethpalser.chess.move.MoveSpec;
+import com.ethpalser.chess.move.custom.condition.ConditionalOptions;
 import com.ethpalser.chess.move.custom.condition.Operator;
-import com.ethpalser.chess.move.custom.condition.Conditional;
-import com.ethpalser.chess.move.custom.condition.GameHistoryConditional;
-import com.ethpalser.chess.move.custom.condition.PieceStateConditional;
 import com.ethpalser.chess.move.custom.condition.PropertyType;
-import com.ethpalser.chess.move.custom.condition.PieceCompareConditional;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -51,38 +48,38 @@ public class CustomPieceFactory implements PieceFactory {
 
     // CONDITIONS
 
-    private Conditional conditionSelfNotMoved() {
-        return new PieceStateConditional(new Reference(Location.POINT, Direction.AT), Operator.FALSE,
-                PropertyType.HAS_MOVED, false);
+    private ConditionalOptions conditionSelfNotMoved() {
+        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT), PropertyType.HAS_MOVED,
+                Operator.FALSE, false);
     }
 
-    private Conditional conditionTargetNotMoved(Coordinate point) {
-        return new PieceStateConditional(new Reference(Location.POINT, Direction.AT, point),
-                Operator.FALSE, PropertyType.HAS_MOVED, false);
+    private ConditionalOptions conditionTargetNotMoved(Coordinate point) {
+        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT, point), PropertyType.HAS_MOVED,
+                Operator.FALSE, false);
     }
 
-    private Conditional conditionTargetIsRook(Coordinate point) {
-        return new PieceStateConditional(new Reference(Location.POINT, Direction.AT, point),
-                Operator.EQUAL, PropertyType.CODE, PieceType.ROOK.toCode());
+    private ConditionalOptions conditionTargetIsRook(Coordinate point) {
+        return ConditionalOptions.pieceState(new Reference(Location.POINT, Direction.AT, point), PropertyType.CODE,
+                Operator.EQUAL, PieceType.ROOK.toCode());
     }
 
-    private Conditional conditionPathIsEmpty(Coordinate start, Coordinate end) {
-        return new PieceCompareConditional(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
+    private ConditionalOptions conditionPathIsEmpty(Coordinate start, Coordinate end) {
+        return ConditionalOptions.pieceCompare(new Reference(Location.PATH, Direction.AT, new Path(start, end)),
                 Operator.EQUAL, null);
     }
 
-    private Conditional conditionLastMovedIsPawn() {
-        return new PieceStateConditional(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
-                PropertyType.CODE, PieceType.PAWN.toCode());
+    private ConditionalOptions conditionLastMovedIsPawn() {
+        return ConditionalOptions.pieceState(new Reference(Location.LAST_MOVED, Direction.AT), PropertyType.CODE,
+                Operator.EQUAL, PieceType.PAWN.toCode());
     }
 
-    private Conditional conditionLastMovedIsAtDirection(Direction direction) {
-        return new PieceCompareConditional(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
+    private ConditionalOptions conditionLastMovedIsAtDirection(Direction direction) {
+        return ConditionalOptions.pieceCompare(new Reference(Location.LAST_MOVED, Direction.AT), Operator.EQUAL,
                 new Reference(Location.POINT, direction));
     }
 
-    private Conditional conditionLastMovedTwo() {
-        return new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
+    private ConditionalOptions conditionLastMovedTwo() {
+        return ConditionalOptions.gameHistory(PropertyType.DISTANCE_MOVED, Operator.EQUAL, 2);
     }
 
     // PIECES
