@@ -1,5 +1,7 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.space.PathOptions;
+
 public class ConditionalFactory {
 
     private static ConditionalFactory factory;
@@ -28,6 +30,13 @@ public class ConditionalFactory {
             case LOG -> {
                 if (spec.property() != null) {
                     return new GameHistoryConditional(spec.operator(), spec.property(), spec.expected());
+                }
+                return fail();
+            }
+            case BOARD -> {
+                if (spec.optional() != null) {
+                    return new PathStateConditional(new PathOptions(PathOptions.Type.CUSTOM, spec.primary(),
+                            spec.optional()), spec.operator(), spec.expected());
                 }
                 return fail();
             }
