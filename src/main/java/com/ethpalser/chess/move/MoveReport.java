@@ -17,6 +17,6 @@ public record MoveReport(Move move, Status status, Coordinate lastChecked, boole
         BLOCKED_BY_ALLY,
         BLOCKED_BY_OPPONENT,
         BLOCKED_BY_OBSTACLE,
-        FAILED_CONDITIONS;
+        BLOCKED_BY_THREAT;
     }
 }

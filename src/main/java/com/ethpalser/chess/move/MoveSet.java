@@ -41,7 +41,7 @@ public class MoveSet {
                         defendList.add(report.lastChecked());
                     } else if (!status.equals(MoveReport.Status.OUT_OF_BOUNDS)
                             && !status.equals(MoveReport.Status.BLOCKED_BY_OBSTACLE)
-                            && !status.equals(MoveReport.Status.FAILED_CONDITIONS)) {
+                            && !status.equals(MoveReport.Status.BLOCKED_BY_THREAT)) {
                         attackList.add(report.lastChecked());
                     }
                 }
