@@ -38,4 +38,8 @@ public record ConditionalOptions(ConditionalOptions.Type type, Reference primary
             Object expected) {
         return new ConditionalOptions(Type.PIECE, primary, property, operator, expected, null);
     }
+
+    public static ConditionalOptions pathState(Reference start, Reference end, Operator operator, Object expected) {
+        return new ConditionalOptions(Type.BOARD, start, null, operator, expected, end);
+    }
 }
