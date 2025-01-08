@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Reference {
-
-    public enum Location {POINT, PATH, EDGE, LAST_MOVED}
+    // Note: Edge locations are constrained to a 2D space
+    public enum Location {POINT, PATH, LAST_MOVED, NORTH_EDGE, SOUTH_EDGE, EAST_EDGE, WEST_EDGE}
 
     private final Location location;
     private final Direction direction;
@@ -71,58 +71,64 @@ public class Reference {
         }
     }
 
-    public List<Coordinate> coordinates(GameContext.Record context, Coordinate relativeCoordinate) {
+    public List<Coordinate> coordinates(GameContext.Record context, Coordinate providedCoordinates) {
         if (context == null) {
             throw new IllegalArgumentException("null context");
         }
-        if (this.fixedCoordinates == null && relativeCoordinate == null) {
-            throw new IllegalArgumentException("both fixed and relative coordinates are null, one should not be null");
+        if (this.fixedCoordinates == null && providedCoordinates == null) {
+            throw new IllegalArgumentException("both fixed and provided coordinates are null, one should not be null");
         }
-
-        int[] directionVector = this.direction.vector();
-        List<Coordinate> coordinates;
-        switch (this.location) {
-            case LAST_MOVED -> {
-                Log<Coordinate, Piece> log = context.getLog();
-                if (log != null && log.peek() != null) {
-                    return List.of(context.getLog().peek().getEnd());
-                }
-                return List.of();
-            }
-            case POINT -> {
-                // Only one coordinate is expected in this case, and all others are ignored
-                if (this.fixedCoordinates != null && this.fixedCoordinates.length > 0) {
-                    coordinates = List.of(this.fixedCoordinates[0]);
-                } else if (relativeCoordinate != null) {
-                    coordinates = List.of(relativeCoordinate);
-                } else {
-                    coordinates = List.of();
-                }
-            }
-            case PATH -> {
-                if (this.fixedCoordinates != null) {
-                    coordinates = List.of(this.fixedCoordinates);
-                    coordinates.forEach(c -> c.translate(1, directionVector));
-                } else {
-                    if (Direction.AT.equals(this.direction)) {
-                        coordinates = List.of(relativeCoordinate);
-                    } else {
-                        // Draw a path to the edge of the board
-                        List<Coordinate> temp = new ArrayList<>();
-                        Board<Coordinate> board = context.getBoard();
-                        // Shift the coordinate first, as the relative coordinate is not intended to be included
-                        Coordinate c = relativeCoordinate.translate(1, directionVector);
-                        while (!board.rejects(c)) {
-                            temp.add(c);
-                            c.translate(1, directionVector);
-                        }
-                        coordinates = temp;
-                    }
-                }
-            }
-            default -> coordinates = List.of();
-        }
+        List<Coordinate> coordinates = switch (this.location) {
+            case LAST_MOVED -> this.lastMovedCoordinate(context.getLog());
+            case POINT -> this.pointCoordinate(providedCoordinates);
+            case PATH -> this.pathCoordinates(providedCoordinates, context.getBoard());
+            default -> this.edgeCoordinate(providedCoordinates, context.getBoard().space());
+        };
         return coordinates.stream().map(c -> c.translate(this.distance, this.direction)).toList();
+    }
+
+    private List<Coordinate> lastMovedCoordinate(Log<Coordinate, Piece> log) {
+        if (log != null && log.peek() != null) {
+            return List.of(log.peek().getEnd());
+        }
+        return List.of();
+    }
+
+    private List<Coordinate> pointCoordinate(Coordinate provided) {
+        // Only one coordinate is expected in this case, and all others are ignored
+        if (this.fixedCoordinates != null && this.fixedCoordinates.length > 0) {
+            return List.of(this.fixedCoordinates[0]);
+        } else if (provided != null) {
+            return List.of(provided);
+        }
+        return List.of();
+    }
+
+    private List<Coordinate> pathCoordinates(Coordinate provided, Board<Coordinate> board) {
+        if (this.fixedCoordinates != null) {
+            return Arrays.asList(this.fixedCoordinates);
+        } else if (Direction.AT.equals(this.direction)) {
+            return List.of(provided);
+        }
+        // Draw a path to the edge of the board
+        List<Coordinate> coordinates = new ArrayList<>();
+        int[] directionVector = this.direction.vector();
+        Coordinate point = provided;
+        while (!board.rejects(point)) {
+            coordinates.add(point);
+            point = point.translate(1, directionVector);
+        }
+        return coordinates;
+    }
+
+    private List<Coordinate> edgeCoordinate(Coordinate provided, Space space) {
+        return switch (this.location) {
+            case NORTH_EDGE -> List.of(Coordinate.at(provided.getValue(Space.AXIS.X), space.max(Space.AXIS.Y)));
+            case SOUTH_EDGE -> List.of(Coordinate.at(provided.getValue(Space.AXIS.X), space.min(Space.AXIS.Y)));
+            case EAST_EDGE -> List.of(Coordinate.at(space.max(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
+            case WEST_EDGE -> List.of(Coordinate.at(space.min(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
+            default -> List.of(); // Cannot determine an edge without an absolute direction
+        };
     }
 
     @Override
