@@ -69,9 +69,10 @@ public class Path implements Iterable<Coordinate> {
             throw new IllegalArgumentException("one ore more arguments are null");
         }
         boolean hasNonZero = false;
-        for (int i = 0; i < shiftVector.length && !hasNonZero; i++) {
-            if (shiftVector[i] != 0) {
+        for (int j : shiftVector) {
+            if (j != 0) {
                 hasNonZero = true;
+                break;
             }
         }
         if (!hasNonZero) {

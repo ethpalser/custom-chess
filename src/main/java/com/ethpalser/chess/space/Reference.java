@@ -123,10 +123,10 @@ public class Reference {
 
     private List<Coordinate> edgeCoordinate(Coordinate provided, Space space) {
         return switch (this.location) {
-            case NORTH_EDGE -> List.of(Coordinate.at(provided.getValue(Space.AXIS.X), space.max(Space.AXIS.Y)));
-            case SOUTH_EDGE -> List.of(Coordinate.at(provided.getValue(Space.AXIS.X), space.min(Space.AXIS.Y)));
-            case EAST_EDGE -> List.of(Coordinate.at(space.max(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
-            case WEST_EDGE -> List.of(Coordinate.at(space.min(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
+            case NORTH_EDGE -> List.of(new Point(provided.getValue(Space.AXIS.X), space.max(Space.AXIS.Y)));
+            case SOUTH_EDGE -> List.of(new Point(provided.getValue(Space.AXIS.X), space.min(Space.AXIS.Y)));
+            case EAST_EDGE -> List.of(new Point(space.max(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
+            case WEST_EDGE -> List.of(new Point(space.min(Space.AXIS.X), provided.getValue(Space.AXIS.Y)));
             default -> List.of(); // Cannot determine an edge without an absolute direction
         };
     }

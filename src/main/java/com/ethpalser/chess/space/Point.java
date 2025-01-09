@@ -117,8 +117,11 @@ public class Point implements Coordinate, Comparable<Point> {
             return true;
         if (o == null)
             return false;
-        if (o.getClass() != this.getClass())
+        if (!this.getClass().isInstance(o)) {
+            System.err.println("object is " + o.getClass());
+            System.err.println("can cast to point " + (Point.class.isAssignableFrom(o.getClass())));
             return false;
+        }
 
         Point vector = (Point) o;
         // Compares only x and y values, ignoring bounds
