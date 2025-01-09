@@ -5,6 +5,7 @@ import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
@@ -117,5 +118,65 @@ class RelativeReferenceTest {
 
         assertFalse(coordinates.isEmpty());
         assertNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void edgeRef_getCoordinates_givenOriginToWest_thenA1() {
+        // Given
+        Point origin = new Point(0, 0);
+        Reference edgeRef = new Reference(Reference.Location.WEST_EDGE, Direction.AT);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
+
+        assertFalse(coordinates.isEmpty());
+        assertEquals(new Point("a1"), coordinates.get(0));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void edgeRef_getCoordinates_givenOriginToEast_thenH1() {
+        // Given
+        Point origin = new Point(0, 0);
+        Reference edgeRef = new Reference(Reference.Location.EAST_EDGE, Direction.AT);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
+
+        assertFalse(coordinates.isEmpty());
+        assertEquals(new Point("h1"), coordinates.get(0));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void edgeRef_getCoordinates_givenOriginToRightOfWest_thenB1() {
+        // Given
+        Point origin = new Point(0, 0);
+        Reference edgeRef = new Reference(Reference.Location.WEST_EDGE, Direction.RIGHT);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
+
+        assertFalse(coordinates.isEmpty());
+        assertEquals(new Point("b1"), coordinates.get(0));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
+    }
+
+    @Test
+    void edgeRef_getCoordinates_givenOriginToLeftOfEast_thenG1() {
+        // Given
+        Point origin = new Point(0, 0);
+        Reference edgeRef = new Reference(Reference.Location.EAST_EDGE, Direction.LEFT);
+        // Then
+        Game game = new ChessGame();
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
+
+        assertFalse(coordinates.isEmpty());
+        assertEquals(new Point("g1"), coordinates.get(0));
+        assertNotNull(ctxRecord.getBoard().get(coordinates.get(0)));
     }
 }
