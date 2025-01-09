@@ -15,6 +15,9 @@ public class PathFactory {
     }
 
     public Path create(PathOptions options) {
+        if (options == null) {
+            return new Path(List.of());
+        }
         Space space = context.getBoard().space();
         switch (options.type()) {
             case HORIZONTAL -> {
@@ -51,6 +54,9 @@ public class PathFactory {
                 // Otherwise, assume a linear path between these two points is expected
                 Coordinate start = startPath.get(0);
                 Coordinate end = endPath.get(0);
+                if (start.equals(end)) {
+                    return new Path(start);
+                }
                 return this.pathBetweenCoordinates(start, end);
             }
         }
@@ -60,17 +66,17 @@ public class PathFactory {
     private Path pathBetweenCoordinates(Coordinate start, Coordinate end) {
         int xEnd = end.getValue(Space.AXIS.X);
         int yEnd = end.getValue(Space.AXIS.Y);
-        int xDiff = start.getValue(Space.AXIS.X) - xEnd;
-        int yDiff = start.getValue(Space.AXIS.Y) - yEnd;
+        int xDiff = xEnd - start.getValue(Space.AXIS.X);
+        int yDiff = yEnd - start.getValue(Space.AXIS.Y);
         int xDir = xDiff != 0 ? xDiff / Math.abs(xDiff) : 0;
         int yDir = yDiff != 0 ? yDiff / Math.abs(yDiff) : 0;
         // Fill in the gap between these two points
         List<Coordinate> list = new LinkedList<>();
         Coordinate point = start;
-        do {
+        while (point.getValue(Space.AXIS.X) != xEnd && point.getValue(Space.AXIS.Y) != xEnd) {
             list.add(point);
             point = point.translate(1, xDir, yDir);
-        } while (point.getValue(Space.AXIS.X) != xEnd || point.getValue(Space.AXIS.Y) != xEnd);
+        }
         // Loop only continues until the end point is reached on either axis, so this is added after
         list.add(end);
         return new Path(list);
