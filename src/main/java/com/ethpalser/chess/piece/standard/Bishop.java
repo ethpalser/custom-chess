@@ -8,6 +8,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class Bishop implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec spec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 1), new int[]{1, 1}), true, true);
+        MoveSpec spec = new MoveSpec(new PathOptions(PathOptions.Type.DIAGONAL), true, true);
         return new MoveSet(spec.toMoveList(context, this.point, this.colour));
     }
 

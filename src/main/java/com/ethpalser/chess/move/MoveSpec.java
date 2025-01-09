@@ -11,6 +11,8 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathFactory;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
@@ -21,7 +23,7 @@ import java.util.Objects;
 
 public class MoveSpec {
 
-    private final Path pathBase;
+    private final PathOptions pathBase;
     private final boolean mirrorXAxis;
     private final boolean mirrorYAxis;
     private final boolean isSpecificQuadrant;
@@ -29,13 +31,13 @@ public class MoveSpec {
     private final boolean isMove;
     private final List<ConditionalOptions> conditions;
     private final Reference followUpReference;
-    private final Path followUpPath;
+    private final PathOptions followUpPath;
 
-    public MoveSpec(Path path, boolean mirrorXAxis, boolean mirrorYAxis) {
+    public MoveSpec(PathOptions path, boolean mirrorXAxis, boolean mirrorYAxis) {
         this(path, mirrorXAxis, mirrorYAxis, false);
     }
 
-    public MoveSpec(Path path, boolean mirrorXAxis, boolean mirrorYAxis, boolean isSpecificQuadrant) {
+    public MoveSpec(PathOptions path, boolean mirrorXAxis, boolean mirrorYAxis, boolean isSpecificQuadrant) {
         if (path == null) {
             throw new IllegalArgumentException("path is not defined");
         }
@@ -73,8 +75,9 @@ public class MoveSpec {
             return List.of();
         }
 
-        Path base = this.pathBase;
-        Path followUp = this.followUpPath;
+        PathFactory factory = new PathFactory(context, offset);
+        Path base = factory.create(this.pathBase);
+        Path followUp = factory.create(this.followUpPath);
         if (!this.isSpecificQuadrant) {
             return this.getPathsInAllQuadrants(context, base, offset, colour, followUp);
         }
@@ -229,7 +232,7 @@ public class MoveSpec {
 
     public static class Builder {
         // required
-        private final Path path;
+        private final PathOptions path;
         // optional
         private boolean mirrorXAxis = true;
         private boolean mirrorYAxis = true;
@@ -238,10 +241,10 @@ public class MoveSpec {
         private boolean isMove = true;
         private List<ConditionalOptions> conditions = List.of();
         private Reference followUpReference = null;
-        private Path followUpPath = null;
+        private PathOptions followUpPath = null;
 
-        public Builder(Path path) {
-            this.path = Objects.requireNonNullElse(path, new Path(List.of()));
+        public Builder(PathOptions path) {
+            this.path = Objects.requireNonNullElse(path, new PathOptions(PathOptions.Type.CUSTOM, null, null));
         }
 
         public Builder isMirrorXAxis(Boolean bool) {
@@ -274,7 +277,7 @@ public class MoveSpec {
             return this;
         }
 
-        public Builder followUp(Reference reference, Path options) {
+        public Builder followUp(Reference reference, PathOptions options) {
             this.followUpReference = reference;
             this.followUpPath = options;
             return this;

@@ -9,6 +9,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class Knight implements Piece {
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
-        MoveSpec rSpec = new MoveSpec(new Path(new Point(1, 2)), true, true);
-        MoveSpec uSpec = new MoveSpec(new Path(new Point(2, 1)), true, true);
+        MoveSpec rSpec = new MoveSpec(new PathOptions(new Point(1, 2)), true, true);
+        MoveSpec uSpec = new MoveSpec(new PathOptions(new Point(2, 1)), true, true);
 
         List<MoveReport> results = new ArrayList<>(8);
         results.addAll(rSpec.toMoveList(context, this.point, this.colour));

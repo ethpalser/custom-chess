@@ -13,6 +13,7 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
@@ -59,8 +60,8 @@ public class Pawn implements Piece {
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
-        MoveSpec moveOne = new MoveSpec(new Path(new Point(0, 1)), false, false, true);
-        MoveSpec capture = (new MoveSpec.Builder(new Path(new Point(1, 1))))
+        MoveSpec moveOne = new MoveSpec(new PathOptions(new Point(0, 1)), false, false, true);
+        MoveSpec capture = (new MoveSpec.Builder(new PathOptions(new Point(1, 1))))
                 .isMove(false)
                 .isMirrorXAxis(false)
                 .build();
@@ -71,7 +72,7 @@ public class Pawn implements Piece {
 
         // pawns can move forward two if it is their first move
         if (!this.hasMoved) {
-            MoveSpec moveTwo = new MoveSpec(new Path(new Point(0, 1), new Point(0, 2)), false, false, true);
+            MoveSpec moveTwo = new MoveSpec(new PathOptions(new Point(0, 1), new Point(0, 2)), false, false, true);
             results.addAll(moveTwo.toMoveList(context, this.point, this.colour));
         }
 
@@ -89,7 +90,7 @@ public class Pawn implements Piece {
                     || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
             ) {
                 // Setup common en passant specifications
-                MoveSpec.Builder epSpec = new MoveSpec.Builder(new Path(new Point(1, 1)))
+                MoveSpec.Builder epSpec = new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
                         .isSpecificQuadrant(true)
                         .isMirrorXAxis(false)
                         .isAttack(false);

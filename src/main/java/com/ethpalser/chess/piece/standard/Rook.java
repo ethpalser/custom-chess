@@ -9,6 +9,7 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +57,8 @@ public class Rook implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec vSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(0, 1), new int[]{0, 1}), true, false);
-        MoveSpec hSpec = new MoveSpec(new Path(context.getBoard().space(), new Point(1, 0), new int[]{1, 0}), false, true);
+        MoveSpec vSpec = new MoveSpec(new PathOptions(PathOptions.Type.VERTICAL), true, false);
+        MoveSpec hSpec = new MoveSpec(new PathOptions(PathOptions.Type.HORIZONTAL), false, true);
 
         List<MoveReport> results = new ArrayList<>(16);
         results.addAll(vSpec.toMoveList(context, this.point, this.colour));

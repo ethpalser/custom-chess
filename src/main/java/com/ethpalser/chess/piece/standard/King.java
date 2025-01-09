@@ -11,6 +11,7 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
+import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
@@ -60,9 +61,9 @@ public class King implements Piece {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
-        MoveSpec vSpec = new MoveSpec(new Path(new Point(0, 1)), true, false);
-        MoveSpec hSpec = new MoveSpec(new Path(new Point(1, 0)), false, true);
-        MoveSpec dSpec = new MoveSpec(new Path(new Point(1, 1)), true, true);
+        MoveSpec vSpec = new MoveSpec(new PathOptions(new Point(0, 1)), true, false);
+        MoveSpec hSpec = new MoveSpec(new PathOptions(new Point(1, 0)), false, true);
+        MoveSpec dSpec = new MoveSpec(new PathOptions(new Point(1, 1)), true, true);
 
         List<MoveReport> results = new ArrayList<>(8);
         results.addAll(vSpec.toMoveList(context, this.point, this.colour));
@@ -80,54 +81,54 @@ public class King implements Piece {
         int startRank = Colour.WHITE.equals(this.colour) ? board.space().min(Space.AXIS.Y) :
                 board.space().max(Space.AXIS.Y);
         // Queen-side Castle
-        Path castleQueenPath = new Path(
+        Coordinate[] castleQueenPath = new Coordinate[] {
                 this.point.translate(1, Direction.LEFT.vector()),
-                this.point.translate(2, Direction.LEFT.vector()));
+                this.point.translate(2, Direction.LEFT.vector())
+        };
         // Cannot move along this path if threatened or blocked
         boolean isQueenSideSafe = true;
-        for (int i = 0; i < castleQueenPath.length() && isQueenSideSafe; i++) {
-            isQueenSideSafe = isEmptyAndSafe(board, opponentThreats, castleQueenPath.getPoint(i));
+        for (int i = 0; i < castleQueenPath.length && isQueenSideSafe; i++) {
+            isQueenSideSafe = isEmptyAndSafe(board, opponentThreats, castleQueenPath[i]);
         }
-        // Queen-side rook is moved to the right of the king's destination
-        Coordinate qskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
         // Queen-side rook starts at the left-most edge of the board
         Coordinate qsrStart = new Point(board.space().min(Space.AXIS.X), startRank);
         Piece queenSideRook = board.get(qsrStart);
         if (queenSideRook != null && !queenSideRook.getHasMoved() && isQueenSideSafe) {
-            MoveSpec castleQueen = (new MoveSpec.Builder(castleQueenPath))
+            MoveSpec castleQueen = (new MoveSpec.Builder(new PathOptions(castleQueenPath)))
                     .isAttack(false)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(true)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Reference.Location.POINT, Direction.AT, qsrStart),
-                            new Path(qskEnd.translate(1, Direction.RIGHT.vector())))
+                            new Reference(Reference.Location.WEST_EDGE, Direction.AT),
+                            new PathOptions(new Reference(Reference.Location.POINT, Direction.RIGHT))
+                    )
                     .build();
             results.addAll(castleQueen.toMoveList(context, this.point, this.colour));
         }
         // King-side castle
-        Path castleKingPath = new Path(
+        Coordinate[] castleKingPath = new Coordinate[]{
                 this.point.translate(1, Direction.RIGHT.vector()),
-                this.point.translate(2, Direction.RIGHT.vector()));
+                this.point.translate(2, Direction.RIGHT.vector())
+        };
         // Cannot move along this path if threatened or blocked
         boolean isKingSideSafe = true;
-        for (int i = 0; i < castleQueenPath.length() && isKingSideSafe; i++) {
-            isKingSideSafe = isEmptyAndSafe(board, opponentThreats, castleQueenPath.getPoint(i));
+        for (int i = 0; i < castleKingPath.length && isKingSideSafe; i++) {
+            isKingSideSafe = isEmptyAndSafe(board, opponentThreats, castleKingPath[i]);
         }
-        // King-side rook is moved to the left of the king's destination
-        Coordinate kskEnd = castleQueenPath.getPoint(castleQueenPath.length() - 1);
         // King-side rook starts at the right-most edge of the board
         Point ksrStart = new Point(board.space().max(Space.AXIS.X), startRank);
         Piece kingSideRook = board.get(ksrStart);
         if (kingSideRook != null && !kingSideRook.getHasMoved() && isKingSideSafe) {
-            MoveSpec castleKing = (new MoveSpec.Builder(castleKingPath))
+            MoveSpec castleKing = (new MoveSpec.Builder(new PathOptions(castleKingPath)))
                     .isAttack(false)
                     .isMirrorXAxis(false)
                     .isMirrorYAxis(false)
                     .isSpecificQuadrant(true)
                     .followUp(
-                            new Reference(Reference.Location.POINT, Direction.AT, ksrStart),
-                            new Path(kskEnd.translate(1, Direction.LEFT.vector())))
+                            new Reference(Reference.Location.EAST_EDGE, Direction.AT),
+                            new PathOptions(new Reference(Reference.Location.POINT, Direction.LEFT))
+                    )
                     .build();
             results.addAll(castleKing.toMoveList(context, this.point, this.colour));
         }
