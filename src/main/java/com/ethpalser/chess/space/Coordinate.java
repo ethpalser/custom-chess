@@ -69,7 +69,8 @@ public interface Coordinate {
 
             @Override
             public int getValue(int dimension) {
-                return points[dimension];
+                // Expecting dimensions to begin at 1
+                return points[dimension - 1];
             }
 
             @Override
