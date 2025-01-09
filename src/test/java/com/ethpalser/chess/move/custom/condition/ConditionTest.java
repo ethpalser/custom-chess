@@ -216,5 +216,73 @@ class ConditionTest {
         assertTrue(conditionD.isExpected(ctxRecord, king));
     }
 
+    @Test
+    void evaluateOptions_castleQueenWithPiecesNotMovedAndClearPath_isTrue() {
+        // Given
+        Game game = new ChessGame();
+        // Simulate all moves to setup a queen-side castle
+        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
+        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
+        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
+
+        ConditionalOptions conditionA = ConditionalOptions.pieceState(new Reference(Reference.Location.POINT, Direction.AT),
+                PropertyType.HAS_MOVED, Operator.FALSE, false);
+
+        Reference qsRookRef = new Reference(Reference.Location.WEST_EDGE, Direction.AT);
+        ConditionalOptions conditionB = ConditionalOptions.pieceState(qsRookRef, PropertyType.HAS_MOVED, Operator.FALSE, false);
+        ConditionalOptions conditionC = ConditionalOptions.pieceState(qsRookRef, PropertyType.CODE, Operator.EQUAL, PieceType.ROOK.toCode());
+
+        Reference start = new Reference(Reference.Location.POINT, Direction.LEFT);
+        Reference end = new Reference(Reference.Location.WEST_EDGE, Direction.RIGHT);
+        ConditionalOptions conditionD = ConditionalOptions.pathState(start, end, Operator.FALSE, null);
+
+        // Then
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        Coordinate king = new Point("e1");
+        // These are all the king's conditions. It provides its own point wherever this is checked
+        ConditionalFactory factory = ConditionalFactory.getInstance();
+        assertTrue(factory.create(conditionA).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionB).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionC).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionD).isExpected(ctxRecord, king));
+    }
+
+    @Test
+    void evaluateOptions_castleKingWithPiecesNotMovedAndClearPath_isTrue() {
+        // Given
+        Game game = new ChessGame();
+        // Simulate all moves to set up a king-side castle
+        game.updateGame(new Action(Colour.WHITE, new Point("g2"), new Point("g4"))); // Bishop can move to h3
+        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("f1"), new Point("h3"))); // Bishop now at h3
+        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.updateGame(new Action(Colour.WHITE, new Point("g1"), new Point("f3"))); // Path to castle now clear
+        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+
+        ConditionalOptions conditionA = ConditionalOptions.pieceState(new Reference(Reference.Location.POINT, Direction.AT),
+                PropertyType.HAS_MOVED, Operator.FALSE, false);
+
+        Reference qsRookRef = new Reference(Reference.Location.EAST_EDGE, Direction.AT);
+        ConditionalOptions conditionB = ConditionalOptions.pieceState(qsRookRef, PropertyType.HAS_MOVED, Operator.FALSE, false);
+        ConditionalOptions conditionC = ConditionalOptions.pieceState(qsRookRef, PropertyType.CODE, Operator.EQUAL, PieceType.ROOK.toCode());
+
+        Reference start = new Reference(Reference.Location.POINT, Direction.RIGHT);
+        Reference end = new Reference(Reference.Location.EAST_EDGE, Direction.LEFT);
+        ConditionalOptions conditionD = ConditionalOptions.pathState(start, end, Operator.FALSE, null);
+
+        // Then
+        GameContext.Record ctxRecord = game.info().context().toRecord();
+        Coordinate king = new Point("e1");
+        // These are all the king's conditions. It provides its own point wherever this is checked
+        ConditionalFactory factory = ConditionalFactory.getInstance();
+        assertTrue(factory.create(conditionA).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionB).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionC).isExpected(ctxRecord, king));
+        assertTrue(factory.create(conditionD).isExpected(ctxRecord, king));
+    }
 
 }
