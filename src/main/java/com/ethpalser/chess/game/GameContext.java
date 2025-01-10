@@ -50,9 +50,9 @@ public class GameContext {
         }
         Space space = new Plane(options.width(), options.length(), options.unavailable());
         if (pieceNotations == null) {
-            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs(), space));
+            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs()));
         } else {
-            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs(), space),
+            this.board = new ChessBoard(space, new CustomPieceFactory(options.pieceSpecs()),
                     Arrays.asList(pieceNotations));
         }
         this.wThreats = new ThreatMap(Colour.WHITE, space, this.board, this.log);

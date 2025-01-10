@@ -11,7 +11,6 @@ import com.ethpalser.chess.piece.standard.Pawn;
 import com.ethpalser.chess.piece.standard.Queen;
 import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Space;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public class CustomPieceFactory implements PieceFactory {
 
     private final Map<String, List<MoveSpec>> pieceSpecs;
 
-    public CustomPieceFactory(Map<String, List<MoveSpec>> pieceSpecs, Space space) {
+    public CustomPieceFactory(Map<String, List<MoveSpec>> pieceSpecs) {
         this.pieceSpecs = pieceSpecs;
     }
 
