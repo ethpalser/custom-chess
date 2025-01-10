@@ -1,6 +1,5 @@
 package com.ethpalser.chess.move.notation;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceRecord;
 import com.ethpalser.chess.piece.PieceType;
@@ -9,10 +8,8 @@ import com.ethpalser.chess.space.Point;
 
 public class VerboseNotationFormat implements ChessNotationFormat {
 
-    private final Board<Coordinate> board;
-
-    public VerboseNotationFormat(Board<Coordinate> board) {
-        this.board = board;
+    public VerboseNotationFormat() {
+        // No dependencies
     }
 
     @Override
@@ -70,13 +67,15 @@ public class VerboseNotationFormat implements ChessNotationFormat {
         }
 
         String[] components = chessNotation.split("[*=\\w]");
-        if (components.length == 1) {
-            String part = components[0];
-            // expecting a colour before the notation's alias, as to identify the turn player
-            Colour colour = Colour.fromCode(part.substring(0, 1));
-            ChessNotationAlias alias = ChessNotationAlias.fromString(part.substring(1));
-            return this.parseAlias(colour, alias);
-        }
+        // Not supporting ChessNotationAlias currently
+//        if (components.length == 1) {
+//            String part = components[0];
+//            // expecting a colour before the notation's alias, as to identify the turn player
+//            // todo: use the turn number to determine the player colour
+//            Colour colour = Colour.fromCode(part.substring(0, 1));
+//            ChessNotationAlias alias = ChessNotationAlias.fromString(part.substring(1));
+//            return this.parseAlias(colour, alias);
+//        }
 
         ChessRecord.Builder builder = new ChessRecord.Builder();
         int partNum = 0;
@@ -115,48 +114,51 @@ public class VerboseNotationFormat implements ChessNotationFormat {
         return "" + ('a' + coordinate.getValue(1)) + coordinate.getValue(2);
     }
 
-    private ChessRecord parseAlias(Colour colour, ChessNotationAlias alias) {
-        int minX = this.board.space().min(0);
-        int maxX = this.board.space().max(0);
-        int y = Colour.WHITE.equals(colour) ? this.board.space().min(1) : this.board.space().max(1);
-        switch (alias) {
-            case QUEEN_SIDE_CASTLE -> {
-                ChessRecord.Builder builder = new ChessRecord.Builder();
-                // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
-                builder.sourceCoordinate(new Point(4, y))
-                        .sourceColour(Colour.WHITE)
-                        .sourceCode(PieceType.KING.toCode())
-                        .targetCoordinate(new Point(2, y))
-                        .followingRecord(
-                                (new ChessRecord.Builder())
-                                        .sourceCoordinate(new Point(minX, y))
-                                        .sourceColour(Colour.WHITE)
-                                        .sourceCode(PieceType.ROOK.toCode())
-                                        .targetCoordinate(new Point(3, y))
-                                        .build()
-                        );
-                return builder.build();
-            }
-            case KING_SIDE_CASTLE -> {
-                ChessRecord.Builder builder = new ChessRecord.Builder();
-                // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
-                builder.sourceCoordinate(new Point(4, y))
-                        .sourceColour(Colour.WHITE)
-                        .sourceCode(PieceType.KING.toCode())
-                        .targetCoordinate(new Point(6, y))
-                        .followingRecord(
-                                (new ChessRecord.Builder())
-                                        .sourceCoordinate(new Point(maxX, y))
-                                        .sourceColour(Colour.WHITE)
-                                        .sourceCode(PieceType.ROOK.toCode())
-                                        .targetCoordinate(new Point(5, y))
-                                        .build()
-                        );
-                return builder.build();
-            }
-            default -> {
-                return null;
-            }
-        }
-    }
+    // Not necessary currently
+    // An alias -> record mapping is from MoveSpec -> Alias -> ChessNotation -> ChessRecord
+    // Todo: Acquire the piece and its move specs with this alias, then create a record with the string info
+//    private ChessRecord parseAlias(Colour colour, ChessNotationAlias alias) {
+//        int minX = this.board.space().min(0);
+//        int maxX = this.board.space().max(0);
+//        int y = Colour.WHITE.equals(colour) ? this.board.space().min(1) : this.board.space().max(1);
+//        switch (alias) {
+//            case QUEEN_SIDE_CASTLE -> {
+//                ChessRecord.Builder builder = new ChessRecord.Builder();
+//                // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
+//                builder.sourceCoordinate(new Point(4, y))
+//                        .sourceColour(Colour.WHITE)
+//                        .sourceCode(PieceType.KING.toCode())
+//                        .targetCoordinate(new Point(2, y))
+//                        .followingRecord(
+//                                (new ChessRecord.Builder())
+//                                        .sourceCoordinate(new Point(minX, y))
+//                                        .sourceColour(Colour.WHITE)
+//                                        .sourceCode(PieceType.ROOK.toCode())
+//                                        .targetCoordinate(new Point(3, y))
+//                                        .build()
+//                        );
+//                return builder.build();
+//            }
+//            case KING_SIDE_CASTLE -> {
+//                ChessRecord.Builder builder = new ChessRecord.Builder();
+//                // Assumes the king starts at 'e0' or 'e8' (8 is the max y value for a standard board)
+//                builder.sourceCoordinate(new Point(4, y))
+//                        .sourceColour(Colour.WHITE)
+//                        .sourceCode(PieceType.KING.toCode())
+//                        .targetCoordinate(new Point(6, y))
+//                        .followingRecord(
+//                                (new ChessRecord.Builder())
+//                                        .sourceCoordinate(new Point(maxX, y))
+//                                        .sourceColour(Colour.WHITE)
+//                                        .sourceCode(PieceType.ROOK.toCode())
+//                                        .targetCoordinate(new Point(5, y))
+//                                        .build()
+//                        );
+//                return builder.build();
+//            }
+//            default -> {
+//                return null;
+//            }
+//        }
+//    }
 }
