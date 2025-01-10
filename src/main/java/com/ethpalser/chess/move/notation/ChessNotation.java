@@ -4,6 +4,8 @@ public class ChessNotation {
     // Store the expected notation that must be built
     private final ChessNotationFormat format;
     private final String string;
+    // Local in-memory cache of its record, to reduce redundant creation
+    private ChessRecord chessRecord;
 
     /**
      * Create a ChessNotation string using an action's alias. This alias should be well known, or it will not
@@ -17,6 +19,14 @@ public class ChessNotation {
         this.string = chessFormat.format(chessRecord, alias);
     }
 
+    public ChessNotation(ChessNotationFormat chessFormat, String notationString) {
+        if (chessFormat == null || notationString == null) {
+            throw new IllegalArgumentException();
+        }
+        this.format = chessFormat;
+        this.string = notationString;
+    }
+
     public ChessNotation(ChessNotationFormat chessFormat, ChessRecord chessRecord) {
         if (chessFormat == null || chessRecord == null) {
             throw new IllegalArgumentException();
@@ -26,7 +36,15 @@ public class ChessNotation {
     }
 
     public ChessRecord toRecord() {
-        return this.format.parse(this.string);
+        // Not thread safe, but this and record are stateless, so it is only a performance issue
+        if (this.chessRecord == null) {
+            ChessRecord rec = this.format.parse(this.string);
+            if (rec == null) {
+                throw new IllegalStateException("ChessFormat created a null ChessRecord");
+            }
+            this.chessRecord = rec;
+        }
+        return this.chessRecord;
     }
 
     @Override
