@@ -27,6 +27,10 @@ public class Reference {
         this(Location.POINT, Direction.AT, 0, (Coordinate[]) null);
     }
 
+    public Reference(Location location) {
+        this(location, Direction.AT, 1, (Coordinate[]) null);
+    }
+
     public Reference(Location location, Direction direction) {
         this(location, direction, 1, (Coordinate[]) null);
     }
