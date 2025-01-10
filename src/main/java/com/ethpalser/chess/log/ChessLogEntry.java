@@ -7,11 +7,8 @@ import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Pawn;
 import com.ethpalser.chess.piece.standard.Rook;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
-import com.ethpalser.chess.view.ActionView;
 
 public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
 
@@ -219,11 +216,5 @@ public class ChessLogEntry implements LogEntry<Coordinate, Piece> {
         }
         sb.append(this.end).append(followUpString);
         return sb.toString();
-    }
-
-    @Override
-    public ActionView toView() {
-        return new ActionView(new Reference(Reference.Location.POINT, Direction.AT, this.start),
-                new Reference(Reference.Location.POINT, Direction.AT, this.end));
     }
 }

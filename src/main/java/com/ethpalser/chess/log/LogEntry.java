@@ -1,8 +1,6 @@
 package com.ethpalser.chess.log;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.view.ActionView;
 
 public interface LogEntry<T extends Coordinate, U> {
 
@@ -30,7 +28,4 @@ public interface LogEntry<T extends Coordinate, U> {
     LogEntry<T, U> getSubLogEntry();
 
     boolean isFirstOccurrence();
-
-    ActionView toView();
-
 }

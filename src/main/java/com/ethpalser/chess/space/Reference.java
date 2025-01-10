@@ -4,7 +4,6 @@ import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.view.ReferenceView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -158,10 +157,5 @@ public class Reference {
         int result = Objects.hash(direction, location);
         result = 31 * result + Arrays.hashCode(fixedCoordinates);
         return result;
-    }
-
-    public ReferenceView toView() {
-        return new ReferenceView(this.location, this.fixedCoordinates != null ? (Point) this.fixedCoordinates[0] :
-                null, this.direction);
     }
 }
