@@ -5,7 +5,7 @@ import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Reference;
+import com.ethpalser.chess.move.config.Reference;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

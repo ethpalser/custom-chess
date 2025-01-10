@@ -1,20 +1,17 @@
-package com.ethpalser.chess.move;
+package com.ethpalser.chess.move.config;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.custom.condition.Conditional;
-import com.ethpalser.chess.move.custom.condition.ConditionalFactory;
-import com.ethpalser.chess.move.custom.condition.ConditionalOptions;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.PathFactory;
-import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Reference;
 import com.ethpalser.chess.space.Space;
 import java.util.ArrayList;
 import java.util.LinkedList;

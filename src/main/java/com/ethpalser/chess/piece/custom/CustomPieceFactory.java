@@ -1,6 +1,6 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.move.MoveSpec;
+import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;

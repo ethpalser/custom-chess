@@ -5,7 +5,7 @@ import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Reference;
+import com.ethpalser.chess.move.config.Reference;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;

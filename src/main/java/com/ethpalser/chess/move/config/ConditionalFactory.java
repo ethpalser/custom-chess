@@ -1,6 +1,10 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.move.config;
 
-import com.ethpalser.chess.space.PathOptions;
+import com.ethpalser.chess.move.custom.condition.Conditional;
+import com.ethpalser.chess.move.custom.condition.GameHistoryConditional;
+import com.ethpalser.chess.move.custom.condition.PathStateConditional;
+import com.ethpalser.chess.move.custom.condition.PieceCompareConditional;
+import com.ethpalser.chess.move.custom.condition.PieceStateConditional;
 
 public class ConditionalFactory {
 

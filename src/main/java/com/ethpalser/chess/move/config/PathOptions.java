@@ -1,4 +1,7 @@
-package com.ethpalser.chess.space;
+package com.ethpalser.chess.move.config;
+
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
 
 public record PathOptions(Type type, Reference start, Reference end) {
 

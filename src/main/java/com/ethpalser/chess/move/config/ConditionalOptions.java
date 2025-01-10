@@ -1,8 +1,9 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.move.custom.condition.Operator;
+import com.ethpalser.chess.move.custom.condition.PropertyType;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Reference;
 
 public record ConditionalOptions(ConditionalOptions.Type type, Reference primary, PropertyType property,
                                  Operator operator, Object expected, Reference optional) {

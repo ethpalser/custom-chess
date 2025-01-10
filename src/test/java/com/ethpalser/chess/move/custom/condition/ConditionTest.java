@@ -4,13 +4,15 @@ import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.config.ConditionalFactory;
+import com.ethpalser.chess.move.config.ConditionalOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Reference;
+import com.ethpalser.chess.move.config.Reference;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

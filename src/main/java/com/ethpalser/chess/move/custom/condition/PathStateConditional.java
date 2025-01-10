@@ -1,12 +1,11 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.PathFactory;
-import com.ethpalser.chess.space.PathOptions;
+import com.ethpalser.chess.move.config.PathFactory;
+import com.ethpalser.chess.move.config.PathOptions;
 import java.util.LinkedList;
 import java.util.List;
 
