@@ -4,8 +4,8 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -27,7 +27,7 @@ public class ChessBoard implements Board<Coordinate> {
     private final Map<Coordinate, Piece> pieces;
 
     public ChessBoard() {
-        this(new Plane(8, 8), new StandardPieceFactory());
+        this(new Plane(8, 8), new CustomPieceFactory(Map.of()));
     }
 
     public ChessBoard(ChessBoard original) {

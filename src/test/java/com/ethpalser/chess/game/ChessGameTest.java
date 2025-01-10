@@ -2,25 +2,13 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.BoardTestCases;
-import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.game.logic.GameTree;
-import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.map.MoveMap;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.PieceFactory;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
-import com.ethpalser.chess.piece.standard.StandardPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Space;
-import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
