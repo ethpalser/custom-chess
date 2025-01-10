@@ -1,9 +1,8 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.condition;
 
-import com.ethpalser.chess.condition.Property;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
