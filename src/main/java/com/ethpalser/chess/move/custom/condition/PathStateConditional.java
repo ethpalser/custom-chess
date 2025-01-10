@@ -47,8 +47,4 @@ public class PathStateConditional implements Conditional {
                     || (this.expected instanceof Path && !this.expected.equals(path));
         };
     }
-
-    List<Piece> piecesOfPath(Path path, Board<Coordinate> board) {
-        return path.toList().stream().map(board::get).toList();
-    }
 }
