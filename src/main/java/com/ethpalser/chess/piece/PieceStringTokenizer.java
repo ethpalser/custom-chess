@@ -1,6 +1,5 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.piece.custom.PieceType;
 import java.util.ArrayList;
 import java.util.List;
 

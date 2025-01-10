@@ -1,4 +1,4 @@
-package com.ethpalser.chess.piece.custom;
+package com.ethpalser.chess.piece;
 
 public enum PieceType {
     PAWN("P"),

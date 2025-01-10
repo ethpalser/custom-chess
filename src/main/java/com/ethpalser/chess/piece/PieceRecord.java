@@ -1,6 +1,5 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 

@@ -12,7 +12,7 @@ import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;

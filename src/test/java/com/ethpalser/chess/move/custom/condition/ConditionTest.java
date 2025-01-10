@@ -5,7 +5,7 @@ import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;

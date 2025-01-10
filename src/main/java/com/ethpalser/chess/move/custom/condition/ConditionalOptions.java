@@ -1,6 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Reference;
 

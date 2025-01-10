@@ -4,7 +4,7 @@ import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Space;

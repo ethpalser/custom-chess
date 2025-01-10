@@ -1,7 +1,6 @@
 package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.piece.custom.CustomPiece;
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Bishop;
 import com.ethpalser.chess.piece.standard.King;
 import com.ethpalser.chess.piece.standard.Knight;

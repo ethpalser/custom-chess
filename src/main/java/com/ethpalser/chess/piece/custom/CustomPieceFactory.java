@@ -4,6 +4,7 @@ import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.piece.standard.Bishop;
 import com.ethpalser.chess.piece.standard.King;
 import com.ethpalser.chess.piece.standard.Knight;

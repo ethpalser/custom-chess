@@ -8,7 +8,7 @@ import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.move.custom.condition.ConditionalOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.PathOptions;

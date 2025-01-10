@@ -3,7 +3,7 @@ package com.ethpalser.chess.move.notation;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceRecord;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 
