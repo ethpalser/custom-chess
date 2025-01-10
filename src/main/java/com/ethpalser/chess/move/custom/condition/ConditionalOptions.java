@@ -1,5 +1,7 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Reference;
 
 public record ConditionalOptions(ConditionalOptions.Type type, Reference primary, PropertyType property,
@@ -42,4 +44,28 @@ public record ConditionalOptions(ConditionalOptions.Type type, Reference primary
     public static ConditionalOptions pathState(Reference start, Reference end, Operator operator, Object expected) {
         return new ConditionalOptions(Type.BOARD, start, null, operator, expected, end);
     }
+
+    // Specific Conditional Options
+
+    public static ConditionalOptions refNotMoved(Reference ref) {
+        return ConditionalOptions.pieceState(ref, PropertyType.HAS_MOVED, Operator.FALSE, false);
+    }
+
+    public static ConditionalOptions refIsType(Reference ref, PieceType pieceType) {
+        return ConditionalOptions.pieceState(ref, PropertyType.CODE, Operator.EQUAL, pieceType.toCode());
+    }
+
+    public static ConditionalOptions refAtDirection(Reference ref, Direction direction, int distance) {
+        return ConditionalOptions.pieceCompare(ref, Operator.EQUAL,
+                new Reference(Reference.Location.POINT, direction, distance));
+    }
+
+    public static ConditionalOptions pathIsEmpty(Reference start, Reference end) {
+        return ConditionalOptions.pathState(start, end, Operator.FALSE, null);
+    }
+
+    public static ConditionalOptions lastMovedDistance(int distance) {
+        return ConditionalOptions.gameHistory(PropertyType.DISTANCE_MOVED, Operator.EQUAL, distance);
+    }
+
 }
