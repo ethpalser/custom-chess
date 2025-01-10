@@ -7,72 +7,36 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.PathOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Queen implements Piece {
+public class Queen extends Piece {
 
+    private static final String CODE = PieceType.QUEEN.toCode();
     private static final List<MoveSpec> MOVE_SPECS = List.of(
             new MoveSpec(new PathOptions(PathOptions.Type.VERTICAL), true, false),
             new MoveSpec(new PathOptions(PathOptions.Type.HORIZONTAL), false, true),
             new MoveSpec(new PathOptions(PathOptions.Type.DIAGONAL), true, true)
     );
 
-    private final Colour colour;
-    private Coordinate point;
-    private boolean hasMoved;
-
     public Queen(Colour colour, Coordinate point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+        super(Queen.CODE, colour, point, false);
     }
 
     public Queen(Colour colour, Coordinate point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public String getCode() {
-        return "Q";
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
-    }
-
-    @Override
-    public Coordinate getCoordinate() {
-        return this.point;
-    }
-
-    @Override
-    public void setCoordinate(Coordinate point) {
-        this.point = point;
+        super(Queen.CODE, colour, point, hasMoved);
     }
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
         List<MoveReport> results = new ArrayList<>(24);
         for (MoveSpec spec : Queen.MOVE_SPECS) {
-            results.addAll(spec.toMoveList(context, this.point, this.colour));
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
         return new MoveSet(results);
-    }
-
-    @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
     }
 
     @Override
@@ -81,12 +45,7 @@ public class Queen implements Piece {
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         return List.of();
-    }
-
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }

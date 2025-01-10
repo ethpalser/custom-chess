@@ -108,7 +108,7 @@ public class MoveEvent implements GameEvent {
         if (piece.canPromote(board)) {
             boolean promoted = this.promotePiece(piece, board, log);
             if (!promoted) {
-                context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, piece.promoteOptions()));
+                context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, piece.getPromotions()));
             }
         }
         // Commit this change to the game
@@ -116,7 +116,7 @@ public class MoveEvent implements GameEvent {
     }
 
     private boolean promotePiece(Piece piece, Board<Coordinate> board, Log<Coordinate, Piece> log) {
-        List<String> promoteOptions = piece.promoteOptions();
+        List<String> promoteOptions = piece.getPromotions();
         // Temporary, always have pawns promote to queen to simplify running simulations
         String pieceStr;
         if (promoteOptions.size() == 1 || PieceType.PAWN.toCode().equals(piece.getCode())) {

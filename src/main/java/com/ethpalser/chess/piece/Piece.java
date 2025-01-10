@@ -2,36 +2,57 @@ package com.ethpalser.chess.piece;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.space.Coordinate;
 import java.util.List;
+import java.util.Objects;
 
-public interface Piece {
+public abstract class Piece {
 
-    String getCode();
+    private final String code;
+    private final Colour colour;
+    private Coordinate position;
+    private boolean hasMoved;
 
-    Colour getColour();
+    protected Piece(String code, Colour colour, Coordinate point, boolean hasMoved) {
+        this.code = code;
+        this.colour = colour;
+        this.position = point;
+        this.hasMoved = hasMoved;
+    }
 
-    Coordinate getCoordinate();
+    public String getCode() {
+        return this.code;
+    }
 
-    void setCoordinate(Coordinate coordinate);
+    public Colour getColour() {
+        return this.colour;
+    }
 
-    MoveSet getMoves(GameContext.Record context);
+    public Coordinate getCoordinate() {
+        return this.position;
+    }
 
-    default boolean canMove(Coordinate target, GameContext.Record context) {
+    public void setCoordinate(Coordinate coordinate) {
+        this.position = coordinate;
+    }
+
+    public boolean getHasMoved() {
+        return this.hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    public boolean canMove(Coordinate target, GameContext.Record context) {
         if (context == null) {
             return false;
         }
         return this.getMoves(context).moves().stream().anyMatch(m -> m.path().toSet().contains(target));
     }
 
-    boolean getHasMoved();
-
-    void setHasMoved(boolean hasMoved);
-
-    default void move(Coordinate point) {
+    public void move(Coordinate point) {
         if (point == null) {
             throw new IllegalArgumentException("piece cannot move to null");
         }
@@ -39,11 +60,37 @@ public interface Piece {
             return;
         }
         this.setCoordinate(point);
-        this.setHasMoved(true);
+        this.hasMoved = true;
     }
 
-    boolean canPromote(Board<Coordinate> board);
+    public abstract MoveSet getMoves(GameContext.Record context);
 
-    List<String> promoteOptions();
+    public abstract boolean canPromote(Board<Coordinate> board);
 
+    public abstract List<String> getPromotions();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Piece piece = (Piece) o;
+        return hasMoved == piece.hasMoved && Objects.equals(code, piece.code) && colour == piece.colour && Objects.equals(position, piece.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, colour, position, hasMoved);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getColour().toCode());
+        sb.append(this.getCode());
+        sb.append(this.getCoordinate());
+        if (this.getHasMoved()) {
+            sb.append("*");
+        }
+        return sb.toString();
+    }
 }

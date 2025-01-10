@@ -7,71 +7,35 @@ import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.PathOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Rook implements Piece {
+public class Rook extends Piece {
 
+    private static final String CODE = PieceType.ROOK.toCode();
     private static final List<MoveSpec> MOVE_SPECS = List.of(
             new MoveSpec(new PathOptions(PathOptions.Type.VERTICAL), true, false),
             new MoveSpec(new PathOptions(PathOptions.Type.HORIZONTAL), false, true)
     );
 
-    private final Colour colour;
-    private Coordinate point;
-    private boolean hasMoved;
-
     public Rook(Colour colour, Coordinate point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+        super(Rook.CODE, colour, point, false);
     }
 
     public Rook(Colour colour, Coordinate point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public String getCode() {
-        return "R";
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
-    }
-
-    @Override
-    public Coordinate getCoordinate() {
-        return this.point;
-    }
-
-    @Override
-    public void setCoordinate(Coordinate point) {
-        this.point = point;
+        super(Rook.CODE, colour, point, hasMoved);
     }
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
         List<MoveReport> results = new ArrayList<>(16);
         for (MoveSpec spec : Rook.MOVE_SPECS) {
-            results.addAll(spec.toMoveList(context, this.point, this.colour));
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
         return new MoveSet(results);
-    }
-
-    @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
     }
 
     @Override
@@ -80,12 +44,7 @@ public class Rook implements Piece {
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         return List.of();
-    }
-
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }
