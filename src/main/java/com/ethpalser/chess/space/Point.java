@@ -1,8 +1,5 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.piece.Colour;
-
 public class Point implements Coordinate, Comparable<Point> {
 
     private final int x;
@@ -70,6 +67,14 @@ public class Point implements Coordinate, Comparable<Point> {
         return new int[]{this.x, this.y};
     }
 
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
     @Override
     public Coordinate translate(int magnitude, int... values) {
         int[] newValues = new int[this.getDimension()];
@@ -103,14 +108,6 @@ public class Point implements Coordinate, Comparable<Point> {
         return this.getY() * 31 + this.getX();
     }
 
-    public int getX() {
-        return this.x;
-    }
-
-    public int getY() {
-        return this.y;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -118,8 +115,6 @@ public class Point implements Coordinate, Comparable<Point> {
         if (o == null)
             return false;
         if (!this.getClass().isInstance(o)) {
-            System.err.println("object is " + o.getClass());
-            System.err.println("can cast to point " + (Point.class.isAssignableFrom(o.getClass())));
             return false;
         }
 
@@ -134,41 +129,4 @@ public class Point implements Coordinate, Comparable<Point> {
         char xChar = (char) ('a' + this.x);
         return "" + xChar + (this.y + 1);
     }
-
-    // STATIC METHODS
-
-    public static Point validOrNull(Board<Coordinate> board, Point start, Colour colour,
-            int xOffset, int yOffset, boolean includeDefends) {
-        Point point = (Point) start.translate(1, xOffset, yOffset);
-        // In general, valid spaces are empty or an opponent's piece
-        boolean isEmpty = board.get(point) == null;
-        boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);
-        // IncludeDefends is a special valid case only needed for algorithms considering opponent actions
-        if (!board.rejects(point) && (includeDefends || isEmpty || isOpponent)) {
-            return point;
-        }
-        return null;
-    }
-
-    public static Point notCaptureOrNull(Board<Coordinate> board, Point start, int xOffset, int yOffset) {
-        Point point = (Point) start.translate(1, xOffset, yOffset);
-        // Non-capture points are always empty
-        if (!board.rejects(point) && board.get(point) == null) {
-            return point;
-        }
-        return null;
-    }
-
-    public static Point captureOrNull(Board<Coordinate> board, Point start, Colour colour,
-            int xOffset, int yOffset, boolean includeDefends) {
-        Point point = (Point) start.translate(1, xOffset, yOffset);
-        // Capture points are all valid spaces that are not empty
-        boolean isEmpty = board.get(point) == null;
-        boolean isOpponent = !isEmpty && !board.get(point).getColour().equals(colour);
-        if (!board.rejects(point) && (includeDefends || isOpponent)) {
-            return point;
-        }
-        return null;
-    }
-
 }
