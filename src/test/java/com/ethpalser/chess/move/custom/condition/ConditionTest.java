@@ -1,5 +1,11 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.condition.Conditional;
+import com.ethpalser.chess.condition.GameHistoryConditional;
+import com.ethpalser.chess.condition.Operator;
+import com.ethpalser.chess.condition.PieceCompareConditional;
+import com.ethpalser.chess.condition.PieceStateConditional;
+import com.ethpalser.chess.condition.PropertyType;
 import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;

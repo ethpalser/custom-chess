@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.custom.condition;
 
+import com.ethpalser.chess.condition.Property;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.custom.CustomPiece;
 import com.ethpalser.chess.piece.PieceType;

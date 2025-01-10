@@ -1,7 +1,7 @@
 package com.ethpalser.chess.move.config;
 
-import com.ethpalser.chess.move.custom.condition.Operator;
-import com.ethpalser.chess.move.custom.condition.PropertyType;
+import com.ethpalser.chess.condition.Operator;
+import com.ethpalser.chess.condition.PropertyType;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Direction;
 

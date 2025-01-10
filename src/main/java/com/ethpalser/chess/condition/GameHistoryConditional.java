@@ -1,4 +1,4 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.condition;
 
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.log.Log;

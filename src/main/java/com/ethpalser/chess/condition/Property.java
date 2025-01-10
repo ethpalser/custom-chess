@@ -1,4 +1,4 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.condition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

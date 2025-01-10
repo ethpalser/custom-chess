@@ -1,4 +1,4 @@
-package com.ethpalser.chess.move.custom.condition;
+package com.ethpalser.chess.condition;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
