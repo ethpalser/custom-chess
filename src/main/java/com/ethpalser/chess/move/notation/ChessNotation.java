@@ -33,6 +33,7 @@ public class ChessNotation {
         }
         this.format = chessFormat;
         this.string = chessFormat.format(chessRecord);
+        this.chessRecord = chessRecord;
     }
 
     public ChessRecord toRecord() {
