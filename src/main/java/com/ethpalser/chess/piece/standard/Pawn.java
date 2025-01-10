@@ -2,17 +2,15 @@ package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
+import com.ethpalser.chess.move.custom.condition.ConditionalOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
-import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.PathOptions;
 import com.ethpalser.chess.space.Point;
 import com.ethpalser.chess.space.Reference;
@@ -21,6 +19,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pawn implements Piece {
+
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            // Move one - Move only
+            new MoveSpec.Builder(new PathOptions(new Point(0, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .build(),
+            // Diagonal one - Capture only
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMove(false)
+                    .build(),
+            // Move two - Move only
+            new MoveSpec.Builder(new PathOptions(new Point(0, 1), new Point(0, 2)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(ConditionalOptions.refNotMoved(new Reference())))
+                    .build(),
+            // En Passant front-right
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.LAST_MOVED), PieceType.PAWN),
+                            ConditionalOptions.refAtDirection(new Reference(Reference.Location.LAST_MOVED),
+                                    Direction.RIGHT, 1),
+                            ConditionalOptions.lastMovedDistance(2)
+                    ))
+                    // This should use the piece's relative point for reference. The captured pawn is to the right.
+                    .followUp(new Reference(Reference.Location.POINT, Direction.RIGHT), null)
+                    .build(),
+            // En Passant front-left
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(true)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.LAST_MOVED), PieceType.PAWN),
+                            ConditionalOptions.refAtDirection(new Reference(Reference.Location.LAST_MOVED),
+                                    Direction.LEFT, 1),
+                            ConditionalOptions.lastMovedDistance(2)
+                    ))
+                    // This should use the piece's relative point for reference. The captured pawn is to the left.
+                    .followUp(new Reference(Reference.Location.POINT, Direction.LEFT), null)
+                    .build()
+    );
 
     private final Colour colour;
     private Coordinate point;
@@ -60,54 +111,9 @@ public class Pawn implements Piece {
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
-        MoveSpec moveOne = new MoveSpec(new PathOptions(new Point(0, 1)), false, false, true);
-        MoveSpec capture = (new MoveSpec.Builder(new PathOptions(new Point(1, 1))))
-                .isMove(false)
-                .isMirrorXAxis(false)
-                .build();
-
-        List<MoveReport> results = new ArrayList<>();
-        results.addAll(moveOne.toMoveList(context, this.point, this.colour));
-        results.addAll(capture.toMoveList(context, this.point, this.colour));
-
-        // pawns can move forward two if it is their first move
-        if (!this.hasMoved) {
-            MoveSpec moveTwo = new MoveSpec(new PathOptions(new Point(0, 1), new Point(0, 2)), false, false, true);
-            results.addAll(moveTwo.toMoveList(context, this.point, this.colour));
-        }
-
-        // Special move: En Passant
-        Board<Coordinate> board = context.getBoard();
-        Log<Coordinate, Piece> log = context.getLog(); // Todo: replace old log with new log
-        // en passant (there must be at least one move)
-        if (log != null && !log.isEmpty()) {
-            LogEntry<Coordinate, Piece> lastMove = log.peek();
-            Point peekStart = (Point) lastMove.getStart();
-            Point peekEnd = (Point) lastMove.getEnd();
-            // a pawn moved forward two
-            if (lastMove.isFirstOccurrence() && board.get(peekEnd) != null && "P".equals(board.get(peekEnd).getCode())
-                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
-                    || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
-            ) {
-                // Setup common en passant specifications
-                MoveSpec.Builder epSpec = new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
-                        .isSpecificQuadrant(true)
-                        .isMirrorXAxis(false)
-                        .isAttack(false);
-                // that pawn is to the left of this pawn
-                Coordinate enPassantLeft = this.point.translate(1, Direction.LEFT.vector());
-                if (enPassantLeft.equals(peekEnd)) {
-                    epSpec.isMirrorYAxis(true)
-                            .followUp(new Reference(Reference.Location.POINT, Direction.AT, enPassantLeft), null);
-                    results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
-                }
-                // that pawn is to the right of this pawn
-                Coordinate enPassantRight = this.point.translate(1, Direction.RIGHT.vector(this.colour));
-                if (enPassantRight.equals(peekEnd)) {
-                    epSpec.followUp(new Reference(Reference.Location.POINT, Direction.AT, enPassantRight), null);
-                    results.addAll(epSpec.build().toMoveList(context, this.point, this.colour));
-                }
-            }
+        List<MoveReport> results = new ArrayList<>(10);
+        for (MoveSpec spec : Pawn.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.point, this.colour));
         }
         return new MoveSet(results);
     }

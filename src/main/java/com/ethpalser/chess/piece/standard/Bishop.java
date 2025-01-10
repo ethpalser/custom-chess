@@ -2,17 +2,21 @@ package com.ethpalser.chess.piece.standard;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.PathOptions;
-import com.ethpalser.chess.space.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bishop implements Piece {
+
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            new MoveSpec(new PathOptions(PathOptions.Type.DIAGONAL), true, true)
+    );
 
     private final Colour colour;
     private Coordinate point;
@@ -52,11 +56,11 @@ public class Bishop implements Piece {
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
-        if (context == null) {
-            throw new IllegalArgumentException("context cannot be null");
+        List<MoveReport> results = new ArrayList<>(8);
+        for (MoveSpec spec : Bishop.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.point, this.colour));
         }
-        MoveSpec spec = new MoveSpec(new PathOptions(PathOptions.Type.DIAGONAL), true, true);
-        return new MoveSet(spec.toMoveList(context, this.point, this.colour));
+        return new MoveSet(results);
     }
 
     @Override

@@ -8,13 +8,16 @@ import com.ethpalser.chess.move.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.PathOptions;
-import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Rook implements Piece {
+
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            new MoveSpec(new PathOptions(PathOptions.Type.VERTICAL), true, false),
+            new MoveSpec(new PathOptions(PathOptions.Type.HORIZONTAL), false, true)
+    );
 
     private final Colour colour;
     private Coordinate point;
@@ -54,15 +57,10 @@ public class Rook implements Piece {
 
     @Override
     public MoveSet getMoves(GameContext.Record context) {
-        if (context == null) {
-            throw new IllegalArgumentException("context cannot be null");
-        }
-        MoveSpec vSpec = new MoveSpec(new PathOptions(PathOptions.Type.VERTICAL), true, false);
-        MoveSpec hSpec = new MoveSpec(new PathOptions(PathOptions.Type.HORIZONTAL), false, true);
-
         List<MoveReport> results = new ArrayList<>(16);
-        results.addAll(vSpec.toMoveList(context, this.point, this.colour));
-        results.addAll(hSpec.toMoveList(context, this.point, this.colour));
+        for (MoveSpec spec : Rook.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.point, this.colour));
+        }
         return new MoveSet(results);
     }
 
