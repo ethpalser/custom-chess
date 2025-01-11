@@ -63,6 +63,10 @@ public class ChessGame implements Game {
         return new GameInfo(this.turn, this.evaluateState(), this.status, this.context);
     }
 
+    public GameContext context() {
+        return this.context;
+    }
+
     @Override
     public GameStatus getStatus() {
         return status;

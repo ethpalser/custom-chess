@@ -31,7 +31,7 @@ class LogReferenceTest {
         Game game = new ChessGame();
         game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
         // Then
-        GameContext context = game.info().context();
+        GameContext context = game.context();
         assertFalse(logRef.coordinates(context.toRecord(), new Point()).isEmpty());
         assertTrue(logRef.coordinates(context.toRecord(), new Point()).contains(context.getLog().peek().getEnd()));
     }

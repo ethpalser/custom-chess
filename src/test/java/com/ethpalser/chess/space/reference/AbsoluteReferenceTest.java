@@ -43,7 +43,7 @@ class AbsoluteReferenceTest {
         ChessGame game = new ChessGame();
         game.updateGame(new Point("e2"), new Point("e4"), Colour.WHITE); // Moving white pawn e2 to e4
         // Then
-        GameContext context = game.info().context();
+        GameContext context = game.context();
         assertFalse(absRef.coordinates(context.toRecord(), null).isEmpty());
         assertTrue(absRef.coordinates(context.toRecord(), null).contains(point));
         assertNotNull(context.getBoard().get(point));

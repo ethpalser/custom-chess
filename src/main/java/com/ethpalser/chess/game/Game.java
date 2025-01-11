@@ -3,6 +3,8 @@ package com.ethpalser.chess.game;
 public interface Game {
 
     GameInfo info();
+    
+    GameContext context();
 
     GameStatus getStatus();
 

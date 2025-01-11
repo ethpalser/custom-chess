@@ -39,7 +39,7 @@ class RelativeReferenceTest {
         game.updateGame(new Action(Colour.WHITE, pawn, target));
         // Then
         // Note: ref.coordinates used by a piece would provide its own coordinate, which moved from "point" to "target"
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, target);
 
         assertFalse(coordinates.isEmpty());
@@ -57,7 +57,7 @@ class RelativeReferenceTest {
         Coordinate destination = new Point("e3");
         game.updateGame(new Action(Colour.WHITE, pawn, destination));
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, destination);
 
         assertFalse(coordinates.isEmpty());
@@ -77,7 +77,7 @@ class RelativeReferenceTest {
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Filler
         game.updateGame(new Action(Colour.WHITE, pawnF, pawnF.translate(1, Direction.NORTH)));
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         Coordinate piece = pawnE.translate(1, Direction.NORTH);
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, piece);
 
@@ -97,7 +97,7 @@ class RelativeReferenceTest {
         Reference pieceRef = new Reference(Reference.Location.POINT, Direction.LEFT, 4);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, king);
 
         assertFalse(coordinates.isEmpty());
@@ -112,7 +112,7 @@ class RelativeReferenceTest {
         Reference pieceRef = new Reference(Reference.Location.POINT, Direction.BACK, 2);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, king);
 
         assertFalse(coordinates.isEmpty());
@@ -126,7 +126,7 @@ class RelativeReferenceTest {
         Reference edgeRef = new Reference(Reference.Location.WEST_EDGE, Direction.AT);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
 
         assertFalse(coordinates.isEmpty());
@@ -141,7 +141,7 @@ class RelativeReferenceTest {
         Reference edgeRef = new Reference(Reference.Location.EAST_EDGE, Direction.AT);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
 
         assertFalse(coordinates.isEmpty());
@@ -156,7 +156,7 @@ class RelativeReferenceTest {
         Reference edgeRef = new Reference(Reference.Location.WEST_EDGE, Direction.RIGHT);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
 
         assertFalse(coordinates.isEmpty());
@@ -171,7 +171,7 @@ class RelativeReferenceTest {
         Reference edgeRef = new Reference(Reference.Location.EAST_EDGE, Direction.LEFT);
         // Then
         Game game = new ChessGame();
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = edgeRef.coordinates(ctxRecord, origin);
 
         assertFalse(coordinates.isEmpty());

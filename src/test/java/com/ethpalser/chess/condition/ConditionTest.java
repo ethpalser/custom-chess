@@ -32,7 +32,7 @@ class ConditionTest {
         );
         // Then
         Coordinate enPassantPawn = new Point("d2"); // Not moved
-        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantPawn));
+        assertFalse(condition.isExpected(game.context().toRecord(), enPassantPawn));
     }
 
     @Test
@@ -44,7 +44,7 @@ class ConditionTest {
 
         // Then
         Coordinate enPassantPawn = new Point("d2"); // Not moved
-        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantPawn));
+        assertFalse(condition.isExpected(game.context().toRecord(), enPassantPawn));
     }
 
     @Test
@@ -59,7 +59,7 @@ class ConditionTest {
 
         Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
-        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
+        assertFalse(condition.isExpected(game.context().toRecord(), enPassantReady));
     }
 
     @Test
@@ -74,7 +74,7 @@ class ConditionTest {
 
         Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
-        assertTrue(condition.isExpected(game.info().context().toRecord(), enPassantReady));
+        assertTrue(condition.isExpected(game.context().toRecord(), enPassantReady));
     }
 
     @Test
@@ -90,7 +90,7 @@ class ConditionTest {
         // Note: Each piece will provide its own colour when setting up this condition, and in this case it is WHITE
         Conditional condition = new GameHistoryConditional(Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
         // Then
-        assertFalse(condition.isExpected(game.info().context().toRecord(), enPassantReady));
+        assertFalse(condition.isExpected(game.context().toRecord(), enPassantReady));
     }
 
     @Test
@@ -114,7 +114,7 @@ class ConditionTest {
                 Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
 
         // When
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         assertTrue(condLastMovedIsPawn.isExpected(ctxRecord, enPassantReady));
         assertTrue(condLastMovedTwo.isExpected(ctxRecord, enPassantReady));
         assertTrue(condLastMovedNotAllied.isExpected(ctxRecord, enPassantReady));
@@ -123,7 +123,7 @@ class ConditionTest {
         game.updateGame(new Action(Colour.WHITE, enPassantReady, enPassantDestination)); // EN PASSANT !!!
 
         // Then
-        GameContext.Record ctxRecordAfter = game.info().context().toRecord();
+        GameContext.Record ctxRecordAfter = game.context().toRecord();
         assertNotNull(ctxRecordAfter.getBoard().get(enPassantDestination));
         assertNull(ctxRecordAfter.getBoard().get(enPassantVictim)); // Piece should be captured by en passant
         assertNotNull(ctxRecordAfter.getLog().peek().getStartObject());
@@ -137,7 +137,7 @@ class ConditionTest {
         Conditional condition = new PieceStateConditional(new Reference(Reference.Location.POINT, Direction.AT),
                 Operator.EQUAL, PropertyType.TYPE, PieceType.KING);
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         assertFalse(condition.isExpected(ctxRecord, new Point("e2"))); // Pawn is at e2, not a king!
     }
 
@@ -153,7 +153,7 @@ class ConditionTest {
         Conditional condition = new PieceStateConditional(new Reference(Reference.Location.POINT, Direction.AT),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         assertFalse(condition.isExpected(ctxRecord, kingDestination));
     }
 
@@ -173,7 +173,7 @@ class ConditionTest {
                 queenSideRook),
                 Operator.FALSE, PropertyType.HAS_MOVED, false);
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         assertFalse(condition.isExpected(ctxRecord, new Point("e1"))); // This is the king's condition
     }
 
@@ -185,7 +185,7 @@ class ConditionTest {
                 new Point("b1")),
                 Operator.EQUAL, null);
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         assertFalse(condition.isExpected(ctxRecord, new Point("e1"))); // This is the king's condition
     }
 
@@ -215,7 +215,7 @@ class ConditionTest {
                 Operator.EQUAL, null);
 
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         Coordinate king = new Point("e1");
         // These are all the king's conditions. It provides its own point wherever this is checked
         assertTrue(conditionA.isExpected(ctxRecord, king));
@@ -252,7 +252,7 @@ class ConditionTest {
         ConditionalOptions conditionD = ConditionalOptions.pathState(start, end, Operator.FALSE, null);
 
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         Coordinate king = new Point("e1");
         // These are all the king's conditions. It provides its own point wherever this is checked
         ConditionalFactory factory = ConditionalFactory.getInstance();
@@ -289,7 +289,7 @@ class ConditionTest {
         ConditionalOptions conditionD = ConditionalOptions.pathState(start, end, Operator.FALSE, null);
 
         // Then
-        GameContext.Record ctxRecord = game.info().context().toRecord();
+        GameContext.Record ctxRecord = game.context().toRecord();
         Coordinate king = new Point("e1");
         // These are all the king's conditions. It provides its own point wherever this is checked
         ConditionalFactory factory = ConditionalFactory.getInstance();
