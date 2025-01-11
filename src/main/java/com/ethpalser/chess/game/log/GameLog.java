@@ -3,7 +3,7 @@ package com.ethpalser.chess.game.log;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class GameLog<E> {
+public class GameLog<E> implements Iterable<E> {
 
     private final LinkedList<E> log; // Stack of added items
     private final LinkedList<E> history; // Stack of removed items

@@ -3,7 +3,6 @@ package com.ethpalser.chess.game.log;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;
 import com.ethpalser.chess.move.notation.ChessNotation;
-import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.move.notation.VerboseNotationFormat;
 import java.util.ArrayList;
 import java.util.List;
