@@ -13,7 +13,7 @@ public class GameEventProxy implements GameEvent {
 
     public GameEventProxy(ChessNotation chessNotation) {
         if (chessNotation == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("notation cannot be null for proxy");
         }
         this.eventNotation = chessNotation;
         this.event = null;
@@ -21,6 +21,9 @@ public class GameEventProxy implements GameEvent {
     }
 
     private GameEventProxy(GameEvent event, GameEvent next) {
+        if (event == null) {
+            throw new IllegalArgumentException("event cannot be null for proxy");
+        }
         this.eventNotation = null; // Not needed
         this.event = event;
         this.next = next;
@@ -69,7 +72,10 @@ public class GameEventProxy implements GameEvent {
         if (this.event != null) {
             return this.event;
         }
-        // Notation is only null when this class is constructed with a null event
+        if (this.eventNotation == null) {
+            throw new IllegalStateException("GameEventProxy in illegal state with both a null event and notation");
+        }
+        // Notation is only null when this class is constructed with a null event, which throws an exception
         ChessRecord chessRecord = this.eventNotation.toRecord();
         if (chessRecord.source() == null) {
             throw new IllegalStateException("Failed to determine initial piece coordinate from chess notation.");
