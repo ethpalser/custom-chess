@@ -58,9 +58,9 @@ public record GameOptions(
         private GameOptionsBuilder() {
             this.width = 8;
             this.length = 8;
-            this.unavailable = List.of();
-            this.pieceStarts = Map.of();
-            this.pieceSpecs = Map.of();
+            this.unavailable = new ArrayList<>();
+            this.pieceStarts = new HashMap<>();
+            this.pieceSpecs = new HashMap<>();
         }
 
         public GameOptionsBuilder width(int width) {
