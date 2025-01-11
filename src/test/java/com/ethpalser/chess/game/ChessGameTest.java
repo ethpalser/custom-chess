@@ -582,7 +582,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingH8PieceCanMove_gameIsInProgress() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressPieceCanMove, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressPieceCanMove, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("g4")));
@@ -594,7 +594,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCanCapture_gameIsInProgress() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressPieceCanCapture, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressPieceCanCapture, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));
@@ -606,7 +606,7 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKingsAndAdditionalPiece_gameIsInProgress() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressNotOnlyKings, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.inProgressNotOnlyKings, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2")));
@@ -620,7 +620,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingH8PieceCannotMove_gameIsStalemate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.stalematePieceCannotMove, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.stalematePieceCannotMove, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("g4")));
@@ -632,7 +632,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingF6PieceCannotMove_gameIsStalemate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.stalematePieceCannotCapture, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.stalematePieceCannotCapture, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));
@@ -644,7 +644,7 @@ class ChessGameTest {
     @Test
     void executeAction_onlyKings_gameIsStalemate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.stalemateOnlyKings, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.stalemateOnlyKings, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("e1"), new Point("e2")));
@@ -658,7 +658,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCanCapture_gameHasCheck() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkPieceCanCapture, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkPieceCanCapture, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));
@@ -670,7 +670,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCanBlock_gameHasCheck() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkPieceCanBlock, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkPieceCanBlock, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame( new Action(Colour.WHITE, new Point("d1"), new Point("d8")));
@@ -682,7 +682,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCanMove_gameHasCheck() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkKingCanMove, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkKingCanMove, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));
@@ -696,7 +696,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingD8PieceCannotCapture_gameHasCheckmate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmatePieceCannotCapture, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmatePieceCannotCapture, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));
@@ -708,7 +708,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG8PieceCannotBlock_gameHasCheckmate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmatePieceCannotBlock, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmatePieceCannotBlock, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d8")));
@@ -720,7 +720,7 @@ class ChessGameTest {
     @Test
     void executeAction_kingG7KingCannotMove_gameHasCheckmate() {
         // Given
-        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmateKingCannotMove, null, null);
+        GameSaveData saveData = new GameSaveData(BoardTestCases.checkmateKingCannotMove, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
         GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d7")));

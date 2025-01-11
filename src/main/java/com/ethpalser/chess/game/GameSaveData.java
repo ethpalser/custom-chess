@@ -1,10 +1,13 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.game.state.GamePrompt;
+import com.ethpalser.chess.move.config.MoveSpec;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
-public record GameSaveData(String[] pieceNotations, String[] logNotations, GamePrompt prompt) {
+public record GameSaveData(String[] pieceNotations, String[] logNotations, GamePrompt prompt,
+                           Map<String, MoveSpec> pieceSpecifications) {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
