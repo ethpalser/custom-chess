@@ -34,7 +34,7 @@ public class GameLog<E> implements Iterable<E> {
 
     public E pop() {
         if (this.log.isEmpty()) {
-            throw new NullPointerException("Cannot remove item, as log is empty");
+            return null;
         }
         this.history.add(this.log.getLast());
         return this.log.removeLast();
