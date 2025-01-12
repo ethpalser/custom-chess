@@ -30,6 +30,18 @@ public record ChessRecord(
         private String promoteCode;
         private ChessRecord followUp;
 
+        public Builder original(ChessRecord rec) {
+            this.source = rec.source;
+            this.target = rec.target;
+            this.sourceColour = rec.sourceColour;
+            this.targetColour = rec.targetColour;
+            this.sourceCode = rec.sourceCode;
+            this.targetCode = rec.targetCode;
+            this.promoteCode = rec.promoteCode;
+            this.followUp = rec.followUpRecord;
+            return this;
+        }
+
         public Builder sourceCoordinate(Coordinate coordinate) {
             this.source = coordinate;
             return this;
