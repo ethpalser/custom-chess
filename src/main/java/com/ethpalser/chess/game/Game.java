@@ -3,7 +3,7 @@ package com.ethpalser.chess.game;
 public interface Game {
 
     GameInfo info();
-    
+
     GameContext context();
 
     GameStatus getStatus();
@@ -12,17 +12,9 @@ public interface Game {
 
     GameStatus updateGame(Action action);
 
-    GameStatus undoUpdate(int changesToUndo, boolean saveForRedo);
+    GameStatus undo();
 
-    default GameStatus undoUpdate() {
-        return this.undoUpdate(1, true);
-    }
-
-    GameStatus redoUpdate(int changesToRedo);
-
-    default GameStatus redoUpdate() {
-        return this.redoUpdate(1);
-    }
+    GameStatus redo();
 
     Iterable<Action> potentialUpdates();
 

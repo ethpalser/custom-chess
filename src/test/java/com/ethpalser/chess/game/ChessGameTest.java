@@ -65,7 +65,8 @@ class ChessGameTest {
         // Checking that a bug does not occur
         game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6")));
         game.updateGame(new Action(Colour.WHITE, new Point("e4"), new Point("f6")));
-        game.undoUpdate(2, false);
+        game.undo();
+        game.undo();
 
         // Asserting that actions are all legal moves after undo
         Iterable<Action> blackActions2 = game.potentialUpdates();
@@ -78,7 +79,7 @@ class ChessGameTest {
             assertTrue(blackMoves2.getPieces(action.getEnd()).contains(piece));
             assertTrue(piece.getMoves(ctxRecord2).moves().stream().anyMatch(m -> m.path().toSet().contains(action.getEnd())));
         }
-        game.undoUpdate(1, false);
+        game.undo();
     }
 
     @Test
@@ -128,7 +129,7 @@ class ChessGameTest {
             if (result == GameStatus.NO_CHANGE) {
                 fail("available actions must prevent check");
             }
-            game.undoUpdate(1, true);
+            game.undo();
         }
     }
 
@@ -179,15 +180,15 @@ class ChessGameTest {
             if (result == GameStatus.NO_CHANGE) {
                 fail("available actions must prevent check");
             }
-            game.undoUpdate(1, true);
+            game.undo();
         }
 
         // Threats should be updated to reflect the king in check
         assertEquals(GameStatus.BLACK_IN_CHECK, game.getStatus());
         // Checking that a bug does not occur
-        GameStatus afterUndoG5F7 = game.undoUpdate(1, true);
+        GameStatus afterUndoG5F7 = game.undo();
         assertEquals(GameStatus.ONGOING, afterUndoG5F7);
-        GameStatus afterUndoE7E5 = game.undoUpdate(1, true);
+        GameStatus afterUndoE7E5 = game.undo();
         assertEquals(GameStatus.ONGOING, afterUndoE7E5);
         // This is illegal, as this black pawn moving will open a path for the white queen to capture the black king
         GameStatus s6 = game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f5")));
@@ -328,7 +329,9 @@ class ChessGameTest {
         GameInfo info = game.info();
         Board<Coordinate> updatedBoard = info.context().getBoard();
         assertNotNull(updatedBoard.get(end));
-        assertNotNull(info.context().getLog().peek().getPromotion());
+
+        // Todo: Auto promote pawn to queen, then update this to make an update with a Promote event
+        assertNotNull(info.context().getLog().peek().notation().toRecord().promoteCode());
         assertEquals("Q", updatedBoard.get(end).getCode());
 
         // Testing Undo and Redo as well
@@ -577,6 +580,7 @@ class ChessGameTest {
         assertNull(updatedBoard.get(target.translate(1, Direction.BACK)));
         assertNotNull(updatedBoard.get(target));
     }
+
     // endregion
     // region In Progress Game
     @Test
@@ -673,7 +677,7 @@ class ChessGameTest {
         GameSaveData saveData = new GameSaveData(BoardTestCases.checkPieceCanBlock, null, null, null);
         Game game = new ChessGame(new GameOptions(), saveData);
         // When
-        GameStatus status = game.updateGame( new Action(Colour.WHITE, new Point("d1"), new Point("d8")));
+        GameStatus status = game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d8")));
         // Then
         assertEquals(GameStatus.BLACK_IN_CHECK, status);
         assertFalse(GameStatus.isCompletedGameStatus(status));

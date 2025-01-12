@@ -2,7 +2,7 @@ package com.ethpalser.chess.move.map;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -28,8 +28,7 @@ public class ThreatMap {
         this.length = original.length;
     }
 
-    public ThreatMap(Colour colour, Space space, Board<Coordinate> board,
-            Log<Coordinate, Piece> log) {
+    public ThreatMap(Colour colour, Space space, Board<Coordinate> board, ChessLog log) {
         if (space == null || board == null || log == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }

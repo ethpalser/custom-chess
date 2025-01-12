@@ -1,10 +1,10 @@
 package com.ethpalser.chess.condition;
 
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.space.Coordinate;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.space.Space;
 
 public class GameHistoryConditional implements Conditional {
 
@@ -24,41 +24,31 @@ public class GameHistoryConditional implements Conditional {
     @Override
     public boolean isExpected(GameContext.Record context, Coordinate appliedTo) {
         // Note: appliedTo is ignored, as this is only checking the context's log
-        if (this.operator == null || context == null || context.getLog() == null || context.getLog().peek() == null) {
+        if (context == null || context.getLog() == null || context.getLog().peek() == null) {
             return false;
         }
-        // Todo: replace with newer log
-        Log<Coordinate, Piece> log = context.getLog();
-        switch (this.propType) {
-            case HAS_MOVED -> {
-                return switch (this.operator) {
-                    case TRUE -> log.peek().isFirstOccurrence();
-                    case FALSE -> !log.peek().isFirstOccurrence();
-                    default -> false;
-                };
-            }
-            case DISTANCE_MOVED -> {
-                Point start = (Point) log.peek().getStart();
-                Point end = (Point) log.peek().getEnd();
-                int diff;
-                if (start == null || end == null) {
-                    diff = 0;
-                } else {
-                    diff = Math.max(
-                            Math.abs(start.getX() - end.getX()),
-                            Math.abs(start.getY() - end.getY())
-                    );
-                }
-
-                return switch (this.operator) {
-                    case EQUAL -> expected.equals(diff);
-                    case NOT_EQUAL -> !expected.equals(diff);
-                    default -> false;
-                };
-            }
-            default -> {
+        ChessLog log = context.getLog();
+        if (this.propType == PropertyType.DISTANCE_MOVED) {
+            if (log.peek() == null) {
                 return false;
             }
+            ChessRecord rec = log.peek().notation().toRecord();
+            Coordinate start = rec.source();
+            Coordinate end = rec.target();
+            int diff;
+            if (start == null || end == null) {
+                diff = 0;
+            } else {
+                diff = Math.abs(start.getValue(Space.AXIS.X) - end.getValue(Space.AXIS.X)) +
+                        Math.abs(start.getValue(Space.AXIS.Y) - end.getValue(Space.AXIS.Y));
+            }
+
+            return switch (this.operator) {
+                case EQUAL -> expected.equals(diff);
+                case NOT_EQUAL -> !expected.equals(diff);
+                default -> false;
+            };
         }
+        return false;
     }
 }

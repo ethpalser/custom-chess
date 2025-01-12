@@ -3,16 +3,16 @@ package com.ethpalser.chess.game;
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
-import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.Log;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
+import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import com.ethpalser.chess.space.Plane;
@@ -22,15 +22,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class GameContext {
 
     private Board<Coordinate> board;
-    private Log<Coordinate, Piece> log;
+    private ChessLog log;
     private ThreatMap wThreats;
     private ThreatMap bThreats;
     private Coordinate wKing;
     private Coordinate bKing;
+
+    private Map<String, List<MoveSpec>> moveSpecs;
 
     private GamePrompt prompt; // Nullable
 
@@ -46,7 +49,7 @@ public class GameContext {
         if (logNotations == null) {
             this.log = new ChessLog();
         } else {
-            this.log = new ChessLog(); // Todo: replace with new log that uses chess notation
+            this.log = new ChessLog(logNotations);
         }
         Space space = new Plane(options.width(), options.length(), options.unavailable());
         if (pieceNotations == null) {
@@ -70,6 +73,7 @@ public class GameContext {
         // Creating ThreatMap may not have had the king threatened, as the threats were just being made
         this.refreshThreats(Colour.WHITE, this.wKing, this.toRecord());
         this.refreshThreats(Colour.WHITE, this.wKing, this.toRecord());
+        this.moveSpecs = options.pieceSpecs();
     }
 
 
@@ -77,7 +81,7 @@ public class GameContext {
         return this.board;
     }
 
-    public Log<Coordinate, Piece> getLog() {
+    public ChessLog getLog() {
         return this.log;
     }
 
@@ -87,6 +91,10 @@ public class GameContext {
 
     public Coordinate getKingCoordinate(Colour colour) {
         return Colour.WHITE.equals(colour) ? this.wKing : this.bKing;
+    }
+
+    public Map<String, List<MoveSpec>> getMoveSpecs() {
+        return this.moveSpecs;
     }
 
     public GamePrompt getPrompt() {
@@ -104,15 +112,15 @@ public class GameContext {
         this.prompt = null;
     }
 
-    public void update(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog) {
+    public void update(Colour turn, Board<Coordinate> updatedBoard, ChessLog updatedLog) {
         this.update(turn, updatedBoard, updatedLog, false);
     }
 
-    public void undo(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog) {
+    public void undo(Colour turn, Board<Coordinate> updatedBoard, ChessLog updatedLog) {
         this.update(turn, updatedBoard, updatedLog, true);
     }
 
-    private void update(Colour turn, Board<Coordinate> updatedBoard, Log<Coordinate, Piece> updatedLog,
+    private void update(Colour turn, Board<Coordinate> updatedBoard, ChessLog updatedLog,
             boolean isUndo) {
         if (turn == null || updatedBoard == null) {
             throw new IllegalArgumentException("Cannot update game as one or more arguments are null.");
@@ -273,11 +281,11 @@ public class GameContext {
     public static class Record {
 
         private final Board<Coordinate> board;
-        private final Log<Coordinate, Piece> log;
+        private final ChessLog log;
         private final ThreatMap whiteThreats;
         private final ThreatMap blackThreats;
 
-        public Record(Board<Coordinate> board, Log<Coordinate, Piece> log, ThreatMap whiteThreats,
+        public Record(Board<Coordinate> board, ChessLog log, ThreatMap whiteThreats,
                 ThreatMap blackThreats) {
             this.board = board;
             this.log = log;
@@ -289,7 +297,7 @@ public class GameContext {
             return this.board;
         }
 
-        public Log<Coordinate, Piece> getLog() {
+        public ChessLog getLog() {
             return this.log;
         }
 

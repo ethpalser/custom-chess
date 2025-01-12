@@ -2,18 +2,19 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.MoveEvent;
+import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.game.state.AwaitState;
 import com.ethpalser.chess.game.state.EndState;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.game.state.GameState;
 import com.ethpalser.chess.game.state.ReadyState;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.map.MoveMap;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
@@ -45,7 +46,16 @@ public class ChessGame implements Game {
             this.state = new ReadyState(this.context);
         } else {
             this.context = new GameContext(options, saveData.pieceNotations(), saveData.logNotations());
-            this.turn = saveData.logNotations() == null ? 1 : saveData.logNotations().length;
+            // Count changes in turn
+            int turnCount = 1;
+            for (ChessLog.Entry entry : this.context.getLog()) {
+                ChessRecord rec = entry.notation().toRecord();
+                // Ignore records that are either of these, as they are part of the same player's turn
+                if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                    turnCount++;
+                }
+            }
+            this.turn = turnCount;
             this.status = checkGameStatus(this.currentPlayer(), false);
             GamePrompt prompt = this.context.getPrompt();
             if (GameStatus.isCompletedGameStatus(this.status)) {
@@ -63,6 +73,7 @@ public class ChessGame implements Game {
         return new GameInfo(this.turn, this.evaluateState(), this.status, this.context);
     }
 
+    @Override
     public GameContext context() {
         return this.context;
     }
@@ -111,86 +122,63 @@ public class ChessGame implements Game {
         return this.status;
     }
 
-    public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
-        GameContext.Record ctxRecord = this.context.toRecord();
-        Board<Coordinate> boardCopy = ctxRecord.getBoard();
-        Log<Coordinate, Piece> logCopy = ctxRecord.getLog();
-        for (int i = 0; i < beforeCurrent; i++) {
-            LogEntry<Coordinate, Piece> logEntry;
-            if (saveUndone) {
-                logEntry = logCopy.undo();
-            } else {
-                logEntry = logCopy.pop();
-            }
-            if (logEntry == null) {
+    @Override
+    public GameStatus undo() {
+        ChessLog logCopy = this.context.toRecord().getLog();
+        if (logCopy.peek() == null) {
+            return GameStatus.NO_CHANGE;
+        }
+        boolean undoneBaseMove = false;
+        while (!undoneBaseMove) {
+            if (logCopy.peek() == null) {
                 break;
             }
-            if (logEntry.getSubLogEntry() != null) {
-                this.undoLogEntryToBoard(boardCopy, logEntry.getSubLogEntry());
+            // Undo all non-base moves
+            ChessRecord rec = logCopy.peek().notation().toRecord();
+            if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                undoneBaseMove = true;
             }
-            this.undoLogEntryToBoard(boardCopy, logEntry);
-            // Commit changes to context
-            this.context.undo(this.currentPlayer(), boardCopy, logCopy);
-            this.turn--;
-            this.status = this.checkGameStatus(this.currentPlayer(), true);
+            GameEvent event = logCopy.peek().event();
+            // un-execute should be responsible for context updates
+            event.unExecute(this.context);
         }
-        return this.status;
-    }
 
-    private void undoLogEntryToBoard(Board<Coordinate> board, LogEntry<Coordinate, Piece> logEntry) {
-        if (board == null || logEntry == null) {
-            return;
-        }
-        if (logEntry.getEndObject() != null) {
-            board.add(logEntry.getEnd(), logEntry.getEndObject());
-            logEntry.getEndObject().move(logEntry.getEnd());
-        } else {
-            board.remove(logEntry.getEnd());
-        }
-        board.add(logEntry.getStart(), logEntry.getStartObject());
-        logEntry.getStartObject().move(logEntry.getStart());
-        if (logEntry.isFirstOccurrence()) {
-            logEntry.getStartObject().setHasMoved(false);
-        }
+        // Commit changes to context
+        this.turn--; // Reduce the turn count first to be on the player we just reverted the event(s) for.
+        this.status = this.checkGameStatus(this.currentPlayer(), true);
+        return this.status;
     }
 
     @Override
-    public GameStatus redoUpdate(int afterCurrent) {
-        GameContext.Record ctxRecord = this.context.toRecord();
-        Board<Coordinate> boardCopy = ctxRecord.getBoard();
-        Log<Coordinate, Piece> logCopy = ctxRecord.getLog();
-        for (int i = 0; i < afterCurrent; i++) {
-            LogEntry<Coordinate, Piece> logEntry = logCopy.redo();
-            if (logEntry == null) {
+    public GameStatus redo() {
+        ChessLog logCopy = this.context.toRecord().getLog();
+        if (logCopy.peekUndone() == null) {
+            return GameStatus.NO_CHANGE;
+        }
+
+        GameEvent event = logCopy.peekUndone().event();
+        // un-execute should be responsible for context updates
+        event.execute(this.context);
+
+        boolean atNextBaseMoved = false;
+        while (!atNextBaseMoved) {
+            ChessLog.Entry toRedo = logCopy.peekUndone();
+            if (toRedo == null) {
                 break;
             }
-            this.redoLogEntryToBoard(boardCopy, logEntry);
-            if (logEntry.getSubLogEntry() != null) {
-                this.redoLogEntryToBoard(boardCopy, logEntry.getSubLogEntry());
+            // Redo the first base move and all non-base moves up to the next
+            ChessRecord rec = toRedo.notation().toRecord();
+            if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                atNextBaseMoved = true;
+            } else {
+                event = toRedo.event();
+                event.execute(this.context);
             }
-
-            Piece promoted = logEntry.getPromotion();
-            if (promoted != null) {
-                boardCopy.add(promoted.getCoordinate(), promoted);
-            }
-
-            this.context.update(this.currentPlayer(), boardCopy, logCopy);
-            this.status = this.checkGameStatus(this.currentPlayer(), false);
-            this.turn++;
         }
+        // Commit changes to context
+        this.status = this.checkGameStatus(this.currentPlayer(), true);
+        this.turn++; // Increase the turn count after, as we need to check the status of the executing player
         return this.status;
-    }
-
-    private void redoLogEntryToBoard(Board<Coordinate> board, LogEntry<Coordinate, Piece> logEntry) {
-        if (logEntry == null) {
-            return;
-        }
-        board.add(logEntry.getEnd(), logEntry.getStartObject());
-        logEntry.getStartObject().move(logEntry.getEnd());
-        if (logEntry.isFirstOccurrence()) {
-            logEntry.getStartObject().setHasMoved(true);
-        }
-        board.remove(logEntry.getStart());
     }
 
     @Override
@@ -262,12 +250,16 @@ public class ChessGame implements Game {
             i++;
         }
 
-        Log<Coordinate, Piece> log = this.context.getLog();
+        ChessLog log = this.context.getLog();
         String[] notations = new String[log.size()];
-        // Todo: Use newer log with chess notation
+        int k = 0;
+        for (ChessLog.Entry entry : log) {
+            notations[k] = entry.notation().toString();
+            k++;
+        }
 
         GamePrompt prompt = this.context.getPrompt();
-        return new GameSaveData(pieces, notations, prompt);
+        return new GameSaveData(pieces, notations, prompt, null);
     }
 
     // PRIVATE METHODS

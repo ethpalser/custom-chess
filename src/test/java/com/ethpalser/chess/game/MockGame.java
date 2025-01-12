@@ -27,6 +27,7 @@ public class MockGame implements Game {
             int val = action.getEnd().getValue(Space.AXIS.X);
             if (node.getValue() == val) {
                 this.logStack.push(this.current);
+                this.undoStack.clear();
                 this.current = node;
                 return GameStatus.ONGOING;
             }
@@ -46,15 +47,13 @@ public class MockGame implements Game {
     }
 
     @Override
-    public GameStatus undoUpdate(int changesToUndo, boolean saveForRedo) {
+    public GameStatus undo() {
         if (this.logStack.isEmpty()) {
             return GameStatus.ONGOING;
         }
         MockNode prev = this.logStack.pop();
         if (prev != null) {
-            if (saveForRedo) {
-                this.undoStack.push(this.current);
-            }
+            this.undoStack.push(this.current);
             this.current = prev;
             this.turn--;
         } else {
@@ -65,7 +64,7 @@ public class MockGame implements Game {
     }
 
     @Override
-    public GameStatus redoUpdate(int changesToRedo) {
+    public GameStatus redo() {
         if (this.undoStack.isEmpty()) {
             return GameStatus.ONGOING;
         }
@@ -101,6 +100,11 @@ public class MockGame implements Game {
 
     @Override
     public GameInfo info() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public GameContext context() {
         throw new UnsupportedOperationException();
     }
 }

@@ -88,19 +88,19 @@ public class GameTree {
         }
         if (GameStatus.WHITE_WIN.equals(status)) {
             int result = Integer.MAX_VALUE;
-            this.root.undoUpdate(1, false);
+            this.root.undo();
             return result;
         }
         if (GameStatus.BLACK_WIN.equals(status)) {
             int result = Integer.MIN_VALUE;
-            this.root.undoUpdate(1, false);
+            this.root.undo();
             return result;
         }
 
         Iterable<Action> it = this.root.potentialUpdates();
         if (depth <= 0 || !it.iterator().hasNext()) {
             int result = this.root.evaluateState();
-            this.root.undoUpdate(1, false);
+            this.root.undo();
             return result;
         }
 
@@ -113,7 +113,7 @@ public class GameTree {
                     break;
                 }
             }
-            this.root.undoUpdate(1, false);
+            this.root.undo();
             return localMax;
         } else {
             int localMin = beta;
@@ -124,7 +124,7 @@ public class GameTree {
                     break;
                 }
             }
-            this.root.undoUpdate(1, false);
+            this.root.undo();
             return localMin;
         }
     }

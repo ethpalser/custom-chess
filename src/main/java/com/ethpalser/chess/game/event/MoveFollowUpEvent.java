@@ -5,8 +5,6 @@ import com.ethpalser.chess.exception.IllegalActionException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
-import com.ethpalser.chess.move.Move;
-import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
@@ -14,15 +12,14 @@ import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
-import java.util.List;
 
-public class MoveEvent implements GameEvent {
+public class MoveFollowUpEvent implements GameEvent {
 
     private final Coordinate source;
     private final Coordinate target;
 
-    public MoveEvent(Coordinate source, Coordinate target) {
-        if (source == null || target == null) {
+    public MoveFollowUpEvent(Coordinate source, Coordinate target) {
+        if (source == null) {
             throw new IllegalArgumentException("One or more constructor arguments are null. None can be null.");
         }
         this.source = source;
@@ -36,7 +33,7 @@ public class MoveEvent implements GameEvent {
 
     @Override
     public EventType type() {
-        return EventType.MOVE;
+        return EventType.MOVE_FOLLOW_UP;
     }
 
     @Override
@@ -49,45 +46,54 @@ public class MoveEvent implements GameEvent {
         Board<Coordinate> board = contextRecord.getBoard();
         ChessLog log = contextRecord.getLog();
 
-        if (board.rejects(this.source) || board.rejects(this.target)) {
+        if (board.rejects(this.source)) {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
         if (board.get(this.source) == null) {
             throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
         }
 
-        Piece moving = board.get(this.source);
-        MoveSet moveSet = moving.getMoves(contextRecord);
-        Move move = moveSet.getMove(this.target);
-        if (move == null) {
-            throw new IllegalActionException("piece (" + moving + ") cannot move to " + target);
-        }
-        // Create this record before applying updates, as movement info is needed prior to the change (for un-execute)
-        Piece captured = board.get(this.target);
-        ChessRecord chessRecord = (new ChessRecord.Builder(this.source, this.target, moving, captured)).build();
+        /*
+         * Notice:
+         * The significant differences between a Move and a MoveFollowUp are when each are allowed and what they do.
+         * A move:
+         * - Always by the turn player, and only once per turn
+         * - Verifies that it can happen on the board, the turn player's piece is moving, and it can move as requested
+         * A follow-up:
+         * - Always follows a move, and only once per move
+         * - Verifies that it can happen on the board, but not whose piece it is nor if that piece can move as requested
+         * - The follow-up was pre-verified by the move that preceded this
+         */
 
         // Update board
+        Piece moving = board.get(this.source);
+        Piece captured = board.get(this.target); // Needed before update to create record
         board.remove(this.source);
-        board.remove(this.target);
-        board.add(this.target, moving);
-        moving.move(this.target);
+        // Followup can have a null target, which will remove the piece
+        if (this.target != null) {
+            board.remove(this.target);
+            board.add(this.target, moving);
+            moving.move(this.target);
+        }
 
+        ChessRecord previous = log.peek().notation().toRecord(); // Needed before update to check promotions
         // Update log
+        ChessRecord chessRecord = new ChessRecord.Builder(this.source, this.target, moving, captured)
+                .isFollowUp(true)
+                .build();
         ChessNotation notation = new ChessNotation(chessRecord);
         log.push(new ChessLog.Entry(notation, this));
 
-        // Raise a prompt for the current player to perform, which must happen before the turn changes
-        Move.FollowUp followUp = move.followUp();
-        if (followUp != null) {
-            Coordinate refTarget = followUp.reference().coordinates(contextRecord, this.source).get(0);
-            List<String> options = followUp.path().toList().stream().map(Coordinate::toString).toList();
-            context.raisePrompt(new GamePrompt(EventType.MOVE_FOLLOW_UP, refTarget, options));
+        // Check for promotions. This followup may have prevented a promotion from the original move
+        Piece previouslyMoved = board.get(previous.target());
+        if (previouslyMoved.canPromote(board)) {
+            context.raisePrompt(new GamePrompt(EventType.PROMOTE, previous.target(), previouslyMoved.getPromotions()));
         } else if (moving.canPromote(board)) {
             context.raisePrompt(new GamePrompt(EventType.PROMOTE, this.target, moving.getPromotions()));
         }
         // Commit this change to the game
         // This should be true in every case, as base movement is only allowed by the turn player
-        Colour turnPlayer = moving.getColour();
+        Colour turnPlayer = previouslyMoved.getColour();
         context.update(turnPlayer, board, log);
     }
 
@@ -99,35 +105,45 @@ public class MoveEvent implements GameEvent {
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         GameContext.Record contextRecord = context.toRecord();
 
+        // Undo changes to log, this is first to access the move that caused this follow up
         ChessLog log = contextRecord.getLog();
-        ChessRecord rec = log.peek().notation().toRecord();
+        ChessLog.Entry followUpEntry = log.pop();
+
+        // Undo changes to board
+        Board<Coordinate> board = contextRecord.getBoard();
+
         PieceFactory factory = new CustomPieceFactory(context.getMoveSpecs());
+        Piece moving = board.get(this.target);
+        if (moving == null) { // This piece was removed
+            ChessRecord rec = log.peek().notation().toRecord();
+            moving = factory.create(rec.targetCode(), rec.targetColour(), this.source);
+            moving.setHasMoved(true); // Could this piece not have moved?
+        }
+
         Piece captured;
+        ChessRecord rec = followUpEntry.notation().toRecord();
         if (rec.targetCode() != null && rec.targetColour() != null) {
             captured = factory.create(rec.targetCode(), rec.targetColour(), rec.target());
             captured.setHasMoved(rec.targetHasMoved());
         } else {
             captured = null;
         }
-        // Undo changes to board
-        Board<Coordinate> board = contextRecord.getBoard();
-        Piece moving = board.get(this.target);
 
-        board.remove(this.target);
         board.remove(this.source);
         board.add(this.source, moving);
-        moving.setHasMoved(rec.sourceHasMoved()); // Todo: Determine if using piece starts would be better
-
-        if (captured != null) {
-            board.add(this.target, captured);
-        }
         moving.move(this.source);
+        // Followup can have a null target, which will remove the piece
+        if (this.target != null) {
+            board.remove(this.target);
+            board.add(this.target, captured);
+            if (captured != null) {
+                captured.move(this.target);
+            }
+        }
 
-        // Undo changes to log
-        log.pop();
-
+        // Todo: Determine if this should raise a prompt, or that its unnecessary when the preceding move is also undone
         // Commit this change to the game
-        Colour turnPlayer = moving.getColour();
-        context.undo(turnPlayer, board, log);
+        Colour turnPlayer = log.peek().notation().toRecord().sourceColour();
+        context.update(turnPlayer, board, log);
     }
 }

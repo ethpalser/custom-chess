@@ -2,8 +2,8 @@ package com.ethpalser.chess.move.config;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;
@@ -95,9 +95,15 @@ public class Reference {
         return coordinates.stream().map(c -> c.translate(this.distance, this.direction)).toList();
     }
 
-    private List<Coordinate> lastMovedCoordinate(Log<Coordinate, Piece> log) {
+    private List<Coordinate> lastMovedCoordinate(ChessLog log) {
         if (log != null && log.peek() != null) {
-            return List.of(log.peek().getEnd());
+            ChessRecord rec = log.peek().notation().toRecord();
+            if (rec != null && !rec.isFollowUp()) {
+                return List.of(rec.target());
+            } else {
+                // FollowUp moves will have there not be a last moved coordinate
+                return List.of();
+            }
         }
         return List.of();
     }

@@ -4,10 +4,13 @@ import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.move.config.ConditionalFactory;
 import com.ethpalser.chess.move.config.ConditionalOptions;
 import com.ethpalser.chess.move.config.Reference;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
@@ -104,14 +107,13 @@ class ConditionTest {
         game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
         game.updateGame(new Action(Colour.BLACK, new Point("e7"), enPassantVictim));
 
-        Conditional condLastMovedIsPawn = new PieceStateConditional(new Reference(Reference.Location.LAST_MOVED,
-                Direction.AT),
-                Operator.EQUAL, PropertyType.CODE, PieceType.PAWN.toCode());
+        Conditional condLastMovedIsPawn = new PieceStateConditional(
+                new Reference(Reference.Location.LAST_MOVED, Direction.AT), Operator.EQUAL, PropertyType.CODE,
+                PieceType.PAWN.toCode());
         Conditional condLastMovedTwo = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
-        // Todo: Update LogCondition to verify Colour and Code
-        Conditional condLastMovedNotAllied = new PieceStateConditional(new Reference(Reference.Location.LAST_MOVED,
-                Direction.AT),
-                Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
+        Conditional condLastMovedNotAllied = new PieceStateConditional(
+                new Reference(Reference.Location.LAST_MOVED, Direction.AT), Operator.NOT_EQUAL, PropertyType.COLOUR,
+                Colour.WHITE);
 
         // When
         GameContext.Record ctxRecord = game.context().toRecord();
@@ -126,8 +128,19 @@ class ConditionTest {
         GameContext.Record ctxRecordAfter = game.context().toRecord();
         assertNotNull(ctxRecordAfter.getBoard().get(enPassantDestination));
         assertNull(ctxRecordAfter.getBoard().get(enPassantVictim)); // Piece should be captured by en passant
-        assertNotNull(ctxRecordAfter.getLog().peek().getStartObject());
-        assertEquals(ctxRecordAfter.getLog().peek().getStartObject().getCode(), PieceType.PAWN.toCode());
+
+        ChessLog log = ctxRecordAfter.getLog();
+        // Check that the followup removed the piece
+        ChessRecord rec = log.peek().notation().toRecord();
+        Piece removed = ctxRecordAfter.getBoard().get(rec.source());
+        assertNull(removed);
+
+        log.pop();
+        // Check that the move that caused en passant is at its destination
+        ChessRecord rec2 = log.peek().notation().toRecord();
+        Piece moved = ctxRecordAfter.getBoard().get(rec2.target());
+        assertNotNull(moved);
+        assertEquals(moved.getCode(), PieceType.PAWN.toCode());
     }
 
     @Test

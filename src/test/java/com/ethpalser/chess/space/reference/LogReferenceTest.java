@@ -4,10 +4,10 @@ import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.config.Reference;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.move.config.Reference;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,7 @@ class LogReferenceTest {
         // Then
         GameContext context = game.context();
         assertFalse(logRef.coordinates(context.toRecord(), new Point()).isEmpty());
-        assertTrue(logRef.coordinates(context.toRecord(), new Point()).contains(context.getLog().peek().getEnd()));
+        assertTrue(logRef.coordinates(context.toRecord(),
+                new Point()).contains(context.getLog().peek().notation().toRecord().target()));
     }
 }
