@@ -11,12 +11,15 @@ public record ChessRecord(
         Coordinate target,
         Colour targetColour,
         String targetCode,
+        boolean sourceHasMoved,
+        boolean targetHasMoved,
         String promoteCode,
-        ChessRecord previous) {
+        boolean isFollowUp) {
 
     private ChessRecord(Builder builder) {
         this(builder.source, builder.sourceColour, builder.sourceCode, builder.target, builder.targetColour,
-                builder.targetCode, builder.promoteCode, builder.previous);
+                builder.targetCode, builder.sourceHasMoved, builder.targetHasMoved, builder.promoteCode,
+                builder.isFollowUp);
     }
 
     public static class Builder {
@@ -27,8 +30,10 @@ public record ChessRecord(
         private Colour targetColour;
         private String sourceCode;
         private String targetCode;
+        private boolean sourceHasMoved; // This depends on the record being created before the movement
+        private boolean targetHasMoved;
         private String promoteCode;
-        private ChessRecord previous;
+        private boolean isFollowUp;
 
         /**
          * Create a blank ChessRecord builder. Not recommended for general use.
@@ -43,11 +48,23 @@ public record ChessRecord(
             if (moving != null) {
                 this.sourceColour = moving.getColour();
                 this.sourceCode = moving.getCode();
+                this.sourceHasMoved = moving.getHasMoved();
+            } else {
+                this.sourceColour = null;
+                this.sourceCode = null;
+                this.sourceHasMoved = false;
             }
             if (captured != null) {
                 this.targetColour = captured.getColour();
                 this.targetCode = captured.getCode();
+                this.targetHasMoved = captured.getHasMoved();
+            } else {
+                this.targetColour = null;
+                this.targetCode = null;
+                this.targetHasMoved = false;
             }
+            this.promoteCode = null;
+            this.isFollowUp = false;
         }
 
         public Builder original(ChessRecord rec) {
@@ -58,7 +75,7 @@ public record ChessRecord(
             this.sourceCode = rec.sourceCode;
             this.targetCode = rec.targetCode;
             this.promoteCode = rec.promoteCode;
-            this.previous = rec.previous;
+            this.isFollowUp = rec.isFollowUp;
             return this;
         }
 
@@ -97,8 +114,8 @@ public record ChessRecord(
             return this;
         }
 
-        public Builder previousRecord(ChessRecord chessRecord) {
-            this.previous = chessRecord;
+        public Builder isFollowUp(boolean isFollowUp) {
+            this.isFollowUp = isFollowUp;
             return this;
         }
 
