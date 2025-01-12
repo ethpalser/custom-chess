@@ -60,7 +60,7 @@ class ChessGameTest {
             Piece piece = ctxRecord.getBoard().get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(action.getEnd(), ctxRecord));
+            assertTrue(piece.getMoves(ctxRecord).moves().stream().anyMatch(m -> m.path().toSet().contains(action.getEnd())));
         }
         // Checking that a bug does not occur
         game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6")));
@@ -76,7 +76,7 @@ class ChessGameTest {
             Piece piece = ctxRecord2.getBoard().get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves2.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(action.getEnd(), ctxRecord2));
+            assertTrue(piece.getMoves(ctxRecord2).moves().stream().anyMatch(m -> m.path().toSet().contains(action.getEnd())));
         }
         game.undoUpdate(1, false);
     }
@@ -100,7 +100,7 @@ class ChessGameTest {
             Piece piece = ctxRecord.getBoard().get(action.getStart());
             assertNotNull(piece);
             assertTrue(blackMoves.getPieces(action.getEnd()).contains(piece));
-            assertTrue(piece.canMove(action.getEnd(), ctxRecord));
+            assertTrue(piece.getMoves(ctxRecord).moves().stream().anyMatch(m -> m.path().toSet().contains(action.getEnd())));
         }
     }
 
