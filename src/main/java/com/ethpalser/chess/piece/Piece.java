@@ -81,7 +81,7 @@ public abstract class Piece {
         sb.append(this.getColour().toCode());
         sb.append(this.getCode());
         sb.append(this.getCoordinate());
-        if (this.getHasMoved()) {
+        if (!this.getHasMoved()) {
             sb.append("*");
         }
         return sb.toString();
