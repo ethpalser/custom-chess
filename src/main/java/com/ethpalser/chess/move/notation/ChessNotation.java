@@ -1,5 +1,7 @@
 package com.ethpalser.chess.move.notation;
 
+import java.util.Objects;
+
 public class ChessNotation {
 
     public static final ChessNotationFormat DEFAULT_FORMAT = new VerboseNotationFormat();
@@ -64,4 +66,16 @@ public class ChessNotation {
         return this.string;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessNotation notation = (ChessNotation) o;
+        return format.equals(notation.format) && string.equals(notation.string);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(format, string);
+    }
 }
