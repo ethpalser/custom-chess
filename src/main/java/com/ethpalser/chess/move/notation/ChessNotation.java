@@ -1,6 +1,9 @@
 package com.ethpalser.chess.move.notation;
 
 public class ChessNotation {
+
+    public static final ChessNotationFormat DEFAULT_FORMAT = new VerboseNotationFormat();
+
     // Store the expected notation that must be built
     private final ChessNotationFormat format;
     private final String string;
@@ -19,12 +22,20 @@ public class ChessNotation {
         this.string = chessFormat.format(chessRecord, alias);
     }
 
+    public ChessNotation(String notationString) {
+        this(DEFAULT_FORMAT, notationString);
+    }
+
     public ChessNotation(ChessNotationFormat chessFormat, String notationString) {
         if (chessFormat == null || notationString == null) {
             throw new IllegalArgumentException();
         }
         this.format = chessFormat;
         this.string = notationString;
+    }
+
+    public ChessNotation(ChessRecord chessRecord) {
+        this(DEFAULT_FORMAT, chessRecord);
     }
 
     public ChessNotation(ChessNotationFormat chessFormat, ChessRecord chessRecord) {

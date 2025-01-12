@@ -3,7 +3,6 @@ package com.ethpalser.chess.game.log;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;
 import com.ethpalser.chess.move.notation.ChessNotation;
-import com.ethpalser.chess.move.notation.VerboseNotationFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class ChessLog extends GameLog<ChessLog.Entry> {
         for (String entry : storedLog) {
             // A mutable list is used as this list can be appended to with new events for the same/modified notation
             List<GameEvent> list = new ArrayList<>(2);
-            ChessNotation notation = new ChessNotation(new VerboseNotationFormat(), entry);
+            ChessNotation notation = new ChessNotation(entry);
             list.add(new GameEventProxy(notation));
             this.push(new Entry(notation, list));
         }
