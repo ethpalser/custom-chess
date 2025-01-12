@@ -14,7 +14,14 @@ public class GameLog<E> implements Iterable<E> {
     }
 
     public void push(E item) {
-        this.history.clear();
+        // This item is a historical record being reapplied
+        if (!history.isEmpty() && history.getLast().equals(item)) {
+            // Only remove what is reapplied
+            this.history.removeLast();
+        } else {
+            // Otherwise, the history must be cleared to disallow redo with a different sequence of items
+            this.history.clear();
+        }
         this.log.add(item);
     }
 
@@ -22,7 +29,7 @@ public class GameLog<E> implements Iterable<E> {
         if (this.log.isEmpty()) {
             return null;
         }
-        return this.log.get(this.log.size() - 1);
+        return this.log.getLast();
     }
 
     public E pop() {
@@ -33,12 +40,17 @@ public class GameLog<E> implements Iterable<E> {
         return this.log.removeLast();
     }
 
-    public E redo() {
+    /**
+     * A game log's undone items are those that were previously applied, but are currently not applied. This state
+     * is a result of a log removing a record and not updating its state away from its once-added items.
+     *
+     * @return The most recent item removed. Otherwise, null, as it is at the most recent update.
+     */
+    public E peekUndone() {
         if (this.history.isEmpty()) {
-            throw new NullPointerException("Cannot redo item, as undo history is empty");
+            return null;
         }
-        this.log.add(this.history.getLast());
-        return this.history.removeLast();
+        return this.history.getLast();
     }
 
     public int size() {
