@@ -45,13 +45,6 @@ public abstract class Piece {
         this.hasMoved = hasMoved;
     }
 
-    public boolean canMove(Coordinate target, GameContext.Record context) {
-        if (context == null) {
-            return false;
-        }
-        return this.getMoves(context).moves().stream().anyMatch(m -> m.path().toSet().contains(target));
-    }
-
     public void move(Coordinate point) {
         if (point == null) {
             throw new IllegalArgumentException("piece cannot move to null");
