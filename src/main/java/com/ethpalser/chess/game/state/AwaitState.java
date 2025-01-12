@@ -30,7 +30,7 @@ public class AwaitState implements GameState {
             throw new IllegalArgumentException("Event choice is not one of expected choices");
         }
         switch (event.type()) {
-            case MOVE, PROMOTE -> {
+            case MOVE_FOLLOW_UP, PROMOTE -> {
                 // We no longer need the prompt used to start this wait state
                 this.context.clearPrompt();
                 event.execute(this.context);
