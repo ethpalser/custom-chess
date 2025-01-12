@@ -12,11 +12,11 @@ public record ChessRecord(
         Colour targetColour,
         String targetCode,
         String promoteCode,
-        ChessRecord followUpRecord) {
+        ChessRecord previous) {
 
     private ChessRecord(Builder builder) {
         this(builder.source, builder.sourceColour, builder.sourceCode, builder.target, builder.targetColour,
-                builder.targetCode, builder.promoteCode, builder.followUp);
+                builder.targetCode, builder.promoteCode, builder.previous);
     }
 
     public static class Builder {
@@ -28,7 +28,27 @@ public record ChessRecord(
         private String sourceCode;
         private String targetCode;
         private String promoteCode;
-        private ChessRecord followUp;
+        private ChessRecord previous;
+
+        /**
+         * Create a blank ChessRecord builder. Not recommended for general use.
+         */
+        public Builder() {
+            this(null, null, null, null);
+        }
+
+        public Builder(Coordinate source, Coordinate target, Piece moving, Piece captured) {
+            this.source = source;
+            this.target = target;
+            if (moving != null) {
+                this.sourceColour = moving.getColour();
+                this.sourceCode = moving.getCode();
+            }
+            if (captured != null) {
+                this.targetColour = captured.getColour();
+                this.targetCode = captured.getCode();
+            }
+        }
 
         public Builder original(ChessRecord rec) {
             this.source = rec.source;
@@ -38,7 +58,7 @@ public record ChessRecord(
             this.sourceCode = rec.sourceCode;
             this.targetCode = rec.targetCode;
             this.promoteCode = rec.promoteCode;
-            this.followUp = rec.followUpRecord;
+            this.previous = rec.previous;
             return this;
         }
 
@@ -57,12 +77,6 @@ public record ChessRecord(
             return this;
         }
 
-        public Builder sourcePiece(Piece piece) {
-            this.sourceColour = piece.getColour();
-            this.sourceCode = piece.getCode();
-            return this;
-        }
-
         public Builder targetCoordinate(Coordinate coordinate) {
             this.target = coordinate;
             return this;
@@ -78,19 +92,13 @@ public record ChessRecord(
             return this;
         }
 
-        public Builder targetPiece(Piece piece) {
-            this.targetColour = piece.getColour();
-            this.targetCode = piece.getCode();
-            return this;
-        }
-
         public Builder promoteCode(String code) {
             this.promoteCode = code;
             return this;
         }
 
-        public Builder followingRecord(ChessRecord chessRecord) {
-            this.followUp = chessRecord;
+        public Builder previousRecord(ChessRecord chessRecord) {
+            this.previous = chessRecord;
             return this;
         }
 
