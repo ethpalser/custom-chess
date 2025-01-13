@@ -4,8 +4,8 @@ import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Plane;
 import com.ethpalser.chess.space.Point;
@@ -118,8 +118,6 @@ public class ChessBoard implements Board<Coordinate> {
             }
             // Replaces the piece at the new point
             this.pieces.put(point, piece);
-            // Update the position of the piece, but not that it has moved. This insertion is not treated as a move.
-            // piece.setCoordinate(point); // Todo: Is this necessary? It is breaking updates
         }
         this.pieces.remove(null);
     }
