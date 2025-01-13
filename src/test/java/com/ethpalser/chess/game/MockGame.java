@@ -22,7 +22,7 @@ public class MockGame implements Game {
     }
 
     @Override
-    public GameStatus updateGame(Action action) {
+    public GameStatus update(Action action) {
         for (MockNode node : current.getNext()) {
             int val = action.getEnd().getValue(Space.AXIS.X);
             if (node.getValue() == val) {
@@ -37,12 +37,12 @@ public class MockGame implements Game {
     }
 
     @Override
-    public GameStatus getStatus() {
+    public GameStatus status() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public int getTurn() {
+    public int turn() {
         return this.turn;
     }
 
@@ -89,7 +89,7 @@ public class MockGame implements Game {
     }
 
     @Override
-    public int evaluateState() {
+    public int score() {
         return this.current.getValue();
     }
 

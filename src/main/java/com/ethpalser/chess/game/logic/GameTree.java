@@ -20,7 +20,7 @@ public class GameTree {
 
         Action best = null;
 
-        boolean maximizingPlayer = this.root.getTurn() % 2 != 0; // Should correspond to when White player acts
+        boolean maximizingPlayer = this.root.turn() % 2 != 0; // Should correspond to when White player acts
 //        for (int d = 1; d <= depth; d++) {
             int alpha = Integer.MIN_VALUE;
             int beta = Integer.MAX_VALUE;
@@ -82,7 +82,7 @@ public class GameTree {
             return maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         }
 
-        GameStatus status = this.root.updateGame(node);
+        GameStatus status = this.root.update(node);
         if (GameStatus.NO_CHANGE.equals(status)) {
             return maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         }
@@ -99,7 +99,7 @@ public class GameTree {
 
         Iterable<Action> it = this.root.potentialUpdates();
         if (depth <= 0 || !it.iterator().hasNext()) {
-            int result = this.root.evaluateState();
+            int result = this.root.score();
             this.root.undo();
             return result;
         }

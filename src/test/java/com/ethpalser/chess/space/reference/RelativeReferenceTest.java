@@ -36,7 +36,7 @@ class RelativeReferenceTest {
         Reference pieceRef = new Reference(Reference.Location.POINT, Direction.AT);
         // When
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, pawn, target));
+        game.update(new Action(Colour.WHITE, pawn, target));
         // Then
         // Note: ref.coordinates used by a piece would provide its own coordinate, which moved from "point" to "target"
         GameContext.Record ctxRecord = game.context().toRecord();
@@ -55,7 +55,7 @@ class RelativeReferenceTest {
         // When
         Game game = new ChessGame();
         Coordinate destination = new Point("e3");
-        game.updateGame(new Action(Colour.WHITE, pawn, destination));
+        game.update(new Action(Colour.WHITE, pawn, destination));
         // Then
         GameContext.Record ctxRecord = game.context().toRecord();
         List<Coordinate> coordinates = pieceRef.coordinates(ctxRecord, destination);
@@ -73,9 +73,9 @@ class RelativeReferenceTest {
         Reference pieceRef = new Reference(Reference.Location.POINT, Direction.RIGHT);
         // When
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, pawnE, pawnE.translate(1, Direction.NORTH)));
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Filler
-        game.updateGame(new Action(Colour.WHITE, pawnF, pawnF.translate(1, Direction.NORTH)));
+        game.update(new Action(Colour.WHITE, pawnE, pawnE.translate(1, Direction.NORTH)));
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Filler
+        game.update(new Action(Colour.WHITE, pawnF, pawnF.translate(1, Direction.NORTH)));
         // Then
         GameContext.Record ctxRecord = game.context().toRecord();
         Coordinate piece = pawnE.translate(1, Direction.NORTH);

@@ -70,7 +70,7 @@ public class ChessGame implements Game {
 
     @Override
     public GameInfo info() {
-        return new GameInfo(this.turn, this.evaluateState(), this.status, this.context);
+        return new GameInfo(this.turn, this.score(), this.status, this.context);
     }
 
     @Override
@@ -79,18 +79,18 @@ public class ChessGame implements Game {
     }
 
     @Override
-    public GameStatus getStatus() {
+    public GameStatus status() {
         return status;
     }
 
     @Override
-    public int getTurn() {
+    public int turn() {
         return this.turn;
     }
 
     @Deprecated
     @Override
-    public GameStatus updateGame(Action action) throws IllegalActionException {
+    public GameStatus update(Action action) throws IllegalActionException {
         if (action == null) {
             throw new IllegalActionException("action cannot be null");
         }
@@ -223,7 +223,7 @@ public class ChessGame implements Game {
     }
 
     @Override
-    public int evaluateState() {
+    public int score() {
         // Using Record here to avoid redundant copying downstream
         GameContext.Record ctxRecord = this.context.toRecord();
         int whiteSum = 0;

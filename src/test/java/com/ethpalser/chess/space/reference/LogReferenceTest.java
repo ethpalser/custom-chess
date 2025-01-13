@@ -29,7 +29,7 @@ class LogReferenceTest {
         Reference logRef = new Reference(Reference.Location.LAST_MOVED, Direction.AT);
         // When
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
+        game.update(new Action(Colour.WHITE, new Point("e2"), new Point("e4")));
         // Then
         GameContext context = game.context();
         assertFalse(logRef.coordinates(context.toRecord(), new Point()).isEmpty());

@@ -6,19 +6,19 @@ public interface Game {
 
     GameContext context();
 
-    GameStatus getStatus();
+    GameStatus status();
 
-    int getTurn();
+    int turn();
 
-    GameStatus updateGame(Action action);
+    int score();
+
+    GameStatus update(Action action);
 
     GameStatus undo();
 
     GameStatus redo();
 
     Iterable<Action> potentialUpdates();
-
-    int evaluateState();
 
     GameSaveData createSaveData();
 

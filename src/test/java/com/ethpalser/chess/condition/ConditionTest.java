@@ -25,7 +25,7 @@ class ConditionTest {
     void evaluate_enPassantAtStartIsNotPawn_isFalse() {
         // Given
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
+        game.update(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
 
         Conditional condition = new PieceStateConditional(
                 new Reference(Reference.Location.LAST_MOVED, Direction.AT),
@@ -42,7 +42,7 @@ class ConditionTest {
     void evaluate_enPassantLastMovedIsNotPawn_isFalse() {
         // Given
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
+        game.update(new Action(Colour.WHITE, new Point("b1"), new Point("c3"))); // Knight moves to c3
         Conditional condition = new GameHistoryConditional(Operator.NOT_EQUAL, PropertyType.TYPE, PieceType.PAWN);
 
         // Then
@@ -55,10 +55,10 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         Coordinate enPassantReady = new Point("d5");
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
-        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Only moved one
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.update(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.update(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Only moved one
 
         Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
@@ -70,10 +70,10 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         Coordinate enPassantReady = new Point("d5");
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
-        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e5"))); // Can get en passant
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.update(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.update(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e5"))); // Can get en passant
 
         Conditional condition = new GameHistoryConditional(Operator.EQUAL, PropertyType.DISTANCE_MOVED, 2);
         // Then
@@ -85,11 +85,11 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         Coordinate enPassantReady = new Point("d5");
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
-        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Ignored
-        game.updateGame(new Action(Colour.BLACK, new Point("e2"), new Point("e4"))); // Matches distance moved
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.update(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.update(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // Ignored
+        game.update(new Action(Colour.BLACK, new Point("e2"), new Point("e4"))); // Matches distance moved
         // Note: Each piece will provide its own colour when setting up this condition, and in this case it is WHITE
         Conditional condition = new GameHistoryConditional(Operator.NOT_EQUAL, PropertyType.COLOUR, Colour.WHITE);
         // Then
@@ -102,10 +102,10 @@ class ConditionTest {
         Game game = new ChessGame();
         Coordinate enPassantReady = new Point("d5");
         Coordinate enPassantVictim = new Point("e5");
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
-        game.updateGame(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), enPassantVictim));
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Pawn moving to be ready
+        game.update(new Action(Colour.BLACK, new Point("a7"), new Point("a6"))); // Filler
+        game.update(new Action(Colour.WHITE, new Point("d4"), enPassantReady)); // Pawn ready for en passant
+        game.update(new Action(Colour.BLACK, new Point("e7"), enPassantVictim));
 
         Conditional condLastMovedIsPawn = new PieceStateConditional(
                 new Reference(Reference.Location.LAST_MOVED, Direction.AT), Operator.EQUAL, PropertyType.CODE,
@@ -122,7 +122,7 @@ class ConditionTest {
         assertTrue(condLastMovedNotAllied.isExpected(ctxRecord, enPassantReady));
 
         Coordinate enPassantDestination = new Point("e6");
-        game.updateGame(new Action(Colour.WHITE, enPassantReady, enPassantDestination)); // EN PASSANT !!!
+        game.update(new Action(Colour.WHITE, enPassantReady, enPassantDestination)); // EN PASSANT !!!
 
         // Then
         GameContext.Record ctxRecordAfter = game.context().toRecord();
@@ -158,10 +158,10 @@ class ConditionTest {
     void evaluate_castleAtStartHasMoved_isFalse() {
         // Given
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, new Point("e2"), new Point("e3"))); // Opening space for king
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("e2"), new Point("e3"))); // Opening space for king
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
         Coordinate kingDestination = new Point("e2");
-        game.updateGame(new Action(Colour.WHITE, new Point("e1"), kingDestination)); // Condition now fails
+        game.update(new Action(Colour.WHITE, new Point("e1"), kingDestination)); // Condition now fails
 
         Conditional condition = new PieceStateConditional(new Reference(Reference.Location.POINT, Direction.AT),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
@@ -174,13 +174,13 @@ class ConditionTest {
     void evaluate_castleAtCoordinateA0PreviouslyMoved_isFalse() {
         // Given
         Game game = new ChessGame();
-        game.updateGame(new Action(Colour.WHITE, new Point("a2"), new Point("a3"))); // Opening space for rook
-        game.updateGame(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("a2"), new Point("a3"))); // Opening space for rook
+        game.update(new Action(Colour.BLACK, new Point("e7"), new Point("e6"))); // filler
         Coordinate queenSideRook = new Point("a1");
         Coordinate rookDestination = new Point("a2");
-        game.updateGame(new Action(Colour.WHITE, queenSideRook, rookDestination)); // Condition now fails
-        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, rookDestination, queenSideRook)); // Reposition back to a1
+        game.update(new Action(Colour.WHITE, queenSideRook, rookDestination)); // Condition now fails
+        game.update(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.update(new Action(Colour.WHITE, rookDestination, queenSideRook)); // Reposition back to a1
         // This uses an absolute reference, so only the provided coordinate is used
         Conditional condition = new PieceStateConditional(new Reference(Reference.Location.POINT, Direction.AT,
                 queenSideRook),
@@ -207,13 +207,13 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         // Simulate all moves to setup a queen-side castle
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
-        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
-        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
-        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
+        game.update(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
+        game.update(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
+        game.update(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
 
         Conditional conditionA = new PieceStateConditional(new Reference(Reference.Location.POINT, Direction.AT),
                 Operator.FALSE, PropertyType.HAS_MOVED, null);
@@ -242,13 +242,13 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         // Simulate all moves to setup a queen-side castle
-        game.updateGame(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
-        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
-        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
-        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
+        game.update(new Action(Colour.WHITE, new Point("d2"), new Point("d4"))); // Open moving Bishop and Queen
+        game.update(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("c1"), new Point("e3"))); // Move Bishop out
+        game.update(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("b1"), new Point("a3"))); // Move Knight out
+        game.update(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("d1"), new Point("d2"))); // Move Queen out, path clear
 
         ConditionalOptions conditionA = ConditionalOptions.pieceState(new Reference(Reference.Location.POINT,
                         Direction.AT),
@@ -280,12 +280,12 @@ class ConditionTest {
         // Given
         Game game = new ChessGame();
         // Simulate all moves to set up a king-side castle
-        game.updateGame(new Action(Colour.WHITE, new Point("g2"), new Point("g4"))); // Bishop can move to h3
-        game.updateGame(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("f1"), new Point("h3"))); // Bishop now at h3
-        game.updateGame(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
-        game.updateGame(new Action(Colour.WHITE, new Point("g1"), new Point("f3"))); // Path to castle now clear
-        game.updateGame(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("g2"), new Point("g4"))); // Bishop can move to h3
+        game.update(new Action(Colour.BLACK, new Point("h7"), new Point("h6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("f1"), new Point("h3"))); // Bishop now at h3
+        game.update(new Action(Colour.BLACK, new Point("g7"), new Point("g6"))); // filler
+        game.update(new Action(Colour.WHITE, new Point("g1"), new Point("f3"))); // Path to castle now clear
+        game.update(new Action(Colour.BLACK, new Point("f7"), new Point("f6"))); // filler
 
         ConditionalOptions conditionA = ConditionalOptions.pieceState(new Reference(Reference.Location.POINT,
                         Direction.AT),
