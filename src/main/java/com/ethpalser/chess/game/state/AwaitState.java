@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.state;
 
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.game.event.GameEvent;
@@ -40,7 +40,7 @@ public class AwaitState implements GameState {
                     return new AwaitState(this.context, newPrompt.eventType(), newPrompt.choices());
                 }
             }
-            default -> throw new IllegalActionException("Event not supported by the current game state");
+            default -> throw new UnsupportedEventException();
         }
         return new ReadyState(this.context);
     }

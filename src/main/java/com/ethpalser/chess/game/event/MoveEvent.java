@@ -1,7 +1,9 @@
 package com.ethpalser.chess.game.event;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
+import com.ethpalser.chess.exception.IllegalMoveException;
+import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
@@ -57,17 +59,17 @@ public class MoveEvent implements GameEvent {
         ChessLog log = contextRecord.getLog();
 
         if (board.rejects(this.source) || board.rejects(this.target)) {
-            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
+            throw new CoordinateOutOfBoundsException();
         }
         if (board.get(this.source) == null) {
-            throw new IllegalActionException( "piece to move from " + this.source + " to " + this.target + " is null");
+            throw new MissingPieceException("Missing piece at " + this.source + " cannot move to " + this.target);
         }
 
         Piece moving = board.get(this.source);
         MoveSet moveSet = moving.getMoves(contextRecord);
         Move move = moveSet.getMove(this.target);
         if (move == null) {
-            throw new IllegalActionException("piece (" + moving + ") cannot move to " + target);
+            throw new IllegalMoveException("Piece (" + moving + ") cannot move to " + this.target);
         }
         // Create this record before applying updates, as movement info is needed prior to the change (for un-execute)
         Piece captured = board.get(this.target);

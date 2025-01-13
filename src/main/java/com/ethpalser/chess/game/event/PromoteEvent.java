@@ -1,7 +1,9 @@
 package com.ethpalser.chess.game.event;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
+import com.ethpalser.chess.exception.IllegalMoveException;
+import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.move.notation.ChessNotation;
@@ -84,12 +86,12 @@ public class PromoteEvent implements GameEvent {
     }
 
     private void verifyPieceExists(GameContext context, Coordinate coordinate)
-            throws IllegalActionException, IndexOutOfBoundsException {
+            throws IllegalMoveException, IndexOutOfBoundsException {
         if (context.getBoard().rejects(coordinate)) {
-            throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
+            throw new CoordinateOutOfBoundsException();
         }
         if (context.getBoard().get(coordinate) == null) {
-            throw new IllegalActionException("The piece to move does not exist");
+            throw new MissingPieceException();
         }
     }
 

@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.state;
 
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.event.GameEvent;
 import java.util.List;
@@ -18,7 +18,7 @@ public class EndState implements GameState {
 
     @Override
     public GameState update(GameEvent event) {
-        throw new IllegalActionException();
+        throw new UnsupportedEventException();
     }
 
     @Override

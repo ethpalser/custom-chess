@@ -1,7 +1,11 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
+import com.ethpalser.chess.exception.IllegalMoveException;
+import com.ethpalser.chess.exception.IllegalResultException;
+import com.ethpalser.chess.exception.MissingPieceException;
+import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.MoveEvent;
 import com.ethpalser.chess.game.log.ChessLog;
@@ -108,9 +112,9 @@ public class ChessGame implements Game {
 
     @Deprecated
     @Override
-    public GameStatus update(Action action) throws IllegalActionException {
+    public GameStatus update(Action action) throws IllegalMoveException {
         if (action == null) {
-            throw new IllegalActionException("action cannot be null");
+            throw new IllegalMoveException("Action is null");
         }
         GameEvent event = new MoveEvent(action.getColour(), action.getStart(), action.getEnd());
         return this.update(event);
@@ -125,13 +129,14 @@ public class ChessGame implements Game {
 
         try {
             this.state = this.state.update(event);
-        } catch (IllegalActionException | IndexOutOfBoundsException ex) {
+        } catch (CoordinateOutOfBoundsException | IllegalResultException | MissingPieceException
+                | UnsupportedEventException ex) {
+            // These are regular exceptions that are expected and ignored with not changes to state
+            return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
+        } catch (IllegalMoveException ex) {
+            // These are irregular exceptions that can be ignored but should be handled
             System.err.println(ex.getMessage());
-            if (GameStatus.isCompletedGameStatus(this.status)) {
-                return this.status;
-            } else {
-                return GameStatus.NO_CHANGE;
-            }
+            return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             System.err.println(this.context.getBoard());

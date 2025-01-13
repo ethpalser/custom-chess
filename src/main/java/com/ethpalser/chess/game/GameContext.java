@@ -2,7 +2,7 @@ package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.move.Move;
@@ -166,7 +166,7 @@ public class GameContext {
             }
             // This may have been raised by an event
             this.clearPrompt();
-            throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
+            throw new IllegalResultException("Cannot update game as " + turn + " will put its king in check");
         }
 
         // Update the board state after all changes have been made and no exception has occurred

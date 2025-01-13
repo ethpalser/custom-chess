@@ -1,7 +1,8 @@
 package com.ethpalser.chess.game.event;
 
 import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.IllegalMoveException;
+import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.log.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
@@ -57,7 +58,7 @@ public class MoveFollowUpEvent implements GameEvent {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
         if (board.get(this.source) == null) {
-            throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
+            throw new MissingPieceException("Missing piece at " + this.source + " cannot move to " + this.target);
         }
 
         /*

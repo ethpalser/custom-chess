@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.game.event.GameEvent;
 
 public interface Game {
@@ -26,9 +27,9 @@ public interface Game {
 
     GameStatus update(GameEvent event);
 
-    GameStatus undo();
+    GameStatus undo() throws IllegalResultException;
 
-    GameStatus redo();
+    GameStatus redo() throws IllegalResultException;
 
     Iterable<Action> potentialUpdates();
 

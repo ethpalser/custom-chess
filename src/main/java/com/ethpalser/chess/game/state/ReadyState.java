@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.state;
 
-import com.ethpalser.chess.exception.IllegalActionException;
+import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.game.event.GameEvent;
@@ -35,7 +35,7 @@ public class ReadyState implements GameState {
                 return new ReadyState(this.context);
             }
         } else {
-            throw new IllegalActionException("Event not supported by the current game state");
+            throw new UnsupportedEventException();
         }
     }
 
