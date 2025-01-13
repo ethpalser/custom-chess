@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.event;
 
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;

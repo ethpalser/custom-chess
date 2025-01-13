@@ -1,4 +1,4 @@
-package com.ethpalser.chess.condition;
+package com.ethpalser.chess.condition.reflection;
 
 public enum PropertyType {
 

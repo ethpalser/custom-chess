@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.logic;
 
-import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameStatus;
 

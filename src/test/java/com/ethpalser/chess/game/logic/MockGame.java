@@ -1,8 +1,8 @@
 package com.ethpalser.chess.game.logic;
 
-import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.Game;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.GameInfo;
 import com.ethpalser.chess.game.GameSaveData;
 import com.ethpalser.chess.game.GameStatus;

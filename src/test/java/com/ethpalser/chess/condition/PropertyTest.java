@@ -1,5 +1,6 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.condition.reflection.Property;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.piece.custom.CustomPiece;

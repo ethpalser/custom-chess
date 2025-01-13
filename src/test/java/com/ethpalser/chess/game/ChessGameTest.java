@@ -1,9 +1,11 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.board.BoardTestCases;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.logic.GameTree;
-import com.ethpalser.chess.move.map.MoveMap;
+import com.ethpalser.chess.move.MoveMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;

@@ -1,6 +1,6 @@
 package com.ethpalser.chess.space.reference;
 
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Path;

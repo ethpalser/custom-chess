@@ -1,14 +1,16 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
 import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.exception.UnsupportedEventException;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.MoveEvent;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.game.state.AwaitState;
 import com.ethpalser.chess.game.state.EndState;
@@ -16,8 +18,8 @@ import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.game.state.GameState;
 import com.ethpalser.chess.game.state.ReadyState;
 import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveMap;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.MoveMap;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -110,9 +112,17 @@ public class ChessGame implements Game {
         return whiteSum + whitePawn - (blackSum + blackPawn);
     }
 
-    @Deprecated
+    /**
+     * Move a piece, by the Action's player, from the Action's start to end. No changes are made if this action's player
+     * is not the turn player or if the action is illegal.
+     *
+     * @param action A record representing information for a movement, replaced by MoveEvent.
+     * @return
+     * @deprecated Since January 12, 2025. Replaced Action with GameEvent
+     */
+    @Deprecated(since = "2025-01-12")
     @Override
-    public GameStatus update(Action action) throws IllegalMoveException {
+    public GameStatus update(Action action) {
         if (action == null) {
             throw new IllegalMoveException("Action is null");
         }
@@ -305,7 +315,7 @@ public class ChessGame implements Game {
         Colour oppColour = Colour.opposite(playerColour);
         Coordinate oppKingPoint = this.context.getKingCoordinate(Colour.opposite(playerColour));
         if (oppKingPoint == null || ctxRecord.getBoard().get(oppKingPoint) == null) {
-            throw new IllegalStateException("opponent king is missing");
+            throw new IllegalStateException("Severe exception: Opponent's king is missing");
         }
         // Assuming King is in check
         MoveSet oppKingMoveSet = ctxRecord.getBoard().get(oppKingPoint).getMoves(ctxRecord);
@@ -400,7 +410,7 @@ public class ChessGame implements Game {
         for (Coordinate attacker : sourcesOfCheck) {
             Piece attackerPiece = ctxRecord.getBoard().get(attacker);
             if (attackerPiece == null) {
-                throw new IllegalStateException("attacker that is causing check cannot be null");
+                throw new IllegalStateException("Severe exception: Piece causing check is null");
             }
             // Can this piece be captured by the opponent?
             Set<Coordinate> defenders = ctxRecord.getThreats(playerInCheck).getThreats(attacker);
@@ -410,9 +420,7 @@ public class ChessGame implements Game {
             // Can a piece block its path?
             Move moveCausingCheck = attackerPiece.getMoves(ctxRecord).getMove(inCheckKing);
             if (moveCausingCheck == null) {
-                System.err.println("Player in check " + playerInCheck);
-                System.err.println(this.context.getBoard());
-                throw new NullPointerException("exception in game state, move causing check should not be null");
+                throw new NullPointerException("Severe exception: Move causing check is null");
             }
             MoveMap moveMap = new MoveMap(playerInCheck, ctxRecord);
             for (Coordinate pathCoordinate : moveCausingCheck.path()) {

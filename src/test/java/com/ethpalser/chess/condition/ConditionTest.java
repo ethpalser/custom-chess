@@ -1,10 +1,11 @@
 package com.ethpalser.chess.condition;
 
-import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.condition.reflection.PropertyType;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.Game;
-import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.move.config.ConditionalFactory;
 import com.ethpalser.chess.move.config.ConditionalOptions;
 import com.ethpalser.chess.move.config.Reference;

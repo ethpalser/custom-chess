@@ -1,7 +1,7 @@
 package com.ethpalser.chess.condition;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.move.config.Reference;

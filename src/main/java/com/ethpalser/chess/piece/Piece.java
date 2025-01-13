@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.space.Coordinate;
 import java.util.List;

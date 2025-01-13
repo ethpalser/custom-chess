@@ -1,8 +1,8 @@
 package com.ethpalser.chess.move;
 
+import com.ethpalser.chess.move.config.Reference;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.move.config.Reference;
 
 public record Move(Path path, FollowUp followUp) {
 

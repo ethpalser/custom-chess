@@ -1,5 +1,7 @@
 package com.ethpalser.chess.board;
 
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.ChessBoard;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceType;

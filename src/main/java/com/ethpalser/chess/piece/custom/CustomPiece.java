@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.config.MoveSpec;
@@ -11,6 +11,7 @@ import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class CustomPiece extends Piece {
@@ -60,5 +61,20 @@ public class CustomPiece extends Piece {
         } else {
             return List.of();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CustomPiece piece = (CustomPiece) o;
+        return Objects.equals(moveSpecs, piece.moveSpecs);
+    }
+
+    @Override
+    public int hashCode() {
+        // Ignore move specs, as it is expected that all pieces with the same code have the same specification
+        return Objects.hash(super.hashCode());
     }
 }

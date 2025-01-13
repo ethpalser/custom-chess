@@ -1,6 +1,6 @@
 package com.ethpalser.chess.game.event;
 
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.piece.Colour;
 
 public class ConcedeEvent implements GameEvent {
@@ -30,11 +30,11 @@ public class ConcedeEvent implements GameEvent {
 
     @Override
     public void execute(GameContext context) {
-
+        // todo: Update the game's state to the opponent's win, and the game is at an end state
     }
 
     @Override
     public void unExecute(GameContext context) {
-
+        // todo: Not allowed
     }
 }

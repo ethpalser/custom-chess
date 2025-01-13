@@ -1,14 +1,11 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.game.context;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.ChessBoard;
 import com.ethpalser.chess.exception.IllegalResultException;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.GameOptions;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.config.MoveSpec;
-import com.ethpalser.chess.move.map.ThreatMap;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -34,7 +31,7 @@ public class GameContext {
     private Coordinate wKing;
     private Coordinate bKing;
 
-    private Map<String, List<MoveSpec>> moveSpecs;
+    private final Map<String, List<MoveSpec>> moveSpecs;
 
     private GamePrompt prompt; // Nullable
 

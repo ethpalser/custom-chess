@@ -1,7 +1,7 @@
 package com.ethpalser.chess.game.state;
 
 import com.ethpalser.chess.exception.UnsupportedEventException;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.event.GameEvent;
 import java.util.List;
 

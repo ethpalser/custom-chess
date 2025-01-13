@@ -1,4 +1,4 @@
-package com.ethpalser.chess.board;
+package com.ethpalser.chess.game.context;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;

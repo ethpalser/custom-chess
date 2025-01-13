@@ -1,8 +1,8 @@
 package com.ethpalser.chess.space.reference;
 
-import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.ChessGame;
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.config.Reference;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Direction;

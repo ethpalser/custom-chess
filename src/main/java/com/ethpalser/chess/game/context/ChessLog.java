@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game.log;
+package com.ethpalser.chess.game.context;
 
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;

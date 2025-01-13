@@ -1,6 +1,6 @@
 package com.ethpalser.chess.condition;
 
-import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.space.Coordinate;
 
 /**

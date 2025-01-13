@@ -1,4 +1,4 @@
-package com.ethpalser.chess.game.log;
+package com.ethpalser.chess.game.context;
 
 import java.util.Iterator;
 import java.util.LinkedList;

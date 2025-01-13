@@ -1,8 +1,8 @@
 package com.ethpalser.chess.move.config;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;

@@ -1,7 +1,7 @@
 package com.ethpalser.chess.log;
 
 import com.ethpalser.chess.game.event.MoveEvent;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;

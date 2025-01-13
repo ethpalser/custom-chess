@@ -1,6 +1,8 @@
 package com.ethpalser.chess.game;
 
 import com.ethpalser.chess.exception.IllegalResultException;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.event.GameEvent;
 
 public interface Game {

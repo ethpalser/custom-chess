@@ -1,11 +1,11 @@
 package com.ethpalser.chess.game.event;
 
-import com.ethpalser.chess.board.Board;
+import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
 import com.ethpalser.chess.exception.MissingPieceException;
-import com.ethpalser.chess.game.GameContext;
-import com.ethpalser.chess.game.log.ChessLog;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;

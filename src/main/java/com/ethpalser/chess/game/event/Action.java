@@ -1,12 +1,15 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.game.event;
 
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 
 /**
- * Container for an attempted piece movement for a Player of this colour, Point start and Point end
+ * Container for an attempted piece movement for a Player of this colour, Point start and Point end.
+ *
+ * @deprecated Since January 12, 2025. Replaced by MoveEvent.
  */
+@Deprecated(since = "2025-01-12")
 public class Action {
 
     private final Colour colour;
