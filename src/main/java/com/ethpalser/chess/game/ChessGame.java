@@ -6,11 +6,11 @@ import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.MoveEvent;
-import com.ethpalser.chess.game.context.ChessLog;
 import com.ethpalser.chess.game.logic.Heuristics;
 import com.ethpalser.chess.game.state.AwaitState;
 import com.ethpalser.chess.game.state.EndState;
@@ -139,8 +139,8 @@ public class ChessGame implements Game {
 
         try {
             this.state = this.state.update(event);
-        } catch (CoordinateOutOfBoundsException | IllegalResultException | MissingPieceException
-                | UnsupportedEventException ex) {
+        } catch (CoordinateOutOfBoundsException | IllegalArgumentException | IllegalResultException
+                | MissingPieceException | UnsupportedEventException ex) {
             // These are regular exceptions that are expected and ignored with not changes to state
             return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
         } catch (IllegalMoveException ex) {
@@ -148,7 +148,9 @@ public class ChessGame implements Game {
             System.err.println(ex.getMessage());
             return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
         } catch (Exception ex) {
+            // These are unexpected exceptions that should be resolved ASAP
             System.err.println(ex.getMessage());
+            System.err.println(event);
             System.err.println(this.context.getBoard());
             throw ex;
         }
@@ -159,13 +161,12 @@ public class ChessGame implements Game {
 
     @Override
     public GameStatus undo() {
-        ChessLog log = this.context.getLog();
-        if (log.peek() == null) {
+        if (this.context.getLog().peek() == null) {
             return GameStatus.NO_CHANGE;
         }
         boolean undoneBaseMove = false;
         while (!undoneBaseMove) {
-            ChessLog.Entry peek = log.peek();
+            ChessLog.Entry peek = this.context.getLog().peek();
             if (peek == null) {
                 break;
             }
@@ -187,18 +188,18 @@ public class ChessGame implements Game {
 
     @Override
     public GameStatus redo() {
-        ChessLog logCopy = this.context.toRecord().getLog();
-        if (logCopy.peekUndone() == null) {
+        ChessLog.Entry firstRedo = this.context.getLog().peekUndone();
+        if (firstRedo == null) {
             return GameStatus.NO_CHANGE;
         }
 
-        GameEvent event = logCopy.peekUndone().event();
+        GameEvent event = firstRedo.event();
         // un-execute should be responsible for context updates
         event.execute(this.context);
 
         boolean atNextBaseMoved = false;
         while (!atNextBaseMoved) {
-            ChessLog.Entry toRedo = logCopy.peekUndone();
+            ChessLog.Entry toRedo = this.context.getLog().peekUndone();
             if (toRedo == null) {
                 break;
             }

@@ -13,6 +13,13 @@ public class GameLog<E> implements Iterable<E> {
         this.history = new LinkedList<>();
     }
 
+    public GameLog(GameLog<E> original) {
+        this.log = new LinkedList<>();
+        this.log.addAll(original.log);
+        this.history = new LinkedList<>();
+        this.history.addAll(original.history);
+    }
+
     public void push(E item) {
         // This item is a historical record being reapplied
         if (!history.isEmpty() && history.getLast().equals(item)) {

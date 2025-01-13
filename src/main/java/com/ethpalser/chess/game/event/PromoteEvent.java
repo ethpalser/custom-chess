@@ -1,11 +1,11 @@
 package com.ethpalser.chess.game.event;
 
-import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
 import com.ethpalser.chess.exception.MissingPieceException;
-import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.ChessLog;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
@@ -73,10 +73,15 @@ public class PromoteEvent implements GameEvent {
         this.verifyPieceExists(context, this.source);
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
         GameContext.Record ctxRecord = context.toRecord();
+
         Board<Coordinate> board = ctxRecord.getBoard();
         ChessLog log = ctxRecord.getLog();
         // Undo change to board
-        String oldCode = log.peek().notation().toRecord().sourceCode();
+        ChessLog.Entry prevRec = log.peek();
+        if (prevRec == null) {
+            throw new IllegalStateException("Severe exception: Log entry before a piece promotion is null");
+        }
+        String oldCode = prevRec.notation().toRecord().sourceCode();
         Piece replacement = this.updatePieceType(oldCode, board);
         board.add(this.source, replacement);
         // Undo change to log
