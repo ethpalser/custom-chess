@@ -1,11 +1,12 @@
 package com.ethpalser.chess.space.reference;
 
+import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.game.ChessGame;
 import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.move.config.Reference;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Direction;
 import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.move.config.Reference;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +42,7 @@ class AbsoluteReferenceTest {
         Reference absRef = new Reference(Reference.Location.POINT, Direction.AT, point); // Nothing starts at e4
         // When
         ChessGame game = new ChessGame();
-        game.updateGame(new Point("e2"), new Point("e4"), Colour.WHITE); // Moving white pawn e2 to e4
+        game.update(new Action(Colour.WHITE, new Point("e2"), new Point("e4"))); // Moving white pawn e2 to e4
         // Then
         GameContext context = game.context();
         assertFalse(absRef.coordinates(context.toRecord(), null).isEmpty());

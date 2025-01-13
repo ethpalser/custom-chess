@@ -88,23 +88,43 @@ public class ChessGame implements Game {
         return this.turn;
     }
 
+    @Override
+    public int score() {
+        // Using Record here to avoid redundant copying downstream
+        GameContext.Record ctxRecord = this.context.toRecord();
+        int whiteSum = 0;
+        int blackSum = 0;
+        for (Piece p : ctxRecord.getBoard()) {
+            if (Colour.WHITE.equals(p.getColour())) {
+                whiteSum += Heuristics.pieceValue(ctxRecord, p);
+            } else {
+                blackSum += Heuristics.pieceValue(ctxRecord, p);
+            }
+        }
+        int whitePawn = Heuristics.pawnValue(ctxRecord, Colour.WHITE);
+        int blackPawn = Heuristics.pawnValue(ctxRecord, Colour.BLACK);
+        return whiteSum + whitePawn - (blackSum + blackPawn);
+    }
+
     @Deprecated
     @Override
     public GameStatus update(Action action) throws IllegalActionException {
         if (action == null) {
             throw new IllegalActionException("action cannot be null");
         }
-        return this.updateGame(action.getStart(), action.getEnd(), action.getColour());
+        GameEvent event = new MoveEvent(action.getColour(), action.getStart(), action.getEnd());
+        return this.update(event);
     }
 
-    public GameStatus updateGame(Coordinate start, Coordinate end, Colour player) {
+    @Override
+    public GameStatus update(GameEvent event) {
         Colour expectedPlayer = this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
-        if (!expectedPlayer.equals(player)) {
+        if (!expectedPlayer.equals(event.player())) {
             return GameStatus.NO_CHANGE;
         }
-        MoveEvent event = new MoveEvent(start, end);
+
         try {
-            this.state.update(event);
+            this.state = this.state.update(event);
         } catch (IllegalActionException | IndexOutOfBoundsException ex) {
             System.err.println(ex.getMessage());
             if (GameStatus.isCompletedGameStatus(this.status)) {
@@ -220,24 +240,6 @@ public class ChessGame implements Game {
         // Potential captures initially have priority for evaluating board state (can change by game tree)
         potentialCaptures.addAll(quietActions);
         return potentialCaptures;
-    }
-
-    @Override
-    public int score() {
-        // Using Record here to avoid redundant copying downstream
-        GameContext.Record ctxRecord = this.context.toRecord();
-        int whiteSum = 0;
-        int blackSum = 0;
-        for (Piece p : ctxRecord.getBoard()) {
-            if (Colour.WHITE.equals(p.getColour())) {
-                whiteSum += Heuristics.pieceValue(ctxRecord, p);
-            } else {
-                blackSum += Heuristics.pieceValue(ctxRecord, p);
-            }
-        }
-        int whitePawn = Heuristics.pawnValue(ctxRecord, Colour.WHITE);
-        int blackPawn = Heuristics.pawnValue(ctxRecord, Colour.BLACK);
-        return whiteSum + whitePawn - (blackSum + blackPawn);
     }
 
     @Override

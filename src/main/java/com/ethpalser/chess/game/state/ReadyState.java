@@ -6,6 +6,7 @@ import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.MoveFollowUpEvent;
 import com.ethpalser.chess.game.event.PromoteEvent;
+import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
@@ -29,7 +30,7 @@ public class ReadyState implements GameState {
             event.execute(this.context);
             GamePrompt prompt = this.context.getPrompt();
             if (prompt != null) {
-                return this.handlePrompt(prompt);
+                return this.handlePrompt(event.player(), prompt);
             } else {
                 return new ReadyState(this.context);
             }
@@ -38,7 +39,7 @@ public class ReadyState implements GameState {
         }
     }
 
-    private GameState handlePrompt(GamePrompt prompt) {
+    private GameState handlePrompt(Colour player, GamePrompt prompt) {
         Piece source = context.getBoard().get(prompt.source());
         boolean isPawn = PieceType.PAWN.toCode().equals(source.getCode());
 
@@ -60,12 +61,12 @@ public class ReadyState implements GameState {
                 } else {
                     target = new Point(choice);
                 }
-                new MoveFollowUpEvent(prompt.source(), target).execute(this.context);
+                new MoveFollowUpEvent(player, prompt.source(), target).execute(this.context);
             } else if (EventType.PROMOTE.equals(prompt.eventType())) {
                 if (choice == null) {
                     throw new IllegalArgumentException("Cannot promote with a null choice");
                 }
-                new PromoteEvent(prompt.source(), prompt.choices().get(0)).execute(this.context);
+                new PromoteEvent(player, prompt.source(), prompt.choices().get(0)).execute(this.context);
             }
             // Another prompt may have been raised
             GamePrompt another = this.context.getPrompt();

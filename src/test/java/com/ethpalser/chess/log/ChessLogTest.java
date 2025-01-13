@@ -27,7 +27,7 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event = new MoveEvent(p1, p2);
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
         log.push(new ChessLog.Entry(notation, event));
 
         ChessLog.Entry entry = log.peek();
@@ -50,7 +50,7 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event = new MoveEvent(p1, p2);
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
         log.push(new ChessLog.Entry(notation, event));
 
         ChessLog.Entry entry = log.pop();
@@ -74,7 +74,7 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event = new MoveEvent(p1, p2);
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
         ChessLog.Entry move = new ChessLog.Entry(notation, event);
         log.push(move);
 
@@ -97,12 +97,12 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation1 = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event1 = new MoveEvent(p1, p2);
+        MoveEvent event1 = new MoveEvent(Colour.WHITE, p1, p2);
         ChessLog.Entry move1 = new ChessLog.Entry(notation1, event1);
         log.push(move1);
 
         ChessNotation notation2 = new ChessNotation(new ChessRecord.Builder(p2, p3, moving, null).build());
-        MoveEvent event2 = new MoveEvent(p2, p3);
+        MoveEvent event2 = new MoveEvent(Colour.WHITE, p2, p3);
         ChessLog.Entry move2 = new ChessLog.Entry(notation2, event2);
         log.push(move2);
 
@@ -125,7 +125,7 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event = new MoveEvent(p1, p2);
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
         ChessLog.Entry move = new ChessLog.Entry(notation, event);
         log.push(move);
 
@@ -143,12 +143,12 @@ class ChessLogTest {
 
         Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
         ChessNotation notation1 = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
-        MoveEvent event1 = new MoveEvent(p1, p2);
+        MoveEvent event1 = new MoveEvent(Colour.WHITE, p1, p2);
         ChessLog.Entry move1 = new ChessLog.Entry(notation1, event1);
         log.push(move1);
 
         ChessNotation notation2 = new ChessNotation(new ChessRecord.Builder(p2, p3, moving, null).build());
-        MoveEvent event2 = new MoveEvent(p2, p3);
+        MoveEvent event2 = new MoveEvent(Colour.WHITE, p2, p3);
         ChessLog.Entry move2 = new ChessLog.Entry(notation2, event2);
         log.push(move2);
 

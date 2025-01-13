@@ -18,15 +18,22 @@ import java.util.List;
 
 public class MoveEvent implements GameEvent {
 
+    private final Colour player;
     private final Coordinate source;
     private final Coordinate target;
 
-    public MoveEvent(Coordinate source, Coordinate target) {
-        if (source == null || target == null) {
+    public MoveEvent(Colour player, Coordinate source, Coordinate target) {
+        if (player == null || source == null || target == null) {
             throw new IllegalArgumentException("One or more constructor arguments are null. None can be null.");
         }
+        this.player = player;
         this.source = source;
         this.target = target;
+    }
+
+    @Override
+    public Colour player() {
+        return this.player;
     }
 
     @Override

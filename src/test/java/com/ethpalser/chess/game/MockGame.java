@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.space.Space;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -22,6 +23,31 @@ public class MockGame implements Game {
     }
 
     @Override
+    public GameInfo info() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public GameContext context() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public GameStatus status() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int turn() {
+        return this.turn;
+    }
+
+    @Override
+    public int score() {
+        return this.current.getValue();
+    }
+
+    @Override
     public GameStatus update(Action action) {
         for (MockNode node : current.getNext()) {
             int val = action.getEnd().getValue(Space.AXIS.X);
@@ -37,13 +63,8 @@ public class MockGame implements Game {
     }
 
     @Override
-    public GameStatus status() {
+    public GameStatus update(GameEvent event) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int turn() {
-        return this.turn;
     }
 
     @Override
@@ -89,22 +110,7 @@ public class MockGame implements Game {
     }
 
     @Override
-    public int score() {
-        return this.current.getValue();
-    }
-
-    @Override
     public GameSaveData createSaveData() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public GameInfo info() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public GameContext context() {
         throw new UnsupportedOperationException();
     }
 }

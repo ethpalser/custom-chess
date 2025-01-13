@@ -3,30 +3,39 @@ package com.ethpalser.chess.game.event;
 import com.ethpalser.chess.game.GameContext;
 import com.ethpalser.chess.move.notation.ChessNotation;
 import com.ethpalser.chess.move.notation.ChessRecord;
+import com.ethpalser.chess.piece.Colour;
 
 public class GameEventProxy implements GameEvent {
 
+    private final Colour player;
     private final ChessNotation eventNotation;
 
     private GameEvent event;
     private final GameEvent next; // A notation can be an aggregate of many events, so there may be another
 
-    public GameEventProxy(ChessNotation chessNotation) {
-        if (chessNotation == null) {
+    public GameEventProxy(Colour player, ChessNotation chessNotation) {
+        if (player == null || chessNotation == null) {
             throw new IllegalArgumentException("notation cannot be null for proxy");
         }
+        this.player = player;
         this.eventNotation = chessNotation;
         this.event = null;
         this.next = null;
     }
 
-    private GameEventProxy(GameEvent event, GameEvent next) {
-        if (event == null) {
+    private GameEventProxy(Colour player, GameEvent event, GameEvent next) {
+        if (player == null || event == null) {
             throw new IllegalArgumentException("event cannot be null for proxy");
         }
+        this.player = player;
         this.eventNotation = null; // Not needed
         this.event = event;
         this.next = next;
+    }
+
+    @Override
+    public Colour player() {
+        return this.player;
     }
 
     @Override
@@ -84,7 +93,8 @@ public class GameEventProxy implements GameEvent {
         GameEvent promoteEvent;
         // Promotions are always last to execute, first to un-execute for all Chess Notations
         if (chessRecord.promoteCode() != null) {
-            promoteEvent = new GameEventProxy(new PromoteEvent(chessRecord.source(), chessRecord.promoteCode()), null);
+            promoteEvent = new GameEventProxy(this.player, new PromoteEvent(this.player, chessRecord.source(),
+                    chessRecord.promoteCode()), null);
         } else {
             promoteEvent = null;
         }
@@ -92,7 +102,8 @@ public class GameEventProxy implements GameEvent {
         // Movements are always first to execute, last to un-execute
         if (chessRecord.target() != null) {
             // This event is a primitive LinkedList of GameEventProxy, and uses the inner event for execute/un-execute
-            return new GameEventProxy(new MoveEvent(chessRecord.source(), chessRecord.target()), promoteEvent);
+            return new GameEventProxy(this.player, new MoveEvent(this.player, chessRecord.source(),
+                    chessRecord.target()), promoteEvent);
         } else {
             throw new IllegalStateException("Failed to create an event from chess notation.");
         }

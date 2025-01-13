@@ -15,15 +15,22 @@ import com.ethpalser.chess.space.Coordinate;
 
 public class MoveFollowUpEvent implements GameEvent {
 
+    private final Colour player;
     private final Coordinate source;
     private final Coordinate target;
 
-    public MoveFollowUpEvent(Coordinate source, Coordinate target) {
-        if (source == null) {
+    public MoveFollowUpEvent(Colour player, Coordinate source, Coordinate target) {
+        if (player == null || source == null) {
             throw new IllegalArgumentException("One or more constructor arguments are null. None can be null.");
         }
+        this.player = player;
         this.source = source;
         this.target = target;
+    }
+
+    @Override
+    public Colour player() {
+        return this.player;
     }
 
     @Override

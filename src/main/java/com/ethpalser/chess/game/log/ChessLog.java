@@ -3,6 +3,8 @@ package com.ethpalser.chess.game.log;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;
 import com.ethpalser.chess.move.notation.ChessNotation;
+import com.ethpalser.chess.move.notation.ChessRecord;
+import com.ethpalser.chess.piece.Colour;
 import java.util.Objects;
 
 public class ChessLog extends GameLog<ChessLog.Entry> {
@@ -13,9 +15,19 @@ public class ChessLog extends GameLog<ChessLog.Entry> {
 
     public ChessLog(String[] entryList) {
         super();
+        Colour prevColour = Colour.NO_COLOUR;
         for (String entry : entryList) {
             ChessNotation notation = new ChessNotation(entry);
-            GameEvent event = new GameEventProxy(notation);
+            ChessRecord rec = notation.toRecord();
+            // Specific cases are determined by ReadyState and AwaitState. This should be consistent with those.
+            Colour player;
+            if (rec.isFollowUp() && !Colour.NO_COLOUR.equals(prevColour)) {
+                player = prevColour;
+            } else {
+                player = rec.sourceColour();
+            }
+            prevColour = rec.sourceColour();
+            GameEvent event = new GameEventProxy(player, notation);
             this.push(new Entry(notation, event));
         }
     }

@@ -14,6 +14,10 @@ public class ConcedeEvent implements GameEvent {
         this.player = player;
     }
 
+    public Colour player() {
+        return this.player;
+    }
+
     @Override
     public String choice() {
         return this.player.toString();

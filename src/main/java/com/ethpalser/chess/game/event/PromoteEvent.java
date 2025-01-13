@@ -19,15 +19,22 @@ import java.util.Map;
 
 public class PromoteEvent implements GameEvent {
 
+    private final Colour player;
     private final Coordinate source;
     private final String promoteCode;
 
-    public PromoteEvent(Coordinate source, String pieceCode) {
-        if (source == null || pieceCode == null) {
+    public PromoteEvent(Colour player, Coordinate source, String pieceCode) {
+        if (player == null || source == null || pieceCode == null) {
             throw new IllegalArgumentException();
         }
+        this.player = player;
         this.source = source;
         this.promoteCode = pieceCode;
+    }
+
+    @Override
+    public Colour player() {
+        return this.player;
     }
 
     @Override
