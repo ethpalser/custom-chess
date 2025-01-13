@@ -60,7 +60,7 @@ class PieceStringTokenizerTest {
 
     @Test
     void testConstructor_givenLongMalformedCustomCode_hasFiveTokensAndNoPiece() {
-        String testStr = "wdark-knight~e3";
+        String testStr = "wdark-knight)e3";
         PieceStringTokenizer tokenizer = new PieceStringTokenizer(testStr);
 
         assertEquals("w", tokenizer.nextToken());
