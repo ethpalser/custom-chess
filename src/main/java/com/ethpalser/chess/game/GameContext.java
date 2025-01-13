@@ -9,6 +9,7 @@ import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceType;
@@ -120,29 +121,49 @@ public class GameContext {
         this.update(turn, updatedBoard, updatedLog, true);
     }
 
-    private void update(Colour turn, Board<Coordinate> updatedBoard, ChessLog updatedLog,
-            boolean isUndo) {
+    private void update(Colour turn, Board<Coordinate> updatedBoard, ChessLog updatedLog, boolean isUndo) {
         if (turn == null || updatedBoard == null) {
             throw new IllegalArgumentException("Cannot update game as one or more arguments are null.");
         }
         // Shallow copying context data for reference and to lazily discard changes if any exception occurs
-        GameContext.Record ctxRecord = new GameContext.Record(new ChessBoard((ChessBoard) updatedBoard), updatedLog,
-                new ThreatMap(this.wThreats), new ThreatMap(this.bThreats));
+        GameContext.Record ctxCopy = new GameContext.Record(updatedBoard, updatedLog, this.wThreats, this.bThreats);
         // Update threats wherever there was a change
-        for (Coordinate change : this.getBoardChanges(updatedBoard)) {
+        List<Coordinate> changes = this.getBoardChanges(updatedBoard);
+        for (Coordinate change : changes) {
             Piece p = updatedBoard.get(change);
-            if (p != null && PieceType.KING.equals(PieceType.fromCode(p.getCode()))) {
+            // Update the king's location, if it moved. This move should be safe from any threat.
+            if (p != null && PieceType.KING.toCode().equals(p.getCode())) {
                 if (Colour.WHITE.equals(p.getColour())) {
                     this.wKing = change;
                 } else {
                     this.bKing = change;
                 }
             }
-            this.refreshThreats(Colour.WHITE, change, ctxRecord);
-            this.refreshThreats(Colour.BLACK, change, ctxRecord);
+            this.refreshThreats(Colour.WHITE, change, ctxCopy);
+            this.refreshThreats(Colour.BLACK, change, ctxCopy);
         }
         // After all changes, did the turn player put itself into check?
-        if (!isUndo && !this.getThreats(Colour.opposite(turn)).hasNoThreats(this.getKingCoordinate(turn))) {
+        if (!isUndo && !ctxCopy.getThreats(Colour.opposite(turn)).hasNoThreats(this.getKingCoordinate(turn))) {
+            // The copied context still modifies the original's threats (even after copying), so revert them instead
+            for (Coordinate change : changes) {
+                GameContext.Record ctxOriginal = this.toRecord();
+                if (this.board.get(change) != null) {
+                    // Pieces have state (which I want changed to stateless)
+                    // The updated board's change had modified the original board's piece's internal coordinate
+                    // So, change it back to the original, where it is not null on the original board
+                    Piece piece = this.board.get(change);
+                    piece.move(change);
+                    // The update also changed its "has moved" state, so it needs to be corrected using the log
+                    ChessRecord rec = updatedLog.peek().notation().toRecord();
+                    if (change.equals(rec.source())) {
+                        piece.setHasMoved(rec.sourceHasMoved());
+                    } else if (change.equals(rec.target())) {
+                        piece.setHasMoved(rec.targetHasMoved());
+                    }
+                }
+                this.refreshThreats(Colour.WHITE, change, ctxOriginal);
+                this.refreshThreats(Colour.BLACK, change, ctxOriginal);
+            }
             // This may have been raised by an event
             this.clearPrompt();
             throw new IllegalActionException("Cannot update game as " + turn + " player king will be in check");
@@ -151,8 +172,8 @@ public class GameContext {
         // Update the board state after all changes have been made and no exception has occurred
         this.board = updatedBoard;
         this.log = updatedLog;
-        this.wThreats = ctxRecord.getThreats(Colour.WHITE);
-        this.bThreats = ctxRecord.getThreats(Colour.BLACK);
+        this.wThreats = ctxCopy.getThreats(Colour.WHITE);
+        this.bThreats = ctxCopy.getThreats(Colour.BLACK);
     }
 
     private List<Coordinate> getBoardChanges(Board<Coordinate> board) {
@@ -218,9 +239,10 @@ public class GameContext {
         }
         Board<Coordinate> ctxBoard = ctxRecord.getBoard();
         ThreatMap ctxThreatMap = ctxRecord.getThreats(colour);
-        // Fetch this piece and temporarily remove it from the board, so paths can be fetched that exclude this change
+
         Piece changePiece = ctxBoard.get(change);
-        ctxBoard.remove(change);
+        ctxBoard.remove(change); // temporarily remove it from the board, so paths can exclude this piece
+
         // Get all paths that lead to the change
         List<Pair<Coordinate, Path>> pathsToChange = new ArrayList<>();
         for (Coordinate threat : ctxRecord.getThreats(colour).getThreats(change)) {
@@ -260,15 +282,15 @@ public class GameContext {
             }
         }
         // Add all threats made by the change, if it exists
+        ctxBoard.add(change, changePiece);
         if (changePiece != null && colour.equals(changePiece.getColour())) {
-            ctxBoard.add(change, changePiece);
             ctxThreatMap.addThreats(change, changePiece.getMoves(ctxRecord));
         }
     }
 
     public GameContext.Record toRecord() {
         return new Record(new ChessBoard((ChessBoard) this.board),
-                this.log,
+                new ChessLog(this.log),
                 new ThreatMap(this.wThreats),
                 new ThreatMap(this.bThreats));
     }

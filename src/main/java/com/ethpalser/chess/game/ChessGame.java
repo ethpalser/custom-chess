@@ -144,21 +144,22 @@ public class ChessGame implements Game {
 
     @Override
     public GameStatus undo() {
-        ChessLog logCopy = this.context.toRecord().getLog();
-        if (logCopy.peek() == null) {
+        ChessLog log = this.context.getLog();
+        if (log.peek() == null) {
             return GameStatus.NO_CHANGE;
         }
         boolean undoneBaseMove = false;
         while (!undoneBaseMove) {
-            if (logCopy.peek() == null) {
+            ChessLog.Entry peek = log.peek();
+            if (peek == null) {
                 break;
             }
             // Undo all non-base moves
-            ChessRecord rec = logCopy.peek().notation().toRecord();
+            ChessRecord rec = peek.notation().toRecord();
             if (!rec.isFollowUp() && rec.promoteCode() == null) {
                 undoneBaseMove = true;
             }
-            GameEvent event = logCopy.peek().event();
+            GameEvent event = peek.event();
             // un-execute should be responsible for context updates
             event.unExecute(this.context);
         }
@@ -404,6 +405,8 @@ public class ChessGame implements Game {
             // Can a piece block its path?
             Move moveCausingCheck = attackerPiece.getMoves(ctxRecord).getMove(inCheckKing);
             if (moveCausingCheck == null) {
+                System.err.println("Player in check " + playerInCheck);
+                System.err.println(this.context.getBoard());
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
             MoveMap moveMap = new MoveMap(playerInCheck, ctxRecord);

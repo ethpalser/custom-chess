@@ -60,7 +60,7 @@ public class MoveEvent implements GameEvent {
             throw new IndexOutOfBoundsException("One or more coordinates are out of bounds");
         }
         if (board.get(this.source) == null) {
-            throw new IllegalActionException("piece to move from " + this.source + " to " + this.target + " is null");
+            throw new IllegalActionException( "piece to move from " + this.source + " to " + this.target + " is null");
         }
 
         Piece moving = board.get(this.source);
@@ -119,16 +119,18 @@ public class MoveEvent implements GameEvent {
         // Undo changes to board
         Board<Coordinate> board = contextRecord.getBoard();
         Piece moving = board.get(this.target);
+        if (moving == null) {
+            throw new IllegalStateException("Moving piece from undo is is not at its expected location");
+        }
 
         board.remove(this.target);
         board.remove(this.source);
         board.add(this.source, moving);
+        moving.move(this.source);
         moving.setHasMoved(rec.sourceHasMoved()); // Todo: Determine if using piece starts would be better
-
         if (captured != null) {
             board.add(this.target, captured);
         }
-        moving.move(this.source);
 
         // Undo changes to log
         log.pop();

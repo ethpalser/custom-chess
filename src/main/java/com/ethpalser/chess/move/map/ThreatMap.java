@@ -23,6 +23,7 @@ public class ThreatMap {
 
     public ThreatMap(ThreatMap original) {
         this.colour = original.colour;
+        // Note: The map's values are object references (to a Set), a change to these will change the original
         this.map = new HashMap<>(original.map);
         this.width = original.width;
         this.length = original.length;

@@ -32,6 +32,14 @@ public class ChessLog extends GameLog<ChessLog.Entry> {
         }
     }
 
+    public ChessLog(ChessLog original) {
+        super();
+        // A shallow copy with the same entries but in a different data structure
+        for (ChessLog.Entry entry : original) {
+            this.push(entry);
+        }
+    }
+
     public record Entry(ChessNotation notation, GameEvent event) {
         public Entry {
             if (notation == null || event == null) {

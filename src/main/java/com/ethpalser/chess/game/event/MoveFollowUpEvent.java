@@ -75,6 +75,12 @@ public class MoveFollowUpEvent implements GameEvent {
         // Update board
         Piece moving = board.get(this.source);
         Piece captured = board.get(this.target); // Needed before update to create record
+
+        // Create chess record first as we need to know if a piece did not move prior to the update
+        ChessRecord chessRecord = new ChessRecord.Builder(this.source, this.target, moving, captured)
+                .isFollowUp(true)
+                .build();
+
         board.remove(this.source);
         // Followup can have a null target, which will remove the piece
         if (this.target != null) {
@@ -85,9 +91,6 @@ public class MoveFollowUpEvent implements GameEvent {
 
         ChessRecord previous = log.peek().notation().toRecord(); // Needed before update to check promotions
         // Update log
-        ChessRecord chessRecord = new ChessRecord.Builder(this.source, this.target, moving, captured)
-                .isFollowUp(true)
-                .build();
         ChessNotation notation = new ChessNotation(chessRecord);
         log.push(new ChessLog.Entry(notation, this));
 
@@ -131,7 +134,6 @@ public class MoveFollowUpEvent implements GameEvent {
         ChessRecord rec = followUpEntry.notation().toRecord();
         if (rec.targetCode() != null && rec.targetColour() != null) {
             captured = factory.create(rec.targetCode(), rec.targetColour(), rec.target());
-            captured.setHasMoved(rec.targetHasMoved());
         } else {
             captured = null;
         }
@@ -145,6 +147,7 @@ public class MoveFollowUpEvent implements GameEvent {
             board.add(this.target, captured);
             if (captured != null) {
                 captured.move(this.target);
+                captured.setHasMoved(rec.targetHasMoved());
             }
         }
 
