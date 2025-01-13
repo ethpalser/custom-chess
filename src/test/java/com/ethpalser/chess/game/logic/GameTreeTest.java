@@ -1,6 +1,6 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.game.logic;
 
-import com.ethpalser.chess.game.logic.GameTree;
+import com.ethpalser.chess.game.Action;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Space;
 import java.util.List;

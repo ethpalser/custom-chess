@@ -1,5 +1,11 @@
-package com.ethpalser.chess.game;
+package com.ethpalser.chess.game.logic;
 
+import com.ethpalser.chess.game.Action;
+import com.ethpalser.chess.game.Game;
+import com.ethpalser.chess.game.GameContext;
+import com.ethpalser.chess.game.GameInfo;
+import com.ethpalser.chess.game.GameSaveData;
+import com.ethpalser.chess.game.GameStatus;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.space.Space;
 import java.util.ArrayDeque;
