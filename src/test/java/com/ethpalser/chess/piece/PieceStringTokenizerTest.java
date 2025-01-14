@@ -33,12 +33,12 @@ class PieceStringTokenizerTest {
     }
 
     @Test
-    void testConstructor_givenInvalidStandardCode_hasFiveTokensAndPawn() {
+    void testConstructor_givenInvalidStandardCode_hasFiveTokensAndNoPiece() {
         String testStr = "wVe3";
         PieceStringTokenizer tokenizer = new PieceStringTokenizer(testStr);
 
         assertEquals("w", tokenizer.nextToken());
-        assertEquals("P", tokenizer.nextToken());
+        assertEquals("_", tokenizer.nextToken());
         assertEquals("e", tokenizer.nextToken());
         assertEquals("3", tokenizer.nextToken());
         assertEquals("", tokenizer.nextToken());
@@ -46,12 +46,12 @@ class PieceStringTokenizerTest {
     }
 
     @Test
-    void testConstructor_givenMalformedCustomCode_hasFiveTokensAndPawn() {
+    void testConstructor_givenMalformedCustomCode_hasFiveTokensAndNoPiece() {
         String testStr = "wp~e3";
         PieceStringTokenizer tokenizer = new PieceStringTokenizer(testStr);
 
         assertEquals("w", tokenizer.nextToken());
-        assertEquals("P", tokenizer.nextToken());
+        assertEquals("_", tokenizer.nextToken());
         assertEquals("e", tokenizer.nextToken());
         assertEquals("3", tokenizer.nextToken());
         assertEquals("", tokenizer.nextToken());
@@ -59,12 +59,12 @@ class PieceStringTokenizerTest {
     }
 
     @Test
-    void testConstructor_givenLongMalformedCustomCode_hasFiveTokensAndPawn() {
-        String testStr = "wdark-knight~e3";
+    void testConstructor_givenLongMalformedCustomCode_hasFiveTokensAndNoPiece() {
+        String testStr = "wdark-knight)e3";
         PieceStringTokenizer tokenizer = new PieceStringTokenizer(testStr);
 
         assertEquals("w", tokenizer.nextToken());
-        assertEquals("P", tokenizer.nextToken());
+        assertEquals("_", tokenizer.nextToken());
         assertEquals("e", tokenizer.nextToken());
         assertEquals("3", tokenizer.nextToken());
         assertEquals("", tokenizer.nextToken());
@@ -165,7 +165,7 @@ class PieceStringTokenizerTest {
 
     @Test
     void testConstructor_givenValidCustomPiece_hasFiveTokens() {
-        String testStr = "b~batman~b24*";
+        String testStr = "b(batman)b24*";
         PieceStringTokenizer tokenizer = new PieceStringTokenizer(testStr);
 
         assertEquals("b", tokenizer.nextToken());

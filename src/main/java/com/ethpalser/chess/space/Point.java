@@ -1,17 +1,20 @@
 package com.ethpalser.chess.space;
 
-import com.ethpalser.chess.piece.Colour;
-import com.ethpalser.chess.piece.Piece;
+import com.ethpalser.chess.annotation.ClassPreamble;
 
-public class Point implements Comparable<Point> {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
+public class Point implements Coordinate, Comparable<Point> {
 
     private final int x;
     private final int y;
 
-    public static final int MAX_WIDTH = 26;
-    public static final int MAX_HEIGHT = 26;
-
-    public static final Point ORIGIN = new Point(0, 0);
+    public static final Point ORIGIN = new Point();
 
     public Point() {
         this.x = 0;
@@ -54,6 +57,25 @@ public class Point implements Comparable<Point> {
         this(copy.x, copy.y);
     }
 
+    @Override
+    public int getDimension() {
+        return 2;
+    }
+
+    @Override
+    public int getValue(int dimension) {
+        return switch (dimension) {
+            case 1 -> this.x;
+            case 2 -> this.y;
+            default -> throw new IndexOutOfBoundsException();
+        };
+    }
+
+    @Override
+    public int[] getValues() {
+        return new int[]{this.x, this.y};
+    }
+
     public int getX() {
         return this.x;
     }
@@ -63,25 +85,36 @@ public class Point implements Comparable<Point> {
     }
 
     @Override
-    public int compareTo(Point o) {
-        if (o == null) {
-            return -1;
+    public Coordinate translate(int magnitude, int... values) {
+        int[] newValues = new int[this.getDimension()];
+        for (int i = 0; i < newValues.length; i++) {
+            newValues[i] += this.getValue(i + 1);
+            if (i < values.length) {
+                newValues[i] += magnitude * values[i];
+            }
         }
-        // The hashCodes are unique for every x,y combination
-        return this.hashCode() - o.hashCode();
+        return new Point(newValues[0], newValues[1]);
     }
 
-    /**
-     * A Point's hash code is its x and y value if it were in a 1D array. The maximum value for x and y is 31.
-     * For x and y such that 0 <= [x, y] < 31, its hash code is within 32^2 (1024).
-     *
-     * @return int mapping of its array index in a 1D array.
-     */
+    @Override
+    public int compareTo(Point o) {
+        if (o == null)
+            return -1;
+        int dimDiff = o.getDimension() - this.getDimension();
+        if (dimDiff != 0)
+            return dimDiff;
+
+        for (int d = 1; d <= o.getDimension(); d++) {
+            int valDiff = o.getValue(d) - this.getValue(d);
+            if (valDiff != 0)
+                return valDiff;
+        }
+        return 0;
+    }
+
     @Override
     public int hashCode() {
-        // Each x, y value maps to a distinct positive integer in a bounded space
-        // Min x and min y at 0 equals 0. Max x and max y at 31 equals 1023
-        return this.y * (MAX_WIDTH + 1) + this.x;
+        return this.getY() * 31 + this.getX();
     }
 
     @Override
@@ -90,8 +123,9 @@ public class Point implements Comparable<Point> {
             return true;
         if (o == null)
             return false;
-        if (o.getClass() != this.getClass())
+        if (!this.getClass().isInstance(o)) {
             return false;
+        }
 
         Point vector = (Point) o;
         // Compares only x and y values, ignoring bounds
@@ -104,60 +138,4 @@ public class Point implements Comparable<Point> {
         char xChar = (char) ('a' + this.x);
         return "" + xChar + (this.y + 1);
     }
-
-    /**
-     * Creates a new Vector from the current Vector shifted one space in the given direction.
-     *
-     * @param colour    {@link Colour} of the piece which the player is facing.
-     * @param direction {@link Direction} relative to the piece. Left is always White's left side.
-     * @return {@link Point}
-     */
-    public Point shift(Colour colour, Direction direction) {
-        if (colour == null || direction == null) {
-            throw new NullPointerException();
-        }
-        // The direction the piece will shift towards. Black's directions are the opposite of White's
-        int dir = Colour.WHITE.equals(colour) ? 1 : -1;
-        return switch (direction) {
-            case AT -> this;
-            case FRONT -> new Point(this.x, this.y + dir);
-            case BACK -> new Point(this.x, this.y - dir);
-            case RIGHT -> new Point(this.x + dir, this.y);
-            case LEFT -> new Point(this.x - dir, this.y);
-        };
-    }
-
-    // STATIC METHODS
-
-    public static Point validOrNull(Plane<Piece> board, Point start, Colour colour,
-            int xOffset, int yOffset, boolean includeDefends) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends || board.get(point) == null
-                || (board.get(point) != null && !board.get(point).getColour().equals(colour)))) {
-            return point;
-        }
-        return null;
-    }
-
-    public static Point notCaptureOrNull(Plane<Piece> board, Point start, int xOffset, int yOffset) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && board.get(point) == null) {
-            return point;
-        }
-        return null;
-    }
-
-    public static Point captureOrNull(Plane<Piece> board, Point start, Colour colour,
-            int xOffset, int yOffset, boolean includeDefends) {
-        Point point = new Point(start.getX() + xOffset, start.getY() + yOffset);
-        // in bounds and either open, can capture or can defend (if allowed)
-        if (board.isInBounds(point) && (includeDefends || (board.get(point) != null
-                && !board.get(point).getColour().equals(colour)))) {
-            return point;
-        }
-        return null;
-    }
-
 }

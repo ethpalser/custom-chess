@@ -1,38 +1,49 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.exception.IllegalResultException;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.event.Action;
+import com.ethpalser.chess.game.event.GameEvent;
 
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-12-01",
+        majorVersion = 3,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public interface Game {
 
-    Board getBoard();
+    GameInfo info();
 
-    Log<Point, Piece> getLog();
+    GameContext context();
 
-    GameStatus getStatus();
+    GameStatus status();
 
-    int getTurn();
+    int turn();
 
-    GameStatus updateGame(Action action);
+    int score();
 
-    GameStatus undoUpdate(int changesToUndo, boolean saveForRedo);
+    /**
+     * Update the game by performing a movement according to the start and end coordinates provided by Action.
+     *
+     * @param action A record representing information for a movement, replaced by MoveEvent.
+     * @return GameStatus enum representing the result of the game update.
+     * @deprecated Since January 12, 2025
+     */
+    @Deprecated(since = "2025-01-12")
+    GameStatus update(Action action);
 
-    default GameStatus undoUpdate() {
-        return this.undoUpdate(1, true);
-    }
+    GameStatus update(GameEvent event);
 
-    GameStatus redoUpdate(int changesToRedo);
+    GameStatus undo() throws IllegalResultException;
 
-    default GameStatus redoUpdate() {
-        return this.redoUpdate(1);
-    }
+    GameStatus redo() throws IllegalResultException;
 
     Iterable<Action> potentialUpdates();
 
-    int evaluateState();
-
-    String toJson();
+    GameSaveData createSaveData();
 
 }

@@ -1,74 +1,97 @@
 package com.ethpalser.chess.piece;
 
-import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.space.Positional;
+import com.ethpalser.chess.space.Coordinate;
 import java.util.List;
+import java.util.Objects;
 
-public interface Piece extends Positional {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 2,
+        lastModified = "2025-01-13"
+)
+public abstract class Piece {
 
-    String getCode();
+    private final String code;
+    private final Colour colour;
+    private Coordinate position;
+    private boolean hasMoved;
 
-    Colour getColour();
-
-    Point getPoint();
-
-    void setPoint(Point point);
-
-    MoveSet getMoves(Plane<Piece> board);
-
-    default MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
-        return this.getMoves(board, log, null, false, false);
+    protected Piece(String code, Colour colour, Coordinate point, boolean hasMoved) {
+        this.code = code;
+        this.colour = colour;
+        this.position = point;
+        this.hasMoved = hasMoved;
     }
 
-    default MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats) {
-        return this.getMoves(board, log, threats, false, false);
+    public String getCode() {
+        return this.code;
     }
 
-    MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats, boolean onlyAttacks,
-            boolean includeDefends);
-
-    default boolean canMove(Plane<Piece> board, Point destination) {
-        if (board == null || destination == null) {
-            return false;
-        }
-        return this.getMoves(board).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+    public Colour getColour() {
+        return this.colour;
     }
 
-    default boolean canMove(Plane<Piece> board, Log<Point, Piece> log, Point destination) {
-        if (board == null || destination == null) {
-            return false;
-        }
-        return this.getMoves(board, log).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+    public Coordinate getCoordinate() {
+        return this.position;
     }
 
-    default boolean canMove(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats, Point destination) {
-        if (board == null || destination == null) {
-            return false;
-        }
-        return this.getMoves(board, log, threats).toSet().stream().anyMatch(m -> m.getPath().toSet().contains(destination));
+    public void setCoordinate(Coordinate coordinate) {
+        this.position = coordinate;
     }
 
-    boolean getHasMoved();
+    public boolean getHasMoved() {
+        return this.hasMoved;
+    }
 
-    void setHasMoved(boolean hasMoved);
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
 
-    default void move(Point point) {
+    public void move(Coordinate point) {
         if (point == null) {
             throw new IllegalArgumentException("piece cannot move to null");
         }
-        if (point.equals(this.getPoint())) {
+        if (point.equals(this.getCoordinate())) {
             return;
         }
-        this.setPoint(point);
-        this.setHasMoved(true);
+        this.setCoordinate(point);
+        this.hasMoved = true;
     }
 
-    boolean canPromote(Plane<Piece> board);
+    public abstract MoveSet getMoves(GameContext.Record context);
 
-    List<String> promoteOptions();
+    public abstract boolean canPromote(Board<Coordinate> board);
 
+    public abstract List<String> getPromotions();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Piece piece = (Piece) o;
+        return hasMoved == piece.hasMoved && Objects.equals(code, piece.code) && colour == piece.colour && Objects.equals(position, piece.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, colour, position, hasMoved);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getColour().toCode());
+        sb.append(this.getCode());
+        sb.append(this.getCoordinate());
+        if (!this.getHasMoved()) {
+            sb.append("*");
+        }
+        return sb.toString();
+    }
 }

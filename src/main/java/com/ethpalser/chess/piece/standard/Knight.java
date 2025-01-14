@@ -1,94 +1,59 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.move.config.PathOptions;
 import com.ethpalser.chess.space.Point;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Knight implements Piece {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
+public class Knight extends Piece {
 
-    private final Colour colour;
-    private Point point;
-    private boolean hasMoved;
+    private static final String CODE = PieceType.KNIGHT.toCode();
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            new MoveSpec(new PathOptions(new Point(1, 2)), true, true),
+            new MoveSpec(new PathOptions(new Point(2, 1)), true, true)
+    );
 
-    public Knight(Colour colour, Point point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+    public Knight(Colour colour, Coordinate point) {
+        super(Knight.CODE, colour, point, false);
     }
 
-    public Knight(Colour colour, Point point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public String getCode() {
-        return "N";
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
+    public Knight(Colour colour, Coordinate point, boolean hasMoved) {
+        super(Knight.CODE, colour, point, hasMoved);
     }
 
     @Override
-    public Point getPoint() {
-        return this.point;
+    public MoveSet getMoves(GameContext.Record context) {
+        List<MoveReport> results = new ArrayList<>(8);
+        for (MoveSpec spec : Knight.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
+        }
+        return new MoveSet(results);
     }
 
     @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board) {
-        // Log and Threats are not needed
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        return new MoveSet(
-                Point.validOrNull(board, this.point, this.colour, -2, 1, includeDefends), // left 2 up
-                Point.validOrNull(board, this.point, this.colour, -1, 2, includeDefends), // up 2 left
-                Point.validOrNull(board, this.point, this.colour, 1, 2, includeDefends), // up 2 right
-                Point.validOrNull(board, this.point, this.colour, 2, 1, includeDefends), // right 2 up
-                Point.validOrNull(board, this.point, this.colour, 2, -1, includeDefends), // right 2 down
-                Point.validOrNull(board, this.point, this.colour, 1, -2, includeDefends), // down 2 right
-                Point.validOrNull(board, this.point, this.colour, -1, -2, includeDefends), // down 2 left
-                Point.validOrNull(board, this.point, this.colour, -2, -1, includeDefends) // left 2 down
-        );
-    }
-
-    @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         return false;
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         return List.of();
-    }
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }

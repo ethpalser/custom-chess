@@ -1,5 +1,9 @@
 package com.ethpalser.chess.log;
 
+import com.ethpalser.chess.game.event.MoveEvent;
+import com.ethpalser.chess.game.context.ChessLog;
+import com.ethpalser.chess.move.notation.ChessNotation;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.standard.Pawn;
@@ -11,9 +15,7 @@ class ChessLogTest {
 
     @Test
     void testPeek_givenEmpty_thenNull() {
-        ChessLog log = new ChessLog();
-
-        LogEntry<Point, Piece> entry = log.peek();
+        ChessLog.Entry entry = new ChessLog().peek();
         Assertions.assertNull(entry);
     }
 
@@ -22,9 +24,13 @@ class ChessLogTest {
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 3);
-        log.push(new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2)));
 
-        LogEntry<Point, Piece> entry = log.peek();
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
+        log.push(new ChessLog.Entry(notation, event));
+
+        ChessLog.Entry entry = log.peek();
         Assertions.assertNotNull(entry);
     }
 
@@ -32,7 +38,7 @@ class ChessLogTest {
     void testPop_givenEmpty_thenNull() {
         ChessLog log = new ChessLog();
 
-        LogEntry<Point, Piece> entry = log.pop();
+        ChessLog.Entry entry = log.pop();
         Assertions.assertNull(entry);
     }
 
@@ -41,9 +47,13 @@ class ChessLogTest {
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 3);
-        log.push(new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2)));
 
-        LogEntry<Point, Piece> entry = log.pop();
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
+        log.push(new ChessLog.Entry(notation, event));
+
+        ChessLog.Entry entry = log.pop();
         Assertions.assertNotNull(entry);
     }
 
@@ -51,7 +61,8 @@ class ChessLogTest {
     void testUndo_givenEmpty_thenNoChange() {
         ChessLog log = new ChessLog();
 
-        LogEntry<Point, Piece> entry = log.undo();
+        log.pop();
+        ChessLog.Entry entry = log.peekUndone();
         Assertions.assertNull(entry);
     }
 
@@ -60,13 +71,20 @@ class ChessLogTest {
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 3);
-        LogEntry<Point, Piece> move = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
+
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
+        ChessLog.Entry move = new ChessLog.Entry(notation, event);
         log.push(move);
 
-        LogEntry<Point, Piece> entry = log.undo();
+        ChessLog.Entry entry = log.pop();
         Assertions.assertEquals(move, entry);
 
-        LogEntry<Point, Piece> peek = log.peek();
+        ChessLog.Entry undo = log.peekUndone();
+        Assertions.assertEquals(move, undo);
+
+        ChessLog.Entry peek = log.peek();
         Assertions.assertNull(peek);
     }
 
@@ -76,47 +94,84 @@ class ChessLogTest {
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 2);
         Point p3 = new Point(3, 3);
-        LogEntry<Point, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
-        LogEntry<Point, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2), new Pawn(Colour.WHITE, p3));
+
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation1 = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event1 = new MoveEvent(Colour.WHITE, p1, p2);
+        ChessLog.Entry move1 = new ChessLog.Entry(notation1, event1);
         log.push(move1);
+
+        ChessNotation notation2 = new ChessNotation(new ChessRecord.Builder(p2, p3, moving, null).build());
+        MoveEvent event2 = new MoveEvent(Colour.WHITE, p2, p3);
+        ChessLog.Entry move2 = new ChessLog.Entry(notation2, event2);
         log.push(move2);
 
-        LogEntry<Point, Piece> entry = log.undo();
+        ChessLog.Entry entry = log.pop();
         Assertions.assertEquals(move2, entry);
 
-        LogEntry<Point, Piece> peek = log.peek();
-        Assertions.assertNotNull(peek);
+        ChessLog.Entry undo = log.peekUndone();
+        Assertions.assertEquals(move2, undo);
+
+        ChessLog.Entry peek = log.peek();
         Assertions.assertEquals(move1, peek);
     }
 
     @Test
     void testRedo_givenEmpty_thenNoChange() {
+        // Note: Redo is now a check by the log. A record pushed to the log that matches its most recent undo is a redo
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 3);
-        log.push(new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2)));
 
-        LogEntry<Point, Piece> entry = log.redo();
-        Assertions.assertNull(entry);
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event = new MoveEvent(Colour.WHITE, p1, p2);
+        ChessLog.Entry move = new ChessLog.Entry(notation, event);
+        log.push(move);
+
+        ChessLog.Entry undo = log.peekUndone();
+        Assertions.assertNull(undo);
     }
 
     @Test
-    void testRedo_givenOneEntry_thenRedoneIsTop() {
+    void testRedo_givenTwoEntries_thenRedoneIsTop() {
+        // Note: Redo is now a check by the log. A record pushed to the log that matches its most recent undo is a redo
         ChessLog log = new ChessLog();
         Point p1 = new Point(3, 1);
         Point p2 = new Point(3, 2);
         Point p3 = new Point(3, 3);
-        LogEntry<Point, Piece> move1 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p1), new Pawn(Colour.WHITE, p2));
-        LogEntry<Point, Piece> move2 = new ChessLogEntry(p1, p2, new Pawn(Colour.WHITE, p2), new Pawn(Colour.WHITE, p3));
+
+        Piece moving = new Pawn(Colour.WHITE, p1); // This will not move in this test
+        ChessNotation notation1 = new ChessNotation(new ChessRecord.Builder(p1, p2, moving, null).build());
+        MoveEvent event1 = new MoveEvent(Colour.WHITE, p1, p2);
+        ChessLog.Entry move1 = new ChessLog.Entry(notation1, event1);
         log.push(move1);
+
+        ChessNotation notation2 = new ChessNotation(new ChessRecord.Builder(p2, p3, moving, null).build());
+        MoveEvent event2 = new MoveEvent(Colour.WHITE, p2, p3);
+        ChessLog.Entry move2 = new ChessLog.Entry(notation2, event2);
         log.push(move2);
 
-        LogEntry<Point, Piece> entry = log.undo();
+        ChessLog.Entry entry = log.pop();
         Assertions.assertEquals(move2, entry);
 
-        LogEntry<Point, Piece> redo = log.redo();
-        Assertions.assertNotNull(redo);
-        Assertions.assertEquals(move2, redo);
+        ChessLog.Entry undo = log.peekUndone();
+        Assertions.assertEquals(move2, undo);
+
+        ChessLog.Entry peek = log.peek();
+        Assertions.assertEquals(move1, peek);
+
+        // Undo again to check for proper redo
+        ChessLog.Entry redo = log.pop();
+
+        Assertions.assertNull(log.peek());
+        Assertions.assertEquals(redo, log.peekUndone());
+
+        // Apply redo
+        log.push(redo);
+
+        Assertions.assertEquals(redo, log.peek());
+        Assertions.assertEquals(entry, log.peekUndone()); // This has not been cleared with a proper redo
     }
 
 }

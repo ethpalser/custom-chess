@@ -1,336 +1,229 @@
 package com.ethpalser.chess.game;
 
-import com.ethpalser.chess.board.Board;
-import com.ethpalser.chess.board.ChessBoard;
-import com.ethpalser.chess.exception.IllegalActionException;
-import com.ethpalser.chess.log.ChessLog;
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
+import com.ethpalser.chess.exception.IllegalMoveException;
+import com.ethpalser.chess.exception.IllegalResultException;
+import com.ethpalser.chess.exception.MissingPieceException;
+import com.ethpalser.chess.exception.UnsupportedEventException;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.ChessLog;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.event.Action;
+import com.ethpalser.chess.game.event.GameEvent;
+import com.ethpalser.chess.game.event.MoveEvent;
+import com.ethpalser.chess.game.logic.Heuristics;
+import com.ethpalser.chess.game.state.AwaitState;
+import com.ethpalser.chess.game.state.EndState;
+import com.ethpalser.chess.game.state.GamePrompt;
+import com.ethpalser.chess.game.state.GameState;
+import com.ethpalser.chess.game.state.ReadyState;
+import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.move.MoveMap;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.Movement;
-import com.ethpalser.chess.move.map.MoveMap;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.PieceFactory;
-import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.Pieces;
-import com.ethpalser.chess.piece.custom.CustomPieceFactory;
-import com.ethpalser.chess.piece.custom.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
-import com.ethpalser.chess.view.GameView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-01",
+        majorVersion = 3,
+        minorVersion = 21,
+        lastModified = "2025-01-13"
+)
 public class ChessGame implements Game {
 
-    private final Board board;
-    private final Log<Point, Piece> log;
-    private final ThreatMap whiteThreats;
-    private final ThreatMap blackThreats;
-
-    private GameStatus status;
-    private Colour player;
-    private Point whiteKing;
-    private Point blackKing;
+    private final GameContext context;
     private int turn;
-    private Point promotePoint;
+    private GameState state; // Defines what events are handled
+    private GameStatus status; // Describes the most recent result
 
-    public ChessGame(Board board, Log<Point, Piece> log) {
-        if (board == null) {
-            throw new NullPointerException("board cannot be null");
+    public ChessGame() {
+        this(new GameOptions(), null);
+    }
+
+    public ChessGame(GameOptions options, GameSaveData saveData) {
+        if (options == null) {
+            throw new IllegalArgumentException("game options cannot be null");
         }
-        this.board = board;
-        this.log = log;
-        this.status = GameStatus.PENDING;
-        for (Piece p : this.board.getPieces()) {
-            if (PieceType.KING.getCode().equals(p.getCode())) {
-                if (Colour.WHITE.equals(p.getColour())) {
-                    this.whiteKing = p.getPoint();
-                } else {
-                    this.blackKing = p.getPoint();
+        if (saveData == null) {
+            this.context = new GameContext(options);
+            this.turn = 1;
+            this.status = GameStatus.ONGOING;
+            this.state = new ReadyState(this.context);
+        } else {
+            this.context = new GameContext(options, saveData.pieceNotations(), saveData.logNotations());
+            // Count changes in turn
+            int turnCount = 1;
+            for (ChessLog.Entry entry : this.context.getLog()) {
+                ChessRecord rec = entry.notation().toRecord();
+                // Ignore records that are either of these, as they are part of the same player's turn
+                if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                    turnCount++;
                 }
             }
-        }
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), log);
-        this.turn = log.size() + 1;
-        this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
-    }
-
-    public ChessGame(GameView view) {
-        this.turn = Math.max(view.getTurn(), 1);
-        this.player = this.turn % 2 != 0 ? Colour.WHITE : Colour.BLACK;
-        this.log = new ChessLog();
-        Plane<Piece> plane = new Plane<>(view.getBoard().getWidth() - 1, view.getBoard().getLength() - 1);
-        // Todo: Remove views
-        PieceFactory factory = new CustomPieceFactory(view.getPieceSpecs(), plane, this.log);
-        this.board = new ChessBoard(factory, view.getBoard().getPieces());
-        for (Piece p : this.board.getPieces()) {
-            if (PieceType.KING.getCode().equals(p.getCode())) {
-                if (Colour.WHITE.equals(p.getColour())) {
-                    this.whiteKing = p.getPoint();
-                } else {
-                    this.blackKing = p.getPoint();
-                }
+            this.turn = turnCount;
+            this.status = checkGameStatus(this.currentPlayer(), false);
+            GamePrompt prompt = this.context.getPrompt();
+            if (GameStatus.isCompletedGameStatus(this.status)) {
+                this.state = new EndState(this.context);
+            } else if (prompt != null) {
+                this.state = new AwaitState(this.context, prompt.eventType(), prompt.choices());
+            } else {
+                this.state = new ReadyState(this.context);
             }
         }
-        // this.log.addAll(this.board.getPieces(), view.getLog()); // todo: refactor log, it is a pain to recreate
-        this.whiteThreats = new ThreatMap(Colour.WHITE, this.board.getPieces(), this.log);
-        this.blackThreats = new ThreatMap(Colour.BLACK, this.board.getPieces(), this.log);
-        this.status = checkGameStatus();
     }
 
     @Override
-    public Board getBoard() {
-        return this.board;
+    public GameInfo info() {
+        return new GameInfo(this.turn, this.score(), this.status, this.context);
     }
 
     @Override
-    public Log<Point, Piece> getLog() {
-        return this.log;
+    public GameContext context() {
+        return this.context;
     }
 
     @Override
-    public GameStatus getStatus() {
+    public GameStatus status() {
         return status;
     }
 
     @Override
-    public int getTurn() {
+    public int turn() {
         return this.turn;
     }
 
-    public LogEntry<Point, Piece> movePiece(Point start, Point end,
-            Log<Point, Piece> log, ThreatMap threatMap) {
-        if (start == null || end == null) {
-            throw new NullPointerException();
-        }
-        Piece piece = this.board.getPiece(start);
-        if (piece == null) {
-            throw new IllegalActionException("piece cannot move as it does not exist at " + start);
-        }
-
-        Movement move = piece.getMoves(this.board.getPieces(), log, threatMap).getMove(end);
-        if (move == null) {
-            throw new IllegalActionException("piece (" + piece + ") cannot move to " + end);
-        }
-        Piece captured = this.board.getPiece(end);
-
-        LogEntry<Point, Piece> response = new ChessLogEntry(start, end, piece, captured, move.getFollowUpMove());
-
-        this.board.getPieces().remove(end);
-        this.board.getPieces().remove(start);
-        this.board.getPieces().put(end, piece);
-        piece.move(end);
-
-        LogEntry<Point, Piece> followUp = move.getFollowUpMove();
-        if (followUp != null) {
-            Piece toForcePush = followUp.getStartObject();
-            this.board.getPieces().remove(followUp.getStart());
-            if (followUp.getEnd() != null) {
-                this.board.getPieces().put(followUp.getEnd(), toForcePush);
+    @Override
+    public int score() {
+        // Using Record here to avoid redundant copying downstream
+        GameContext.Record ctxRecord = this.context.toRecord();
+        int whiteSum = 0;
+        int blackSum = 0;
+        for (Piece p : ctxRecord.getBoard()) {
+            if (Colour.WHITE.equals(p.getColour())) {
+                whiteSum += Heuristics.pieceValue(ctxRecord, p);
+            } else {
+                blackSum += Heuristics.pieceValue(ctxRecord, p);
             }
         }
-        this.board.getPieces().remove(null);
-        return response;
+        int whitePawn = Heuristics.pawnValue(ctxRecord, Colour.WHITE);
+        int blackPawn = Heuristics.pawnValue(ctxRecord, Colour.BLACK);
+        return whiteSum + whitePawn - (blackSum + blackPawn);
+    }
+
+    /**
+     * Move a piece, by the Action's player, from the Action's start to end. No changes are made if this action's player
+     * is not the turn player or if the action is illegal.
+     *
+     * @param action A record representing information for a movement, replaced by MoveEvent.
+     * @return
+     * @deprecated Since January 12, 2025. Replaced Action with GameEvent
+     */
+    @Deprecated(since = "2025-01-12")
+    @Override
+    public GameStatus update(Action action) {
+        if (action == null) {
+            throw new IllegalMoveException("Action is null");
+        }
+        GameEvent event = new MoveEvent(action.getColour(), action.getStart(), action.getEnd());
+        return this.update(event);
     }
 
     @Override
-    public GameStatus updateGame(Action action) throws IllegalActionException {
-        if (action == null) {
-            throw new IllegalActionException("action cannot be null");
-        }
-        return this.updateGame(action.getStart(), action.getEnd(), action.getColour());
-    }
-
-    public GameStatus updateGame(Point start, Point end, Colour player) throws IllegalActionException {
-        if (GameStatus.isCompletedGameStatus(this.status)) {
-            return this.status;
-        }
-        if (isNotPlayerAction(player)) {
-            return GameStatus.NO_CHANGE;
-        }
-        if (isNotInBoardBounds(start, end)) {
+    public GameStatus update(GameEvent event) {
+        Colour expectedPlayer = this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
+        if (!expectedPlayer.equals(event.player())) {
             return GameStatus.NO_CHANGE;
         }
 
-        Piece movingPiece = this.board.getPiece(start);
-        if (movingPiece == null) {
-            return GameStatus.NO_CHANGE;
+        try {
+            this.state = this.state.update(event);
+        } catch (CoordinateOutOfBoundsException | IllegalArgumentException | IllegalResultException
+                | MissingPieceException | UnsupportedEventException ex) {
+            // These are regular exceptions that are expected and ignored with not changes to state
+            return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
+        } catch (IllegalMoveException ex) {
+            // These are irregular exceptions that can be ignored but should be handled
+            System.err.println(ex.getMessage());
+            return GameStatus.isCompletedGameStatus(this.status) ? this.status : GameStatus.NO_CHANGE;
+        } catch (Exception ex) {
+            // These are unexpected exceptions that should be resolved ASAP
+            System.err.println(ex.getMessage());
+            System.err.println(event);
+            System.err.println(this.context.getBoard());
+            throw ex;
         }
-        if (isNotAllowedToMove(movingPiece)) {
-            return GameStatus.NO_CHANGE;
-        }
-        LogEntry<Point, Piece> entry = this.movePiece(start, end, this.log,
-                this.getThreatMap(Colour.opposite(this.player)));
-        this.log.push(entry);
-        this.updateKingPosition(movingPiece, end);
-
-        // Update opponent's threats with the move performed
-        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, start);
-        this.getThreatMap(Colour.opposite(this.player)).refreshThreats(this.board.getPieces(), this.log, end);
-        // Does moving this piece put turn player in check? (opponent's updated threats now include turn player's king)
-        if (this.isKingInCheck(this.player)) {
-            LogEntry<Point, Piece> logEntry = this.log.pop();
-            // soft undo update, which does not alter turn or player nor check game status
-            this.undoLogEntryToBoard(logEntry.getSubLogEntry());
-            this.undoLogEntryToBoard(logEntry);
-            this.applyLogEntryToThreats(logEntry);
-            this.updateKingPosition(movingPiece, start);
-            return GameStatus.NO_CHANGE;
-        }
-
-        // Update remaining threats
-        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, start);
-        this.getThreatMap(this.player).refreshThreats(this.board.getPieces(), this.log, end);
-        if (entry.getSubLogEntry() != null) {
-            this.applyLogEntryToThreats(entry.getSubLogEntry());
-        }
-
-        if (this.board.getPiece(start) != null) {
-            throw new IllegalActionException("cannot perform move as it cannot move to " + end);
-        }
-
-        // Promote the piece if it can be promoted
-        List<String> promoteOptions = movingPiece.promoteOptions();
-        if (movingPiece.canPromote(this.board.getPieces())) {
-            this.promotePoint = end;
-            if (!promoteOptions.isEmpty()) {
-                // TEMPORARY use only the first option for promotion
-                this.promotePiece(movingPiece.promoteOptions().get(0));
-            }
-        } else {
-            // Piece was not promoted (if promotion was not enforced), so remove ability to promote it
-            this.promotePoint = null;
-        }
-
-        this.status = this.checkGameStatus();
-        this.player = Colour.opposite(this.player);
+        this.status = this.checkGameStatus(this.currentPlayer(), false);
         this.turn++;
         return this.status;
     }
 
-    public void promotePiece(String selection) {
-        if (this.promotePoint == null) {
-            throw new IllegalActionException("cannot promote a piece when there are none to promote.");
+    @Override
+    public GameStatus undo() {
+        if (this.context.getLog().peek() == null) {
+            return GameStatus.NO_CHANGE;
         }
-        Piece promoting = this.board.getPiece(this.promotePoint);
-        // Manually modify piece's string then convert it into a piece
-        String pieceStr = Pieces.asString(promoting, selection);
-        Piece replacement;
-        if (PieceType.fromCode(selection) == PieceType.CUSTOM) {
-            // CustomPieceFactory should load custom piece specifications to determine how to make the custom piece
-            PieceFactory factory = new CustomPieceFactory(Map.of(), this.board.getPieces(), this.log);
-            PieceStringTokenizer tokenizer = new PieceStringTokenizer(pieceStr);
-            // colour then code
-            replacement = factory.create(Colour.fromCode(tokenizer.nextToken()), tokenizer.nextToken());
-        } else {
-            // Build a standard piece using information from the piece string
-            replacement = Pieces.fromString(pieceStr);
+        boolean undoneBaseMove = false;
+        while (!undoneBaseMove) {
+            ChessLog.Entry peek = this.context.getLog().peek();
+            if (peek == null) {
+                break;
+            }
+            // Undo all non-base moves
+            ChessRecord rec = peek.notation().toRecord();
+            if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                undoneBaseMove = true;
+            }
+            GameEvent event = peek.event();
+            // un-execute should be responsible for context updates
+            event.unExecute(this.context);
         }
-        // Update the board and latest log with this promotion
-        this.board.addPiece(this.promotePoint, replacement);
-        this.log.peek().setPromotion(replacement);
+
+        // Commit changes to context
+        this.turn--; // Reduce the turn count first to be on the player we just reverted the event(s) for.
+        this.status = this.checkGameStatus(this.currentPlayer(), true);
+        return this.status;
     }
 
     @Override
-    public GameStatus undoUpdate(int beforeCurrent, boolean saveUndone) {
-        for (int i = 0; i < beforeCurrent; i++) {
-            LogEntry<Point, Piece> logEntry;
-            if (saveUndone) {
-                logEntry = this.log.undo();
+    public GameStatus redo() {
+        ChessLog.Entry firstRedo = this.context.getLog().peekUndone();
+        if (firstRedo == null) {
+            return GameStatus.NO_CHANGE;
+        }
+
+        GameEvent event = firstRedo.event();
+        // un-execute should be responsible for context updates
+        event.execute(this.context);
+
+        boolean atNextBaseMoved = false;
+        while (!atNextBaseMoved) {
+            ChessLog.Entry toRedo = this.context.getLog().peekUndone();
+            if (toRedo == null) {
+                break;
+            }
+            // Redo the first base move and all non-base moves up to the next
+            ChessRecord rec = toRedo.notation().toRecord();
+            if (!rec.isFollowUp() && rec.promoteCode() == null) {
+                atNextBaseMoved = true;
             } else {
-                logEntry = this.log.pop();
+                event = toRedo.event();
+                event.execute(this.context);
             }
-            if (logEntry == null) {
-                break;
-            }
-            if (logEntry.getSubLogEntry() != null) {
-                this.undoLogEntryToBoard(logEntry.getSubLogEntry());
-                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
-            }
-            this.undoLogEntryToBoard(logEntry);
-            this.applyLogEntryToThreats(logEntry);
-
-            this.updateKingPosition(logEntry.getStartObject(), logEntry.getStart());
-            this.status = this.checkGameStatus();
-            this.player = Colour.opposite(this.player);
-            this.turn--;
         }
+        // Commit changes to context
+        this.status = this.checkGameStatus(this.currentPlayer(), true);
+        this.turn++; // Increase the turn count after, as we need to check the status of the executing player
         return this.status;
-    }
-
-    private void undoLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
-        if (logEntry == null) {
-            return;
-        }
-        this.board.addPiece(logEntry.getEnd(), logEntry.getEndObject());
-        this.board.addPiece(logEntry.getStart(), logEntry.getStartObject());
-        if (logEntry.isFirstOccurrence()) {
-            logEntry.getStartObject().setHasMoved(false);
-        }
-
-    }
-
-    @Override
-    public GameStatus redoUpdate(int afterCurrent) {
-        for (int i = 0; i < afterCurrent; i++) {
-            LogEntry<Point, Piece> logEntry = this.log.redo();
-            if (logEntry == null) {
-                break;
-            }
-            this.redoLogEntryToBoard(logEntry);
-            this.applyLogEntryToThreats(logEntry);
-            if (logEntry.getSubLogEntry() != null) {
-                this.redoLogEntryToBoard(logEntry.getSubLogEntry());
-                this.applyLogEntryToThreats(logEntry.getSubLogEntry());
-            }
-
-            Piece promoted = logEntry.getPromotion();
-            if (promoted != null) {
-                this.board.addPiece(promoted.getPoint(), promoted);
-            }
-
-            this.updateKingPosition(logEntry.getStartObject(), logEntry.getEnd());
-            this.status = this.checkGameStatus();
-            this.player = Colour.opposite(this.player);
-            this.turn++;
-        }
-        return this.status;
-    }
-
-    private void redoLogEntryToBoard(LogEntry<Point, Piece> logEntry) {
-        if (logEntry == null) {
-            return;
-        }
-        this.board.addPiece(logEntry.getEnd(), logEntry.getStartObject());
-        if (logEntry.isFirstOccurrence()) {
-            logEntry.getStartObject().setHasMoved(true);
-        }
-        // Remove the piece at the start point
-        this.board.addPiece(logEntry.getStart(), null);
-    }
-
-    private void applyLogEntryToThreats(LogEntry<Point, Piece> logEntry) {
-        if (logEntry == null) {
-            return;
-        }
-        // End can be null when removing a piece
-        if (logEntry.getEnd() != null) {
-            this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
-            this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getEnd());
-        }
-        this.whiteThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
-        this.blackThreats.refreshThreats(this.board.getPieces(), this.log, logEntry.getStart());
     }
 
     @Override
@@ -345,19 +238,24 @@ public class ChessGame implements Game {
         } else if (GameStatus.BLACK_IN_CHECK.equals(this.status)) {
             return this.getActionsAgainstCheck(Colour.BLACK);
         } else {
-            for (Piece piece : this.board.getPieces()) {
-                if (Pieces.isAllied(this.player, piece)) {
-                    MoveSet moves = piece.getMoves(this.board.getPieces(), this.log,
-                            this.getThreatMap(Colour.opposite(piece.getColour())));
-                    for (Movement m : moves.toSet()) {
-                        Path path = m.getPath();
+            GameContext.Record ctxRecord = this.context.toRecord();
+
+            for (Piece piece : ctxRecord.getBoard()) {
+                if (piece == null) {
+                    continue;
+                }
+                if (Pieces.isAllied(this.currentPlayer(), piece)) {
+                    MoveSet moves = piece.getMoves(ctxRecord);
+                    for (Move m : moves.moves()) {
+                        Path path = m.path();
                         if (path != null && path.length() > 0) {
                             // The last point in a path is a potential capture
-                            potentialCaptures.add(new Action(piece.getColour(), piece.getPoint(),
+                            potentialCaptures.add(new Action(piece.getColour(), piece.getCoordinate(),
                                     path.getPoint(path.length() - 1)));
                             // Remaining points are quiet actions (no captures)
                             for (int i = 0; i < path.length() - 1; i++) {
-                                quietActions.add(new Action(piece.getColour(), piece.getPoint(), path.getPoint(i)));
+                                quietActions.add(new Action(piece.getColour(), piece.getCoordinate(),
+                                        path.getPoint(i)));
                             }
                         }
                     }
@@ -370,148 +268,48 @@ public class ChessGame implements Game {
     }
 
     @Override
-    public int evaluateState() {
-        return this.evaluateBoardState()
-                + this.whiteThreats.evaluate(this.board.getPieces())
-                + this.blackThreats.evaluate(this.board.getPieces());
-    }
-
-    public String toJson() {
-        GameView info = new GameView(this);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(info);
-    }
-
-    public static Game fromJson(String json) {
-        if (json == null) {
-            return null;
+    public GameSaveData createSaveData() {
+        Board<Coordinate> board = this.context.getBoard();
+        String[] pieces = new String[board.count()];
+        int i = 0;
+        for (Piece piece : board) {
+            pieces[i] = Pieces.asString(piece);
+            i++;
         }
-        GameView info = new Gson().fromJson(json, GameView.class);
-        return new ChessGame(info);
+
+        ChessLog log = this.context.getLog();
+        String[] notations = new String[log.size()];
+        int k = 0;
+        for (ChessLog.Entry entry : log) {
+            notations[k] = entry.notation().toString();
+            k++;
+        }
+
+        GamePrompt prompt = this.context.getPrompt();
+        return new GameSaveData(pieces, notations, prompt, null);
     }
 
     // PRIVATE METHODS
 
-    private int evaluateBoardState() {
-        int whiteSum = 0;
-        int blackSum = 0;
-        for (Piece p : board.getPieces()) {
-            if (Colour.WHITE.equals(p.getColour())) {
-                whiteSum += this.getPieceValue(p);
-            } else {
-                blackSum += this.getPieceValue(p);
-            }
-        }
-        return whiteSum - blackSum;
+    private Colour currentPlayer() {
+        return this.turn % 2 == 1 ? Colour.WHITE : Colour.BLACK;
     }
 
-    private int getPieceValue(Piece p) {
-        if (p == null) {
-            return 0;
-        }
-        int value;
-        switch (PieceType.fromCode(p.getCode())) {
-            case PAWN -> value = 1;
-            case BISHOP, KNIGHT -> value = 3;
-            case ROOK -> value = 5;
-            case QUEEN -> value = 9;
-            case CUSTOM -> {
-                // Currently, this uses MoveSet, but this would be more accurate to use its blueprint
-                MoveSet moveSet = p.getMoves(this.board.getPieces(), this.log,
-                        this.getThreatMap(Colour.opposite(p.getColour())));
-                int numMoves = moveSet.getPoints().size();
-                int base = (int) Math.ceil(numMoves / 3.0);
-                value = base + base / 3;
-            }
-            default -> value = 0;
-        }
-        return value;
-    }
-
-    private Colour opponent() {
-        return Colour.opposite(this.player);
-    }
-
-    private boolean isNotPlayerAction(Colour colour) {
-        return !this.player.equals(colour);
-    }
-
-    private boolean isNotInBoardBounds(Point start, Point end) {
-        return start == null || end == null || !this.board.isInBounds(start) || !this.board.isInBounds(end);
-    }
-
-    private boolean isNotAllowedToMove(Piece piece) {
-        if (piece == null) {
-            throw new NullPointerException();
-        }
-        return !this.player.equals(piece.getColour());
-    }
-
-    private boolean isKingInCheck(Colour kingColour) {
-        if (kingColour == null) {
-            throw new NullPointerException();
-        }
-        // Does the opponent have a threat on the current king's position
-        return !this.getThreatMap(Colour.opposite(kingColour)).hasNoThreats(getKingPosition(kingColour));
-    }
-
-    private void updateKingPosition(Piece piece, Point update) {
-        if (Pieces.isKing(piece)) {
-            if (Pieces.isAllied(Colour.WHITE, piece)) {
-                this.whiteKing = update;
-            } else {
-                this.blackKing = update;
-            }
-        }
-    }
-
-    private Point getKingPosition(Colour colour) {
-        Point point;
-        if (Colour.WHITE.equals(colour)) {
-            point = this.whiteKing;
-        } else {
-            point = this.blackKing;
-        }
-        return point;
-    }
-
-    private Point actualKingPosition(Colour colour) {
-        System.out.println("King expected: " + this.getKingPosition(colour));
-        for (int y = 0; y < this.board.getPieces().length(); y++) {
-            for (int x = 0; x < this.board.getPieces().width(); x++) {
-                Point p = new Point(x, y);
-                if (Pieces.isKing(this.board.getPiece(p)) && Pieces.isAllied(colour, this.board.getPiece(p))) {
-                    return new Point(x, y);
-                }
-            }
-        }
-        return null;
-    }
-
-    private ThreatMap getThreatMap(Colour colour) {
-        if (Colour.WHITE.equals(colour)) {
-            return whiteThreats;
-        } else {
-            return blackThreats;
-        }
-    }
-
-    private MoveMap getMoveMap(Colour colour) {
-        return new MoveMap(colour, this.board.getPieces(), this.log, this.getThreatMap(Colour.opposite(colour)));
-    }
-
-    private GameStatus checkGameStatus() {
-        Colour opponent = Colour.opposite(this.player);
+    private GameStatus checkGameStatus(Colour playerColour, boolean isUndo) {
+        Colour lastMovedPlayer = !isUndo ? playerColour : Colour.opposite(playerColour);
+        Colour opponentColour = Colour.opposite(lastMovedPlayer);
         // Is there a check, checkmate or stalemate?
         GameStatus nextStatus;
-        if (isKingInCheck(opponent)) {
-            if (this.isCheckmate()) {
-                nextStatus = GameStatus.colourWinStatus(this.player);
+        boolean opponentInCheck = !this.context.getThreats(lastMovedPlayer)
+                .hasNoThreats(this.context.getKingCoordinate(opponentColour));
+        if (opponentInCheck) {
+            if (this.isCheckmate(lastMovedPlayer)) {
+                nextStatus = GameStatus.colourWinStatus(lastMovedPlayer);
             } else {
-                nextStatus = GameStatus.colourInCheckStatus(opponent);
+                nextStatus = GameStatus.colourInCheckStatus(opponentColour);
             }
         } else {
-            if (this.isStalemate()) {
+            if (this.isStalemate(lastMovedPlayer)) {
                 nextStatus = GameStatus.STALEMATE;
             } else {
                 nextStatus = GameStatus.ONGOING;
@@ -520,18 +318,20 @@ public class ChessGame implements Game {
         return nextStatus;
     }
 
-    private boolean isCheckmate() {
-        Colour oppColour = Colour.opposite(this.player);
-        Point oppKingPoint = this.getKingPosition(Colour.opposite(this.player));
-        if (oppKingPoint == null || this.board.getPiece(oppKingPoint) == null) {
+    private boolean isCheckmate(Colour playerColour) {
+        GameContext.Record ctxRecord = this.context.toRecord();
+
+        Colour oppColour = Colour.opposite(playerColour);
+        Coordinate oppKingPoint = this.context.getKingCoordinate(Colour.opposite(playerColour));
+        if (oppKingPoint == null || ctxRecord.getBoard().get(oppKingPoint) == null) {
+            throw new IllegalStateException("Severe exception: Opponent's king is missing");
         }
         // Assuming King is in check
-        MoveSet oppKingMoveSet = this.board.getPiece(oppKingPoint)
-                .getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player));
+        MoveSet oppKingMoveSet = ctxRecord.getBoard().get(oppKingPoint).getMoves(ctxRecord);
         if (oppKingMoveSet != null && !oppKingMoveSet.isEmpty()) {
-            for (Point p : oppKingMoveSet.getPoints()) {
+            for (Coordinate moveCoordinate : oppKingMoveSet.coordinates()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.getThreatMap(this.player).hasNoThreats(p)) {
+                if (ctxRecord.getThreats(playerColour).hasNoThreats(moveCoordinate)) {
                     // Yes, so the king is not in checkmate
                     return false;
                 }
@@ -539,26 +339,27 @@ public class ChessGame implements Game {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Piece> sourcesOfCheck = this.getThreatMap(this.player).getPieces(oppKingPoint);
+        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(playerColour).getThreats(oppKingPoint);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return true;
         }
         // There is only one threatening check
-        for (Piece p : sourcesOfCheck) {
+        for (Coordinate defendCoordinate : sourcesOfCheck) {
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(oppColour).getPieces(p.getPoint());
+            Set<Coordinate> defenders = ctxRecord.getThreats(oppColour).getThreats(defendCoordinate);
             if (!defenders.isEmpty()) {
                 // Yes, as this piece can be captured by a non-king, the opponent has a legal move to prevent check
                 return false;
             }
             // Can a piece block its path?
-            Movement causingCheck = p.getMoves(this.board.getPieces(), this.log).getMove(oppKingPoint);
+
+            Move causingCheck = ctxRecord.getBoard().get(defendCoordinate).getMoves(ctxRecord).getMove(oppKingPoint);
             if (causingCheck == null) {
                 throw new NullPointerException("exception in game state, move causing check should not be null");
             }
-            MoveMap moveMap = new MoveMap(oppColour, this.board.getPieces(), this.log, this.getThreatMap(this.player));
-            for (Point c : causingCheck.getPath()) {
+            MoveMap moveMap = new MoveMap(oppColour, ctxRecord);
+            for (Coordinate c : causingCheck.path()) {
                 // Yes, there is at least one non-king piece that can move to a point along the path causing check
                 if (!moveMap.hasNoMove(c, true)) {
                     return false;
@@ -568,17 +369,21 @@ public class ChessGame implements Game {
         return true;
     }
 
-    private boolean isStalemate() {
+    private boolean isStalemate(Colour playerColour) {
+        GameContext.Record ctxRecord = this.context.toRecord();
         // Only kings remain, which is a stalemate
-        if (this.board.getPieces().size() <= 2) {
+        if (ctxRecord.getBoard().count() <= 2) {
             return true;
         }
         // Are there any opponent pieces that can move?
-        List<Piece> opponentPieces = this.board.getPieces().values().stream()
-                .filter(p -> Colour.opposite(this.player).equals(p.getColour()))
-                .collect(Collectors.toList());
+        List<Piece> opponentPieces = new ArrayList<>();
+        for (Piece p : ctxRecord.getBoard()) {
+            if (!Pieces.isAllied(playerColour, p)) {
+                opponentPieces.add(p);
+            }
+        }
         for (Piece p : opponentPieces) {
-            if (!p.getMoves(this.board.getPieces(), this.log, this.getThreatMap(this.player)).isEmpty()) {
+            if (!p.getMoves(ctxRecord).isEmpty()) {
                 return false;
             }
         }
@@ -586,17 +391,18 @@ public class ChessGame implements Game {
     }
 
     private List<Action> getActionsAgainstCheck(Colour playerInCheck) {
+        GameContext.Record ctxRecord = this.context.toRecord();
+
         List<Action> actions = new ArrayList<>();
         // This method assumes a player is in check
         Colour causingCheck = Colour.opposite(playerInCheck);
-        Point inCheckKing = this.getKingPosition(playerInCheck);
-        MoveSet inCheckMoves = this.board.getPiece(inCheckKing).getMoves(this.board.getPieces(), this.log,
-                this.getThreatMap(causingCheck));
+        Coordinate inCheckKing = this.context.getKingCoordinate(playerInCheck);
+        MoveSet inCheckMoves = ctxRecord.getBoard().get(inCheckKing).getMoves(ctxRecord);
 
         if (inCheckMoves != null && !inCheckMoves.isEmpty()) {
-            for (Point p : inCheckMoves.getPoints()) {
+            for (Coordinate p : inCheckMoves.coordinates()) {
                 // Is there a location the opponent king can move to that is not threatened by the opponent?
-                if (this.getThreatMap(this.player).hasNoThreats(p)) {
+                if (ctxRecord.getThreats(this.currentPlayer()).hasNoThreats(p)) {
                     // Yes, so the king is not in checkmate
                     actions.add(new Action(playerInCheck, inCheckKing, p));
                 }
@@ -604,27 +410,31 @@ public class ChessGame implements Game {
         }
 
         // The opponent king cannot move, but can another piece move to block all sources of check?
-        Set<Piece> sourcesOfCheck = this.getThreatMap(causingCheck).getPieces(inCheckKing);
+        Set<Coordinate> sourcesOfCheck = ctxRecord.getThreats(causingCheck).getThreats(inCheckKing);
         if (sourcesOfCheck.size() > 1) {
             // A piece cannot simultaneously capture one piece and block another, as neither were original blocked
             return List.of();
         }
 
-        for (Piece attacker : sourcesOfCheck) {
+        for (Coordinate attacker : sourcesOfCheck) {
+            Piece attackerPiece = ctxRecord.getBoard().get(attacker);
+            if (attackerPiece == null) {
+                throw new IllegalStateException("Severe exception: Piece causing check is null");
+            }
             // Can this piece be captured by the opponent?
-            Set<Piece> defenders = this.getThreatMap(playerInCheck).getPieces(attacker.getPoint());
-            for (Piece defender : defenders) {
-                actions.add(new Action(playerInCheck, defender.getPoint(), attacker.getPoint()));
+            Set<Coordinate> defenders = ctxRecord.getThreats(playerInCheck).getThreats(attacker);
+            for (Coordinate defender : defenders) {
+                actions.add(new Action(playerInCheck, defender, attacker));
             }
             // Can a piece block its path?
-            Movement moveCausingCheck = attacker.getMoves(this.board.getPieces(), this.log).getMove(inCheckKing);
+            Move moveCausingCheck = attackerPiece.getMoves(ctxRecord).getMove(inCheckKing);
             if (moveCausingCheck == null) {
-                throw new NullPointerException("exception in game state, move causing check should not be null");
+                throw new NullPointerException("Severe exception: Move causing check is null");
             }
-            MoveMap moveMap = this.getMoveMap(playerInCheck);
-            for (Point pointOnPath : moveCausingCheck.getPath()) {
-                for (Piece blocker : moveMap.getPieces(pointOnPath)) {
-                    actions.add(new Action(playerInCheck, blocker.getPoint(), pointOnPath));
+            MoveMap moveMap = new MoveMap(playerInCheck, ctxRecord);
+            for (Coordinate pathCoordinate : moveCausingCheck.path()) {
+                for (Piece blocker : moveMap.getPieces(pathCoordinate)) {
+                    actions.add(new Action(playerInCheck, blocker.getCoordinate(), pathCoordinate));
                 }
             }
         }

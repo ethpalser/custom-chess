@@ -1,171 +1,82 @@
 package com.ethpalser.chess.space;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import java.util.List;
 
-public class Plane<T extends Positional> implements Map<Point, T>, Iterable<T> {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-05-14",
+        majorVersion = 2,
+        minorVersion = 6,
+        lastModified = "2025-01-13"
+)
+public class Plane implements Space {
 
+    private static final int DIMENSION = 2;
     private final int minX;
     private final int minY;
     private final int maxX;
     private final int maxY;
-
-    private final Map<Point, T> space;
+    private final boolean[][] unavailable;
 
     public Plane() {
-        space = new HashMap<>();
+        this.minX = Integer.MIN_VALUE >> Plane.DIMENSION;
+        this.maxX = Integer.MAX_VALUE >> Plane.DIMENSION;
+        this.minY = Integer.MIN_VALUE >> Plane.DIMENSION;
+        this.maxY = Integer.MAX_VALUE >> Plane.DIMENSION;
+        int width = Math.abs(this.minX) + Math.abs(this.maxX);
+        int height = Math.abs(this.minY) + Math.abs(this.maxY);
+        this.unavailable = new boolean[width][height];
+    }
+
+    public Plane(int width, int height) {
         this.minX = 0;
         this.minY = 0;
-        this.maxX = 7;
-        this.maxY = 7;
+        this.maxX = width - 1;
+        this.maxY = height - 1;
+        this.unavailable = new boolean[width][height];
     }
 
-    public Plane(int maxX, int maxY) {
-        space = new HashMap<>();
-        this.minX = 0;
-        this.minY = 0;
-        this.maxX = maxX;
-        this.maxY = maxY;
-    }
-
-    @Override
-    public int size() {
-        return space.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return space.isEmpty();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return space.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-        return space.containsValue(value);
-    }
-
-    @Override
-    public T get(Object key) {
-        return space.get(key);
-    }
-
-    @Override
-    public T put(Point key, T value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value added to plane cannot be null; occurred at point " + key);
-        }
-        return space.put(key, value);
-    }
-
-    @Override
-    public T remove(Object key) {
-        return space.remove(key);
-    }
-
-    @Override
-    public void putAll(Map<? extends Point, ? extends T> m) {
-        space.putAll(m);
-    }
-
-    @Override
-    public void clear() {
-        space.clear();
-    }
-
-    @Override
-    public Set<Point> keySet() {
-        return space.keySet();
-    }
-
-    @Override
-    public Collection<T> values() {
-        return space.values();
-    }
-
-    @Override
-    public Set<Entry<Point, T>> entrySet() {
-        return space.entrySet();
-    }
-
-    public Iterator<T> iterator() {
-        return space.values().iterator();
-    }
-
-    public Point at(int x, int y) throws IndexOutOfBoundsException {
-        if (!this.isInBounds(x, y)) {
-            String errMsg = "Invalid x (" + x + ") or y (" + y + ") coordinates for this space. " + this.printBounds();
-            throw new IndexOutOfBoundsException(errMsg);
-        }
-        return new Point(x, y);
-    }
-
-    public Point at(char x, char y) throws IndexOutOfBoundsException {
-        // This has greater bounds than Vector2D's char constructor. Ensures consistency in hash value
-        return this.at(x - 'a', y - '1');
-    }
-
-    public String printBounds() {
-        String xBounds = "[" + minX + "," + maxX + "]";
-        String yBounds = "[" + minY + "," + maxY + "]";
-        return "x:" + xBounds + " y:" + yBounds;
-    }
-
-    public boolean isInBounds(int x, int y) {
-        return minX <= x && x <= maxX && minY <= y && y <= maxY;
-    }
-
-    public boolean isInBounds(Point point) {
-        return point != null && this.isInBounds(point.getX(), point.getY());
-    }
-
-    public int getMinX() {
-        return this.minX;
-    }
-
-    public int getMaxX() {
-        return this.maxX;
-    }
-
-    public int getMinY() {
-        return this.minY;
-    }
-
-    public int getMaxY() {
-        return this.maxY;
-    }
-
-    public int length() {
-        return this.maxY - this.minY + 1;
-    }
-
-    public int width() {
-        return this.maxX - this.minX + 1;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int y = this.length() - 1; y >= 0; y--) {
-            for (int x = 0; x <= this.width() - 1; x++) {
-                T item = this.get(this.at(x, y));
-                if (item == null) {
-                    sb.append("|   ");
-                } else {
-                    sb.append("| ").append(item).append(" ");
-                }
+    public Plane(int width, int height, List<Coordinate> unavailable) {
+        this(width, height);
+        for (Coordinate c : unavailable) {
+            if (c.getDimension() > 1) {
+                this.unavailable[c.getValue(1)][c.getValue(2)] = true;
+            } else {
+                this.unavailable[c.getValue(1)][0] = true;
             }
-            sb.append("| ").append(1 + y).append("\n");
         }
-        for (int x = 0; x < this.width(); x++) {
-            sb.append("  ").append((char) ('a' + x)).append(" ");
+    }
+
+    @Override
+    public int getDimension() {
+        return Plane.DIMENSION;
+    }
+
+    @Override
+    public int max(int dimension) {
+        return switch (dimension) {
+            case 1 -> this.maxX;
+            case 2 -> this.maxY;
+            default -> throw new IndexOutOfBoundsException();
+        };
+    }
+
+    @Override
+    public int min(int dimension) {
+        return switch (dimension) {
+            case 1 -> this.minX;
+            case 2 -> this.minY;
+            default -> throw new IndexOutOfBoundsException();
+        };
+    }
+
+    @Override
+    public boolean isUnavailable(Coordinate coordinate) {
+        if (coordinate.getDimension() > 1) {
+            return this.unavailable[coordinate.getValue(1)][coordinate.getValue(2)];
+        } else {
+            return this.unavailable[coordinate.getValue(1)][0];
         }
-        return sb.toString();
     }
 }

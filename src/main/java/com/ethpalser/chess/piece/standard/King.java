@@ -1,167 +1,107 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.config.MoveSpec;
+import com.ethpalser.chess.move.config.ConditionalOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.move.config.PathOptions;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.move.config.Reference;
+import java.util.ArrayList;
 import java.util.List;
 
-public class King implements Piece {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 8,
+        lastModified = "2025-01-13"
+)
+public class King extends Piece {
 
-    private final Colour colour;
-    private Point point;
-    private boolean hasMoved;
+    private static final String CODE = PieceType.KING.toCode();
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            new MoveSpec(new PathOptions(new Point(0, 1)), true, false),
+            new MoveSpec(new PathOptions(new Point(1, 0)), false, true),
+            new MoveSpec(new PathOptions(new Point(1, 1)), true, true),
+            // Castle Queen-side
+            (new MoveSpec.Builder(new PathOptions(
+                    new Reference(Reference.Location.POINT, Direction.RIGHT, 2, Point.ORIGIN) // Blueprint
+            )))
+                    .isAttack(false)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(true)
+                    .isSpecificQuadrant(true)
+                    .conditions(List.of(
+                            ConditionalOptions.refNotMoved(new Reference()),
+                            ConditionalOptions.refNotMoved(new Reference(Reference.Location.WEST_EDGE)),
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.WEST_EDGE), PieceType.ROOK),
+                            ConditionalOptions.pathIsEmpty(
+                                    new Reference(Reference.Location.POINT, Direction.LEFT),
+                                    new Reference(Reference.Location.WEST_EDGE, Direction.RIGHT)
+                            )
+                    ))
+                    .followUp(
+                            new Reference(Reference.Location.WEST_EDGE),
+                            new PathOptions(new Reference(Reference.Location.POINT, Direction.LEFT))
+                    )
+                    .build(),
+            // Castle King-side
+            (new MoveSpec.Builder(new PathOptions(
+                    new Reference(Reference.Location.POINT, Direction.RIGHT, 2, Point.ORIGIN) // Blueprint
+            )))
+                    .isAttack(false)
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .conditions(List.of(
+                            ConditionalOptions.refNotMoved(new Reference()),
+                            ConditionalOptions.refNotMoved(new Reference(Reference.Location.EAST_EDGE)),
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.EAST_EDGE), PieceType.ROOK),
+                            ConditionalOptions.pathIsEmpty(
+                                    new Reference(Reference.Location.POINT, Direction.RIGHT),
+                                    new Reference(Reference.Location.EAST_EDGE, Direction.LEFT)
+                            )
+                    ))
+                    .followUp(
+                            new Reference(Reference.Location.EAST_EDGE, Direction.AT),
+                            new PathOptions(new Reference(Reference.Location.POINT, Direction.RIGHT))
+                    )
+                    .build()
+    );
 
-    public King(Colour colour, Point point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+    public King(Colour colour, Coordinate point) {
+        super(King.CODE, colour, point, false);
     }
 
-    public King(Colour colour, Point point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
+    public King(Colour colour, Coordinate point, boolean hasMoved) {
+        super(King.CODE, colour, point, hasMoved);
     }
 
     @Override
-    public String getCode() {
-        return "K";
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board) {
-        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board)");
-        return this.getMoves(board, null, null);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
-        System.err.println("unsupported method for king used: getMoves(Plane<Piece> board, Log<Point, Piece> log)");
-        return this.getMoves(board, log, null);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats) {
-        return this.getMoves(board, log, threats, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap opponentThreats,
-            boolean onlyAttacks, boolean includeDefends) {
-        MoveSet moveSet = new MoveSet(
-                this.generateSafePointOrNull(board, opponentThreats, -1, 0, includeDefends), // left
-                this.generateSafePointOrNull(board, opponentThreats, -1, 1, includeDefends), // top left
-                this.generateSafePointOrNull(board, opponentThreats, 0, 1, includeDefends), // top
-                this.generateSafePointOrNull(board, opponentThreats, 1, 1, includeDefends), // top right
-                this.generateSafePointOrNull(board, opponentThreats, 1, 0, includeDefends), // right
-                this.generateSafePointOrNull(board, opponentThreats, 1, -1, includeDefends), // bot right
-                this.generateSafePointOrNull(board, opponentThreats, 0, -1, includeDefends), // bottom
-                this.generateSafePointOrNull(board, opponentThreats, -1, -1, includeDefends) // bot left
-        );
-
-        // castling
-        // not moved and not threatened (need to use the correct threat map)
-        if (!this.hasMoved && opponentThreats != null && opponentThreats.hasNoThreats(this.point)) {
-            int startRank = this.colour == Colour.WHITE ? board.getMinY() : board.getMaxY();
-
-            // queen side (towards the left)
-            Piece queenSideRook = board.get(new Point(board.getMinX(), startRank));
-            if (queenSideRook != null && !queenSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 1, this.point.getY())
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() - 2, this.point.getY())
-            ) {
-                LogEntry<Point, Piece> queenSideRookMove = new ChessLogEntry(
-                        new Point(0, startRank),
-                        new Point(this.point.getX() - 1, this.point.getY()),
-                        queenSideRook
-                );
-                moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getX() - 1, this.point.getY()),
-                        new Point(this.point.getX() - 2, this.point.getY())
-                ), queenSideRookMove));
-            }
-
-            // king side (towards the right)
-            Piece kingSideRook = board.get(new Point(board.getMaxX(), startRank));
-            if (kingSideRook != null && !kingSideRook.getHasMoved()
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 1, this.point.getY())
-                    && isEmptyAndSafe(board, opponentThreats, this.point.getX() + 2, this.point.getY())
-            ) {
-                LogEntry<Point, Piece> kingSideRookMove = new ChessLogEntry(
-                        new Point(board.getMaxX(), startRank),
-                        new Point(this.point.getX() + 1, this.point.getY()),
-                        kingSideRook
-                );
-                moveSet.addMove(new Move(new Path(
-                        new Point(this.point.getX() + 1, this.point.getY()),
-                        new Point(this.point.getX() + 2, this.point.getY())
-                ), kingSideRookMove));
-            }
+    public MoveSet getMoves(GameContext.Record context) {
+        List<MoveReport> results = new ArrayList<>(10);
+        for (MoveSpec spec : King.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
-        return moveSet;
+        return new MoveSet(results);
     }
 
     @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         return false;
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         return List.of();
-    }
-
-    // PRIVATE METHODS
-
-    private boolean isEmptyAndSafe(Plane<Piece> board, ThreatMap threatMap, int x, int y) {
-        Point p = new Point(x, y);
-        return board.get(p) == null && threatMap != null && threatMap.hasNoThreats(p);
-    }
-
-    private Point generateSafePointOrNull(Plane<Piece> board, ThreatMap threatMap, int xOffset, int yOffset,
-            boolean includeDefends) {
-        Point p = new Point(this.point.getX() + xOffset, this.point.getY() + yOffset);
-        if (threatMap != null && threatMap.hasNoThreats(p)) {
-            return Point.validOrNull(board, this.point, this.colour, -1, 0, includeDefends);
-        }
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }

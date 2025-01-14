@@ -1,145 +1,115 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.log.ChessLogEntry;
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.log.LogEntry;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.config.MoveSpec;
+import com.ethpalser.chess.move.config.ConditionalOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.piece.custom.PieceType;
-import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.space.Coordinate;
+import com.ethpalser.chess.space.Direction;
+import com.ethpalser.chess.move.config.PathOptions;
 import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.move.config.Reference;
+import com.ethpalser.chess.space.Space;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Pawn implements Piece {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
+public class Pawn extends Piece {
 
-    private final Colour colour;
-    private Point point;
-    private boolean hasMoved;
+    private static final String CODE = PieceType.PAWN.toCode();
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            // Move one - Move only
+            new MoveSpec.Builder(new PathOptions(new Point(0, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .build(),
+            // Diagonal one - Capture only
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMove(false)
+                    .build(),
+            // Move two - Move only
+            new MoveSpec.Builder(new PathOptions(new Point(0, 1), new Point(0, 2)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(ConditionalOptions.refNotMoved(new Reference())))
+                    .build(),
+            // En Passant front-right
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(false)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.LAST_MOVED), PieceType.PAWN),
+                            ConditionalOptions.refAtDirection(new Reference(Reference.Location.LAST_MOVED),
+                                    Direction.RIGHT, 1),
+                            ConditionalOptions.lastMovedDistance(2)
+                    ))
+                    // This should use the piece's relative point for reference. The captured pawn is to the right.
+                    .followUp(new Reference(Reference.Location.POINT, Direction.RIGHT), null)
+                    .build(),
+            // En Passant front-left
+            new MoveSpec.Builder(new PathOptions(new Point(1, 1)))
+                    .isMirrorXAxis(false)
+                    .isMirrorYAxis(true)
+                    .isSpecificQuadrant(true)
+                    .isAttack(false)
+                    .conditions(List.of(
+                            ConditionalOptions.refIsType(new Reference(Reference.Location.LAST_MOVED), PieceType.PAWN),
+                            ConditionalOptions.refAtDirection(new Reference(Reference.Location.LAST_MOVED),
+                                    Direction.LEFT, 1),
+                            ConditionalOptions.lastMovedDistance(2)
+                    ))
+                    // This should use the piece's relative point for reference. The captured pawn is to the left.
+                    .followUp(new Reference(Reference.Location.POINT, Direction.LEFT), null)
+                    .build()
+    );
 
-    public Pawn(Colour colour, Point point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+    public Pawn(Colour colour, Coordinate point) {
+        super(Pawn.CODE, colour, point, false);
     }
 
-    public Pawn(Colour colour, Point point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
+    public Pawn(Colour colour, Coordinate point, boolean hasMoved) {
+        super(Pawn.CODE, colour, point, hasMoved);
     }
 
     @Override
-    public String getCode() {
-        return "P"; // Often it is nothing or a 'P'
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.point;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board) {
-        System.err.println("unsupported method used by pawn: getMoves(Plane<Piece> board)");
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log) {
-        // Threats are not needed
-        return this.getMoves(board, log, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        int yOffset = this.colour == Colour.WHITE ? 1 : -1;
-        if (onlyAttacks) {
-            // As we want only attacks, include an attack even if there is no capture. Intended to use for threats.
-            return new MoveSet(
-                    Point.validOrNull(board, this.point, this.colour, -1, yOffset, includeDefends),
-                    Point.validOrNull(board, this.point, this.colour, 1, yOffset, includeDefends)
-            );
+    public MoveSet getMoves(GameContext.Record context) {
+        List<MoveReport> results = new ArrayList<>(10);
+        for (MoveSpec spec : Pawn.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
-        MoveSet moveSet = new MoveSet(
-                Point.notCaptureOrNull(board, this.point, 0, yOffset),
-                Point.captureOrNull(board, this.point, this.colour, -1, yOffset, includeDefends),
-                Point.captureOrNull(board, this.point, this.colour, 1, yOffset, includeDefends)
-        );
-
-        // pawns can move forward two if it is their first move
-        if (!this.hasMoved) {
-            moveSet.addMove(new Move(new Path(
-                    Point.notCaptureOrNull(board, this.point, 0, yOffset),
-                    Point.notCaptureOrNull(board, this.point, 0, yOffset * 2)
-            )));
-        }
-
-        // en passant (there must be at least one move)
-        if (log != null && !log.isEmpty()) {
-            LogEntry<Point, Piece> lastMove = log.peek();
-            Point peekStart = lastMove.getStart();
-            Point peekEnd = lastMove.getEnd();
-            // a pawn moved forward two
-            if (lastMove.isFirstOccurrence() && board.get(peekEnd) != null && "P".equals(board.get(peekEnd).getCode())
-                    && ((lastMove.getStartObject().getColour() == Colour.WHITE && peekStart.getY() + 2 == peekEnd.getY())
-                    || (lastMove.getStartObject().getColour() == Colour.BLACK && peekStart.getY() - 2 == peekEnd.getY()))
-            ) {
-                // that pawn is to the left of this pawn
-                Point left = Point.validOrNull(board, this.point, this.colour, -1, 0, false);
-                if (left != null && left.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, -1, yOffset, false);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(left, null, board.get(left))));
-                }
-                // that pawn is to the right of this pawn
-                Point right = Point.validOrNull(board, this.point, this.colour, 1, 0, false);
-                if (right != null && right.equals(peekEnd)) {
-                    Point enPassPoint = Point.validOrNull(board, this.point, this.colour, 1, yOffset, false);
-                    moveSet.addMove(new Move(enPassPoint, new ChessLogEntry(right, null, board.get(right))));
-                }
-            }
-        }
-        return moveSet;
+        return new MoveSet(results);
     }
 
     @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
+    public boolean canPromote(Board<Coordinate> board) {
+        int minY = board.space().min(Space.AXIS.Y);
+        int maxY = board.space().max(Space.AXIS.Y);
+        return Colour.WHITE.equals(this.getColour()) && this.getCoordinate().getValue(Space.AXIS.Y) == maxY
+                || Colour.BLACK.equals(this.getColour()) && this.getCoordinate().getValue(Space.AXIS.Y) == minY;
     }
 
     @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public boolean canPromote(Plane<Piece> board) {
-        return Colour.WHITE.equals(this.colour) && this.getPoint().getY() == board.getMaxY()
-                || Colour.BLACK.equals(this.colour) && this.getPoint().getY() == board.getMinY();
-    }
-
-    @Override
-    public List<String> promoteOptions() {
-        return List.of(PieceType.QUEEN.getCode(), PieceType.KNIGHT.getCode(), PieceType.ROOK.getCode(),
-                PieceType.BISHOP.getCode());
-    }
-
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
+    public List<String> getPromotions() {
+        return List.of(PieceType.QUEEN.toCode(), PieceType.KNIGHT.toCode(), PieceType.ROOK.toCode(),
+                PieceType.BISHOP.toCode());
     }
 }

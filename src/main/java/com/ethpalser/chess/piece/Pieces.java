@@ -1,7 +1,7 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.custom.CustomPiece;
-import com.ethpalser.chess.piece.custom.PieceType;
 import com.ethpalser.chess.piece.standard.Bishop;
 import com.ethpalser.chess.piece.standard.King;
 import com.ethpalser.chess.piece.standard.Knight;
@@ -13,10 +13,17 @@ import com.ethpalser.chess.space.Point;
 /**
  * Class of static functions related to pieces.
  */
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-09-06",
+        majorVersion = 1,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public class Pieces {
 
     public static boolean isKing(Piece piece) {
-        return piece != null && PieceType.KING.getCode().equals(piece.getCode());
+        return piece != null && PieceType.KING.toCode().equals(piece.getCode());
     }
 
     public static boolean isAllied(Colour player, Piece piece) {
@@ -45,7 +52,7 @@ public class Pieces {
         StringBuilder sb = new StringBuilder();
         sb.append(piece.getColour().toCode());
         sb.append(code);
-        sb.append(piece.getPoint());
+        sb.append(piece.getCoordinate());
         if (piece.getHasMoved()) {
             sb.append("*");
         }

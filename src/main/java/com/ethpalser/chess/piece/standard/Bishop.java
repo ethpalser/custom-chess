@@ -1,96 +1,57 @@
 package com.ethpalser.chess.piece.standard;
 
-import com.ethpalser.chess.log.Log;
-import com.ethpalser.chess.move.Move;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.config.MoveSpec;
+import com.ethpalser.chess.move.config.PathOptions;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Path;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.space.Coordinate;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Bishop implements Piece {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
+public class Bishop extends Piece {
 
-    private final Colour colour;
-    private Point point;
-    private boolean hasMoved;
+    private static final String CODE = PieceType.BISHOP.toCode();
+    private static final List<MoveSpec> MOVE_SPECS = List.of(
+            new MoveSpec(new PathOptions(PathOptions.Type.DIAGONAL), true, true)
+    );
 
-    public Bishop(Colour colour, Point point) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = false;
+    public Bishop(Colour colour, Coordinate point) {
+        super(Bishop.CODE, colour, point, false);
     }
 
-    public Bishop(Colour colour, Point point, boolean hasMoved) {
-        this.colour = colour;
-        this.point = point;
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public String getCode() {
-        return "B";
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
+    public Bishop(Colour colour, Coordinate point, boolean hasMoved) {
+        super(Bishop.CODE, colour, point, hasMoved);
     }
 
     @Override
-    public Point getPoint() {
-        return this.point;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board) {
-        // Log and Threats are not needed
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        if (board == null) {
-            throw new IllegalArgumentException("board cannot be null");
+    public MoveSet getMoves(GameContext.Record context) {
+        List<MoveReport> results = new ArrayList<>(8);
+        for (MoveSpec spec : Bishop.MOVE_SPECS) {
+            results.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
-        return new MoveSet(
-                new Move(Path.diagonal(board, this.point, this.colour, false, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, false, true, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, false, onlyAttacks, includeDefends)),
-                new Move(Path.diagonal(board, this.point, this.colour, true, true, onlyAttacks, includeDefends))
-        );
+        return new MoveSet(results);
     }
 
     @Override
-    public boolean getHasMoved() {
-        return this.hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         return false;
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         return List.of();
-    }
-
-    @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.point.toString() + (this.hasMoved ? "" : "*");
     }
 }

@@ -1,134 +1,88 @@
 package com.ethpalser.chess.piece.custom;
 
-import com.ethpalser.chess.log.Log;
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.game.context.Board;
+import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.move.MoveReport;
 import com.ethpalser.chess.move.MoveSet;
-import com.ethpalser.chess.move.Movement;
-import com.ethpalser.chess.move.custom.CustomMove;
-import com.ethpalser.chess.move.map.ThreatMap;
+import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
-import com.ethpalser.chess.space.Plane;
-import com.ethpalser.chess.space.Point;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.space.Coordinate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-public class CustomPiece implements Piece {
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-22",
+        majorVersion = 3,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
+public class CustomPiece extends Piece {
 
-    private final PieceType type;
-    private final String code;
-    private final Colour colour;
-    private final List<CustomMove> moveSpecifications;
-    private Point position;
-    private boolean hasMoved;
+    private final List<MoveSpec> moveSpecs;
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector) {
-        this(pieceType, colour, vector, (CustomMove) null);
+    public CustomPiece(PieceType pieceType, Colour colour, Coordinate coordinate) {
+        this(pieceType.toCode(), colour, coordinate, false, List.of());
     }
 
-    public CustomPiece(PieceType pieceType, Colour colour, Point vector, CustomMove... specifications) {
-        this.type = pieceType;
-        this.colour = colour;
-        this.position = vector;
-        this.moveSpecifications = new ArrayList<>(Arrays.asList(specifications));
-        this.hasMoved = false;
-        this.code = pieceType.getCode();
+    public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, MoveSpec... moveSpecs) {
+        this(code, colour, coordinate, hasMoved, List.of(moveSpecs));
     }
 
-    public CustomPiece(String code, Colour colour, Point vector, boolean hasMoved, CustomMove... customMoves) {
-        this.type = PieceType.fromCode(code);
-        this.code = code;
-        this.colour = colour;
-        this.position = vector;
-        this.hasMoved = hasMoved;
-        this.moveSpecifications = new ArrayList<>(Arrays.asList(customMoves));
+    public CustomPiece(String code, Colour colour, Coordinate coordinate, boolean hasMoved, List<MoveSpec> moveSpecs) {
+        super(code, colour, coordinate, hasMoved);
+        this.moveSpecs = moveSpecs;
     }
 
     @Override
-    public String getCode() {
-        if (this.type != PieceType.CUSTOM) {
-            return type.getCode();
-        } else {
-            return code;
-        }
-    }
-
-    @Override
-    public Colour getColour() {
-        return this.colour;
-    }
-
-    @Override
-    public Point getPoint() {
-        return this.position;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.position = point;
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board) {
-        return this.getMoves(board, null, null, false, false);
-    }
-
-    @Override
-    public MoveSet getMoves(Plane<Piece> board, Log<Point, Piece> log, ThreatMap threats,
-            boolean onlyAttacks, boolean includeDefends) {
-        Set<Movement> movements = new HashSet<>();
-        for (CustomMove spec : this.moveSpecifications) {
-            movements.addAll(spec.toMovementList(board, threats, this.colour, this.position, onlyAttacks,
-                    includeDefends));
+    public MoveSet getMoves(GameContext.Record context) {
+        Set<MoveReport> movements = new HashSet<>();
+        for (MoveSpec spec : this.moveSpecs) {
+            movements.addAll(spec.toMoveList(context, this.getCoordinate(), this.getColour()));
         }
         return new MoveSet(movements);
     }
 
-    public List<CustomMove> getMoveSpecs() {
-        return this.moveSpecifications;
-    }
-
-    public void addMoveSpec(CustomMove move) {
-        this.moveSpecifications.add(move);
-    }
-
     @Override
-    public boolean getHasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    @Override
-    public boolean canPromote(Plane<Piece> board) {
+    public boolean canPromote(Board<Coordinate> board) {
         // Temporary work-around. This should be defined on construction by a configuration object/string
-        if (PieceType.PAWN.getCode().equals(this.code)) {
-            return Colour.WHITE.equals(this.colour) && this.getPoint().getY() == board.getMaxY()
-                    || Colour.BLACK.equals(this.colour) && this.getPoint().getY() == board.getMinY();
+        if (PieceType.PAWN.toCode().equals(this.getCode())) {
+            // temp promote condition
+            return Colour.WHITE.equals(this.getColour()) && this.getCoordinate().getValue(2) == 7
+                    || Colour.BLACK.equals(this.getColour()) && this.getCoordinate().getValue(2) == 0;
         } else {
             return false;
         }
     }
 
     @Override
-    public List<String> promoteOptions() {
+    public List<String> getPromotions() {
         // Temporary work-around. This should be defined on construction
-        if (PieceType.PAWN.getCode().equals(this.code)) {
-            return List.of(PieceType.QUEEN.getCode(), PieceType.KNIGHT.getCode(), PieceType.ROOK.getCode(),
-                    PieceType.BISHOP.getCode());
+        if (PieceType.PAWN.toCode().equals(this.getCode())) {
+            return List.of(PieceType.QUEEN.toCode(), PieceType.KNIGHT.toCode(), PieceType.ROOK.toCode(),
+                    PieceType.BISHOP.toCode());
         } else {
             return List.of();
         }
     }
 
     @Override
-    public String toString() {
-        return this.colour.toCode() + this.getCode() + this.position.toString() + (this.hasMoved ? "" : "*");
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CustomPiece piece = (CustomPiece) o;
+        return Objects.equals(moveSpecs, piece.moveSpecs);
     }
 
+    @Override
+    public int hashCode() {
+        // Ignore move specs, as it is expected that all pieces with the same code have the same specification
+        return Objects.hash(super.hashCode());
+    }
 }

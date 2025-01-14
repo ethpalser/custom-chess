@@ -1,0 +1,78 @@
+package com.ethpalser.chess.condition;
+
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.condition.reflection.Property;
+import com.ethpalser.chess.piece.Colour;
+import com.ethpalser.chess.piece.PieceType;
+import com.ethpalser.chess.piece.custom.CustomPiece;
+import com.ethpalser.chess.space.Point;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-26"
+)
+class PropertyTest {
+
+    @Test
+    void fetch_missingFieldFromPiece_isNull() {
+        // Given
+        String fieldName = "a";
+        Property<CustomPiece> property = new Property<>(fieldName);
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
+        // When
+        Object result = property.fetch(customPiece);
+        // Then
+        assertNull(result);
+    }
+
+    @Test
+    void fetch_existingFieldWithGetterIncorrectCaseFromPiece_isNull() {
+        // Given
+        String fieldName = "HaSmOvEd";
+        Property<CustomPiece> property = new Property<>(fieldName);
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
+        // When
+        Object result = property.fetch(customPiece);
+        // Then
+        assertNull(result);
+    }
+
+    @Test
+    void fetch_existingFieldWithGetterFromPiece_isNotNull() {
+        // Given
+        String fieldName = "hasMoved";
+        Property<CustomPiece> property = new Property<>(fieldName);
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
+        // When
+        Object result = property.fetch(customPiece);
+        // Then
+        assertNotNull(result);
+    }
+
+    @Test
+    void fetch_existingBooleanWithGetterFromPiece_isBoolean() {
+        // Given
+        String fieldName = "hasMoved";
+        Property<CustomPiece> property = new Property<>(fieldName);
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
+        // When
+        Object result = property.fetch(customPiece);
+        // Then
+        assertEquals(Boolean.class, result.getClass());
+    }
+
+    @Test
+    void fetch_existingColourWithGetterFromPiece_isBoolean() {
+        // Given
+        String fieldName = "colour";
+        Property<CustomPiece> property = new Property<>(fieldName);
+        CustomPiece customPiece = new CustomPiece(PieceType.PAWN, Colour.WHITE, new Point());
+        // When
+        Object result = property.fetch(customPiece);
+        // Then
+        assertEquals(Colour.class, result.getClass());
+    }
+
+}
