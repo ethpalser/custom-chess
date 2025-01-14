@@ -1,5 +1,6 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.piece.Piece;
@@ -8,6 +9,13 @@ import com.ethpalser.chess.move.config.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-08-13",
+        majorVersion = 2,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class PieceCompareConditional implements Conditional {
 
     private final Reference target;

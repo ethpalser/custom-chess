@@ -1,5 +1,14 @@
 package com.ethpalser.chess.move.notation;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-19",
+        majorVersion = 1,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public interface ChessNotationFormat {
 
     String format(ChessRecord chessRecord);

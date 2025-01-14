@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.context;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.PieceFactory;
@@ -18,6 +19,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * An implementation of Board containing Pieces stored at Coordinates.
+ */
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public class ChessBoard implements Board<Coordinate> {
 
     private static final String OUT_OF_BOUNDS_MESSAGE = "Coordinate at %s is out of bounds";

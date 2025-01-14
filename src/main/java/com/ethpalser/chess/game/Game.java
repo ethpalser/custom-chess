@@ -1,10 +1,19 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.event.GameEvent;
 
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-12-01",
+        majorVersion = 3,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public interface Game {
 
     GameInfo info();

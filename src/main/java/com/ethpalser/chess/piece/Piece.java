@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveSet;
@@ -7,6 +8,13 @@ import com.ethpalser.chess.space.Coordinate;
 import java.util.List;
 import java.util.Objects;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 2,
+        lastModified = "2025-01-13"
+)
 public abstract class Piece {
 
     private final String code;

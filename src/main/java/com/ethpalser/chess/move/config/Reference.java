@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.context.ChessLog;
@@ -14,6 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-30", // Unsure if this is correct
+        majorVersion = 2,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public class Reference {
     // Note: Edge locations are constrained to a 2D space
     public enum Location {POINT, PATH, LAST_MOVED, NORTH_EDGE, SOUTH_EDGE, EAST_EDGE, WEST_EDGE}

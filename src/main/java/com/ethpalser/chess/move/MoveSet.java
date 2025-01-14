@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
 import java.util.Arrays;
@@ -9,6 +10,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-01",
+        majorVersion = 2,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public class MoveSet {
 
     private final Set<Move> set;

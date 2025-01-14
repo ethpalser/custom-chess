@@ -1,11 +1,19 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.condition.Conditional;
 import com.ethpalser.chess.condition.GameHistoryConditional;
 import com.ethpalser.chess.condition.PathStateConditional;
 import com.ethpalser.chess.condition.PieceCompareConditional;
 import com.ethpalser.chess.condition.PieceStateConditional;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-09-03",
+        majorVersion = 2,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public class ConditionalFactory {
 
     private static ConditionalFactory factory;

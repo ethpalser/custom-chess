@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.move.config.MoveSpec;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
@@ -9,6 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-22",
+        majorVersion = 1,
+        minorVersion = 8,
+        lastModified = "2025-01-13"
+)
 public record GameOptions(
         int width,
         int length,

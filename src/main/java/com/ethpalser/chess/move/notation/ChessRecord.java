@@ -1,9 +1,17 @@
 package com.ethpalser.chess.move.notation;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-30",
+        majorVersion = 1,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public record ChessRecord(
         Coordinate source,
         Colour sourceColour,

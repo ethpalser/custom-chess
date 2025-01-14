@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.event;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
@@ -18,6 +19,13 @@ import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-19",
+        majorVersion = 1,
+        minorVersion = 22,
+        lastModified = "2025-01-13"
+)
 public class MoveEvent implements GameEvent {
 
     private final Colour player;

@@ -1,5 +1,12 @@
 package com.ethpalser.chess.move.notation;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-30",
+        lastModified = "2025-01-13"
+)
 public enum ChessNotationAlias {
 
     QUEEN_SIDE_CASTLE("O-O-O"),

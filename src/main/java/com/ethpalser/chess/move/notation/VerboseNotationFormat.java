@@ -1,10 +1,17 @@
 package com.ethpalser.chess.move.notation;
 
-import com.ethpalser.chess.piece.PieceRecord;
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Space;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-30",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class VerboseNotationFormat implements ChessNotationFormat {
 
     private static final char CAPTURED_CHAR = '*';

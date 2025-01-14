@@ -1,7 +1,15 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-05-14",
+        majorVersion = 2,
+        minorVersion = 6,
+        lastModified = "2025-01-13"
+)
 public class Plane implements Space {
 
     private static final int DIMENSION = 2;

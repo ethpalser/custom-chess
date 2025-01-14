@@ -1,9 +1,17 @@
 package com.ethpalser.chess.game.logic;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.event.Action;
 import com.ethpalser.chess.game.Game;
 import com.ethpalser.chess.game.GameStatus;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-28",
+        majorVersion = 1,
+        minorVersion = 7,
+        lastModified = "2025-01-13"
+)
 public class GameTree {
 
     private static final int WINNING_THRESHOLD = Integer.MAX_VALUE / 4;

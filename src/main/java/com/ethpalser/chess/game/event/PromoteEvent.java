@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.event;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
 import com.ethpalser.chess.exception.MissingPieceException;
@@ -19,6 +20,13 @@ import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import java.util.Map;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-19",
+        majorVersion = 1,
+        minorVersion = 15,
+        lastModified = "2025-01-13"
+)
 public class PromoteEvent implements GameEvent {
 
     private final Colour player;

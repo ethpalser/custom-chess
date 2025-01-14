@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.context;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.exception.IllegalResultException;
 import com.ethpalser.chess.game.GameOptions;
 import com.ethpalser.chess.game.state.GamePrompt;
@@ -22,6 +23,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-21",
+        majorVersion = 1,
+        minorVersion = 18,
+        lastModified = "2025-01-13"
+)
 public class GameContext {
 
     private Board<Coordinate> board;

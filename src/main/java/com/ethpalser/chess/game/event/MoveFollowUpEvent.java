@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.event;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.exception.MissingPieceException;
 import com.ethpalser.chess.game.context.GameContext;
@@ -13,6 +14,13 @@ import com.ethpalser.chess.piece.PieceFactory;
 import com.ethpalser.chess.piece.custom.CustomPieceFactory;
 import com.ethpalser.chess.space.Coordinate;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-01-12",
+        majorVersion = 1,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public class MoveFollowUpEvent implements GameEvent {
 
     private final Colour player;

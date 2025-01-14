@@ -1,5 +1,6 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.condition.reflection.Property;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceType;
@@ -8,6 +9,10 @@ import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-26"
+)
 class PropertyTest {
 
     @Test

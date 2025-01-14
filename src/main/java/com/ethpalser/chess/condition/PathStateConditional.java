@@ -1,5 +1,6 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.space.Coordinate;
@@ -9,6 +10,13 @@ import com.ethpalser.chess.move.config.PathOptions;
 import java.util.LinkedList;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-08-13",
+        majorVersion = 2,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public class PathStateConditional implements Conditional {
 
     private final PathOptions pathOptions;

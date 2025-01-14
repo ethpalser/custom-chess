@@ -1,10 +1,18 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.condition.Operator;
 import com.ethpalser.chess.condition.reflection.PropertyType;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Direction;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-01-07",
+        majorVersion = 1,
+        minorVersion = 6,
+        lastModified = "2025-01-13"
+)
 public record ConditionalOptions(ConditionalOptions.Type type, Reference primary, PropertyType property,
                                  Operator operator, Object expected, Reference optional) {
     public enum Type {PIECE, BOARD, LOG}

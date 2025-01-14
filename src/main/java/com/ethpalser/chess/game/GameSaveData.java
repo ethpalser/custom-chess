@@ -1,11 +1,19 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.state.GamePrompt;
 import com.ethpalser.chess.move.config.MoveSpec;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-01-04",
+        majorVersion = 1,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public record GameSaveData(String[] pieceNotations, String[] logNotations, GamePrompt prompt,
                            Map<String, MoveSpec> pieceSpecifications) {
     @Override

@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.context;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.event.GameEvent;
 import com.ethpalser.chess.game.event.GameEventProxy;
 import com.ethpalser.chess.move.notation.ChessNotation;
@@ -7,6 +8,19 @@ import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.piece.Colour;
 import java.util.Objects;
 
+/**
+ * An implementation of Board containing Pieces stored at Coordinates.
+ *
+ * @author Ethan Palser
+ * @version 3.0
+ */
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-28",
+        majorVersion = 3, // Replaced two other, vastly-different ChessLog
+        minorVersion = 9,
+        lastModified = "2025-01-13"
+)
 public class ChessLog extends GameLog<ChessLog.Entry> {
 
     public ChessLog() {

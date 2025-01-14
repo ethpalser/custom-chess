@@ -1,11 +1,17 @@
 package com.ethpalser.chess.piece.custom;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Point;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 2
+)
 class CustomPieceTest {
 
     @Test

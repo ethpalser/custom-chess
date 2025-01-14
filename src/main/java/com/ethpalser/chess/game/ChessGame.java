@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.exception.CoordinateOutOfBoundsException;
 import com.ethpalser.chess.exception.IllegalMoveException;
 import com.ethpalser.chess.exception.IllegalResultException;
@@ -30,6 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-01",
+        majorVersion = 3,
+        minorVersion = 21,
+        lastModified = "2025-01-13"
+)
 public class ChessGame implements Game {
 
     private final GameContext context;

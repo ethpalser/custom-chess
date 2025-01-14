@@ -1,5 +1,6 @@
 package com.ethpalser.chess.board;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.ChessBoard;
 import com.ethpalser.chess.piece.Colour;
@@ -13,6 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 1,
+        minorVersion = 7
+)
 class ChessBoardTest {
 
     @Test

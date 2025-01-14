@@ -1,7 +1,15 @@
 package com.ethpalser.chess.game;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-10",
+        majorVersion = 1,
+        minorVersion = 2,
+        lastModified = "2025-01-13"
+)
 public enum GameStatus {
 
     PENDING,

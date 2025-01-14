@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.logic;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
@@ -13,6 +14,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-20",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class Heuristics {
 
     private Heuristics() {

@@ -1,8 +1,16 @@
 package com.ethpalser.chess.move;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.space.Coordinate;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-01-02",
+        majorVersion = 1,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public record MoveReport(Move move, Status status, Coordinate lastChecked, boolean isAttack, List<Coordinate> threatsSinceKing) {
 
     public MoveReport {

@@ -1,8 +1,16 @@
 package com.ethpalser.chess.condition.reflection;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-22",
+        majorVersion = 1,
+        minorVersion = 2,
+        lastModified = "2025-01-13"
+)
 public class Property<T> {
 
     private final String key;

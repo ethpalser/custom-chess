@@ -1,5 +1,14 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-13",
+        majorVersion = 1,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public interface Space {
 
     class AXIS {

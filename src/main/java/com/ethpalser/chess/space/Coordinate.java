@@ -1,8 +1,17 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
 /**
  * An immutable representation of 1 to n values describing a singular point in a nth dimension space.
  */
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "",
+        majorVersion = 1,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public interface Coordinate {
 
     /**

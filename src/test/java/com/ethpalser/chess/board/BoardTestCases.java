@@ -1,5 +1,14 @@
 package com.ethpalser.chess.board;
 
+
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-02-13",
+        majorVersion = 2,
+        minorVersion = 3
+)
 public class BoardTestCases {
 
     // region In Progress

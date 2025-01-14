@@ -1,5 +1,13 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public enum Colour {
     WHITE,
     BLACK,

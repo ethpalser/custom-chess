@@ -1,11 +1,18 @@
 package com.ethpalser.chess.move.notation;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.PieceStringTokenizer;
 import com.ethpalser.chess.piece.PieceType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
-
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-30",
+        majorVersion = 1,
+        minorVersion = 4,
+        lastModified = "2025-01-13"
+)
 public record PieceRecord(Colour colour, String code, Coordinate coordinate, boolean hasMoved) {
 
     public static PieceRecord fromString(String string) {

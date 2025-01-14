@@ -1,5 +1,14 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-22",
+        majorVersion = 1,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public enum Operator {
     FALSE,
     TRUE,

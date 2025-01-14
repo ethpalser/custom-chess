@@ -1,11 +1,12 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+import com.ethpalser.chess.condition.Conditional;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.GameContext;
+import com.ethpalser.chess.game.context.ThreatMap;
 import com.ethpalser.chess.move.Move;
 import com.ethpalser.chess.move.MoveReport;
-import com.ethpalser.chess.condition.Conditional;
-import com.ethpalser.chess.game.context.ThreatMap;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
 import com.ethpalser.chess.piece.Pieces;
@@ -18,6 +19,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-16",
+        majorVersion = 3,
+        minorVersion = 6,
+        lastModified = "2025-01-13"
+)
 public class MoveSpec {
 
     private final PathOptions pathBase;

@@ -1,5 +1,6 @@
 package com.ethpalser.chess.piece.standard;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.Board;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.move.MoveReport;
@@ -14,6 +15,13 @@ import com.ethpalser.chess.space.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 3,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public class Knight extends Piece {
 
     private static final String CODE = PieceType.KNIGHT.toCode();

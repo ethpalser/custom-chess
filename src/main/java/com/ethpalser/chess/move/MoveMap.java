@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -12,6 +13,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-10",
+        majorVersion = 1,
+        minorVersion = 2,
+        lastModified = "2025-01-13"
+)
 public class MoveMap {
 
     private final Map<Coordinate, Set<Piece>> map;

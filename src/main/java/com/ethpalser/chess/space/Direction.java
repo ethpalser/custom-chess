@@ -1,7 +1,15 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-12-01",
+        majorVersion = 2,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public enum Direction {
     AT,
     NORTH,

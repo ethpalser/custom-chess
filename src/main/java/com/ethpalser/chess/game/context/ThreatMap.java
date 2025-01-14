@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.context;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.move.MoveSet;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.piece.Piece;
@@ -11,6 +12,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-11",
+        majorVersion = 2,
+        minorVersion = 8,
+        lastModified = "2025-01-13"
+)
 public class ThreatMap {
 
     private final Colour colour;

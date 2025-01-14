@@ -1,5 +1,14 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-06",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public enum PieceType {
     PAWN("P"),
     ROOK("R"),

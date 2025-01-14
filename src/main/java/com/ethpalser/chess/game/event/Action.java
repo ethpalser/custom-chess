@@ -1,5 +1,6 @@
 package com.ethpalser.chess.game.event;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.piece.Colour;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
@@ -9,6 +10,11 @@ import com.ethpalser.chess.space.Point;
  *
  * @deprecated Since January 12, 2025. Replaced by MoveEvent.
  */
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-12-01",
+        lastModified = "2025-01-13"
+)
 @Deprecated(since = "2025-01-12")
 public class Action {
 

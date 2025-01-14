@@ -1,8 +1,16 @@
 package com.ethpalser.chess.piece;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.util.ArrayList;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-09-01",
+        majorVersion = 1,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public class PieceStringTokenizer {
 
     private final List<String> tokens;

@@ -1,5 +1,6 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Path;
@@ -8,6 +9,13 @@ import com.ethpalser.chess.space.Space;
 import java.util.LinkedList;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-01-08",
+        majorVersion = 1,
+        minorVersion = 3,
+        lastModified = "2025-01-13"
+)
 public class PathFactory {
 
     private final GameContext.Record context;

@@ -1,8 +1,14 @@
 package com.ethpalser.chess.move.config;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Direction;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-01-08",
+        lastModified = "2025-01-13"
+)
 public record PathOptions(Type type, Reference start, Reference end) {
 
     public PathOptions {

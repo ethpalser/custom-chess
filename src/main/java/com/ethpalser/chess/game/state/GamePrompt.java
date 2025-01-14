@@ -1,10 +1,18 @@
 package com.ethpalser.chess.game.state;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Point;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-21",
+        majorVersion = 1,
+        minorVersion = 1,
+        lastModified = "2025-01-13"
+)
 public record GamePrompt(EventType eventType, Coordinate source, List<String> choices) {
     public GamePrompt {
         if (eventType == null || source == null || choices == null) {

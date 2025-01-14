@@ -1,5 +1,6 @@
 package com.ethpalser.chess.space;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -7,6 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-08-30",
+        majorVersion = 2,
+        lastModified = "2025-01-13"
+)
 public class Path implements Iterable<Coordinate> {
 
     private final List<Coordinate> pointList;

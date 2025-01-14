@@ -1,5 +1,6 @@
 package com.ethpalser.chess.condition;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.condition.reflection.PropertyType;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.context.ChessLog;
@@ -7,6 +8,13 @@ import com.ethpalser.chess.move.notation.ChessRecord;
 import com.ethpalser.chess.space.Coordinate;
 import com.ethpalser.chess.space.Space;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2025-08-13",
+        majorVersion = 2,
+        minorVersion = 8,
+        lastModified = "2025-01-13"
+)
 public class GameHistoryConditional implements Conditional {
 
     private final Operator operator;

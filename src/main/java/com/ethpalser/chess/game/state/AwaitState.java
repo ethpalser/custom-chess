@@ -1,11 +1,19 @@
 package com.ethpalser.chess.game.state;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import com.ethpalser.chess.exception.UnsupportedEventException;
 import com.ethpalser.chess.game.context.GameContext;
 import com.ethpalser.chess.game.event.EventType;
 import com.ethpalser.chess.game.event.GameEvent;
 import java.util.List;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-21",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class AwaitState implements GameState {
 
     private final GameContext context;

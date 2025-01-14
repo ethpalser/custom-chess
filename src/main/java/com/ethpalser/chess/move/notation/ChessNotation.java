@@ -1,7 +1,15 @@
 package com.ethpalser.chess.move.notation;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.util.Objects;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-19",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class ChessNotation {
 
     public static final ChessNotationFormat DEFAULT_FORMAT = new VerboseNotationFormat();

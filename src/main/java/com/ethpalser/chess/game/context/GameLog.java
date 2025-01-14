@@ -1,8 +1,16 @@
 package com.ethpalser.chess.game.context;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2024-12-28",
+        majorVersion = 1,
+        minorVersion = 5,
+        lastModified = "2025-01-13"
+)
 public class GameLog<E> implements Iterable<E> {
 
     private final LinkedList<E> log; // Stack of added items

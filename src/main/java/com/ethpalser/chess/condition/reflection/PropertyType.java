@@ -1,5 +1,12 @@
 package com.ethpalser.chess.condition.reflection;
 
+import com.ethpalser.chess.annotation.ClassPreamble;
+
+@ClassPreamble(
+        author = "Ethan A. Palser",
+        created = "2023-11-22",
+        lastModified = "2025-01-13"
+)
 public enum PropertyType {
 
     TYPE("type"),
